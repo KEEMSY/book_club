@@ -1,0 +1,63 @@
+# ─────── OS ───────
+.DS_Store
+Thumbs.db
+
+# ─────── IDE ───────
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ─────── Env / Secrets ───────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ─────── Python (backend) ───────
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+.coverage.*
+dist/
+build/
+
+# ─────── Flutter / Dart (mobile) ───────
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+**/android/.gradle/
+**/android/captures/
+**/android/gradlew
+**/android/gradlew.bat
+**/android/local.properties
+**/android/**/gradle-wrapper.jar
+*.iml
+
+# ─────── Generated ───────
+*.g.dart
+*.freezed.dart
+*.mocks.dart
+
+# ─────── Logs ───────
+*.log
+logs/
+
+# ─────── Docker ───────
+.docker/
