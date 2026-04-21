@@ -123,6 +123,21 @@ Router  →  Service  →  Repository / External Adapter
 - **방향성·범위·아키텍처 결정 변경** 시 버전을 올린다. 오탈자·포맷 수정은 대상 아님.
 - 문서명은 `YYYY-MM-DD-<topic>-<type>.md` 로 시간순 정렬.
 
+### 7.3 Phase / Milestone 종료 커밋 (강제)
+
+개별 Task 단위 커밋과 별개로, **Phase 와 Milestone 은 반드시 종료 커밋 + 태그로 매듭짓는다.**
+
+- **Milestone 종료 시**: 해당 Milestone 의 모든 Task 가 completed 이고 품질 게이트(lint / type / test)가 green 이면,
+  1. 작업 브랜치를 `main` 으로 squash merge
+  2. 머지 커밋 메시지는 `release(MX): <마일스톤 이름> 완료` 형식
+  3. Git 태그 부여: `v0.0.X-mN` (예: `v0.0.0-scaffold`, `v0.0.1-m1`)
+  4. `docs/plans/<해당 계획 문서>` 의 `## Changelog` 에 종료 기록 한 줄 추가
+- **Phase 종료 시**: Phase 내 모든 Milestone 이 태그되어 있으면,
+  1. Phase 종료 커밋 메시지: `release: Phase N 완료 — <한 줄 요약>`
+  2. Phase 대표 태그 부여: `v0.0.N` (Phase 1 = `v0.0.1`, Phase 2 = `v0.1.0` 등 §7.1 규칙에 맞춰)
+  3. `docs/backlog/IDEAS.md` 의 "Phase 전환 리뷰 기록" 섹션에 리뷰 결과 요약
+- 종료 커밋을 생략하고 다음 Milestone / Phase 작업을 시작하지 않는다.
+
 ## 8. 백로그 & 아이디어 프로세스 (강제 규칙)
 
 ### 8.1 작업 중 아이디어 발생 시

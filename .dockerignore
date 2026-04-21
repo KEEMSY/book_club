@@ -1,0 +1,51 @@
+# Keep build contexts small & secrets out.
+
+# VCS
+.git
+.gitignore
+.gitattributes
+
+# OS & editor artefacts
+.DS_Store
+Thumbs.db
+.idea
+.vscode
+*.swp
+*.swo
+
+# Secrets & local env
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Python caches / virtualenvs
+**/__pycache__
+*.py[cod]
+*.egg-info
+**/.venv
+**/venv
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+**/htmlcov
+**/.coverage
+**/.coverage.*
+**/dist
+**/build
+
+# Flutter / Node (never part of backend image)
+mobile/
+**/node_modules
+**/.dart_tool
+**/.pub-cache
+**/.pub
+
+# Docs & planning artefacts — not needed inside the image
+docs/
+.github/
+
+# Misc
+*.log
+logs/

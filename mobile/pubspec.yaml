@@ -1,0 +1,59 @@
+name: book_club
+description: "Book Club mobile app (Flutter)."
+publish_to: 'none'
+
+version: 0.0.1-dev+1
+
+environment:
+  sdk: '>=3.5.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # State management
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+
+  # Routing
+  go_router: ^14.6.2
+
+  # Models / serialization annotations
+  freezed_annotation: ^2.4.4
+  json_annotation: ^4.9.0
+
+  # HTTP
+  dio: ^5.7.0
+  retrofit: ^4.4.1
+
+  # Secure storage (JWT)
+  flutter_secure_storage: ^9.2.4
+
+  # i18n / formatting
+  intl: ^0.19.0
+
+  # Typography — Claude design system maps Anthropic Serif → Fraunces and
+  # Anthropic Sans → Inter. Fonts are fetched at runtime by google_fonts.
+  google_fonts: ^6.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^5.0.0
+
+  # Code generation
+  build_runner: ^2.4.13
+  freezed: ^2.5.7
+  json_serializable: ^6.9.0
+  retrofit_generator: ^9.1.5
+  riverpod_generator: ^2.6.3
+
+  # Lint plugins (Riverpod-aware)
+  custom_lint: ^0.7.0
+  riverpod_lint: ^2.6.3
+
+flutter:
+  uses-material-design: true

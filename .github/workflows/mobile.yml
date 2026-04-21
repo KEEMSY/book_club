@@ -1,0 +1,50 @@
+name: mobile
+
+# Scope to mobile-only concerns: mobile/ tree or this workflow file.
+# Backend-only PRs should not spin up Flutter.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths:
+      - 'mobile/**'
+      - '.github/workflows/mobile.yml'
+
+concurrency:
+  group: mobile-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: mobile
+
+jobs:
+  analyze-and-test:
+    name: analyze & test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Pinned Flutter version (stable channel, 3.41.5) for reproducible
+      # analyzer / test output. `cache: true` uses mobile/pubspec.lock as
+      # the cache key so package-set changes bust cleanly.
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.41.5
+          cache: true
+          cache-key: 'flutter-:os:-:channel:-:version:-${{ hashFiles(''mobile/pubspec.lock'') }}'
+
+      - name: Resolve packages
+        run: flutter pub get
+
+      - name: dart format --set-exit-if-changed
+        run: dart format --set-exit-if-changed .
+
+      - name: flutter analyze
+        run: flutter analyze
+
+      - name: flutter test
+        run: flutter test

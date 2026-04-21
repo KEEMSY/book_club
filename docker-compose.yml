@@ -1,0 +1,135 @@
+# Book Club — local development stack.
+#
+# Services: api (FastAPI) · db (Postgres 16) · redis (Redis 7) · minio (R2 stand-in)
+# Plus `minio-init` which bootstraps the dev bucket then exits.
+#
+# Conventions:
+#   • Pinned versions on data stores (postgres:16-alpine, redis:7-alpine).
+#     MinIO publishes rolling `:latest` only (no stable major tag) — see comment
+#     on the minio service.
+#   • Every service has a healthcheck; `api.depends_on` uses condition:
+#     service_healthy so the API never starts against an unready backing store.
+#   • Named volumes are prefixed `bookclub_` to avoid clashes with other
+#     projects on the same dev machine.
+
+name: bookclub
+
+services:
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    image: bookclub-api:dev
+    env_file:
+      - .env
+    environment:
+      # Compose-scope overrides of the hosts so this file works even if a dev
+      # accidentally left a localhost URL in .env.
+      DATABASE_URL: postgresql+asyncpg://bookclub:bookclub@db:5432/bookclub
+      REDIS_URL: redis://redis:6379/0
+      S3_ENDPOINT_URL: http://minio:9000
+    ports:
+      - "8000:8000"
+    volumes:
+      # Bind-mount source for live reload. .venv is kept inside the image so
+      # the host's Python/venv doesn't shadow it.
+      - ./backend/app:/app/app
+      - ./backend/migrations:/app/migrations
+      - ./backend/alembic.ini:/app/alembic.ini
+      - ./backend/pyproject.toml:/app/pyproject.toml
+      - ./backend/uv.lock:/app/uv.lock
+      - ./backend/tests:/app/tests
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8000/health || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 15s
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: bookclub
+      POSTGRES_PASSWORD: bookclub
+      POSTGRES_DB: bookclub
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bookclub -d bookclub"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  minio:
+    # MinIO only publishes rolling tags; pin to a known-good SHA in production
+    # infra. `:latest` is acceptable for local dev — reproducibility of the
+    # dev stack is not a compliance requirement here.
+    image: minio/minio:latest
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"   # S3 API
+      - "9001:9001"   # web console
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:9000/minio/health/live || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  minio-init:
+    # One-shot bootstrap: create the dev bucket then exit. Safe to re-run —
+    # `mb --ignore-existing` makes it idempotent.
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+      S3_BUCKET: bookclub-dev
+    entrypoint: >
+      /bin/sh -c "
+        set -e;
+        mc alias set local http://minio:9000 \"$$MINIO_ROOT_USER\" \"$$MINIO_ROOT_PASSWORD\";
+        mc mb --ignore-existing local/\"$$S3_BUCKET\";
+        mc anonymous set public local/\"$$S3_BUCKET\" || true;
+        echo 'bucket ready: '\"$$S3_BUCKET\";
+      "
+    restart: "no"
+
+volumes:
+  postgres_data:
+    name: bookclub_postgres_data
+  minio_data:
+    name: bookclub_minio_data
+
+# Default bridge network is created automatically as `bookclub_default`.

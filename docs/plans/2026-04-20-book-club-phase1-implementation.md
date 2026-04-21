@@ -541,3 +541,11 @@ TDD: 경계값 10 가지 이상 케이스.
 ## Changelog
 
 - **0.1.0** (2026-04-20) — 초기 Phase 1 구현 계획. 6개 마일스톤 · 에이전트 분배 전략 포함.
+- **0.1.1** (2026-04-20) — **Milestone 0 (스캐폴딩 · 인프라 기반) 완료.** 태그 `v0.0.0-scaffold`.
+  - 모노레포 레이아웃 (backend / mobile / docs / .github)
+  - FastAPI 스켈레톤 + Alembic 초기화 + core 공용 계층 (http client · R2 storage · JWT · 예외 · 이벤트 버스)
+  - Flutter 스켈레톤 (Riverpod · go_router · freezed · dio · flutter_secure_storage)
+  - Claude (Anthropic) 디자인 시스템 Flutter 테마 적용 (Fraunces/Inter 타이포, 5등급 시맨틱 컬러)
+  - Docker Compose 로컬 개발 환경 (api · postgres:16-alpine · redis:7-alpine · minio + minio-init)
+  - GitHub Actions CI (backend: ruff / mypy / pytest / docker build · mobile: format / analyze / test)
+  - 품질 게이트 전부 green: backend pytest 12/12, mobile test 9/9.
