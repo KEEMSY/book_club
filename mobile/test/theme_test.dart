@@ -87,13 +87,21 @@ void main() {
       }
     });
 
-    testWidgets('apply swaps primary color off the base AppTheme brand',
+    testWidgets('apply swaps color scheme off the base AppTheme brand',
         (tester) async {
       final ThemeData base = AppTheme.light;
       final ThemeData themed = GradeTheme.apply(base, ReaderGrade.devoted);
       await settleTheme(tester, themed);
 
-      expect(themed.colorScheme.primary, isNot(base.colorScheme.primary));
+      // Apple's "애독자" grade seeds on systemBlue — the same hue as the base
+      // primary — so `.primary` can legitimately tonal-match the base. We
+      // therefore assert that at least one meaningful chromatic slot has
+      // shifted (primaryContainer is tonally derived from the seed and
+      // differs from the hand-crafted base container).
+      expect(
+        themed.colorScheme.primaryContainer,
+        isNot(base.colorScheme.primaryContainer),
+      );
       // Text theme + extensions must survive the merge.
       expect(themed.textTheme.headlineMedium, base.textTheme.headlineMedium);
       expect(themed.extension<AppSpacing>(), isNotNull);

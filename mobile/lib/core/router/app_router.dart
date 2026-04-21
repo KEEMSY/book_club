@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -37,9 +38,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   );
 });
 
-/// M0 home placeholder — exists primarily to verify the Claude-themed
-/// [AppTheme] is plumbed end-to-end (serif headline, muted subtitle, branded
-/// CTA, AppSpacing extension). The real home screen lands in later milestones.
+/// M0 home placeholder — exists primarily to verify the Apple-themed
+/// [AppTheme] is plumbed end-to-end (iOS-system typography, secondaryLabel
+/// subtitle, tinted CTA, AppSpacing extension). The real home screen lands in
+/// later milestones.
 class _HomePlaceholderScreen extends StatelessWidget {
   const _HomePlaceholderScreen();
 
@@ -48,32 +50,49 @@ class _HomePlaceholderScreen extends StatelessWidget {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
     final env = currentEnvLabel();
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Book Club'),
+        // Keep the bar compact and flat — HIG uses a tall stack for the Large
+        // Title below, not a centered title on the bar itself.
+        toolbarHeight: 44,
+        leading: Padding(
+          padding: EdgeInsets.only(left: spacing.md),
+          child: Icon(
+            CupertinoIcons.book,
+            color: theme.colorScheme.primary,
+          ),
+        ),
+        leadingWidth: 40,
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(
-          horizontal: spacing.lg,
-          vertical: spacing.xl,
+          horizontal: spacing.md,
+          vertical: spacing.sm,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+            // HIG Large Title — stacked below the bar (displayLarge is 34/bold
+            // with HIG's -0.374 tracking, matching the system Large Title).
             Text(
               'Book Club',
-              style: theme.textTheme.headlineMedium,
+              style: theme.textTheme.displayLarge,
             ),
-            SizedBox(height: spacing.sm),
+            SizedBox(height: spacing.xs),
             Text(
               '독서를 기록하고, 책으로 대화하세요',
-              style: theme.textTheme.bodyLarge,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: isDark
+                    ? AppPalette.secondaryLabelDark
+                    : AppPalette.secondaryLabel,
+              ),
             ),
             SizedBox(height: spacing.lg),
             FilledButton(
               onPressed: () {},
-              child: const Text('독서 시작하기'),
+              child: const Text('시작하기'),
             ),
             SizedBox(height: spacing.md),
             Text(
@@ -96,7 +115,7 @@ class _LoginPlaceholderScreen extends StatelessWidget {
       body: Center(
         child: Text(
           '로그인',
-          style: Theme.of(context).textTheme.headlineMedium,
+          style: Theme.of(context).textTheme.displayMedium,
         ),
       ),
     );

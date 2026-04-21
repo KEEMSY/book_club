@@ -1,53 +1,107 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Exact brand color constants from the active design system.
+/// Exact token constants from Apple's HIG / apple.com DESIGN.md.
 ///
 /// Re-exported as a zero-instance class so other files can reference the tokens
-/// by name (e.g. `AppPalette.brand`) without rebuilding a [Color] each time.
-/// Values are kept in lock-step with the design-system markdown under
-/// `/awesome-design-md/design-md/<system>/DESIGN.md`. The class name is kept
-/// brand-neutral so future design-system swaps don't cascade through the
-/// codebase.
+/// by name (e.g. `AppPalette.systemBlue`) without rebuilding a [Color] each
+/// time. The class name is brand-neutral on purpose — future design-system
+/// swaps should only change this file's body, not every import site.
+///
+/// Values are kept in lock-step with
+/// `/awesome-design-md/design-md/apple/DESIGN.md`. iOS system colors that the
+/// markdown doesn't enumerate verbatim are pulled straight from Apple's
+/// published HIG light/dark system palette so the brand intent stays on-spec.
 class AppPalette {
   const AppPalette._();
 
-  // Primary
-  static const Color nearBlack = Color(0xFF141413); // Anthropic Near Black
-  static const Color brand = Color(0xFFC96442); // Terracotta Brand
-  static const Color coral = Color(0xFFD97757); // Coral Accent
+  // -- Chromatic accent (iOS system colors) ----------------------------------
+  //
+  // Apple Blue is the ONLY chromatic accent on apple.com (DESIGN.md §2
+  // "Interactive"). The HIG publishes per-hue light/dark pairs; we expose both
+  // so grade-themed surfaces can pull from the exact system palette.
+  static const Color systemBlue = Color(0xFF0071E3); // DESIGN.md §2 Interactive
+  static const Color systemBlueDark = Color(0xFF0A84FF); // HIG iOS dark
+  static const Color linkBlue = Color(0xFF0066CC); // DESIGN.md §2 body links
+  static const Color brightBlue = Color(0xFF2997FF); // DESIGN.md §2 dark links
 
-  // Semantic
-  static const Color errorCrimson = Color(0xFFB53333);
-  static const Color focusBlue = Color(0xFF3898EC);
+  // Grade seeds sourced from Apple's published system colors (HIG).
+  static const Color systemGreen = Color(0xFF34C759);
+  static const Color systemGreenDark = Color(0xFF30D158);
+  static const Color systemTeal = Color(0xFF30B0C7);
+  static const Color systemTealDark = Color(0xFF40C8E0);
+  static const Color systemIndigo = Color(0xFF5856D6);
+  static const Color systemIndigoDark = Color(0xFF5E5CE6);
+  static const Color systemOrange = Color(0xFFFF9500);
+  static const Color systemOrangeDark = Color(0xFFFF9F0A);
+  static const Color systemRed = Color(0xFFFF3B30);
+  static const Color systemRedDark = Color(0xFFFF453A);
 
-  // Surface & background
-  static const Color parchment = Color(0xFFF5F4ED); // primary light bg
-  static const Color ivory = Color(0xFFFAF9F5); // card / elevated light
+  // -- Canonical background / text tones -------------------------------------
+  //
+  // DESIGN.md §2 Primary — pure black + "not-white" light gray with its slight
+  // blue-gray tint, plus near-black for text on the light canvas.
+  static const Color pureBlack = Color(0xFF000000);
   static const Color pureWhite = Color(0xFFFFFFFF);
-  static const Color warmSand = Color(0xFFE8E6DC); // secondary button bg
-  static const Color darkSurface = Color(0xFF30302E); // dark containers
-  static const Color deepDark = Color(0xFF141413); // dark page bg
+  static const Color lightGray = Color(0xFFF5F5F7); // systemBackground (light)
+  static const Color nearBlack = Color(0xFF1D1D1F); // primary text on light
 
-  // Neutrals & text
-  static const Color charcoalWarm = Color(0xFF4D4C48);
-  static const Color oliveGray = Color(0xFF5E5D59);
-  static const Color stoneGray = Color(0xFF87867F);
-  static const Color darkWarm = Color(0xFF3D3D3A);
-  static const Color warmSilver = Color(0xFFB0AEA5);
+  // -- iOS system gray scale (HIG, light) ------------------------------------
+  static const Color systemGray = Color(0xFF8E8E93); // Gray 1
+  static const Color systemGray2 = Color(0xFFAEAEB2);
+  static const Color systemGray3 = Color(0xFFC7C7CC);
+  static const Color systemGray4 = Color(0xFFD1D1D6);
+  static const Color systemGray5 = Color(0xFFE5E5EA);
+  static const Color systemGray6 = Color(0xFFF2F2F7); // iOS secondarySystemBg
 
-  // Borders & rings
-  static const Color borderCream = Color(0xFFF0EEE6);
-  static const Color borderWarm = Color(0xFFE8E6DC);
-  static const Color borderDark = Color(0xFF30302E);
-  static const Color ringWarm = Color(0xFFD1CFC5);
-  static const Color ringDeep = Color(0xFFC2C0B6);
+  // iOS system gray scale (HIG, dark)
+  static const Color systemGrayDark = Color(0xFF8E8E93);
+  static const Color systemGray2Dark = Color(0xFF636366);
+  static const Color systemGray3Dark = Color(0xFF48484A);
+  static const Color systemGray4Dark = Color(0xFF3A3A3C);
+  static const Color systemGray5Dark = Color(0xFF2C2C2E);
+  static const Color systemGray6Dark = Color(0xFF1C1C1E);
+
+  // -- Dark surface ramp (DESIGN.md §2 Surface & Dark Variants) --------------
+  static const Color darkSurface1 = Color(0xFF272729);
+  static const Color darkSurface2 = Color(0xFF262628);
+  static const Color darkSurface3 = Color(0xFF28282A);
+  static const Color darkSurface4 = Color(0xFF2A2A2D);
+  static const Color darkSurface5 = Color(0xFF242426);
+
+  // -- Labels (HIG iOS semantic label colors) --------------------------------
+  //
+  // DESIGN.md §2 Text documents the rgba breakdown we translate to label /
+  // secondaryLabel / tertiaryLabel.
+  static const Color label = nearBlack;
+  static const Color labelDark = pureWhite;
+  static const Color secondaryLabel = Color(0xCC000000); // rgba(0,0,0,0.8)
+  static const Color secondaryLabelDark =
+      Color(0xCCFFFFFF); // rgba(255,.,.,0.8)
+  static const Color tertiaryLabel = Color(0x7A000000); // rgba(0,0,0,0.48)
+  static const Color tertiaryLabelDark = Color(0x7AFFFFFF);
+
+  // Separator / fill (HIG).
+  static const Color separator = Color(0x4D3C3C43); // rgba(60,60,67,0.30)
+  static const Color separatorDark = Color(0x99545458); // rgba(84,84,88,0.60)
+  static const Color fill = Color(0x33787880); // rgba(120,120,128,0.20)
+  static const Color fillDark = Color(0x5C787880); // rgba(120,120,128,0.36)
+
+  // -- Back-compat aliases ---------------------------------------------------
+  //
+  // These names survive from earlier revisions so the grade theme / tests can
+  // continue asserting `AppPalette.brand` / `AppPalette.parchment`. Keep them
+  // pointed at the Apple-system equivalents so "brand = primary accent" stays
+  // true on the new design system.
+  static const Color brand = systemBlue;
+  static const Color parchment = lightGray;
 }
 
-/// Spacing scale from DESIGN.md §5 ("Base unit: 8px; scale: 3,4,6,8,10,12,16,20,24,30").
+/// iOS 8-pt spacing grid (DESIGN.md §5 "Spacing System").
 ///
-/// Only the five roles explicitly listed in the task brief are exposed — we
-/// intentionally do not surface every raw step to keep call sites disciplined.
+/// The five roles the app uses are exposed directly; we intentionally do not
+/// surface every raw step from the Apple scale (2/4/5/6/7/8/9/10/11/14/15/17)
+/// to keep call sites disciplined.
 @immutable
 class AppSpacing extends ThemeExtension<AppSpacing> {
   const AppSpacing({
@@ -64,6 +118,7 @@ class AppSpacing extends ThemeExtension<AppSpacing> {
   final double lg;
   final double xl;
 
+  /// iOS 8-pt standard: 4 / 8 / 16 / 24 / 32.
   static const AppSpacing standard = AppSpacing(
     xs: 4,
     sm: 8,
@@ -106,32 +161,40 @@ class AppSpacing extends ThemeExtension<AppSpacing> {
   static double _lerp(double a, double b, double t) => a + (b - a) * t;
 }
 
-/// Border-radius scale from DESIGN.md §5 ("Border Radius Scale").
+/// Border-radius scale from DESIGN.md §5 "Border Radius Scale", remapped to
+/// Apple's rectangular-element conventions (8 / 12 / 16 / 20).
 ///
-/// Exposes the four specific values the task brief requires.
+/// DESIGN.md also defines a 980px pill radius for CTA links — we represent it
+/// via [pill] but use it sparingly (HIG "Don'ts": rounded corners > 12px on
+/// rectangular elements are avoided; 980px is for pill chips only).
 @immutable
 class AppRadius extends ThemeExtension<AppRadius> {
   const AppRadius({
     required this.sm,
     required this.md,
     required this.lg,
+    required this.xLarge,
     required this.pill,
   });
 
   final double sm;
   final double md;
   final double lg;
+  final double xLarge;
   final double pill;
 
-  // sm  = subtly rounded (6-8 band → 8 standard cards/buttons)
-  // md  = generously rounded (12) — primary buttons, inputs, nav
-  // lg  = very rounded (16) — featured containers
-  // pill = maximum rounded (32) — hero containers, embedded media
+  /// Apple rectangular radius ramp.
+  /// - sm     =  8 (buttons, product cards, image containers — DESIGN.md §4)
+  /// - md     = 12 (large feature panels, lifestyle image containers)
+  /// - lg     = 16 (hero modules)
+  /// - xLarge = 20 (modal sheets, rare large surfaces)
+  /// - pill   = 980 (CTA pills — "Learn more", "Shop")
   static const AppRadius standard = AppRadius(
     sm: 8,
     md: 12,
     lg: 16,
-    pill: 32,
+    xLarge: 20,
+    pill: 980,
   );
 
   @override
@@ -139,12 +202,14 @@ class AppRadius extends ThemeExtension<AppRadius> {
     double? sm,
     double? md,
     double? lg,
+    double? xLarge,
     double? pill,
   }) {
     return AppRadius(
       sm: sm ?? this.sm,
       md: md ?? this.md,
       lg: lg ?? this.lg,
+      xLarge: xLarge ?? this.xLarge,
       pill: pill ?? this.pill,
     );
   }
@@ -158,6 +223,7 @@ class AppRadius extends ThemeExtension<AppRadius> {
       sm: _lerp(sm, other.sm, t),
       md: _lerp(md, other.md, t),
       lg: _lerp(lg, other.lg, t),
+      xLarge: _lerp(xLarge, other.xLarge, t),
       pill: _lerp(pill, other.pill, t),
     );
   }
@@ -165,12 +231,16 @@ class AppRadius extends ThemeExtension<AppRadius> {
   static double _lerp(double a, double b, double t) => a + (b - a) * t;
 }
 
-/// Shadow tokens from DESIGN.md §6 ("Depth & Elevation").
+/// Apple's elevation system is deliberately sparse (DESIGN.md §6). Instead of
+/// Material's punchy drop shadows we layer a tight near-shadow with a wider,
+/// low-opacity ambient shadow — together they approximate the soft diffused
+/// studio-light look the HIG describes.
 ///
-/// Claude's signature is ring-based shadows (`0px 0px 0px 1px`) — Flutter has
-/// no direct equivalent to CSS ring shadows, so we approximate with a 1px
-/// BoxShadow at spreadRadius 0 / blurRadius 0 that sits flush against the
-/// element like a halo. `overlay` uses the "whisper" drop-shadow instead.
+/// * [ambient] — subtle separation for stacked surfaces (nav strip, tab bar).
+/// * [elevated] — the signature "product card" shadow
+///   (`rgba(0,0,0,0.22) 3px 5px 30px 0px` — DESIGN.md §6 Subtle Lift).
+/// * [overlay] — modal / floating sheet, pairing the card shadow with an
+///   extra soft ambient to read clearly above photographic backgrounds.
 @immutable
 class AppShadows extends ThemeExtension<AppShadows> {
   const AppShadows({
@@ -179,43 +249,40 @@ class AppShadows extends ThemeExtension<AppShadows> {
     required this.overlay,
   });
 
-  /// Level 2 — ring halo for interactive surfaces (buttons, cards on hover).
   final List<BoxShadow> ambient;
-
-  /// Level 3 — "whisper" soft drop shadow for elevated feature cards.
-  /// `rgba(0,0,0,0.05) 0px 4px 24px` in the source spec.
   final List<BoxShadow> elevated;
-
-  /// Elevated + ring — for modal-style surfaces floating over the page.
   final List<BoxShadow> overlay;
 
   static const AppShadows light = AppShadows(
     ambient: <BoxShadow>[
       BoxShadow(
-        color: AppPalette.ringWarm,
-        offset: Offset.zero,
-        blurRadius: 0,
-        spreadRadius: 1,
+        color: Color(0x0F000000), // rgba(0,0,0,0.06)
+        offset: Offset(0, 1),
+        blurRadius: 2,
       ),
     ],
     elevated: <BoxShadow>[
       BoxShadow(
-        color: Color(0x0D000000), // rgba(0,0,0,0.05)
-        offset: Offset(0, 4),
-        blurRadius: 24,
+        color: Color(0x0A000000), // tight near-shadow, rgba(0,0,0,0.04)
+        offset: Offset(0, 1),
+        blurRadius: 3,
+      ),
+      BoxShadow(
+        color: Color(0x38000000), // rgba(0,0,0,0.22) — DESIGN.md §6
+        offset: Offset(3, 5),
+        blurRadius: 30,
       ),
     ],
     overlay: <BoxShadow>[
       BoxShadow(
-        color: Color(0x0D000000),
-        offset: Offset(0, 4),
-        blurRadius: 24,
+        color: Color(0x14000000), // rgba(0,0,0,0.08)
+        offset: Offset(0, 2),
+        blurRadius: 8,
       ),
       BoxShadow(
-        color: AppPalette.ringWarm,
-        offset: Offset.zero,
-        blurRadius: 0,
-        spreadRadius: 1,
+        color: Color(0x38000000),
+        offset: Offset(0, 12),
+        blurRadius: 40,
       ),
     ],
   );
@@ -223,30 +290,33 @@ class AppShadows extends ThemeExtension<AppShadows> {
   static const AppShadows dark = AppShadows(
     ambient: <BoxShadow>[
       BoxShadow(
-        color: AppPalette.borderDark,
-        offset: Offset.zero,
-        blurRadius: 0,
-        spreadRadius: 1,
+        color: Color(0x33000000), // rgba(0,0,0,0.20)
+        offset: Offset(0, 1),
+        blurRadius: 2,
       ),
     ],
     elevated: <BoxShadow>[
       BoxShadow(
-        color: Color(0x33000000), // slightly heavier on dark canvas
-        offset: Offset(0, 4),
-        blurRadius: 24,
+        color: Color(0x33000000),
+        offset: Offset(0, 1),
+        blurRadius: 3,
+      ),
+      BoxShadow(
+        color: Color(0x66000000), // deeper cast on black canvas
+        offset: Offset(3, 5),
+        blurRadius: 30,
       ),
     ],
     overlay: <BoxShadow>[
       BoxShadow(
-        color: Color(0x33000000),
-        offset: Offset(0, 4),
-        blurRadius: 24,
+        color: Color(0x4D000000),
+        offset: Offset(0, 2),
+        blurRadius: 8,
       ),
       BoxShadow(
-        color: AppPalette.borderDark,
-        offset: Offset.zero,
-        blurRadius: 0,
-        spreadRadius: 1,
+        color: Color(0x80000000),
+        offset: Offset(0, 12),
+        blurRadius: 40,
       ),
     ],
   );
@@ -274,17 +344,17 @@ class AppShadows extends ThemeExtension<AppShadows> {
   }
 }
 
-/// Book Club light/dark themes wired to Claude's design tokens.
+/// Book Club light/dark themes wired to Apple's HIG + apple.com tokens.
 ///
-/// The light theme uses Parchment as its page canvas and Terracotta as the
-/// primary chromatic accent. The dark theme mirrors Claude's dark mode with
-/// Near Black surfaces and Warm Silver text.
+/// Light uses iOS systemBackground (`#f5f5f7`) as the page canvas with near-
+/// black labels. Dark mirrors iOS dark mode with pure black backgrounds and
+/// the darkened iOS accent blue. Apple Blue is the singular chromatic accent.
 class AppTheme {
   const AppTheme._();
 
-  /// Matches the light ColorScheme's primary — exposed so tests/clients can
-  /// verify the M3 default purple has actually been replaced.
-  static const Color lightPrimary = AppPalette.brand;
+  /// Exposed so tests / clients can verify the Material-default purple has
+  /// actually been replaced by Apple's singular accent.
+  static const Color lightPrimary = AppPalette.systemBlue;
 
   static ThemeData get light => _build(
         brightness: Brightness.light,
@@ -299,186 +369,214 @@ class AppTheme {
       );
 
   // -- Color schemes ---------------------------------------------------------
+  //
+  // Apple's visual system reserves its entire chromatic budget for Apple Blue
+  // (DESIGN.md §7 Do / Don't). We therefore avoid mapping secondary / tertiary
+  // slots onto additional hues and instead use the iOS gray ramp so the UI
+  // retains the "singular accent against neutrals" rhythm.
 
   static const ColorScheme _lightColorScheme = ColorScheme(
     brightness: Brightness.light,
-    primary: AppPalette.brand,
-    onPrimary: AppPalette.ivory,
-    primaryContainer: AppPalette.coral,
-    onPrimaryContainer: AppPalette.ivory,
-    secondary: AppPalette.warmSand,
-    onSecondary: AppPalette.charcoalWarm,
-    secondaryContainer: AppPalette.borderWarm,
-    onSecondaryContainer: AppPalette.charcoalWarm,
-    tertiary: AppPalette.darkSurface,
-    onTertiary: AppPalette.ivory,
-    error: AppPalette.errorCrimson,
-    onError: AppPalette.ivory,
-    surface: AppPalette.parchment,
-    onSurface: AppPalette.nearBlack,
+    primary: AppPalette.systemBlue,
+    onPrimary: AppPalette.pureWhite,
+    primaryContainer: AppPalette.linkBlue,
+    onPrimaryContainer: AppPalette.pureWhite,
+    secondary: AppPalette.systemGray6,
+    onSecondary: AppPalette.label,
+    secondaryContainer: AppPalette.systemGray5,
+    onSecondaryContainer: AppPalette.label,
+    tertiary: AppPalette.nearBlack,
+    onTertiary: AppPalette.pureWhite,
+    error: AppPalette.systemRed,
+    onError: AppPalette.pureWhite,
+    surface: AppPalette.lightGray, // iOS systemBackground (light)
+    onSurface: AppPalette.label,
     surfaceContainerLowest: AppPalette.pureWhite,
-    surfaceContainerLow: AppPalette.ivory,
-    surfaceContainer: AppPalette.ivory,
-    surfaceContainerHigh: AppPalette.warmSand,
-    surfaceContainerHighest: AppPalette.borderWarm,
-    onSurfaceVariant: AppPalette.oliveGray,
-    outline: AppPalette.borderWarm,
-    outlineVariant: AppPalette.borderCream,
+    surfaceContainerLow: AppPalette.systemGray6,
+    surfaceContainer: AppPalette.systemGray6,
+    surfaceContainerHigh: AppPalette.systemGray5,
+    surfaceContainerHighest: AppPalette.systemGray4,
+    onSurfaceVariant: AppPalette.secondaryLabel,
+    outline: AppPalette.separator,
+    outlineVariant: AppPalette.systemGray5,
     inverseSurface: AppPalette.nearBlack,
-    onInverseSurface: AppPalette.ivory,
-    inversePrimary: AppPalette.coral,
-    shadow: Color(0x0D000000),
+    onInverseSurface: AppPalette.pureWhite,
+    inversePrimary: AppPalette.brightBlue,
+    shadow: Color(0x38000000),
     scrim: Color(0x66000000),
   );
 
   static const ColorScheme _darkColorScheme = ColorScheme(
     brightness: Brightness.dark,
-    primary: AppPalette.coral,
-    onPrimary: AppPalette.nearBlack,
-    primaryContainer: AppPalette.brand,
-    onPrimaryContainer: AppPalette.ivory,
-    secondary: AppPalette.darkSurface,
-    onSecondary: AppPalette.warmSilver,
-    secondaryContainer: AppPalette.darkWarm,
-    onSecondaryContainer: AppPalette.warmSilver,
-    tertiary: AppPalette.warmSand,
-    onTertiary: AppPalette.charcoalWarm,
-    error: AppPalette.errorCrimson,
-    onError: AppPalette.ivory,
-    surface: AppPalette.deepDark,
-    onSurface: AppPalette.warmSilver,
-    surfaceContainerLowest: AppPalette.nearBlack,
-    surfaceContainerLow: AppPalette.deepDark,
-    surfaceContainer: AppPalette.darkSurface,
-    surfaceContainerHigh: AppPalette.darkWarm,
-    surfaceContainerHighest: AppPalette.charcoalWarm,
-    onSurfaceVariant: AppPalette.warmSilver,
-    outline: AppPalette.darkSurface,
-    outlineVariant: AppPalette.darkWarm,
-    inverseSurface: AppPalette.parchment,
-    onInverseSurface: AppPalette.nearBlack,
-    inversePrimary: AppPalette.brand,
-    shadow: Color(0x33000000),
+    primary: AppPalette.systemBlueDark,
+    onPrimary: AppPalette.pureWhite,
+    primaryContainer: AppPalette.systemBlue,
+    onPrimaryContainer: AppPalette.pureWhite,
+    secondary: AppPalette.systemGray5Dark,
+    onSecondary: AppPalette.labelDark,
+    secondaryContainer: AppPalette.systemGray4Dark,
+    onSecondaryContainer: AppPalette.labelDark,
+    tertiary: AppPalette.darkSurface1,
+    onTertiary: AppPalette.labelDark,
+    error: AppPalette.systemRedDark,
+    onError: AppPalette.pureWhite,
+    surface: AppPalette.pureBlack, // iOS systemBackground (dark)
+    onSurface: AppPalette.labelDark,
+    surfaceContainerLowest: AppPalette.pureBlack,
+    surfaceContainerLow: AppPalette.systemGray6Dark,
+    surfaceContainer: AppPalette.darkSurface1,
+    surfaceContainerHigh: AppPalette.darkSurface3,
+    surfaceContainerHighest: AppPalette.darkSurface4,
+    onSurfaceVariant: AppPalette.secondaryLabelDark,
+    outline: AppPalette.separatorDark,
+    outlineVariant: AppPalette.systemGray4Dark,
+    inverseSurface: AppPalette.lightGray,
+    onInverseSurface: AppPalette.label,
+    inversePrimary: AppPalette.systemBlue,
+    shadow: Color(0x66000000),
     scrim: Color(0x99000000),
   );
 
   // -- Typography ------------------------------------------------------------
 
-  /// Builds the app's [TextTheme].
+  /// Builds the app's [TextTheme] from Apple's HIG type scale.
   ///
-  /// Font substitution note: Claude's proprietary "Anthropic Serif / Sans /
-  /// Mono" families are not publicly licensed. We use the nearest Google Fonts
-  /// equivalents that preserve the warm, editorial feel:
-  ///   - Fraunces     ↔ Anthropic Serif  (medium weight 500, book-title voice)
-  ///   - Inter        ↔ Anthropic Sans   (neutral, high-legibility UI sans)
-  ///   - JetBrains Mono ↔ Anthropic Mono (code / metadata)
+  /// Font substitution note: Apple's proprietary "SF Pro Display / SF Pro
+  /// Text" families are not redistributable through google_fonts. We fall back
+  /// to **Inter** — the closest SF-adjacent free face on google_fonts — which
+  /// shares SF's humanist, high-x-height, optical-sizing philosophy more than
+  /// any other Google-hosted family. The Display/Text optical split is
+  /// approximated by keeping weight 400 for body sizes (< 20px) and preferring
+  /// weight 600 at 17px for emphasized-body / headline roles, matching HIG.
   ///
-  /// All sizes/weights/line-heights mirror DESIGN.md §3 hierarchy table.
-  /// Mapping to Material 3 roles (CLAUDE role → M3 role):
-  ///   Display / Hero (64/500/1.10)       → displayLarge
-  ///   Section Heading (52/500/1.20)      → displayMedium
-  ///   Sub-heading Large (36/500/1.30)    → displaySmall
-  ///   Sub-heading (32/500/1.10)          → headlineLarge
-  ///   Sub-heading Small (25/500/1.20)    → headlineMedium
-  ///   Feature Title (20.8/500/1.20)      → headlineSmall
-  ///   Body Serif (17/400/1.60)           → titleLarge (serif emphasis)
-  ///   Body Large (20/400/1.60, sans)     → bodyLarge
-  ///   Body Standard (16/400/1.50, sans)  → bodyMedium
-  ///   Body Small (15/400/1.50, sans)     → bodySmall
-  ///   Caption (14/400/1.43, sans)        → labelLarge (inline badges/UI labels)
-  ///   Label (12/500/1.25, 0.12 tracking) → labelMedium
-  ///   Overline (10/400/1.60, 0.5)        → labelSmall
+  /// HIG → Material 3 mapping:
+  ///   Large Title (34/bold)      → displayLarge
+  ///   Title 1     (28/regular)   → displayMedium
+  ///   Title 2     (22/regular)   → displaySmall
+  ///   Title 3     (20/regular)   → headlineLarge
+  ///   Headline    (17/semibold)  → headlineMedium / titleMedium
+  ///   Body        (17/regular)   → bodyLarge
+  ///   Callout     (16/regular)   → bodyMedium
+  ///   Subheadline (15/regular)   → titleSmall
+  ///   Footnote    (13/regular)   → bodySmall
+  ///   Caption 1   (12/regular)   → labelMedium
+  ///   Caption 2   (11/regular)   → labelSmall
+  ///
+  /// Negative letter-spacing is applied at every size per DESIGN.md §3
+  /// ("Negative tracking at all sizes").
   static TextTheme buildTextTheme(Color onSurface, Color mutedOnSurface) {
-    final TextStyle serif = GoogleFonts.fraunces(color: onSurface);
-    final TextStyle sans = GoogleFonts.inter(color: onSurface);
+    final TextStyle base = GoogleFonts.inter(color: onSurface);
 
     return TextTheme(
-      // Display / headline roles use the serif — the signature voice.
-      displayLarge: serif.copyWith(
-        fontSize: 64,
-        fontWeight: FontWeight.w500,
-        height: 1.10,
+      // Large Title — 34 / bold / 1.21 / -0.374
+      displayLarge: base.copyWith(
+        fontSize: 34,
+        fontWeight: FontWeight.w700,
+        height: 1.21,
+        letterSpacing: -0.374,
       ),
-      displayMedium: serif.copyWith(
-        fontSize: 52,
-        fontWeight: FontWeight.w500,
-        height: 1.20,
-      ),
-      displaySmall: serif.copyWith(
-        fontSize: 36,
-        fontWeight: FontWeight.w500,
-        height: 1.30,
-      ),
-      headlineLarge: serif.copyWith(
-        fontSize: 32,
-        fontWeight: FontWeight.w500,
-        height: 1.10,
-      ),
-      headlineMedium: serif.copyWith(
-        fontSize: 25,
-        fontWeight: FontWeight.w500,
-        height: 1.20,
-      ),
-      headlineSmall: serif.copyWith(
-        fontSize: 20.8,
-        fontWeight: FontWeight.w500,
-        height: 1.20,
-      ),
-
-      // titleLarge keeps the serif tone for editorial passages (Body Serif).
-      titleLarge: serif.copyWith(
-        fontSize: 17,
+      // Title 1 — 28 / regular / 1.21 / -0.364
+      displayMedium: base.copyWith(
+        fontSize: 28,
         fontWeight: FontWeight.w400,
-        height: 1.60,
+        height: 1.21,
+        letterSpacing: -0.364,
       ),
-      // titleMedium/Small switch to sans for compact UI headers.
-      titleMedium: sans.copyWith(
-        fontSize: 16,
-        fontWeight: FontWeight.w500,
-        height: 1.25,
+      // Title 2 — 22 / regular / 1.27 / -0.26
+      displaySmall: base.copyWith(
+        fontSize: 22,
+        fontWeight: FontWeight.w400,
+        height: 1.27,
+        letterSpacing: -0.26,
       ),
-      titleSmall: sans.copyWith(
-        fontSize: 15,
-        fontWeight: FontWeight.w500,
-        height: 1.25,
-      ),
-
-      // Body roles — sans-serif, generous line-height for a literary cadence.
-      bodyLarge: sans.copyWith(
+      // Title 3 — 20 / regular / 1.25 / -0.2
+      headlineLarge: base.copyWith(
         fontSize: 20,
         fontWeight: FontWeight.w400,
-        height: 1.60,
-        color: mutedOnSurface,
+        height: 1.25,
+        letterSpacing: -0.2,
       ),
-      bodyMedium: sans.copyWith(
-        fontSize: 16,
-        fontWeight: FontWeight.w400,
-        height: 1.50,
+      // Headline — 17 / semibold / 1.29 / -0.374
+      headlineMedium: base.copyWith(
+        fontSize: 17,
+        fontWeight: FontWeight.w600,
+        height: 1.29,
+        letterSpacing: -0.374,
       ),
-      bodySmall: sans.copyWith(
+      // Alt Headline slot (kept separate so callers that lean on
+      // headlineSmall also land on a HIG-legal style).
+      headlineSmall: base.copyWith(
+        fontSize: 17,
+        fontWeight: FontWeight.w600,
+        height: 1.29,
+        letterSpacing: -0.374,
+      ),
+
+      // Title-family — Apple Headline repeats as titleLarge / titleMedium so
+      // Material widgets that default to these roles pick up HIG Headline.
+      titleLarge: base.copyWith(
+        fontSize: 17,
+        fontWeight: FontWeight.w600,
+        height: 1.29,
+        letterSpacing: -0.374,
+      ),
+      titleMedium: base.copyWith(
+        fontSize: 17,
+        fontWeight: FontWeight.w600,
+        height: 1.29,
+        letterSpacing: -0.374,
+      ),
+      // Subheadline — 15 / regular / 1.33 / -0.24
+      titleSmall: base.copyWith(
         fontSize: 15,
         fontWeight: FontWeight.w400,
-        height: 1.50,
+        height: 1.33,
+        letterSpacing: -0.24,
+      ),
+
+      // Body — 17 / regular / 1.29 / -0.374
+      bodyLarge: base.copyWith(
+        fontSize: 17,
+        fontWeight: FontWeight.w400,
+        height: 1.29,
+        letterSpacing: -0.374,
+        color: mutedOnSurface,
+      ),
+      // Callout — 16 / regular / 1.31 / -0.31
+      bodyMedium: base.copyWith(
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
+        height: 1.31,
+        letterSpacing: -0.31,
+      ),
+      // Footnote — 13 / regular / 1.38 / -0.08
+      bodySmall: base.copyWith(
+        fontSize: 13,
+        fontWeight: FontWeight.w400,
+        height: 1.38,
+        letterSpacing: -0.08,
         color: mutedOnSurface,
       ),
 
-      // Labels — tight sans with the spec's letter-spacing quirks.
-      labelLarge: sans.copyWith(
-        fontSize: 14,
-        fontWeight: FontWeight.w500,
-        height: 1.43,
+      // Label family — HIG Callout / Caption variants.
+      labelLarge: base.copyWith(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        height: 1.31,
+        letterSpacing: -0.31,
       ),
-      labelMedium: sans.copyWith(
+      // Caption 1 — 12 / regular / 1.33 / 0
+      labelMedium: base.copyWith(
         fontSize: 12,
-        fontWeight: FontWeight.w500,
-        height: 1.25,
-        letterSpacing: 0.12,
-      ),
-      labelSmall: sans.copyWith(
-        fontSize: 10,
         fontWeight: FontWeight.w400,
-        height: 1.60,
-        letterSpacing: 0.5,
+        height: 1.33,
+      ),
+      // Caption 2 — 11 / regular / 1.36 / 0.07
+      labelSmall: base.copyWith(
+        fontSize: 11,
+        fontWeight: FontWeight.w400,
+        height: 1.36,
+        letterSpacing: 0.07,
       ),
     );
   }
@@ -494,6 +592,9 @@ class AppTheme {
     final Color muted = colorScheme.onSurfaceVariant;
     final TextTheme textTheme = buildTextTheme(onSurface, muted);
     final bool isLight = brightness == Brightness.light;
+
+    // HIG minimum touch target (44×44 logical px) feeds button padding below.
+    const Size iosMinimumTouch = Size(44, 44);
 
     return ThemeData(
       useMaterial3: true,
@@ -517,98 +618,112 @@ class AppTheme {
         centerTitle: false,
         titleTextStyle: textTheme.headlineMedium,
       ),
+      // FilledButton is the app's iOS-tinted filled button: Apple Blue fill,
+      // white label, 8px radius per DESIGN.md §4 Primary Blue CTA.
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           backgroundColor: colorScheme.primary,
           foregroundColor: colorScheme.onPrimary,
+          minimumSize: iosMinimumTouch,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(12)),
-          ),
-          textStyle: textTheme.labelLarge?.copyWith(
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor:
-              isLight ? AppPalette.warmSand : AppPalette.darkSurface,
-          foregroundColor:
-              isLight ? AppPalette.charcoalWarm : AppPalette.warmSilver,
-          elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(8)),
           ),
-          textStyle: textTheme.labelLarge,
+          textStyle: textTheme.headlineMedium,
+        ),
+      ),
+      // ElevatedButton is repurposed as the iOS "tinted" button: a soft
+      // systemBlue tint on a blue-tinted background (not Material's raised
+      // surface). Gives Flutter's raised-button call sites an HIG-compliant
+      // default without requiring every feature to switch to FilledButton.
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: isLight
+              ? AppPalette.systemBlue.withValues(alpha: 0.12)
+              : AppPalette.systemBlueDark.withValues(alpha: 0.22),
+          foregroundColor:
+              isLight ? AppPalette.systemBlue : AppPalette.systemBlueDark,
+          elevation: 0,
+          shadowColor: Colors.transparent,
+          minimumSize: iosMinimumTouch,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(8)),
+          ),
+          textStyle: textTheme.headlineMedium,
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: colorScheme.onSurface,
-          side: BorderSide(
-            color: isLight ? AppPalette.borderWarm : AppPalette.borderDark,
-          ),
+          foregroundColor: colorScheme.primary,
+          side: BorderSide(color: colorScheme.primary),
+          minimumSize: iosMinimumTouch,
+          // The signature Apple inline "Learn more / Shop" pill uses 980px
+          // radius per DESIGN.md §4 Pill Link; we expose it through the
+          // outlined variant so feature code can opt in without reinventing.
           shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(12)),
+            borderRadius: BorderRadius.all(Radius.circular(980)),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          textStyle: textTheme.labelLarge,
+          textStyle: textTheme.headlineMedium,
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: colorScheme.primary,
-          textStyle: textTheme.labelLarge,
+          minimumSize: iosMinimumTouch,
+          textStyle: textTheme.headlineMedium,
         ),
       ),
       cardTheme: CardThemeData(
-        color: isLight ? AppPalette.ivory : AppPalette.darkSurface,
+        color: isLight ? AppPalette.pureWhite : AppPalette.darkSurface1,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         margin: EdgeInsets.zero,
-        shape: RoundedRectangleBorder(
-          borderRadius: const BorderRadius.all(Radius.circular(8)),
-          side: BorderSide(
-            color: isLight ? AppPalette.borderCream : AppPalette.borderDark,
-          ),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(8)),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: isLight ? AppPalette.ivory : AppPalette.darkSurface,
-        // DESIGN.md §4 Inputs — vertical padding ≈ 1.6px is too tight for
-        // touch targets on mobile; adapt upward to the mobile-minimum 12px.
+        fillColor: isLight ? AppPalette.pureWhite : AppPalette.systemGray6Dark,
+        // HIG recommends 11px radius on search / filter controls (DESIGN.md
+        // §4 Filter / Search Button); 12px content padding meets the 44px
+        // touch-target minimum once line-height is factored in.
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         border: OutlineInputBorder(
-          borderRadius: const BorderRadius.all(Radius.circular(12)),
+          borderRadius: const BorderRadius.all(Radius.circular(11)),
           borderSide: BorderSide(
-            color: isLight ? AppPalette.borderWarm : AppPalette.borderDark,
+            color: isLight ? AppPalette.separator : AppPalette.separatorDark,
           ),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: const BorderRadius.all(Radius.circular(12)),
+          borderRadius: const BorderRadius.all(Radius.circular(11)),
           borderSide: BorderSide(
-            color: isLight ? AppPalette.borderWarm : AppPalette.borderDark,
+            color: isLight ? AppPalette.separator : AppPalette.separatorDark,
           ),
         ),
-        focusedBorder: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(12)),
-          borderSide: BorderSide(color: AppPalette.focusBlue, width: 1.5),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: const BorderRadius.all(Radius.circular(11)),
+          borderSide: BorderSide(
+            color: colorScheme.primary,
+            width: 2, // DESIGN.md §4 focus ring — `2px solid #0071E3`
+          ),
         ),
         hintStyle: textTheme.bodyMedium?.copyWith(
-          color: AppPalette.stoneGray,
+          color:
+              isLight ? AppPalette.tertiaryLabel : AppPalette.tertiaryLabelDark,
         ),
       ),
       dividerTheme: DividerThemeData(
-        color: isLight ? AppPalette.borderCream : AppPalette.borderDark,
-        thickness: 1,
-        space: 1,
+        color: isLight ? AppPalette.separator : AppPalette.separatorDark,
+        thickness: 0.5, // iOS hairline
+        space: 0.5,
       ),
       iconTheme: IconThemeData(
-        color: isLight ? AppPalette.charcoalWarm : AppPalette.warmSilver,
+        color:
+            isLight ? AppPalette.secondaryLabel : AppPalette.secondaryLabelDark,
       ),
     );
   }

@@ -26,10 +26,10 @@ void main() {
     // First frame is MaterialApp; let router settle.
     await tester.pumpAndSettle();
 
-    // The home screen renders "Book Club" both in the app bar and the hero
-    // headline, plus the Claude-themed subtitle and CTA.
-    expect(find.text('Book Club'), findsWidgets);
+    // The home screen renders "Book Club" as the Large Title, plus the
+    // Apple-themed subtitle and tinted CTA.
+    expect(find.text('Book Club'), findsOneWidget);
     expect(find.text('독서를 기록하고, 책으로 대화하세요'), findsOneWidget);
-    expect(find.text('독서 시작하기'), findsOneWidget);
+    expect(find.text('시작하기'), findsOneWidget);
   });
 }

@@ -34,8 +34,9 @@ dependencies:
   # i18n / formatting
   intl: ^0.19.0
 
-  # Typography — Claude design system maps Anthropic Serif → Fraunces and
-  # Anthropic Sans → Inter. Fonts are fetched at runtime by google_fonts.
+  # Typography — Apple design system falls back to Inter (closest SF-adjacent
+  # free face on google_fonts) since SF Pro is not publicly redistributable.
+  # Fonts are fetched at runtime by google_fonts.
   google_fonts: ^6.2.1
 
 dev_dependencies:
