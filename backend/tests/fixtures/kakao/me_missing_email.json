@@ -1,0 +1,15 @@
+{
+  "id": 7777777777,
+  "connected_at": "2026-04-20T10:00:00Z",
+  "properties": {
+    "nickname": "이메일없음"
+  },
+  "kakao_account": {
+    "profile_nickname_needs_agreement": false,
+    "profile": {
+      "nickname": "이메일없음"
+    },
+    "has_email": false,
+    "email_needs_agreement": true
+  }
+}

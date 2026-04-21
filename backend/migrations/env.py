@@ -30,9 +30,13 @@ settings = get_settings()
 # Inject the real DATABASE_URL at runtime so alembic.ini never holds secrets.
 config.set_main_option("sqlalchemy.url", settings.database_url)
 
-# Future milestones: replace with `Base.metadata` (or a combined registry) once
-# domain models exist. See module docstring above.
-target_metadata = None
+# Import every domain's models module so their tables register against
+# Base.metadata before autogenerate diff runs. Adding a new domain means
+# adding its import here (and nothing else).
+from app.core.db import Base  # noqa: E402
+from app.domains.auth import models as _auth_models  # noqa: E402, F401
+
+target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:

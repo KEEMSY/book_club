@@ -1,0 +1,11 @@
+targets:
+  $default:
+    builders:
+      # Global field renaming so freezed DTOs can mirror the backend's
+      # snake_case payloads (see backend/app/domains/auth/schemas.py) without
+      # per-field @JsonKey annotations. The latter triggers the analyzer
+      # `invalid_annotation_target` warning on freezed factory params.
+      json_serializable:
+        options:
+          field_rename: snake
+          explicit_to_json: true

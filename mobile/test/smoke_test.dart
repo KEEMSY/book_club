@@ -9,7 +9,8 @@ void main() {
   // Prevent google_fonts from attempting network fetches during tests.
   GoogleFonts.config.allowRuntimeFetching = false;
 
-  testWidgets('home screen renders Book Club title', (tester) async {
+  testWidgets('home screen renders Airbnb-themed hero, subhead and CTAs',
+      (tester) async {
     // Override dioProvider with a fake instance that is never called at M0.
     // Wiring it here prevents accidental network touches in future tests.
     final fakeDio = Dio();
@@ -26,10 +27,13 @@ void main() {
     // First frame is MaterialApp; let router settle.
     await tester.pumpAndSettle();
 
-    // The home screen renders "Book Club" as the Large Title, plus the
-    // Apple-themed subtitle and tinted CTA.
+    // The home screen renders "Book Club" as the editorial serif hero, the
+    // softened 감성 subhead, a Rausch Red primary CTA, and the pill-shaped
+    // secondary CTA that substitutes for Airbnb's 50%-radius rectangle
+    // controls on mobile.
     expect(find.text('Book Club'), findsOneWidget);
-    expect(find.text('독서를 기록하고, 책으로 대화하세요'), findsOneWidget);
+    expect(find.text('오늘 읽은 책을 기록하고, 책으로 사람과 만나요'), findsOneWidget);
     expect(find.text('시작하기'), findsOneWidget);
+    expect(find.text('어떤 책이 있을까?'), findsOneWidget);
   });
 }

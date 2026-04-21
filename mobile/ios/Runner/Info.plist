@@ -2,7 +2,19 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<!-- TODO(m1/auth): add CFBundleURLTypes for Kakao native key and LSApplicationQueriesSchemes (kakaokompassauth, kakaolink) plus `com.apple.developer.applesignin` entitlement. -->
+	<!--
+		Kakao OAuth + Apple Sign In hooks (M1).
+
+		The CFBundleURLSchemes / LSApplicationQueriesSchemes entries below
+		use placeholder `kakao0000000000000000000000000000` slots that get
+		rewritten at release-build time via the `KAKAO_NATIVE_APP_KEY`
+		dart-define (see mobile/scripts for CI substitution). For local dev
+		runs this placeholder is enough to satisfy `info.plist` validation —
+		real logins fail until a real key is substituted.
+
+		Apple Sign In needs `com.apple.developer.applesignin` entitlement,
+		configured separately in Runner/Runner.entitlements.
+	-->
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
@@ -25,6 +37,24 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<!-- Replace with `kakao<NATIVE_APP_KEY>` at CI build time. -->
+				<string>kakao0000000000000000000000000000</string>
+			</array>
+		</dict>
+	</array>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>kakaokompassauth</string>
+		<string>kakaolink</string>
+		<string>kakaoplus</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>

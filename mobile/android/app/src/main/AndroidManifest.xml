@@ -1,5 +1,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- TODO(m1/auth): add Kakao OAuth redirect scheme intent-filter and Kakao native app key meta-data. -->
+    <!--
+        Kakao OAuth redirect handler.
+
+        The Kakao SDK ships an `AuthCodeCustomTabsActivity` that must receive
+        the OAuth callback via a scheme `kakao<native_app_key>`. We expose
+        the native key via Gradle's `manifestPlaceholders` block (see
+        app/build.gradle) so CI / release builds substitute the real key
+        while local dev uses the 0-padded placeholder defined in
+        app/build.gradle. Never commit a real key here.
+    -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:label="Book Club"
         android:name="${applicationName}"
@@ -26,6 +36,22 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <!-- Kakao OAuth custom-tabs redirect -->
+        <activity
+            android:name="com.kakao.sdk.auth.AuthCodeCustomTabsActivity"
+            android:exported="true">
+            <intent-filter android:label="KakaoOAuth">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Scheme is `kakao<NATIVE_APP_KEY>`. Substituted at build
+                     time via manifestPlaceholders (see app/build.gradle). -->
+                <data android:scheme="kakao${kakaoNativeAppKey}"
+                      android:host="oauth" />
+            </intent-filter>
+        </activity>
+
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

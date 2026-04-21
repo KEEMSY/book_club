@@ -42,8 +42,13 @@ def test_decode_rejects_expired_token() -> None:
 
 def test_decode_rejects_tampered_token() -> None:
     token = create_access_token(user_id="user-1")
-    # Flip the final character of the signature segment.
-    tampered = token[:-1] + ("a" if token[-1] != "a" else "b")
+    # Swap the middle byte of the signature so the HMAC no longer matches.
+    # Flipping only the last base64url character can decode to the same bytes
+    # under some backends, so mutate a character well inside the signature.
+    header_body, _, signature = token.rpartition(".")
+    mid = len(signature) // 2
+    swapped = "A" if signature[mid] != "A" else "B"
+    tampered = f"{header_body}.{signature[:mid]}{swapped}{signature[mid + 1 :]}"
 
     with pytest.raises(AuthError):
         decode_token(tampered)

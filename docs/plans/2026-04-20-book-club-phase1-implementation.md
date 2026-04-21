@@ -541,6 +541,11 @@ TDD: 경계값 10 가지 이상 케이스.
 ## Changelog
 
 - **0.1.0** (2026-04-20) — 초기 Phase 1 구현 계획. 6개 마일스톤 · 에이전트 분배 전략 포함.
+- **0.1.2** (2026-04-20) — **Milestone 1 (Auth · 카카오/애플) 완료.** 태그 `v0.0.1-m1`.
+  - Backend: 8 커밋, 65 테스트(59 pass + 6 postgres-integration skip). User·DeviceToken 모델, Port/Adapter 엄수, Kakao OAuth + Apple Sign-In (JWT + JWKS 캐시), AuthService, `/auth/*` · `/me` · `DELETE /me`, `get_current_user` 의존성, soft-delete 지원.
+  - Mobile: 9 커밋, 29 테스트. Auth feature 레이어, kakao_flutter_sdk_user + sign_in_with_apple 네이티브 연동, Dio Auth/Refresh 인터셉터(401 큐잉·자동 리프레시), AuthNotifier 상태 머신, 세션 복구, Airbnb 톤 로그인 화면, go_router 인증 가드.
+  - 디자인 시스템 반복: Claude → Apple → Airbnb (2030 여성 타겟 반영). 네이밍 중립화(AppPalette) 로 향후 교체 1-파일 수정.
+  - Follow-up: Kakao `code` ↔ `access_token` contract 재조정 필요 (backlog 참조).
 - **0.1.1** (2026-04-20) — **Milestone 0 (스캐폴딩 · 인프라 기반) 완료.** 태그 `v0.0.0-scaffold`.
   - 모노레포 레이아웃 (backend / mobile / docs / .github)
   - FastAPI 스켈레톤 + Alembic 초기화 + core 공용 계층 (http client · R2 storage · JWT · 예외 · 이벤트 버스)

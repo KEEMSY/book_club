@@ -26,21 +26,34 @@ dependencies:
 
   # HTTP
   dio: ^5.7.0
-  retrofit: ^4.4.1
+  # Pinned below 4.5 — retrofit 4.5+ introduced `Parser.DartMappable`, which
+  # retrofit_generator 9.7.x does not handle exhaustively. Bump both together
+  # when we upgrade.
+  retrofit: '>=4.4.1 <4.5.0'
 
   # Secure storage (JWT)
   flutter_secure_storage: ^9.2.4
 
+  # Social login SDKs (M1 · auth). Kakao SDK user module covers OAuth login
+  # via KakaoTalk + fallback web account flow. Apple SDK covers iOS native
+  # Sign in with Apple (Android hidden — backend route still exists but UI
+  # button is iOS-only).
+  kakao_flutter_sdk_user: ^1.9.7
+  sign_in_with_apple: ^6.1.4
+
   # i18n / formatting
   intl: ^0.19.0
 
-  # Typography — Apple design system falls back to Inter (closest SF-adjacent
-  # free face on google_fonts) since SF Pro is not publicly redistributable.
-  # Fonts are fetched at runtime by google_fonts.
+  # Typography — Airbnb design system. Cereal VF is proprietary, so we
+  # substitute with two google_fonts families tuned for a Korean 20–30대 여성
+  # reading-app audience: Playfair Display (editorial serif — hero / display
+  # roles) and Inter (humanist sans — UI / body). Fonts are fetched at runtime.
   google_fonts: ^6.2.1
 
 dev_dependencies:
   flutter_test:
+    sdk: flutter
+  integration_test:
     sdk: flutter
 
   flutter_lints: ^5.0.0
@@ -55,6 +68,13 @@ dev_dependencies:
   # Lint plugins (Riverpod-aware)
   custom_lint: ^0.7.0
   riverpod_lint: ^2.6.3
+
+# Dependency override — analyzer_plugin 0.12.0 (transitive via custom_lint
+# / riverpod_lint) references APIs that conflict with analyzer 7.6. 0.13.0
+# fixes the Element2 split-namespace issue. Revisit once custom_lint 0.8+ is
+# compatible with freezed 2.x (pubspec block shows 0.8+ forces freezed 3.x).
+dependency_overrides:
+  analyzer_plugin: ^0.13.0
 
 flutter:
   uses-material-design: true

@@ -57,6 +57,18 @@ class ExternalServiceError(DomainError):
     code = "EXTERNAL_SERVICE_ERROR"
 
 
+class KakaoAuthError(AuthError):
+    """Kakao OAuth exchange failed — bad code, revoked token, Kakao 4xx."""
+
+    code = "KAKAO_AUTH_FAILED"
+
+
+class AppleAuthError(AuthError):
+    """Apple identity_token verification failed — signature / aud / iss / exp."""
+
+    code = "APPLE_AUTH_FAILED"
+
+
 def _error_response(exc: DomainError) -> JSONResponse:
     return JSONResponse(
         status_code=exc.status_code,

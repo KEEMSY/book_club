@@ -27,10 +27,13 @@ void main() {
 
   group('AppTheme', () {
     testWidgets(
-      'light primary matches AppPalette.brand, not the M3 default',
+      'light primary matches Airbnb Rausch Red (AppPalette.rausch)',
       (tester) async {
         final ThemeData theme = AppTheme.light;
         await settleTheme(tester, theme);
+        // Airbnb DESIGN.md §2 Primary Brand — Rausch Red (#FF385C) is the
+        // singular chromatic accent; brand alias points at the same swatch.
+        expect(theme.colorScheme.primary, AppPalette.rausch);
         expect(theme.colorScheme.primary, AppPalette.brand);
         expect(theme.colorScheme.primary, AppTheme.lightPrimary);
       },
@@ -62,11 +65,12 @@ void main() {
     });
 
     testWidgets(
-        'scaffold background on light theme matches AppPalette.parchment',
-        (tester) async {
+        'scaffold background on light theme matches AppPalette.parchment '
+        '(Airbnb Foggy warm off-white)', (tester) async {
       final ThemeData theme = AppTheme.light;
       await settleTheme(tester, theme);
       expect(theme.scaffoldBackgroundColor, AppPalette.parchment);
+      expect(theme.scaffoldBackgroundColor, AppPalette.foggy);
     });
   });
 
@@ -93,11 +97,11 @@ void main() {
       final ThemeData themed = GradeTheme.apply(base, ReaderGrade.devoted);
       await settleTheme(tester, themed);
 
-      // Apple's "애독자" grade seeds on systemBlue — the same hue as the base
-      // primary — so `.primary` can legitimately tonal-match the base. We
-      // therefore assert that at least one meaningful chromatic slot has
-      // shifted (primaryContainer is tonally derived from the seed and
-      // differs from the hand-crafted base container).
+      // The "애독자" (devoted) grade seeds on Rausch itself — the same hue
+      // as the base primary — so `.primary` can legitimately tonal-match
+      // the base after `ColorScheme.fromSeed` runs. We therefore assert
+      // that `primaryContainer` — a tonally-derived slot from the seed —
+      // differs from the hand-crafted base container (Deep Rausch).
       expect(
         themed.colorScheme.primaryContainer,
         isNot(base.colorScheme.primaryContainer),
@@ -105,6 +109,17 @@ void main() {
       // Text theme + extensions must survive the merge.
       expect(themed.textTheme.headlineMedium, base.textTheme.headlineMedium);
       expect(themed.extension<AppSpacing>(), isNotNull);
+    });
+
+    testWidgets('apply on non-brand grade shifts primary too', (tester) async {
+      final ThemeData base = AppTheme.light;
+      final ThemeData themed = GradeTheme.apply(base, ReaderGrade.master);
+      await settleTheme(tester, themed);
+
+      // 서재 마스터 seeds on Babu (deep teal) — a different hue family
+      // from Rausch, so primary must visibly move off the base brand.
+      expect(themed.colorScheme.primary, isNot(base.colorScheme.primary));
+      expect(themed.isBaseBrand, isFalse);
     });
 
     test('each grade produces a distinct primary color', () {

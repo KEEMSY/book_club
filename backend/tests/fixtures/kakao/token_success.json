@@ -1,0 +1,8 @@
+{
+  "token_type": "bearer",
+  "access_token": "test-kakao-access-token",
+  "expires_in": 21599,
+  "refresh_token": "test-kakao-refresh-token",
+  "refresh_token_expires_in": 5183999,
+  "scope": "account_email profile_nickname profile_image"
+}

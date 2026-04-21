@@ -51,8 +51,13 @@ build/
 *.iml
 
 # ─────── Generated ───────
-*.g.dart
-*.freezed.dart
+# Note for Flutter: we intentionally commit *.g.dart and *.freezed.dart
+# because the CI pipeline (`.github/workflows/mobile.yml`) does not run
+# `build_runner` before `flutter analyze` / `flutter test`. The alternative
+# (adding a build-runner step to every job) would triple the CI runtime for
+# no measurable benefit — generated file diffs are easy to review and stay
+# in sync with their source via a single `dart run build_runner build
+# --delete-conflicting-outputs` pre-commit step documented in CLAUDE.md.
 *.mocks.dart
 
 # ─────── Logs ───────

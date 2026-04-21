@@ -46,6 +46,10 @@ class Settings(BaseSettings):
     naver_client_id: str = Field(default="")
     naver_client_secret: str = Field(default="")
 
+    apple_client_id: str = Field(default="")
+    apple_keys_url: str = Field(default="https://appleid.apple.com/auth/keys")
+    apple_issuer: str = Field(default="https://appleid.apple.com")
+
     cors_allow_origins: list[str] = Field(
         default_factory=lambda: [
             "http://localhost",

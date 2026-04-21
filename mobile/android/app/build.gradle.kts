@@ -28,6 +28,16 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        // Kakao SDK: the OAuth redirect scheme is `kakao<NATIVE_APP_KEY>`.
+        // CI / release builds inject the real key via the
+        // `KAKAO_NATIVE_APP_KEY` gradle property (`-PkakaoNativeAppKey=...`).
+        // Local dev uses the placeholder so `flutter run` succeeds without
+        // secrets. Runtime login will error out until a real key is set.
+        val kakaoNativeAppKey: String =
+            (project.findProperty("kakaoNativeAppKey") as String?)
+                ?: "0000000000000000000000000000"
+        manifestPlaceholders["kakaoNativeAppKey"] = kakaoNativeAppKey
     }
 
     buildTypes {
