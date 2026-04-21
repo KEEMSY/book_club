@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Exact brand color constants from Claude (Anthropic) DESIGN.md §2.
+/// Exact brand color constants from the active design system.
 ///
 /// Re-exported as a zero-instance class so other files can reference the tokens
-/// by name (e.g. `ClaudeColors.brand`) without rebuilding a [Color] each time.
-/// Kept in lock-step with `/awesome-design-md/design-md/claude/DESIGN.md`.
-class ClaudeColors {
-  const ClaudeColors._();
+/// by name (e.g. `AppPalette.brand`) without rebuilding a [Color] each time.
+/// Values are kept in lock-step with the design-system markdown under
+/// `/awesome-design-md/design-md/<system>/DESIGN.md`. The class name is kept
+/// brand-neutral so future design-system swaps don't cascade through the
+/// codebase.
+class AppPalette {
+  const AppPalette._();
 
   // Primary
   static const Color nearBlack = Color(0xFF141413); // Anthropic Near Black
@@ -189,7 +192,7 @@ class AppShadows extends ThemeExtension<AppShadows> {
   static const AppShadows light = AppShadows(
     ambient: <BoxShadow>[
       BoxShadow(
-        color: ClaudeColors.ringWarm,
+        color: AppPalette.ringWarm,
         offset: Offset.zero,
         blurRadius: 0,
         spreadRadius: 1,
@@ -209,7 +212,7 @@ class AppShadows extends ThemeExtension<AppShadows> {
         blurRadius: 24,
       ),
       BoxShadow(
-        color: ClaudeColors.ringWarm,
+        color: AppPalette.ringWarm,
         offset: Offset.zero,
         blurRadius: 0,
         spreadRadius: 1,
@@ -220,7 +223,7 @@ class AppShadows extends ThemeExtension<AppShadows> {
   static const AppShadows dark = AppShadows(
     ambient: <BoxShadow>[
       BoxShadow(
-        color: ClaudeColors.borderDark,
+        color: AppPalette.borderDark,
         offset: Offset.zero,
         blurRadius: 0,
         spreadRadius: 1,
@@ -240,7 +243,7 @@ class AppShadows extends ThemeExtension<AppShadows> {
         blurRadius: 24,
       ),
       BoxShadow(
-        color: ClaudeColors.borderDark,
+        color: AppPalette.borderDark,
         offset: Offset.zero,
         blurRadius: 0,
         spreadRadius: 1,
@@ -281,7 +284,7 @@ class AppTheme {
 
   /// Matches the light ColorScheme's primary — exposed so tests/clients can
   /// verify the M3 default purple has actually been replaced.
-  static const Color lightPrimary = ClaudeColors.brand;
+  static const Color lightPrimary = AppPalette.brand;
 
   static ThemeData get light => _build(
         brightness: Brightness.light,
@@ -299,62 +302,62 @@ class AppTheme {
 
   static const ColorScheme _lightColorScheme = ColorScheme(
     brightness: Brightness.light,
-    primary: ClaudeColors.brand,
-    onPrimary: ClaudeColors.ivory,
-    primaryContainer: ClaudeColors.coral,
-    onPrimaryContainer: ClaudeColors.ivory,
-    secondary: ClaudeColors.warmSand,
-    onSecondary: ClaudeColors.charcoalWarm,
-    secondaryContainer: ClaudeColors.borderWarm,
-    onSecondaryContainer: ClaudeColors.charcoalWarm,
-    tertiary: ClaudeColors.darkSurface,
-    onTertiary: ClaudeColors.ivory,
-    error: ClaudeColors.errorCrimson,
-    onError: ClaudeColors.ivory,
-    surface: ClaudeColors.parchment,
-    onSurface: ClaudeColors.nearBlack,
-    surfaceContainerLowest: ClaudeColors.pureWhite,
-    surfaceContainerLow: ClaudeColors.ivory,
-    surfaceContainer: ClaudeColors.ivory,
-    surfaceContainerHigh: ClaudeColors.warmSand,
-    surfaceContainerHighest: ClaudeColors.borderWarm,
-    onSurfaceVariant: ClaudeColors.oliveGray,
-    outline: ClaudeColors.borderWarm,
-    outlineVariant: ClaudeColors.borderCream,
-    inverseSurface: ClaudeColors.nearBlack,
-    onInverseSurface: ClaudeColors.ivory,
-    inversePrimary: ClaudeColors.coral,
+    primary: AppPalette.brand,
+    onPrimary: AppPalette.ivory,
+    primaryContainer: AppPalette.coral,
+    onPrimaryContainer: AppPalette.ivory,
+    secondary: AppPalette.warmSand,
+    onSecondary: AppPalette.charcoalWarm,
+    secondaryContainer: AppPalette.borderWarm,
+    onSecondaryContainer: AppPalette.charcoalWarm,
+    tertiary: AppPalette.darkSurface,
+    onTertiary: AppPalette.ivory,
+    error: AppPalette.errorCrimson,
+    onError: AppPalette.ivory,
+    surface: AppPalette.parchment,
+    onSurface: AppPalette.nearBlack,
+    surfaceContainerLowest: AppPalette.pureWhite,
+    surfaceContainerLow: AppPalette.ivory,
+    surfaceContainer: AppPalette.ivory,
+    surfaceContainerHigh: AppPalette.warmSand,
+    surfaceContainerHighest: AppPalette.borderWarm,
+    onSurfaceVariant: AppPalette.oliveGray,
+    outline: AppPalette.borderWarm,
+    outlineVariant: AppPalette.borderCream,
+    inverseSurface: AppPalette.nearBlack,
+    onInverseSurface: AppPalette.ivory,
+    inversePrimary: AppPalette.coral,
     shadow: Color(0x0D000000),
     scrim: Color(0x66000000),
   );
 
   static const ColorScheme _darkColorScheme = ColorScheme(
     brightness: Brightness.dark,
-    primary: ClaudeColors.coral,
-    onPrimary: ClaudeColors.nearBlack,
-    primaryContainer: ClaudeColors.brand,
-    onPrimaryContainer: ClaudeColors.ivory,
-    secondary: ClaudeColors.darkSurface,
-    onSecondary: ClaudeColors.warmSilver,
-    secondaryContainer: ClaudeColors.darkWarm,
-    onSecondaryContainer: ClaudeColors.warmSilver,
-    tertiary: ClaudeColors.warmSand,
-    onTertiary: ClaudeColors.charcoalWarm,
-    error: ClaudeColors.errorCrimson,
-    onError: ClaudeColors.ivory,
-    surface: ClaudeColors.deepDark,
-    onSurface: ClaudeColors.warmSilver,
-    surfaceContainerLowest: ClaudeColors.nearBlack,
-    surfaceContainerLow: ClaudeColors.deepDark,
-    surfaceContainer: ClaudeColors.darkSurface,
-    surfaceContainerHigh: ClaudeColors.darkWarm,
-    surfaceContainerHighest: ClaudeColors.charcoalWarm,
-    onSurfaceVariant: ClaudeColors.warmSilver,
-    outline: ClaudeColors.darkSurface,
-    outlineVariant: ClaudeColors.darkWarm,
-    inverseSurface: ClaudeColors.parchment,
-    onInverseSurface: ClaudeColors.nearBlack,
-    inversePrimary: ClaudeColors.brand,
+    primary: AppPalette.coral,
+    onPrimary: AppPalette.nearBlack,
+    primaryContainer: AppPalette.brand,
+    onPrimaryContainer: AppPalette.ivory,
+    secondary: AppPalette.darkSurface,
+    onSecondary: AppPalette.warmSilver,
+    secondaryContainer: AppPalette.darkWarm,
+    onSecondaryContainer: AppPalette.warmSilver,
+    tertiary: AppPalette.warmSand,
+    onTertiary: AppPalette.charcoalWarm,
+    error: AppPalette.errorCrimson,
+    onError: AppPalette.ivory,
+    surface: AppPalette.deepDark,
+    onSurface: AppPalette.warmSilver,
+    surfaceContainerLowest: AppPalette.nearBlack,
+    surfaceContainerLow: AppPalette.deepDark,
+    surfaceContainer: AppPalette.darkSurface,
+    surfaceContainerHigh: AppPalette.darkWarm,
+    surfaceContainerHighest: AppPalette.charcoalWarm,
+    onSurfaceVariant: AppPalette.warmSilver,
+    outline: AppPalette.darkSurface,
+    outlineVariant: AppPalette.darkWarm,
+    inverseSurface: AppPalette.parchment,
+    onInverseSurface: AppPalette.nearBlack,
+    inversePrimary: AppPalette.brand,
     shadow: Color(0x33000000),
     scrim: Color(0x99000000),
   );
@@ -530,9 +533,9 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor:
-              isLight ? ClaudeColors.warmSand : ClaudeColors.darkSurface,
+              isLight ? AppPalette.warmSand : AppPalette.darkSurface,
           foregroundColor:
-              isLight ? ClaudeColors.charcoalWarm : ClaudeColors.warmSilver,
+              isLight ? AppPalette.charcoalWarm : AppPalette.warmSilver,
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           shape: const RoundedRectangleBorder(
@@ -545,7 +548,7 @@ class AppTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: colorScheme.onSurface,
           side: BorderSide(
-            color: isLight ? ClaudeColors.borderWarm : ClaudeColors.borderDark,
+            color: isLight ? AppPalette.borderWarm : AppPalette.borderDark,
           ),
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(12)),
@@ -561,20 +564,20 @@ class AppTheme {
         ),
       ),
       cardTheme: CardThemeData(
-        color: isLight ? ClaudeColors.ivory : ClaudeColors.darkSurface,
+        color: isLight ? AppPalette.ivory : AppPalette.darkSurface,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
           borderRadius: const BorderRadius.all(Radius.circular(8)),
           side: BorderSide(
-            color: isLight ? ClaudeColors.borderCream : ClaudeColors.borderDark,
+            color: isLight ? AppPalette.borderCream : AppPalette.borderDark,
           ),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: isLight ? ClaudeColors.ivory : ClaudeColors.darkSurface,
+        fillColor: isLight ? AppPalette.ivory : AppPalette.darkSurface,
         // DESIGN.md §4 Inputs — vertical padding ≈ 1.6px is too tight for
         // touch targets on mobile; adapt upward to the mobile-minimum 12px.
         contentPadding:
@@ -582,30 +585,30 @@ class AppTheme {
         border: OutlineInputBorder(
           borderRadius: const BorderRadius.all(Radius.circular(12)),
           borderSide: BorderSide(
-            color: isLight ? ClaudeColors.borderWarm : ClaudeColors.borderDark,
+            color: isLight ? AppPalette.borderWarm : AppPalette.borderDark,
           ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: const BorderRadius.all(Radius.circular(12)),
           borderSide: BorderSide(
-            color: isLight ? ClaudeColors.borderWarm : ClaudeColors.borderDark,
+            color: isLight ? AppPalette.borderWarm : AppPalette.borderDark,
           ),
         ),
         focusedBorder: const OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(12)),
-          borderSide: BorderSide(color: ClaudeColors.focusBlue, width: 1.5),
+          borderSide: BorderSide(color: AppPalette.focusBlue, width: 1.5),
         ),
         hintStyle: textTheme.bodyMedium?.copyWith(
-          color: ClaudeColors.stoneGray,
+          color: AppPalette.stoneGray,
         ),
       ),
       dividerTheme: DividerThemeData(
-        color: isLight ? ClaudeColors.borderCream : ClaudeColors.borderDark,
+        color: isLight ? AppPalette.borderCream : AppPalette.borderDark,
         thickness: 1,
         space: 1,
       ),
       iconTheme: IconThemeData(
-        color: isLight ? ClaudeColors.charcoalWarm : ClaudeColors.warmSilver,
+        color: isLight ? AppPalette.charcoalWarm : AppPalette.warmSilver,
       ),
     );
   }

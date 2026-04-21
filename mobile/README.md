@@ -81,7 +81,7 @@ Book Club의 시각 언어는 **Claude (Anthropic) 디자인 시스템**을 Flut
 
 - **테마 진입점**: `lib/core/theme/app_theme.dart`
   - `AppTheme.light` / `AppTheme.dark` — Parchment(`#F5F4ED`) / Near Black(`#141413`) 을 기반으로 한 M3 `ThemeData` getter. `MaterialApp` 의 `theme` / `darkTheme` 에 그대로 연결해 사용한다.
-  - `ClaudeColors.*` — Terracotta, Parchment, Ivory 등 브랜드 색을 `Color` 상수로 노출. UI 코드에서 그대로 `import` 해서 쓴다.
+  - `AppPalette.*` — 현재 디자인 시스템의 원색을 `Color` 상수로 노출한다. 이름을 브랜드 중립으로 유지해 향후 디자인 시스템 교체 시 호출부가 영향받지 않도록 한다.
   - 폰트는 `google_fonts` 로 로드한다. Anthropic Serif 는 **Fraunces**, Anthropic Sans 는 **Inter** 로 대체 매핑되어 있으며, 제목(serif) / 본문(sans) 구분과 weight 500 headline 규칙은 그대로 유지된다.
 
 - **등급별 컬러 테마**: `lib/core/theme/grade_theme.dart`

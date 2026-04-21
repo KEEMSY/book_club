@@ -27,11 +27,11 @@ void main() {
 
   group('AppTheme', () {
     testWidgets(
-      'light primary is Claude Terracotta Brand, not the M3 default',
+      'light primary matches AppPalette.brand, not the M3 default',
       (tester) async {
         final ThemeData theme = AppTheme.light;
         await settleTheme(tester, theme);
-        expect(theme.colorScheme.primary, ClaudeColors.brand);
+        expect(theme.colorScheme.primary, AppPalette.brand);
         expect(theme.colorScheme.primary, AppTheme.lightPrimary);
       },
     );
@@ -61,11 +61,12 @@ void main() {
       expect(dark.extension<AppShadows>(), isNotNull);
     });
 
-    testWidgets('scaffold background on light theme is Claude Parchment',
+    testWidgets(
+        'scaffold background on light theme matches AppPalette.parchment',
         (tester) async {
       final ThemeData theme = AppTheme.light;
       await settleTheme(tester, theme);
-      expect(theme.scaffoldBackgroundColor, ClaudeColors.parchment);
+      expect(theme.scaffoldBackgroundColor, AppPalette.parchment);
     });
   });
 
