@@ -540,6 +540,11 @@ TDD: 경계값 10 가지 이상 케이스.
 
 ## Changelog
 
+- **0.1.4** (2026-04-22) — **Milestone 2 (Book 카탈로그 · 검색 · 서재) 완료.** 태그 `v0.0.3-m2`.
+  - Backend (8 커밋, 99 pass + 12 postgres-integration skip): Book · UserBook 모델, 0003 마이그레이션, Port/Adapter(BookRepository · UserBookRepository · 네이버 · 카카오 · Composite 폴백), BookService(검색 시 카탈로그 upsert · 서재 담기 · 상태 전이 · 리뷰 자동 완독 전이 · 커서 페이지네이션), `/books/search` · `/books/{id}` · `/me/library` 6 라우터, 에러 코드 `BOOK_NOT_FOUND` · `BOOK_ALREADY_IN_LIBRARY` · `USER_BOOK_NOT_FOUND` · `RATING_OUT_OF_RANGE` · `NAVER_BOOK_*` · `KAKAO_BOOK_*`.
+  - Mobile (8 커밋, 52 pass): Book feature 4레이어, retrofit `BookApi`, `BookSearchNotifier`(300ms debounce · request-sequence 토큰 · 커서 페이지네이션), `SearchScreen`(Airbnb 검색 UX) · `BookDetailScreen`(담기 CTA 5-branch state) · `LibraryScreen`(4-탭 세그먼트 · 2열 그리드 · per-tab scroll 보존 · highlight 링), `ReviewModal`(별점 + 200자 한줄 · 완독 자동 트리거 + 햅틱), 하단 네비게이션(검색·서재) + StatefulShellRoute + `/books/:id` 루트 네비게이터.
+  - 로그인 성공 landing 이 `/home` → `/library` 로 변경 (M3 타이머 대시보드가 `/home` 을 다시 차지할 예정).
+  - 새 의존성 2종: `cached_network_image`, `flutter_rating_bar`.
 - **0.1.3** (2026-04-22) — **Kakao OAuth contract hotfix (post-M1).** `POST /auth/kakao` 가 `{ access_token }` 를 받도록 재조정. Kakao Flutter SDK 가 네이티브 iOS/Android 에서 authorization code 대신 access_token 을 반환하므로 백엔드의 token-exchange 스텝 제거, `GET /v2/user/me` 직접 호출. 에러 코드 `KAKAO_TOKEN_EXCHANGE_FAILED` · `KAKAO_TOKEN_MALFORMED` 삭제, `KAKAO_TOKEN_INVALID` (401/403) 신설. 계약 파괴적 변경이지만 프로덕션 클라이언트 0, 모바일도 동일 변경에 포함. 태그 `v0.0.2`.
 - **0.1.0** (2026-04-20) — 초기 Phase 1 구현 계획. 6개 마일스톤 · 에이전트 분배 전략 포함.
 - **0.1.2** (2026-04-20) — **Milestone 1 (Auth · 카카오/애플) 완료.** 태그 `v0.0.1-m1`.

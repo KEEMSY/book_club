@@ -10,6 +10,7 @@ from app.api import health
 from app.core.config import get_settings
 from app.core.exceptions import register_exception_handlers
 from app.domains.auth.router import router as auth_router
+from app.domains.book.router import router as book_router
 
 
 def create_app() -> FastAPI:
@@ -38,6 +39,7 @@ def create_app() -> FastAPI:
     register_exception_handlers(app)
     app.include_router(health.router)
     app.include_router(auth_router)
+    app.include_router(book_router)
 
     return app
 

@@ -11,18 +11,19 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'fakes.dart';
 
-/// End-to-end happy path: Kakao tap → `/home` → logout → `/login`.
+/// End-to-end happy path: Kakao tap → `/library` → logout → `/login`.
 ///
 /// Runs against the mocked network layer (FakeAuthApi + FakeSocialLoginPort);
 /// no real Kakao or Apple SDK is invoked. Lives under `test/` so the standard
-/// `flutter test` CI step covers it without requiring a connected device. A
-/// fuller device-backed run can be added under `integration_test/` once we
-/// have a desktop target or emulator available in CI.
+/// `flutter test` CI step covers it without requiring a connected device. M2
+/// moves the authenticated landing from the former `/home` placeholder to
+/// `/library`, so the post-login assertions now target the "내 서재" header
+/// and the library's logout IconButton instead of the old home CTAs.
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   GoogleFonts.config.allowRuntimeFetching = false;
 
-  testWidgets('Kakao login → /home → logout → /login', (tester) async {
+  testWidgets('Kakao login → /library → logout → /login', (tester) async {
     final storage = InMemorySecureStorage();
     final api = FakeAuthApi(
       loginKakaoResponse: buildLoginResponse(
@@ -59,9 +60,9 @@ void main() {
     await tester.tap(find.byType(KakaoLoginButton));
     await tester.pumpAndSettle();
 
-    // Authenticated -> /home (smoke placeholder screen).
-    expect(find.text('시작하기'), findsOneWidget);
-    expect(find.text('어떤 책이 있을까?'), findsOneWidget);
+    // Authenticated -> /library. The library screen renders the Playfair
+    // "내 서재" header plus a logout IconButton in the top-right.
+    expect(find.text('내 서재'), findsOneWidget);
 
     // Trigger logout via the AppBar icon.
     final logoutIcon = find.byIcon(Icons.logout_outlined);

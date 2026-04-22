@@ -1,0 +1,51 @@
+{
+  "meta": {
+    "total_count": 3,
+    "pageable_count": 3,
+    "is_end": true
+  },
+  "documents": [
+    {
+      "title": "오만과 편견",
+      "contents": "19세기 영국 사회를 배경으로 한 연애 소설의 고전.",
+      "url": "https://search.daum.net/search?w=bookpage&bookId=1",
+      "isbn": "8937460777 9788937460777",
+      "datetime": "2022-01-01T00:00:00.000+09:00",
+      "authors": ["제인 오스틴", "윤지관"],
+      "publisher": "민음사",
+      "translators": [],
+      "price": 12000,
+      "sale_price": 10800,
+      "thumbnail": "https://search1.kakaocdn.net/thumb/cover1.jpg",
+      "status": "정상판매"
+    },
+    {
+      "title": "데미안",
+      "contents": "싱클레어의 성장 이야기.",
+      "url": "https://search.daum.net/search?w=bookpage&bookId=2",
+      "isbn": "9788937460555",
+      "datetime": "2021-05-01T00:00:00.000+09:00",
+      "authors": ["헤르만 헤세"],
+      "publisher": "민음사",
+      "translators": ["전영애"],
+      "price": 10000,
+      "sale_price": 9000,
+      "thumbnail": "https://search1.kakaocdn.net/thumb/cover2.jpg",
+      "status": "정상판매"
+    },
+    {
+      "title": "코스모스",
+      "contents": "우주와 인류에 관한 과학 에세이.",
+      "url": "https://search.daum.net/search?w=bookpage&bookId=3",
+      "isbn": "9788983711892",
+      "datetime": "2006-01-01T00:00:00.000+09:00",
+      "authors": ["칼 세이건"],
+      "publisher": "사이언스북스",
+      "translators": ["홍승수"],
+      "price": 25000,
+      "sale_price": 22500,
+      "thumbnail": "https://search1.kakaocdn.net/thumb/cover3.jpg",
+      "status": "정상판매"
+    }
+  ]
+}

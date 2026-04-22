@@ -1,0 +1,41 @@
+{
+  "lastBuildDate": "Mon, 20 Apr 2026 12:00:00 +0900",
+  "total": 3,
+  "start": 1,
+  "display": 3,
+  "items": [
+    {
+      "title": "오만과 편견",
+      "link": "https://book.naver.com/bookdb/book_detail.nhn?bid=1",
+      "image": "https://bookthumb-phinf.pstatic.net/cover/001/001/cover1.jpg",
+      "author": "제인 오스틴|윤지관",
+      "discount": "12000",
+      "publisher": "민음사",
+      "pubdate": "20220101",
+      "isbn": "8937460777 9788937460777",
+      "description": "19세기 영국 사회를 배경으로 한 연애 소설의 고전."
+    },
+    {
+      "title": "데미안",
+      "link": "https://book.naver.com/bookdb/book_detail.nhn?bid=2",
+      "image": "https://bookthumb-phinf.pstatic.net/cover/001/001/cover2.jpg",
+      "author": "헤르만 헤세",
+      "discount": "10000",
+      "publisher": "민음사",
+      "pubdate": "20210501",
+      "isbn": "9788937460555",
+      "description": "싱클레어의 성장 이야기."
+    },
+    {
+      "title": "코스모스",
+      "link": "https://book.naver.com/bookdb/book_detail.nhn?bid=3",
+      "image": "https://bookthumb-phinf.pstatic.net/cover/001/001/cover3.jpg",
+      "author": "칼 세이건",
+      "discount": "25000",
+      "publisher": "사이언스북스",
+      "pubdate": "20060101",
+      "isbn": "9788983711892",
+      "description": "우주와 인류에 관한 과학 에세이."
+    }
+  ]
+}

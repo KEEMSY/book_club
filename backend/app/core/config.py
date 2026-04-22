@@ -45,6 +45,8 @@ class Settings(BaseSettings):
     kakao_rest_api_key: str = Field(default="")
     naver_client_id: str = Field(default="")
     naver_client_secret: str = Field(default="")
+    naver_book_api_url: str = Field(default="https://openapi.naver.com/v1/search/book.json")
+    kakao_book_api_url: str = Field(default="https://dapi.kakao.com/v3/search/book")
 
     apple_client_id: str = Field(default="")
     apple_keys_url: str = Field(default="https://appleid.apple.com/auth/keys")

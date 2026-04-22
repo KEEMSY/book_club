@@ -50,6 +50,17 @@ dependencies:
   # roles) and Inter (humanist sans — UI / body). Fonts are fetched at runtime.
   google_fonts: ^6.2.1
 
+  # Remote book cover loading (M2 · book feature). Network image cache +
+  # progressive placeholder on top of dio. The Book Club backend returns
+  # `cover_url` from Naver/Kakao directly, so we need HTTP range-friendly
+  # cached images with graceful fallbacks when a book record has no cover.
+  cached_network_image: ^3.4.1
+
+  # Rating stars (M2 · review modal). Chosen over rolling a custom star row
+  # because the package renders cleanly inside our Airbnb-toned modal and
+  # lets us swap the empty/filled colors to Rausch without losing haptics.
+  flutter_rating_bar: ^4.0.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

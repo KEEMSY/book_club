@@ -69,6 +69,18 @@ class AppleAuthError(AuthError):
     code = "APPLE_AUTH_FAILED"
 
 
+class NaverBookError(ExternalServiceError):
+    """Naver book search API call failed — auth, quota, or upstream 5xx."""
+
+    code = "NAVER_BOOK_ERROR"
+
+
+class KakaoBookError(ExternalServiceError):
+    """Kakao book search API call failed — auth, quota, or upstream 5xx."""
+
+    code = "KAKAO_BOOK_ERROR"
+
+
 def _error_response(exc: DomainError) -> JSONResponse:
     return JSONResponse(
         status_code=exc.status_code,

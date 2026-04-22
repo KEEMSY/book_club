@@ -6,15 +6,25 @@ import 'package:go_router/go_router.dart';
 import '../../features/auth/application/auth_providers.dart';
 import '../../features/auth/domain/auth_state.dart';
 import '../../features/auth/presentation/login_screen.dart';
+import '../../features/book/presentation/book_detail_screen.dart';
+import '../../features/book/presentation/library_screen.dart';
+import '../../features/book/presentation/search_screen.dart';
 import '../network/dio_provider.dart';
 import '../theme/app_theme.dart';
+import 'app_shell.dart';
 
 /// Route paths, kept as constants so feature code does not stringly-type them.
 class AppRoutes {
   const AppRoutes._();
 
+  // M0/M1 entry points.
   static const login = '/login';
   static const home = '/home';
+
+  // M2 destinations.
+  static const search = '/search';
+  static const library = '/library';
+  static String bookDetail(String id) => '/books/$id';
 }
 
 /// Adapter that bridges a Riverpod [ValueNotifier]-free state stream into a
@@ -33,23 +43,25 @@ class _AuthStateListenable extends ChangeNotifier {
   late final ProviderSubscription<AuthState> _sub;
 }
 
+final _shellSearchKey = GlobalKey<NavigatorState>();
+final _shellLibraryKey = GlobalKey<NavigatorState>();
+final _rootKey = GlobalKey<NavigatorState>();
+
 final appRouterProvider = Provider<GoRouter>((ref) {
   final listenable = _AuthStateListenable(ref);
   return GoRouter(
-    initialLocation: AppRoutes.home,
+    initialLocation: AppRoutes.library,
+    navigatorKey: _rootKey,
     refreshListenable: listenable,
     redirect: (context, state) {
       final AuthState auth = ref.read(authNotifierProvider);
       final String target = state.matchedLocation;
 
-      // Root alias — send anyone hitting `/` onto the home route; the state
-      // machine still evaluates below so unauthenticated users bounce to
-      // `/login` in the next pass.
-      final String canonical = target == '/' ? AppRoutes.home : target;
+      // Root alias — M2 promotes /library to the authenticated landing.
+      // /home stays registered for M3 (timer dashboard) but we no longer
+      // expose it from the UI.
+      final String canonical = target == '/' ? AppRoutes.library : target;
 
-      // AuthInitial means bootstrap is still in flight. Keep the user on
-      // whatever route they were trying to reach — once the notifier resolves
-      // to Authenticated / Unauthenticated the listenable fires another pass.
       if (auth is AuthInitial) {
         return canonical == target ? null : canonical;
       }
@@ -61,27 +73,67 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         return AppRoutes.login;
       }
       if (authenticated && onLogin) {
-        return AppRoutes.home;
+        return AppRoutes.library;
       }
       return canonical == target ? null : canonical;
     },
     routes: <RouteBase>[
+      // Login sits outside the shell — no bottom nav on the login screen.
+      GoRoute(
+        path: AppRoutes.login,
+        builder: (context, state) => const LoginScreen(),
+      ),
+      // Book detail is pushed on top of whichever shell branch the user is on
+      // (search vs library), so it lives on the root navigator.
+      GoRoute(
+        path: '/books/:id',
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) {
+          final String id = state.pathParameters['id']!;
+          return BookDetailScreen(bookId: id);
+        },
+      ),
+      // M3 placeholder: kept present so deep links to /home don't 404 while
+      // the timer dashboard is in flight. Hidden from UI navigation.
       GoRoute(
         path: AppRoutes.home,
         builder: (context, state) => const _HomePlaceholderScreen(),
       ),
-      GoRoute(
-        path: AppRoutes.login,
-        builder: (context, state) => const LoginScreen(),
+      // Two-tab StatefulShellRoute — Search · Library.
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) =>
+            AppShell(navigationShell: navigationShell),
+        branches: <StatefulShellBranch>[
+          StatefulShellBranch(
+            navigatorKey: _shellSearchKey,
+            routes: <RouteBase>[
+              GoRoute(
+                path: AppRoutes.search,
+                builder: (context, state) => const SearchScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: _shellLibraryKey,
+            routes: <RouteBase>[
+              GoRoute(
+                path: AppRoutes.library,
+                builder: (context, state) {
+                  final String? highlight =
+                      state.uri.queryParameters['highlight'];
+                  return LibraryScreen(highlightUserBookId: highlight);
+                },
+              ),
+            ],
+          ),
+        ],
       ),
     ],
   );
 });
 
-/// M0 home placeholder — exists primarily to verify the Airbnb-themed
-/// [AppTheme] is plumbed end-to-end (editorial serif hero, warm Foggy canvas,
-/// Rausch Red FilledButton, pill OutlinedButton, AppSpacing extension). The
-/// real home screen lands in later milestones.
+/// Legacy home placeholder — exists so M3 timer work can drop into this route
+/// without a migration. No longer reachable from the app's visible UI.
 class _HomePlaceholderScreen extends ConsumerWidget {
   const _HomePlaceholderScreen();
 
@@ -120,18 +172,11 @@ class _HomePlaceholderScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            // Editorial serif hero — Playfair Display 40 / w500 with
-            // Airbnb's negative tracking (-0.44px) for the intimate,
-            // magazine-style headline voice.
             Text(
               'Book Club',
               style: theme.textTheme.displayLarge,
             ),
             SizedBox(height: spacing.sm),
-            // Korean subhead softened from the previous copy to better
-            // match the 감성적 / 따뜻 tone the brief calls for. Original
-            // was "독서를 기록하고, 책으로 대화하세요" — kept meaning, added
-            // warmth with "오늘" + "사람과 만나요".
             Text(
               '오늘 읽은 책을 기록하고, 책으로 사람과 만나요',
               style: theme.textTheme.bodyLarge?.copyWith(
@@ -141,7 +186,6 @@ class _HomePlaceholderScreen extends ConsumerWidget {
               ),
             ),
             SizedBox(height: spacing.xl),
-            // Primary CTA — Rausch Red filled, 12px radius, w500 label.
             SizedBox(
               width: double.infinity,
               child: FilledButton(
@@ -150,8 +194,6 @@ class _HomePlaceholderScreen extends ConsumerWidget {
               ),
             ),
             SizedBox(height: spacing.sm),
-            // Secondary CTA — pill outlined (radius 1000), neutral border,
-            // Rausch text, matching Airbnb's "Become a host"-style link.
             SizedBox(
               width: double.infinity,
               child: OutlinedButton(

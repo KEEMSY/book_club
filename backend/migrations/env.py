@@ -35,6 +35,7 @@ config.set_main_option("sqlalchemy.url", settings.database_url)
 # adding its import here (and nothing else).
 from app.core.db import Base  # noqa: E402
 from app.domains.auth import models as _auth_models  # noqa: E402, F401
+from app.domains.book import models as _book_models  # noqa: E402, F401
 
 target_metadata = Base.metadata
 

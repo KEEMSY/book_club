@@ -1,0 +1,37 @@
+{
+  "meta": {
+    "total_count": 2,
+    "pageable_count": 2,
+    "is_end": true
+  },
+  "documents": [
+    {
+      "title": "유효한 책",
+      "contents": "ISBN13 이 존재함.",
+      "url": "https://search.daum.net/search?w=bookpage&bookId=10",
+      "isbn": "9788937460111",
+      "datetime": "2020-01-01T00:00:00.000+09:00",
+      "authors": ["저자"],
+      "publisher": "출판사",
+      "translators": [],
+      "price": 10000,
+      "sale_price": 9000,
+      "thumbnail": "https://search1.kakaocdn.net/thumb/valid.jpg",
+      "status": "정상판매"
+    },
+    {
+      "title": "구판",
+      "contents": "10자리 ISBN 만 있음 — 드롭 대상.",
+      "url": "https://search.daum.net/search?w=bookpage&bookId=11",
+      "isbn": "8937460123",
+      "datetime": "1999-01-01T00:00:00.000+09:00",
+      "authors": ["저자"],
+      "publisher": "출판사",
+      "translators": [],
+      "price": 8000,
+      "sale_price": 7200,
+      "thumbnail": "https://search1.kakaocdn.net/thumb/old.jpg",
+      "status": "정상판매"
+    }
+  ]
+}
