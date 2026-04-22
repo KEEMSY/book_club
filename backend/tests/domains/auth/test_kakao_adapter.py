@@ -1,8 +1,12 @@
 """Contract tests for the Kakao OAuth adapter.
 
-Uses ``respx`` to stub the Kakao endpoints with fixtures under
+Uses ``respx`` to stub the Kakao user-info endpoint with fixtures under
 ``tests/fixtures/kakao/``. Asserts the adapter normalises the Kakao response
 into :class:`KakaoUserProfile` and maps failures to :class:`KakaoAuthError`.
+
+Note: the adapter no longer calls ``/oauth/token`` because the mobile Kakao
+SDK on native platforms hands the client an access_token directly. All cases
+here therefore only stub the user-info endpoint.
 """
 
 from __future__ import annotations
@@ -39,20 +43,14 @@ async def kakao_adapter() -> AsyncIterator[KakaoOAuthAdapter]:
 
 @pytest.mark.asyncio
 async def test_kakao_happy_path(kakao_adapter: KakaoOAuthAdapter) -> None:
-    token_payload = _load("kakao/token_success.json")
     me_payload = _load("kakao/me_success.json")
 
     with respx.mock(assert_all_called=True) as mock:
-        mock.post("https://kauth.kakao.com/oauth/token").mock(
-            return_value=httpx.Response(200, json=token_payload)
-        )
         mock.get("https://kapi.kakao.com/v2/user/me").mock(
             return_value=httpx.Response(200, json=me_payload)
         )
 
-        profile = await kakao_adapter.exchange_code_for_user(
-            code="valid-code", redirect_uri="bookclub://auth/callback"
-        )
+        profile = await kakao_adapter.fetch_user_by_access_token("valid-access-token")
 
     assert profile.sub == "4242424242"
     assert profile.email == "reader@example.com"
@@ -64,18 +62,14 @@ async def test_kakao_happy_path(kakao_adapter: KakaoOAuthAdapter) -> None:
 async def test_kakao_missing_email_still_returns_profile(
     kakao_adapter: KakaoOAuthAdapter,
 ) -> None:
-    token_payload = _load("kakao/token_success.json")
     me_payload = _load("kakao/me_missing_email.json")
 
     with respx.mock(assert_all_called=True) as mock:
-        mock.post("https://kauth.kakao.com/oauth/token").mock(
-            return_value=httpx.Response(200, json=token_payload)
-        )
         mock.get("https://kapi.kakao.com/v2/user/me").mock(
             return_value=httpx.Response(200, json=me_payload)
         )
 
-        profile = await kakao_adapter.exchange_code_for_user(code="x", redirect_uri=None)
+        profile = await kakao_adapter.fetch_user_by_access_token("tok")
 
     assert profile.email is None
     assert profile.nickname == "이메일없음"
@@ -83,33 +77,15 @@ async def test_kakao_missing_email_still_returns_profile(
 
 
 @pytest.mark.asyncio
-async def test_kakao_token_endpoint_4xx_raises(
+async def test_kakao_user_info_401_maps_to_token_invalid(
     kakao_adapter: KakaoOAuthAdapter,
 ) -> None:
-    error_payload = _load("kakao/token_error.json")
-
     with respx.mock(assert_all_called=True) as mock:
-        mock.post("https://kauth.kakao.com/oauth/token").mock(
-            return_value=httpx.Response(401, json=error_payload)
-        )
-
-        with pytest.raises(KakaoAuthError):
-            await kakao_adapter.exchange_code_for_user(code="bad", redirect_uri=None)
-
-
-@pytest.mark.asyncio
-async def test_kakao_user_info_4xx_raises(
-    kakao_adapter: KakaoOAuthAdapter,
-) -> None:
-    token_payload = _load("kakao/token_success.json")
-
-    with respx.mock(assert_all_called=True) as mock:
-        mock.post("https://kauth.kakao.com/oauth/token").mock(
-            return_value=httpx.Response(200, json=token_payload)
-        )
         mock.get("https://kapi.kakao.com/v2/user/me").mock(
             return_value=httpx.Response(401, json={"code": -401, "msg": "invalid"})
         )
 
-        with pytest.raises(KakaoAuthError):
-            await kakao_adapter.exchange_code_for_user(code="c", redirect_uri=None)
+        with pytest.raises(KakaoAuthError) as exc_info:
+            await kakao_adapter.fetch_user_by_access_token("expired-or-bad")
+
+    assert exc_info.value.code == "KAKAO_TOKEN_INVALID"

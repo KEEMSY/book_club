@@ -9,15 +9,13 @@ part of 'auth_models.dart';
 _$KakaoLoginRequestImpl _$$KakaoLoginRequestImplFromJson(
         Map<String, dynamic> json) =>
     _$KakaoLoginRequestImpl(
-      code: json['code'] as String,
-      redirectUri: json['redirect_uri'] as String?,
+      accessToken: json['access_token'] as String,
     );
 
 Map<String, dynamic> _$$KakaoLoginRequestImplToJson(
         _$KakaoLoginRequestImpl instance) =>
     <String, dynamic>{
-      'code': instance.code,
-      'redirect_uri': instance.redirectUri,
+      'access_token': instance.accessToken,
     };
 
 _$AppleLoginRequestImpl _$$AppleLoginRequestImplFromJson(

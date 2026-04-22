@@ -61,11 +61,9 @@ class AuthRepository {
         message: '카카오 로그인에 실패했습니다. 다시 시도해주세요.',
       );
     }
-    // Contract gap (see auth_models.dart): backend schema field is `code`
-    // but on mobile Kakao SDK only returns access_token, so we pass it
-    // through the same field. Backend adapter is expected to accept either.
     final LoginResponse resp = await _call(
-      () => _api.loginKakao(KakaoLoginRequest(code: accessToken).toJson()),
+      () =>
+          _api.loginKakao(KakaoLoginRequest(accessToken: accessToken).toJson()),
     );
     await _persistTokens(resp.accessToken, resp.refreshToken);
     return resp.user.toDomain();

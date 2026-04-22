@@ -1,5 +1,0 @@
-{
-  "error": "invalid_grant",
-  "error_description": "authorization code not found for code=fake-code",
-  "error_code": "KOE320"
-}

@@ -19,8 +19,11 @@ from app.domains.auth.models import User
 
 
 class KakaoLoginRequest(BaseModel):
-    code: str = Field(..., min_length=1)
-    redirect_uri: str | None = None
+    # The Kakao Flutter SDK on native iOS/Android never surfaces an OAuth
+    # authorization code — it returns an access_token directly. We accept that
+    # token here and call Kakao's /v2/user/me in the adapter; no token-exchange
+    # step is needed.
+    access_token: str = Field(..., min_length=1)
 
 
 class AppleLoginRequest(BaseModel):

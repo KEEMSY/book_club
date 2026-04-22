@@ -66,9 +66,15 @@ class DeviceTokenRepositoryPort(Protocol):
 
 
 class KakaoOAuthPort(Protocol):
-    async def exchange_code_for_user(
-        self, code: str, redirect_uri: str | None
-    ) -> KakaoUserProfile: ...
+    async def fetch_user_by_access_token(self, access_token: str) -> KakaoUserProfile:
+        """Fetch and normalize a Kakao user profile given a valid access_token.
+
+        The mobile Kakao SDK hands the client an OAuth access_token directly
+        (no authorization code on native platforms), so the adapter skips the
+        token-exchange step and calls ``GET /v2/user/me`` with the bearer
+        token. Failures map to :class:`~app.core.exceptions.KakaoAuthError`.
+        """
+        ...
 
 
 class AppleOAuthPort(Protocol):

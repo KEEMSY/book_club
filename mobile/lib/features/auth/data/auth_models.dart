@@ -7,18 +7,15 @@ part 'auth_models.g.dart';
 
 /// Request to POST /auth/kakao.
 ///
-/// **Contract note (M1 gap):** the backend schema calls this field `code`
-/// but the Kakao mobile SDK only exposes an OAuth access_token — it never
-/// surfaces the authorization code on a Korean iOS/Android app. For M1 we
-/// send the SDK-provided `access_token` as the `code` value so the route
-/// stays untouched; the backend adapter is expected to accept either. See
-/// the Milestone 1 report "Assumptions" section for the TODO to converge
-/// the contract. Snake-case JSON keys are handled globally via `build.yaml`.
+/// The Kakao Flutter SDK on native iOS/Android never surfaces an OAuth
+/// authorization code — it hands the client an [accessToken] directly. The
+/// backend therefore accepts the access_token verbatim and calls Kakao's
+/// `/v2/user/me` endpoint itself; no server-side token exchange takes place.
+/// Snake-case JSON keys are handled globally via `build.yaml`.
 @freezed
 class KakaoLoginRequest with _$KakaoLoginRequest {
   const factory KakaoLoginRequest({
-    required String code,
-    String? redirectUri,
+    required String accessToken,
   }) = _KakaoLoginRequest;
 
   factory KakaoLoginRequest.fromJson(Map<String, dynamic> json) =>

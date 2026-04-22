@@ -20,8 +20,7 @@ KakaoLoginRequest _$KakaoLoginRequestFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$KakaoLoginRequest {
-  String get code => throw _privateConstructorUsedError;
-  String? get redirectUri => throw _privateConstructorUsedError;
+  String get accessToken => throw _privateConstructorUsedError;
 
   /// Serializes this KakaoLoginRequest to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -39,7 +38,7 @@ abstract class $KakaoLoginRequestCopyWith<$Res> {
           KakaoLoginRequest value, $Res Function(KakaoLoginRequest) then) =
       _$KakaoLoginRequestCopyWithImpl<$Res, KakaoLoginRequest>;
   @useResult
-  $Res call({String code, String? redirectUri});
+  $Res call({String accessToken});
 }
 
 /// @nodoc
@@ -57,18 +56,13 @@ class _$KakaoLoginRequestCopyWithImpl<$Res, $Val extends KakaoLoginRequest>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? code = null,
-    Object? redirectUri = freezed,
+    Object? accessToken = null,
   }) {
     return _then(_value.copyWith(
-      code: null == code
-          ? _value.code
-          : code // ignore: cast_nullable_to_non_nullable
+      accessToken: null == accessToken
+          ? _value.accessToken
+          : accessToken // ignore: cast_nullable_to_non_nullable
               as String,
-      redirectUri: freezed == redirectUri
-          ? _value.redirectUri
-          : redirectUri // ignore: cast_nullable_to_non_nullable
-              as String?,
     ) as $Val);
   }
 }
@@ -81,7 +75,7 @@ abstract class _$$KakaoLoginRequestImplCopyWith<$Res>
       __$$KakaoLoginRequestImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String code, String? redirectUri});
+  $Res call({String accessToken});
 }
 
 /// @nodoc
@@ -97,18 +91,13 @@ class __$$KakaoLoginRequestImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? code = null,
-    Object? redirectUri = freezed,
+    Object? accessToken = null,
   }) {
     return _then(_$KakaoLoginRequestImpl(
-      code: null == code
-          ? _value.code
-          : code // ignore: cast_nullable_to_non_nullable
+      accessToken: null == accessToken
+          ? _value.accessToken
+          : accessToken // ignore: cast_nullable_to_non_nullable
               as String,
-      redirectUri: freezed == redirectUri
-          ? _value.redirectUri
-          : redirectUri // ignore: cast_nullable_to_non_nullable
-              as String?,
     ));
   }
 }
@@ -116,19 +105,17 @@ class __$$KakaoLoginRequestImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$KakaoLoginRequestImpl implements _KakaoLoginRequest {
-  const _$KakaoLoginRequestImpl({required this.code, this.redirectUri});
+  const _$KakaoLoginRequestImpl({required this.accessToken});
 
   factory _$KakaoLoginRequestImpl.fromJson(Map<String, dynamic> json) =>
       _$$KakaoLoginRequestImplFromJson(json);
 
   @override
-  final String code;
-  @override
-  final String? redirectUri;
+  final String accessToken;
 
   @override
   String toString() {
-    return 'KakaoLoginRequest(code: $code, redirectUri: $redirectUri)';
+    return 'KakaoLoginRequest(accessToken: $accessToken)';
   }
 
   @override
@@ -136,14 +123,13 @@ class _$KakaoLoginRequestImpl implements _KakaoLoginRequest {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$KakaoLoginRequestImpl &&
-            (identical(other.code, code) || other.code == code) &&
-            (identical(other.redirectUri, redirectUri) ||
-                other.redirectUri == redirectUri));
+            (identical(other.accessToken, accessToken) ||
+                other.accessToken == accessToken));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, code, redirectUri);
+  int get hashCode => Object.hash(runtimeType, accessToken);
 
   /// Create a copy of KakaoLoginRequest
   /// with the given fields replaced by the non-null parameter values.
@@ -163,17 +149,14 @@ class _$KakaoLoginRequestImpl implements _KakaoLoginRequest {
 }
 
 abstract class _KakaoLoginRequest implements KakaoLoginRequest {
-  const factory _KakaoLoginRequest(
-      {required final String code,
-      final String? redirectUri}) = _$KakaoLoginRequestImpl;
+  const factory _KakaoLoginRequest({required final String accessToken}) =
+      _$KakaoLoginRequestImpl;
 
   factory _KakaoLoginRequest.fromJson(Map<String, dynamic> json) =
       _$KakaoLoginRequestImpl.fromJson;
 
   @override
-  String get code;
-  @override
-  String? get redirectUri;
+  String get accessToken;
 
   /// Create a copy of KakaoLoginRequest
   /// with the given fields replaced by the non-null parameter values.

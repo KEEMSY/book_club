@@ -68,8 +68,8 @@ class AuthService:
     kakao: KakaoOAuthPort
     apple: AppleOAuthPort
 
-    async def login_with_kakao(self, *, code: str, redirect_uri: str | None) -> LoginResult:
-        profile = await self.kakao.exchange_code_for_user(code, redirect_uri)
+    async def login_with_kakao(self, *, access_token: str) -> LoginResult:
+        profile = await self.kakao.fetch_user_by_access_token(access_token)
         existing = await self.users.get_by_provider_sub(AuthProvider.KAKAO, profile.sub)
         is_new_user = existing is None
         if existing is None:

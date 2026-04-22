@@ -101,10 +101,10 @@ class FakeDeviceTokenRepo:
 class StubKakao:
     def __init__(self, profile: KakaoUserProfile) -> None:
         self.profile = profile
-        self.calls: list[tuple[str, str | None]] = []
+        self.calls: list[str] = []
 
-    async def exchange_code_for_user(self, code: str, redirect_uri: str | None) -> KakaoUserProfile:
-        self.calls.append((code, redirect_uri))
+    async def fetch_user_by_access_token(self, access_token: str) -> KakaoUserProfile:
+        self.calls.append(access_token)
         return self.profile
 
 
@@ -145,7 +145,7 @@ def _build_service(
 async def test_kakao_new_user_creates_and_marks_is_new_user() -> None:
     service, users, _ = _build_service()
 
-    result = await service.login_with_kakao(code="c", redirect_uri=None)
+    result = await service.login_with_kakao(access_token="kakao-at")
 
     assert result.is_new_user is True
     assert result.user.provider is AuthProvider.KAKAO
@@ -160,14 +160,14 @@ async def test_kakao_new_user_creates_and_marks_is_new_user() -> None:
 @pytest.mark.asyncio
 async def test_kakao_returning_user_marks_is_new_user_false() -> None:
     service, users, _ = _build_service()
-    first = await service.login_with_kakao(code="c", redirect_uri=None)
+    first = await service.login_with_kakao(access_token="kakao-at")
     first_last_login = first.user.last_login_at
     assert first_last_login is not None
 
     # Force a later timestamp so we can observe the update.
     users.users[first.user.id].last_login_at = first_last_login - timedelta(minutes=5)
 
-    second = await service.login_with_kakao(code="c", redirect_uri=None)
+    second = await service.login_with_kakao(access_token="kakao-at")
 
     assert second.is_new_user is False
     assert second.user.id == first.user.id
@@ -192,7 +192,7 @@ async def test_apple_new_user_without_email_uses_fallback_nickname() -> None:
 @pytest.mark.asyncio
 async def test_refresh_happy_path_issues_new_pair() -> None:
     service, _users, _ = _build_service()
-    login = await service.login_with_kakao(code="c", redirect_uri=None)
+    login = await service.login_with_kakao(access_token="kakao-at")
 
     refreshed = await service.refresh(refresh_token=login.refresh_token)
 
@@ -204,7 +204,7 @@ async def test_refresh_happy_path_issues_new_pair() -> None:
 @pytest.mark.asyncio
 async def test_refresh_rejects_access_token() -> None:
     service, _, _ = _build_service()
-    login = await service.login_with_kakao(code="c", redirect_uri=None)
+    login = await service.login_with_kakao(access_token="kakao-at")
 
     with pytest.raises(AuthError) as exc_info:
         await service.refresh(refresh_token=login.access_token)
@@ -215,7 +215,7 @@ async def test_refresh_rejects_access_token() -> None:
 @pytest.mark.asyncio
 async def test_refresh_rejects_expired_token() -> None:
     service, _users, _ = _build_service()
-    login = await service.login_with_kakao(code="c", redirect_uri=None)
+    login = await service.login_with_kakao(access_token="kakao-at")
     expired = create_refresh_token(str(login.user.id), ttl=timedelta(seconds=-1))
 
     with pytest.raises(AuthError):
@@ -237,7 +237,7 @@ async def test_refresh_rejects_unknown_user() -> None:
 @pytest.mark.asyncio
 async def test_register_device_token_upserts_idempotently() -> None:
     service, _, tokens = _build_service()
-    login = await service.login_with_kakao(code="c", redirect_uri=None)
+    login = await service.login_with_kakao(access_token="kakao-at")
 
     await service.register_device_token(
         user_id=login.user.id, token="fcm-1", platform=DevicePlatform.IOS
@@ -253,7 +253,7 @@ async def test_register_device_token_upserts_idempotently() -> None:
 @pytest.mark.asyncio
 async def test_get_me_returns_user_or_raises() -> None:
     service, _users, _ = _build_service()
-    login = await service.login_with_kakao(code="c", redirect_uri=None)
+    login = await service.login_with_kakao(access_token="kakao-at")
 
     me = await service.get_me(user_id=login.user.id)
     assert me.id == login.user.id
@@ -265,7 +265,7 @@ async def test_get_me_returns_user_or_raises() -> None:
 @pytest.mark.asyncio
 async def test_delete_account_soft_deletes_user() -> None:
     service, users, _ = _build_service()
-    login = await service.login_with_kakao(code="c", redirect_uri=None)
+    login = await service.login_with_kakao(access_token="kakao-at")
 
     await service.delete_account(user_id=login.user.id)
 
@@ -279,7 +279,7 @@ async def test_delete_account_soft_deletes_user() -> None:
 @pytest.mark.asyncio
 async def test_access_and_refresh_token_types_are_distinct() -> None:
     service, _, _ = _build_service()
-    login = await service.login_with_kakao(code="c", redirect_uri=None)
+    login = await service.login_with_kakao(access_token="kakao-at")
 
     from app.core.security import decode_token
 

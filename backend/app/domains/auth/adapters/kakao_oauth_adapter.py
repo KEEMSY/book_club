@@ -1,11 +1,17 @@
 """Kakao OAuth adapter.
 
-Exchanges an authorization ``code`` for a Kakao access_token, then fetches
-the Kakao user profile and normalizes it into ``KakaoUserProfile``.
+Calls ``GET https://kapi.kakao.com/v2/user/me`` with the bearer access_token
+the mobile Kakao SDK already obtained, and normalizes the response into
+:class:`KakaoUserProfile`.
 
+- No ``/oauth/token`` exchange step: the Kakao Flutter SDK on native iOS /
+  Android never yields an authorization code, only an access_token. Calling
+  the token endpoint with an already-exchanged token would be rejected by
+  Kakao, so we talk directly to the user-info endpoint instead.
 - All HTTP calls flow through ``AsyncHttpClient`` so they inherit retries,
   timeouts, and header redaction (CLAUDE.md §9).
-- Any non-2xx from Kakao maps to ``KakaoAuthError`` (401 to the caller).
+- 401/403 from user-info maps to ``KakaoAuthError`` with code
+  ``KAKAO_TOKEN_INVALID``; any other 4xx maps to ``KAKAO_USER_INFO_FAILED``.
 - The nickname fallback ``"카카오회원"`` covers accounts that did not consent
   to profile scope — we need a non-null UI label even so.
 """
@@ -14,12 +20,10 @@ from __future__ import annotations
 
 from typing import Any
 
-from app.core.config import get_settings
 from app.core.exceptions import KakaoAuthError
 from app.core.http.base_client import AsyncHttpClient
 from app.domains.auth.ports import KakaoUserProfile
 
-_TOKEN_URL = "https://kauth.kakao.com/oauth/token"
 _USER_ME_URL = "https://kapi.kakao.com/v2/user/me"
 _DEFAULT_NICKNAME = "카카오회원"
 
@@ -36,45 +40,16 @@ class KakaoOAuthAdapter:
         if self._owns_client:
             await self._http.aclose()
 
-    async def exchange_code_for_user(self, code: str, redirect_uri: str | None) -> KakaoUserProfile:
-        access_token = await self._exchange_token(code, redirect_uri)
-        return await self._fetch_profile(access_token)
-
-    async def _exchange_token(self, code: str, redirect_uri: str | None) -> str:
-        settings = get_settings()
-        payload: dict[str, str] = {
-            "grant_type": "authorization_code",
-            "client_id": settings.kakao_rest_api_key,
-            "code": code,
-        }
-        if redirect_uri:
-            payload["redirect_uri"] = redirect_uri
-
-        response = await self._http.post(
-            _TOKEN_URL,
-            data=payload,
-            headers={"Content-Type": "application/x-www-form-urlencoded"},
-        )
-        if response.status_code >= 400:
-            raise KakaoAuthError(
-                f"kakao token exchange failed: {response.status_code}",
-                code="KAKAO_TOKEN_EXCHANGE_FAILED",
-            )
-
-        body: dict[str, Any] = response.json()
-        access_token = body.get("access_token")
-        if not isinstance(access_token, str) or not access_token:
-            raise KakaoAuthError(
-                "kakao token response missing access_token",
-                code="KAKAO_TOKEN_MALFORMED",
-            )
-        return access_token
-
-    async def _fetch_profile(self, access_token: str) -> KakaoUserProfile:
+    async def fetch_user_by_access_token(self, access_token: str) -> KakaoUserProfile:
         response = await self._http.get(
             _USER_ME_URL,
             headers={"Authorization": f"Bearer {access_token}"},
         )
+        if response.status_code in (401, 403):
+            raise KakaoAuthError(
+                f"kakao access_token rejected: {response.status_code}",
+                code="KAKAO_TOKEN_INVALID",
+            )
         if response.status_code >= 400:
             raise KakaoAuthError(
                 f"kakao user info failed: {response.status_code}",

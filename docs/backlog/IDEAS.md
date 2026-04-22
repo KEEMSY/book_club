@@ -33,7 +33,7 @@
 - [x] (design) Claude (Anthropic) 디자인 시스템을 Flutter 테마(ColorScheme · TextTheme · grade_theme)에 적용 — 맥락: M0 Flutter 스캐폴드 완료 직후 사용자 요청으로 M0 범위 내 편입 (2026-04-20)
 - [x] (design) 디자인 시스템 교체 — Claude → Apple (awesome-design-md/design-md/apple/DESIGN.md) · 네이밍 중립화(AppPalette·AppTypography 등)로 향후 디자인 시스템 교체 용이성 확보 — 맥락: M0 완료 후 사용자 요청 (2026-04-20)
 - [x] (design) 디자인 시스템 교체 — Apple → Airbnb (2030 여성 타겟, 감각적·직관적, 따뜻한 팔레트·세리프 헤드라인·감성 카드 UX) — 맥락: M1 백엔드 진행 중 사용자 디자인 피드백 반영 (2026-04-20)
-- [ ] (auth) Kakao contract 재조정 — 현재 백엔드 `POST /auth/kakao` 는 `{ code }` 를 받고 내부에서 kauth.kakao.com/oauth/token 으로 access_token 교환 후 user info 를 호출하지만, Kakao Flutter SDK (`kakao_flutter_sdk_user`) 는 모바일에서 code 없이 access_token 만 반환. 모바일은 임시로 access_token 을 `code` 필드로 전송 중. 해결 방향: (a) schema 를 `{ access_token }` 으로 rename + 어댑터의 token 교환 스텝 skip, (b) 두 필드 동시 허용, (c) 새 엔드포인트 분리. M2 진입 직전에 결정 후 적용 필수(실제 로그인이 안 됨) — 맥락: M1 Mobile 완료 후 발견된 contract gap (2026-04-20)
+- [x] (auth) Kakao contract 재조정 — (a) schema `{ access_token }` rename + 어댑터 token 교환 스텝 skip 채택. 2 커밋(`61b941a` backend, `29e7fb2` mobile), 태그 `v0.0.2` (2026-04-22 hotfix)
 - [ ] (mobile/login) 로그인 화면 중앙 illustration 자리에 실제 에디토리얼 SVG 적용 — 현재 Rausch 10% 틴트 + 책 아이콘 placeholder. 2030 여성 타겟의 매거진 톤 강화 — 맥락: M1 Mobile 로그인 스크린 폴리시 후보 (2026-04-20)
 - [ ] (mobile/auth) Kakao 공식 브랜드 SVG 아이콘 교체 — 현재 Material `chat_bubble` 사용. 앱스토어 심사 전 필수 — 맥락: M1 완료 후 QA 단계 (2026-04-20)
 - [ ] (auth) retrofit + custom_lint 의존성 버전 정리 — retrofit `<4.5` 고정 + analyzer_plugin `^0.13.0` override 상태. custom_lint 0.8+ / retrofit_generator 호환 버전 나오는 대로 해제 — 맥락: M1 Mobile 구현 시 freezed/custom_lint/analyzer 버전 충돌 해결 (2026-04-20)

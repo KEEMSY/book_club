@@ -27,7 +27,7 @@ class FakeAuthService:
     """Drop-in replacement for AuthService. Records calls for assertions."""
 
     def __init__(self) -> None:
-        self.kakao_calls: list[tuple[str, str | None]] = []
+        self.kakao_calls: list[str] = []
         self.apple_calls: list[str] = []
         self.refresh_calls: list[str] = []
         self.device_token_calls: list[tuple[UUID, str, DevicePlatform]] = []
@@ -51,8 +51,8 @@ class FakeAuthService:
         user.updated_at = datetime.now(tz=UTC)
         return user
 
-    async def login_with_kakao(self, *, code: str, redirect_uri: str | None) -> LoginResult:
-        self.kakao_calls.append((code, redirect_uri))
+    async def login_with_kakao(self, *, access_token: str) -> LoginResult:
+        self.kakao_calls.append(access_token)
         return LoginResult(
             access_token=create_access_token(str(self.user.id)),
             refresh_token=create_refresh_token(str(self.user.id)),
@@ -112,7 +112,7 @@ async def test_kakao_login_returns_tokens_and_user(
 
     response = await client.post(
         "/auth/kakao",
-        json={"code": "auth-code-x", "redirect_uri": "bookclub://auth"},
+        json={"access_token": "kakao-sdk-access-token"},
     )
 
     assert response.status_code == 200
@@ -124,11 +124,11 @@ async def test_kakao_login_returns_tokens_and_user(
     assert body["refresh_token"]
     assert body["user"]["nickname"] == "책벌레"
     assert body["user"]["provider"] == "kakao"
-    assert fake.kakao_calls == [("auth-code-x", "bookclub://auth")]
+    assert fake.kakao_calls == ["kakao-sdk-access-token"]
 
 
 @pytest.mark.asyncio
-async def test_kakao_login_missing_code_returns_422(
+async def test_kakao_login_missing_access_token_returns_422(
     client_and_fake: tuple[AsyncClient, FakeAuthService],
 ) -> None:
     client, _ = client_and_fake

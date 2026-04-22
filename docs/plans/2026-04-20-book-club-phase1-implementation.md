@@ -540,6 +540,7 @@ TDD: 경계값 10 가지 이상 케이스.
 
 ## Changelog
 
+- **0.1.3** (2026-04-22) — **Kakao OAuth contract hotfix (post-M1).** `POST /auth/kakao` 가 `{ access_token }` 를 받도록 재조정. Kakao Flutter SDK 가 네이티브 iOS/Android 에서 authorization code 대신 access_token 을 반환하므로 백엔드의 token-exchange 스텝 제거, `GET /v2/user/me` 직접 호출. 에러 코드 `KAKAO_TOKEN_EXCHANGE_FAILED` · `KAKAO_TOKEN_MALFORMED` 삭제, `KAKAO_TOKEN_INVALID` (401/403) 신설. 계약 파괴적 변경이지만 프로덕션 클라이언트 0, 모바일도 동일 변경에 포함. 태그 `v0.0.2`.
 - **0.1.0** (2026-04-20) — 초기 Phase 1 구현 계획. 6개 마일스톤 · 에이전트 분배 전략 포함.
 - **0.1.2** (2026-04-20) — **Milestone 1 (Auth · 카카오/애플) 완료.** 태그 `v0.0.1-m1`.
   - Backend: 8 커밋, 65 테스트(59 pass + 6 postgres-integration skip). User·DeviceToken 모델, Port/Adapter 엄수, Kakao OAuth + Apple Sign-In (JWT + JWKS 캐시), AuthService, `/auth/*` · `/me` · `DELETE /me`, `get_current_user` 의존성, soft-delete 지원.

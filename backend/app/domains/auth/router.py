@@ -46,7 +46,7 @@ async def login_with_kakao(
     body: KakaoLoginRequest,
     service: Annotated[AuthService, Depends(get_auth_service)],
 ) -> LoginResponse:
-    result = await service.login_with_kakao(code=body.code, redirect_uri=body.redirect_uri)
+    result = await service.login_with_kakao(access_token=body.access_token)
     return _login_response(
         result.access_token, result.refresh_token, result.user, result.is_new_user
     )
