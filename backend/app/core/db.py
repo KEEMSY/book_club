@@ -53,7 +53,18 @@ def get_sessionmaker() -> async_sessionmaker[AsyncSession]:
 
 
 async def get_session() -> AsyncIterator[AsyncSession]:
-    """FastAPI dependency that yields an AsyncSession and ensures cleanup."""
+    """FastAPI dependency that yields an AsyncSession and ensures cleanup.
+
+    Auto-commits on handler success, rolls back on exception. Without this,
+    writes from Service layers (login, add-to-library, reading sessions) silently
+    disappear at session close — surfaced as FK violations on follow-up reads.
+    """
     sessionmaker = get_sessionmaker()
     async with sessionmaker() as session:
-        yield session
+        try:
+            yield session
+        except Exception:
+            await session.rollback()
+            raise
+        else:
+            await session.commit()

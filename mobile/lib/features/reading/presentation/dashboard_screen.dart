@@ -17,6 +17,7 @@ import '../application/heatmap_notifier.dart';
 import '../application/heatmap_state.dart';
 import '../application/reading_providers.dart';
 import '../domain/goal_period.dart';
+import '../domain/grade_summary.dart';
 import '../domain/heatmap_day.dart';
 import 'widgets/daily_total_card.dart';
 import 'widgets/grade_badge.dart';
@@ -243,8 +244,17 @@ class _GradeRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
+    final bool isError = state is GradeError;
     return GestureDetector(
-      onTap: () => GoRouter.of(context).push('/grade'),
+      onTap: () {
+        if (isError) {
+          // Failure state turns the whole card into a retry affordance so
+          // the user isn't stranded on the grade screen with another error.
+          ref.read(gradeNotifierProvider.notifier).load(force: true);
+          return;
+        }
+        GoRouter.of(context).push('/grade');
+      },
       child: Container(
         padding: EdgeInsets.all(spacing.lg),
         decoration: BoxDecoration(
@@ -257,13 +267,7 @@ class _GradeRow extends ConsumerWidget {
         ),
         child: Row(
           children: <Widget>[
-            if (state is GradeLoaded)
-              GradeBadge(
-                grade: (state as GradeLoaded).summary.readerGrade,
-                size: 64,
-              )
-            else
-              const SizedBox(width: 64, height: 64),
+            _buildBadge(state),
             SizedBox(width: spacing.md),
             Expanded(
               child: Column(
@@ -288,14 +292,23 @@ class _GradeRow extends ConsumerWidget {
                 ],
               ),
             ),
-            const Icon(
-              Icons.chevron_right_rounded,
+            Icon(
+              isError ? Icons.refresh_rounded : Icons.chevron_right_rounded,
               color: AppPalette.focusedGray,
             ),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildBadge(GradeState state) {
+    return switch (state) {
+      GradeLoaded(:final summary) =>
+        GradeBadge(grade: summary.readerGrade, size: 64),
+      GradeLoading() => const GradeBadge.placeholder(size: 64, shimmer: true),
+      GradeInitial() || GradeError() => const GradeBadge.placeholder(size: 64),
+    };
   }
 
   String _title(GradeState state) {
@@ -317,17 +330,22 @@ class _GradeRow extends ConsumerWidget {
   }
 
   String _subtitle(GradeState state) {
-    if (state is GradeLoaded) {
-      final next = state.summary.nextGradeThresholds;
-      if (next == null) return '최고 등급에 도달했어요';
-      final int bookDiff = (next.targetBooks - state.summary.totalBooks)
-          .clamp(0, next.targetBooks);
-      final int secDiff = (next.targetSeconds - state.summary.totalSeconds)
-          .clamp(0, next.targetSeconds);
-      final int hours = secDiff ~/ 3600;
-      return '다음 등급까지 $bookDiff권 · $hours시간 남음';
-    }
-    return '등급 현황 보기';
+    return switch (state) {
+      GradeLoaded(:final summary) => _loadedSubtitle(summary),
+      GradeLoading() || GradeInitial() => '등급을 불러오고 있어요',
+      GradeError() => '등급을 불러오지 못했어요. 다시 시도하려면 눌러주세요',
+    };
+  }
+
+  String _loadedSubtitle(GradeSummary summary) {
+    final next = summary.nextGradeThresholds;
+    if (next == null) return '최고 등급에 도달했어요';
+    final int bookDiff =
+        (next.targetBooks - summary.totalBooks).clamp(0, next.targetBooks);
+    final int secDiff = (next.targetSeconds - summary.totalSeconds)
+        .clamp(0, next.targetSeconds);
+    final int hours = secDiff ~/ 3600;
+    return '다음 등급까지 $bookDiff권 · $hours시간 남음';
   }
 }
 
