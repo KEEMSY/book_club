@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -9,19 +8,27 @@ import '../../features/auth/presentation/login_screen.dart';
 import '../../features/book/presentation/book_detail_screen.dart';
 import '../../features/book/presentation/library_screen.dart';
 import '../../features/book/presentation/search_screen.dart';
-import '../network/dio_provider.dart';
-import '../theme/app_theme.dart';
+import '../../features/reading/presentation/dashboard_screen.dart';
+import '../../features/reading/presentation/goal_screen.dart';
+import '../../features/reading/presentation/grade_screen.dart';
+import '../../features/reading/presentation/timer_screen.dart';
 import 'app_shell.dart';
 
 /// Route paths, kept as constants so feature code does not stringly-type them.
 class AppRoutes {
   const AppRoutes._();
 
-  // M0/M1 entry points.
+  // Entry / auth.
   static const login = '/login';
-  static const home = '/home';
 
-  // M2 destinations.
+  // M3 destinations.
+  static const home = '/home';
+  static const grade = '/grade';
+  static const goals = '/goals';
+  static String timer(String userBookId) =>
+      '/reading/timer?user_book_id=$userBookId';
+
+  // M2 destinations (still reachable through the shell).
   static const search = '/search';
   static const library = '/library';
   static String bookDetail(String id) => '/books/$id';
@@ -43,6 +50,7 @@ class _AuthStateListenable extends ChangeNotifier {
   late final ProviderSubscription<AuthState> _sub;
 }
 
+final _shellHomeKey = GlobalKey<NavigatorState>();
 final _shellSearchKey = GlobalKey<NavigatorState>();
 final _shellLibraryKey = GlobalKey<NavigatorState>();
 final _rootKey = GlobalKey<NavigatorState>();
@@ -50,17 +58,15 @@ final _rootKey = GlobalKey<NavigatorState>();
 final appRouterProvider = Provider<GoRouter>((ref) {
   final listenable = _AuthStateListenable(ref);
   return GoRouter(
-    initialLocation: AppRoutes.library,
+    initialLocation: AppRoutes.home,
     navigatorKey: _rootKey,
     refreshListenable: listenable,
     redirect: (context, state) {
       final AuthState auth = ref.read(authNotifierProvider);
       final String target = state.matchedLocation;
 
-      // Root alias — M2 promotes /library to the authenticated landing.
-      // /home stays registered for M3 (timer dashboard) but we no longer
-      // expose it from the UI.
-      final String canonical = target == '/' ? AppRoutes.library : target;
+      // M3 promotes `/home` back to the authenticated landing.
+      final String canonical = target == '/' ? AppRoutes.home : target;
 
       if (auth is AuthInitial) {
         return canonical == target ? null : canonical;
@@ -73,7 +79,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         return AppRoutes.login;
       }
       if (authenticated && onLogin) {
-        return AppRoutes.library;
+        return AppRoutes.home;
       }
       return canonical == target ? null : canonical;
     },
@@ -84,7 +90,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const LoginScreen(),
       ),
       // Book detail is pushed on top of whichever shell branch the user is on
-      // (search vs library), so it lives on the root navigator.
+      // (home vs search vs library), so it lives on the root navigator.
       GoRoute(
         path: '/books/:id',
         parentNavigatorKey: _rootKey,
@@ -93,17 +99,43 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return BookDetailScreen(bookId: id);
         },
       ),
-      // M3 placeholder: kept present so deep links to /home don't 404 while
-      // the timer dashboard is in flight. Hidden from UI navigation.
+      // Timer lives above the shell so the session UI takes the full screen
+      // without the bottom-nav strip stealing focus.
       GoRoute(
-        path: AppRoutes.home,
-        builder: (context, state) => const _HomePlaceholderScreen(),
+        path: '/reading/timer',
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) {
+          final String userBookId =
+              state.uri.queryParameters['user_book_id'] ?? '';
+          return TimerScreen(userBookId: userBookId);
+        },
       ),
-      // Two-tab StatefulShellRoute — Search · Library.
+      // Grade + Goals are reachable from the dashboard but render without
+      // the shell so their AppBar back-arrow pops cleanly.
+      GoRoute(
+        path: AppRoutes.grade,
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) => const GradeScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.goals,
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) => const GoalScreen(),
+      ),
+      // Three-tab StatefulShellRoute — 홈 · 검색 · 서재.
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
             AppShell(navigationShell: navigationShell),
         branches: <StatefulShellBranch>[
+          StatefulShellBranch(
+            navigatorKey: _shellHomeKey,
+            routes: <RouteBase>[
+              GoRoute(
+                path: AppRoutes.home,
+                builder: (context, state) => const DashboardScreen(),
+              ),
+            ],
+          ),
           StatefulShellBranch(
             navigatorKey: _shellSearchKey,
             routes: <RouteBase>[
@@ -131,84 +163,3 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     ],
   );
 });
-
-/// Legacy home placeholder — exists so M3 timer work can drop into this route
-/// without a migration. No longer reachable from the app's visible UI.
-class _HomePlaceholderScreen extends ConsumerWidget {
-  const _HomePlaceholderScreen();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final spacing = theme.extension<AppSpacing>()!;
-    final env = currentEnvLabel();
-    final isDark = theme.brightness == Brightness.dark;
-
-    return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 56,
-        leading: Padding(
-          padding: EdgeInsets.only(left: spacing.md),
-          child: Icon(
-            CupertinoIcons.book,
-            color: theme.colorScheme.primary,
-          ),
-        ),
-        leadingWidth: 44,
-        actions: <Widget>[
-          IconButton(
-            tooltip: '로그아웃',
-            onPressed: () => ref.read(authNotifierProvider.notifier).logout(),
-            icon: const Icon(Icons.logout_outlined),
-          ),
-          SizedBox(width: spacing.sm),
-        ],
-      ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: spacing.lg,
-          vertical: spacing.md,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              'Book Club',
-              style: theme.textTheme.displayLarge,
-            ),
-            SizedBox(height: spacing.sm),
-            Text(
-              '오늘 읽은 책을 기록하고, 책으로 사람과 만나요',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: isDark
-                    ? AppPalette.darkTextSecondary
-                    : AppPalette.secondaryGray,
-              ),
-            ),
-            SizedBox(height: spacing.xl),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                onPressed: () {},
-                child: const Text('시작하기'),
-              ),
-            ),
-            SizedBox(height: spacing.sm),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: () {},
-                child: const Text('어떤 책이 있을까?'),
-              ),
-            ),
-            const Spacer(),
-            Text(
-              'API: $env',
-              style: theme.textTheme.bodySmall,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

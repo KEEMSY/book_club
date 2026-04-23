@@ -540,6 +540,12 @@ TDD: 경계값 10 가지 이상 케이스.
 
 ## Changelog
 
+- **0.1.5** (2026-04-22) — **Milestone 3 (Reading — 타이머 · 잔디 · 5등급 · 목표) 완료.** 태그 `v0.0.4-m3`. Phase 1 의 핵심 UX.
+  - Backend (9 커밋, 186 pass + 22 postgres-integration skip): ReadingSession · DailyReadingStat · UserGrade · Goal 모델 + 0004 마이그레이션(partial unique index `ended_at IS NULL`), GradePolicy(AND-thresholded 5단계) · StreakPolicy 순수 함수, Repository(ON CONFLICT 누적 upsert), **LocalEventBus 실구현**(after_commit/after_rollback 훅 + `commit_and_publish` + `stage_event`), ReadingService(세션 start/end with paused_ms 재정산 · 수동 세션 등급/잔디 제외 · 이벤트 발행 + 동일-트랜잭션 인라인 캐노니컬 write), `/reading/sessions/{start,end,manual}` · `/reading/heatmap` · `/reading/grade` · `/reading/goals` 7 라우터, 에러 코드 `ACTIVE_SESSION_EXISTS` · `SESSION_TOO_SHORT` · `SESSION_ALREADY_ENDED` · `MANUAL_SESSION_OUT_OF_RANGE`.
+  - Mobile (11 커밋, 77 pass): Reading feature 4레이어, TimerNotifier 상태 머신(Idle/Running/Paused/Ending/Completed/Failure + client-side paused_ms 누적 + SecureStorage 세션 복구), TimerScreen(등급 액센트 TimerRing · 앱 라이프사이클 관찰 · iOS 30분 백그라운드 자동 종료), Android foreground service 브릿지(`flutter_background_service`) + iOS null 브릿지, **JanDeeGrid**(52×7 · 5단계 opacity 버킷 · reverse 스크롤), GradeScreen(GradeBadge 120dp + 다음 등급 진행률 + 스트릭 카드 + 최고등급 축하), GoalScreen(주/월/연 3탭 + 생성 모달), **DashboardScreen(/home)**(인사 + DailyTotalCard + StreakCard + GradeBadge compact + JanDeeGrid + 지금 읽기 CTA + 수동 기록 모달), 하단 네비 3탭 **홈·검색·서재**, 로그인 landing 복원 `/library` → `/home`.
+  - 등급 테마 액센트 12개 widget 에 국한 적용 (앱 전반 톤은 Airbnb Rausch 유지).
+  - 새 의존성: `flutter_background_service: ^5.1.0`.
+  - Follow-up 백로그: Android manifest 네이티브 설정, 수동 기록 책 선택기, 주간 목표 daily slice, TimerRing UX.
 - **0.1.4** (2026-04-22) — **Milestone 2 (Book 카탈로그 · 검색 · 서재) 완료.** 태그 `v0.0.3-m2`.
   - Backend (8 커밋, 99 pass + 12 postgres-integration skip): Book · UserBook 모델, 0003 마이그레이션, Port/Adapter(BookRepository · UserBookRepository · 네이버 · 카카오 · Composite 폴백), BookService(검색 시 카탈로그 upsert · 서재 담기 · 상태 전이 · 리뷰 자동 완독 전이 · 커서 페이지네이션), `/books/search` · `/books/{id}` · `/me/library` 6 라우터, 에러 코드 `BOOK_NOT_FOUND` · `BOOK_ALREADY_IN_LIBRARY` · `USER_BOOK_NOT_FOUND` · `RATING_OUT_OF_RANGE` · `NAVER_BOOK_*` · `KAKAO_BOOK_*`.
   - Mobile (8 커밋, 52 pass): Book feature 4레이어, retrofit `BookApi`, `BookSearchNotifier`(300ms debounce · request-sequence 토큰 · 커서 페이지네이션), `SearchScreen`(Airbnb 검색 UX) · `BookDetailScreen`(담기 CTA 5-branch state) · `LibraryScreen`(4-탭 세그먼트 · 2열 그리드 · per-tab scroll 보존 · highlight 링), `ReviewModal`(별점 + 200자 한줄 · 완독 자동 트리거 + 햅틱), 하단 네비게이션(검색·서재) + StatefulShellRoute + `/books/:id` 루트 네비게이터.

@@ -11,6 +11,7 @@ import 'package:book_club/features/auth/domain/auth_user.dart';
 class InMemorySecureStorage implements SecureStorage {
   String? _access;
   String? _refresh;
+  final Map<String, String> _generic = <String, String>{};
 
   @override
   Future<String?> readAccessToken() async => _access;
@@ -28,6 +29,19 @@ class InMemorySecureStorage implements SecureStorage {
   Future<void> clearTokens() async {
     _access = null;
     _refresh = null;
+  }
+
+  @override
+  Future<String?> readRaw(String key) async => _generic[key];
+
+  @override
+  Future<void> writeRaw(String key, String value) async {
+    _generic[key] = value;
+  }
+
+  @override
+  Future<void> deleteRaw(String key) async {
+    _generic.remove(key);
   }
 }
 

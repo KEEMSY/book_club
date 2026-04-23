@@ -38,3 +38,7 @@
 - [ ] (mobile/auth) Kakao 공식 브랜드 SVG 아이콘 교체 — 현재 Material `chat_bubble` 사용. 앱스토어 심사 전 필수 — 맥락: M1 완료 후 QA 단계 (2026-04-20)
 - [ ] (auth) retrofit + custom_lint 의존성 버전 정리 — retrofit `<4.5` 고정 + analyzer_plugin `^0.13.0` override 상태. custom_lint 0.8+ / retrofit_generator 호환 버전 나오는 대로 해제 — 맥락: M1 Mobile 구현 시 freezed/custom_lint/analyzer 버전 충돌 해결 (2026-04-20)
 - [ ] (auth) FCM 디바이스 토큰 등록은 M5 로 공식 이관 — AuthRepository.registerDeviceToken 메서드는 wiring 완료, M5 에서 실 FCM 토큰으로 호출 — 맥락: M1 에서는 placeholder 토큰 등록 대신 deferral 선택 (2026-04-20)
+- [ ] (mobile/reading) Android foreground service 네이티브 설정 — AndroidManifest.xml 에 `FOREGROUND_SERVICE` · `FOREGROUND_SERVICE_DATA_SYNC` 권한 + 서비스 요소 선언 + 알림 채널 `book_club_timer` 등록 + Rausch 틴트 상태바 아이콘(`drawable/ic_bg_service.xml`) + 딥링크 intent filter. Dart bridge 는 plugin 실패 시 no-op 이므로 앱은 동작하지만 Android 실 기기에서 타이머 지속 알림이 뜨지 않음 — 맥락: M3 Mobile 구현 시 Dart 레이어만 완료, 네이티브 설정은 사용자 리뷰 필요 (2026-04-22)
+- [ ] (mobile/reading) 수동 기록 모달에 책 선택기 추가 — 현재는 "첫 읽는 중 책" 컨텍스트만 사용. library detail 의 3-dot 메뉴에서도 진입 가능하도록 — 맥락: M3 Mobile 에서 스코프 최소화 (2026-04-22)
+- [ ] (mobile/reading) 주간 목표 daily slice 계산 — 현재 flat `target_seconds / 7`. 남은 일수 기반 동적 slice 로 재검토 — 맥락: M3 Dashboard `DailyTotalCard` (2026-04-22)
+- [ ] (mobile/reading) TimerRing progress 시각 — 현재 시간당 wrap (`elapsed % 3600 / 3600`). "오늘 목표" 비례 등 대안 UX 검토 — 맥락: M3 구현 시 결정 유보 (2026-04-22)

@@ -61,6 +61,12 @@ dependencies:
   # lets us swap the empty/filled colors to Rausch without losing haptics.
   flutter_rating_bar: ^4.0.1
 
+  # Android foreground service host for the reading timer (M3 · Task 3.11).
+  # Registers the "독서 중" persistent notification so Android doesn't kill the
+  # Dart isolate while the user is reading outside the app. iOS uses the
+  # wall-clock resume-recompute path instead (see `timer_notifier.dart`).
+  flutter_background_service: ^5.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
