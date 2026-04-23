@@ -34,6 +34,12 @@ abstract class AuthApi {
   @POST('/auth/apple')
   Future<LoginResponse> loginApple(@Body() Map<String, dynamic> body);
 
+  /// Dev-only login. Backend returns 404 when `settings.env != "dev"`, so
+  /// calling this against a non-dev environment surfaces a normal
+  /// [AuthRepositoryException] with NETWORK_ERROR / UNKNOWN code.
+  @POST('/auth/dev-login')
+  Future<LoginResponse> loginDev(@Body() Map<String, dynamic> body);
+
   @POST('/auth/refresh')
   Future<RefreshResponse> refresh(@Body() Map<String, dynamic> body);
 

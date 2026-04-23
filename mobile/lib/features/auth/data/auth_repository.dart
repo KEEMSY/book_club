@@ -69,6 +69,25 @@ class AuthRepository {
     return resp.user.toDomain();
   }
 
+  /// Dev-only login that mints a real backend JWT tied to a real `User` row
+  /// without invoking any social SDK. Mirrors [loginWithKakao] for token
+  /// persistence so the rest of the app (including /me rehydrate) works
+  /// unchanged. Calling this against a non-dev backend yields a 404 that the
+  /// backend serves as an envelope-less body; [_fromDio] maps it to
+  /// NETWORK_ERROR so the UI shows the generic failure copy.
+  Future<AuthUser> loginDev({
+    String nickname = '개발자',
+    String? email,
+  }) async {
+    final LoginResponse resp = await _call(
+      () => _api.loginDev(
+        DevLoginRequest(nickname: nickname, email: email).toJson(),
+      ),
+    );
+    await _persistTokens(resp.accessToken, resp.refreshToken);
+    return resp.user.toDomain();
+  }
+
   Future<AuthUser> loginWithApple() async {
     final SocialLoginResult social = await _social.signInWithApple();
     final String? identityToken = social.identityToken;

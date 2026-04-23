@@ -86,6 +86,29 @@ class AuthService:
         await self.users.update_last_login(user.id, now)
         return self._issue_tokens(user, is_new_user=is_new_user)
 
+    async def login_dev(self, *, nickname: str, email: str | None) -> LoginResult:
+        """Dev-only login. Reuses the ``kakao`` provider with a ``dev:``
+        prefix on ``provider_sub`` so no migration is required. The router
+        gates this behind ``settings.env == "dev"`` — the service itself
+        has no environment knowledge on purpose (unit-testable offline).
+        """
+        sub = f"dev:{nickname}"
+        existing = await self.users.get_by_provider_sub(AuthProvider.KAKAO, sub)
+        is_new_user = existing is None
+        if existing is None:
+            user = await self.users.create(
+                provider=AuthProvider.KAKAO,
+                sub=sub,
+                email=email,
+                nickname=nickname,
+                profile_image_url=None,
+            )
+        else:
+            user = existing
+        now = datetime.now(tz=UTC)
+        await self.users.update_last_login(user.id, now)
+        return self._issue_tokens(user, is_new_user=is_new_user)
+
     async def login_with_apple(self, *, identity_token: str) -> LoginResult:
         profile = await self.apple.verify_identity_token(identity_token)
         existing = await self.users.get_by_provider_sub(AuthProvider.APPLE, profile.sub)

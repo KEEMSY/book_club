@@ -10,15 +10,16 @@ from __future__ import annotations
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 
-from app.core.config import get_settings
+from app.core.config import Settings, get_settings
 from app.core.deps import get_current_user_id
 from app.domains.auth.models import DevicePlatform
 from app.domains.auth.providers import get_auth_service
 from app.domains.auth.schemas import (
     AppleLoginRequest,
     DeviceTokenRegisterRequest,
+    DevLoginRequest,
     KakaoLoginRequest,
     LoginResponse,
     RefreshRequest,
@@ -58,6 +59,23 @@ async def login_with_apple(
     service: Annotated[AuthService, Depends(get_auth_service)],
 ) -> LoginResponse:
     result = await service.login_with_apple(identity_token=body.identity_token)
+    return _login_response(
+        result.access_token, result.refresh_token, result.user, result.is_new_user
+    )
+
+
+@router.post("/auth/dev-login", response_model=LoginResponse)
+async def login_dev(
+    body: DevLoginRequest,
+    service: Annotated[AuthService, Depends(get_auth_service)],
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> LoginResponse:
+    # Dev-only surface. Any non-dev environment gets a flat 404 so the
+    # endpoint is indistinguishable from a missing route to an attacker
+    # probing the production deploy.
+    if settings.env != "dev":
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="not found")
+    result = await service.login_dev(nickname=body.nickname, email=body.email)
     return _login_response(
         result.access_token, result.refresh_token, result.user, result.is_new_user
     )

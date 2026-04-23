@@ -35,6 +35,23 @@ class AppleLoginRequest with _$AppleLoginRequest {
       _$AppleLoginRequestFromJson(json);
 }
 
+/// Request to POST /auth/dev-login.
+///
+/// Dev-only surface — the backend gates this on `settings.env == "dev"` and
+/// returns 404 elsewhere. The mobile side still ships the DTO so release
+/// builds that hit a non-dev backend fail with the normal 404 repository
+/// mapping instead of a freezed/json_serializable compile error.
+@freezed
+class DevLoginRequest with _$DevLoginRequest {
+  const factory DevLoginRequest({
+    @Default('개발자') String nickname,
+    String? email,
+  }) = _DevLoginRequest;
+
+  factory DevLoginRequest.fromJson(Map<String, dynamic> json) =>
+      _$DevLoginRequestFromJson(json);
+}
+
 @freezed
 class RefreshRequest with _$RefreshRequest {
   const factory RefreshRequest({

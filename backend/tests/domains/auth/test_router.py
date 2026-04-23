@@ -14,6 +14,7 @@ from uuid import UUID, uuid4
 
 import pytest
 import pytest_asyncio
+from app.core.config import Settings, get_settings
 from app.core.exceptions import AuthError, NotFoundError
 from app.core.security import create_access_token, create_refresh_token
 from app.domains.auth.models import AuthProvider, DevicePlatform, User
@@ -29,12 +30,14 @@ class FakeAuthService:
     def __init__(self) -> None:
         self.kakao_calls: list[str] = []
         self.apple_calls: list[str] = []
+        self.dev_calls: list[tuple[str, str | None]] = []
         self.refresh_calls: list[str] = []
         self.device_token_calls: list[tuple[UUID, str, DevicePlatform]] = []
         self.get_me_calls: list[UUID] = []
         self.delete_calls: list[UUID] = []
         self.fail_refresh: bool = False
         self.fail_get_me: bool = False
+        self.dev_is_new_user: bool = True
         self.user = self._make_user()
 
     @staticmethod
@@ -67,6 +70,16 @@ class FakeAuthService:
             refresh_token=create_refresh_token(str(self.user.id)),
             user=self.user,
             is_new_user=False,
+        )
+
+    async def login_dev(self, *, nickname: str, email: str | None) -> LoginResult:
+        self.dev_calls.append((nickname, email))
+        self.user.nickname = nickname
+        return LoginResult(
+            access_token=create_access_token(str(self.user.id)),
+            refresh_token=create_refresh_token(str(self.user.id)),
+            user=self.user,
+            is_new_user=self.dev_is_new_user,
         )
 
     async def refresh(self, *, refresh_token: str) -> RefreshResult:
@@ -268,3 +281,60 @@ async def test_delete_me_requires_auth(
     client, _ = client_and_fake
     response = await client.delete("/me")
     assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_dev_login_creates_new_user(
+    client_and_fake: tuple[AsyncClient, FakeAuthService],
+) -> None:
+    client, fake = client_and_fake
+    fake.dev_is_new_user = True
+
+    response = await client.post("/auth/dev-login", json={"nickname": "테스터"})
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["is_new_user"] is True
+    assert body["user"]["nickname"] == "테스터"
+    assert body["access_token"]
+    assert body["refresh_token"]
+    assert fake.dev_calls == [("테스터", None)]
+
+
+@pytest.mark.asyncio
+async def test_dev_login_returns_existing_user(
+    client_and_fake: tuple[AsyncClient, FakeAuthService],
+) -> None:
+    client, fake = client_and_fake
+
+    # First call — treated as new.
+    fake.dev_is_new_user = True
+    first = await client.post("/auth/dev-login", json={"nickname": "개발자"})
+    assert first.status_code == 200
+    assert first.json()["is_new_user"] is True
+
+    # Second call — same nickname, service reports existing user.
+    fake.dev_is_new_user = False
+    second = await client.post("/auth/dev-login", json={"nickname": "개발자"})
+    assert second.status_code == 200
+    assert second.json()["is_new_user"] is False
+    assert fake.dev_calls == [("개발자", None), ("개발자", None)]
+
+
+@pytest.mark.asyncio
+async def test_dev_login_404_in_non_dev() -> None:
+    # Override the settings dependency to pretend we're in production;
+    # the endpoint must disappear with a plain 404, not an explicit error
+    # code that would leak the route's existence.
+    app = create_app()
+    fake = FakeAuthService()
+    app.dependency_overrides[get_auth_service] = lambda: fake
+    app.dependency_overrides[get_settings] = lambda: Settings(env="prod")
+    transport = ASGITransport(app=app)
+    try:
+        async with AsyncClient(transport=transport, base_url="http://testserver") as client:
+            response = await client.post("/auth/dev-login", json={"nickname": "개발자"})
+        assert response.status_code == 404
+        assert fake.dev_calls == []
+    finally:
+        app.dependency_overrides.clear()

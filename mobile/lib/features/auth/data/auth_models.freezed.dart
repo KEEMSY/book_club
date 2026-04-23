@@ -338,6 +338,175 @@ abstract class _AppleLoginRequest implements AppleLoginRequest {
       throw _privateConstructorUsedError;
 }
 
+DevLoginRequest _$DevLoginRequestFromJson(Map<String, dynamic> json) {
+  return _DevLoginRequest.fromJson(json);
+}
+
+/// @nodoc
+mixin _$DevLoginRequest {
+  String get nickname => throw _privateConstructorUsedError;
+  String? get email => throw _privateConstructorUsedError;
+
+  /// Serializes this DevLoginRequest to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of DevLoginRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $DevLoginRequestCopyWith<DevLoginRequest> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $DevLoginRequestCopyWith<$Res> {
+  factory $DevLoginRequestCopyWith(
+          DevLoginRequest value, $Res Function(DevLoginRequest) then) =
+      _$DevLoginRequestCopyWithImpl<$Res, DevLoginRequest>;
+  @useResult
+  $Res call({String nickname, String? email});
+}
+
+/// @nodoc
+class _$DevLoginRequestCopyWithImpl<$Res, $Val extends DevLoginRequest>
+    implements $DevLoginRequestCopyWith<$Res> {
+  _$DevLoginRequestCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of DevLoginRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? nickname = null,
+    Object? email = freezed,
+  }) {
+    return _then(_value.copyWith(
+      nickname: null == nickname
+          ? _value.nickname
+          : nickname // ignore: cast_nullable_to_non_nullable
+              as String,
+      email: freezed == email
+          ? _value.email
+          : email // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$DevLoginRequestImplCopyWith<$Res>
+    implements $DevLoginRequestCopyWith<$Res> {
+  factory _$$DevLoginRequestImplCopyWith(_$DevLoginRequestImpl value,
+          $Res Function(_$DevLoginRequestImpl) then) =
+      __$$DevLoginRequestImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String nickname, String? email});
+}
+
+/// @nodoc
+class __$$DevLoginRequestImplCopyWithImpl<$Res>
+    extends _$DevLoginRequestCopyWithImpl<$Res, _$DevLoginRequestImpl>
+    implements _$$DevLoginRequestImplCopyWith<$Res> {
+  __$$DevLoginRequestImplCopyWithImpl(
+      _$DevLoginRequestImpl _value, $Res Function(_$DevLoginRequestImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of DevLoginRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? nickname = null,
+    Object? email = freezed,
+  }) {
+    return _then(_$DevLoginRequestImpl(
+      nickname: null == nickname
+          ? _value.nickname
+          : nickname // ignore: cast_nullable_to_non_nullable
+              as String,
+      email: freezed == email
+          ? _value.email
+          : email // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$DevLoginRequestImpl implements _DevLoginRequest {
+  const _$DevLoginRequestImpl({this.nickname = '개발자', this.email});
+
+  factory _$DevLoginRequestImpl.fromJson(Map<String, dynamic> json) =>
+      _$$DevLoginRequestImplFromJson(json);
+
+  @override
+  @JsonKey()
+  final String nickname;
+  @override
+  final String? email;
+
+  @override
+  String toString() {
+    return 'DevLoginRequest(nickname: $nickname, email: $email)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$DevLoginRequestImpl &&
+            (identical(other.nickname, nickname) ||
+                other.nickname == nickname) &&
+            (identical(other.email, email) || other.email == email));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, nickname, email);
+
+  /// Create a copy of DevLoginRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$DevLoginRequestImplCopyWith<_$DevLoginRequestImpl> get copyWith =>
+      __$$DevLoginRequestImplCopyWithImpl<_$DevLoginRequestImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$DevLoginRequestImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _DevLoginRequest implements DevLoginRequest {
+  const factory _DevLoginRequest({final String nickname, final String? email}) =
+      _$DevLoginRequestImpl;
+
+  factory _DevLoginRequest.fromJson(Map<String, dynamic> json) =
+      _$DevLoginRequestImpl.fromJson;
+
+  @override
+  String get nickname;
+  @override
+  String? get email;
+
+  /// Create a copy of DevLoginRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$DevLoginRequestImplCopyWith<_$DevLoginRequestImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
 RefreshRequest _$RefreshRequestFromJson(Map<String, dynamic> json) {
   return _RefreshRequest.fromJson(json);
 }

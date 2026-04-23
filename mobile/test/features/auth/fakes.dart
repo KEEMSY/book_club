@@ -83,23 +83,28 @@ class FakeAuthApi implements AuthApi {
   FakeAuthApi({
     this.loginKakaoResponse,
     this.loginAppleResponse,
+    this.loginDevResponse,
     this.refreshResponse,
     this.meResponse,
     this.meError,
     this.loginKakaoError,
     this.loginAppleError,
+    this.loginDevError,
   });
 
   LoginResponse? loginKakaoResponse;
   Object? loginKakaoError;
   LoginResponse? loginAppleResponse;
   Object? loginAppleError;
+  LoginResponse? loginDevResponse;
+  Object? loginDevError;
   RefreshResponse? refreshResponse;
   AuthUserDto? meResponse;
   Object? meError;
 
   int loginKakaoCalls = 0;
   int loginAppleCalls = 0;
+  int loginDevCalls = 0;
   int refreshCalls = 0;
   int getMeCalls = 0;
   int registerDeviceTokenCalls = 0;
@@ -117,6 +122,13 @@ class FakeAuthApi implements AuthApi {
     loginAppleCalls++;
     if (loginAppleError != null) throw loginAppleError!;
     return loginAppleResponse!;
+  }
+
+  @override
+  Future<LoginResponse> loginDev(Map<String, dynamic> body) async {
+    loginDevCalls++;
+    if (loginDevError != null) throw loginDevError!;
+    return loginDevResponse!;
   }
 
   @override

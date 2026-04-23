@@ -36,6 +36,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
     await _performLogin(_repository.loginWithApple);
   }
 
+  /// Dev-only shortcut. Skips the social SDK path entirely and issues a
+  /// backend JWT tied to a `dev:<nickname>` user. See
+  /// `AuthRepository.loginDev` for the prod-safety guarantee.
+  Future<void> loginDev({String nickname = '개발자'}) async {
+    await _performLogin(() => _repository.loginDev(nickname: nickname));
+  }
+
   Future<void> logout() async {
     await _repository.logout();
     _setState(const AuthState.unauthenticated());

@@ -6,8 +6,7 @@ import 'package:book_club/features/auth/data/auth_repository.dart';
 import 'package:book_club/features/auth/data/social_login_port.dart';
 import 'package:book_club/features/auth/domain/auth_state.dart';
 import 'package:book_club/features/auth/presentation/login_screen.dart';
-import 'package:book_club/features/auth/presentation/widgets/apple_login_button.dart';
-import 'package:book_club/features/auth/presentation/widgets/kakao_login_button.dart';
+import 'package:book_club/features/auth/presentation/widgets/dev_login_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -45,8 +44,7 @@ void main() {
     );
   }
 
-  testWidgets('renders Airbnb-toned hero, Kakao button and legal caption',
-      (tester) async {
+  testWidgets('renders hero, dev-login CTA and legal caption', (tester) async {
     final storage = InMemorySecureStorage();
     final api = FakeAuthApi();
     final social = FakeSocialLoginPort(
@@ -60,36 +58,23 @@ void main() {
 
     expect(find.text('Book Club'), findsOneWidget);
     expect(find.text('책으로 연결되는 모든 순간'), findsOneWidget);
-    expect(find.byType(KakaoLoginButton), findsOneWidget);
+    expect(find.byType(DevLoginButton), findsOneWidget);
+    expect(find.text('개발용 로그인'), findsOneWidget);
+    expect(find.text('Dev 환경 전용입니다'), findsOneWidget);
     expect(
       find.text('로그인하면 Book Club 이용약관 및 개인정보처리방침에 동의합니다.'),
       findsOneWidget,
     );
   });
 
-  testWidgets('Apple button is hidden on non-iOS platforms', (tester) async {
-    // debugDefaultTargetPlatformOverride defaults to Android in widget tests.
-    final storage = InMemorySecureStorage();
-    final api = FakeAuthApi();
-    final social = FakeSocialLoginPort(
-      kakaoResult: const SocialLoginResult(accessToken: 'k-at'),
-    );
-
-    await tester.pumpWidget(
-      buildApp(social: social, api: api, storage: storage),
-    );
-    await tester.pumpAndSettle();
-
-    // Login screen uses `Platform.isIOS` — the non-test macOS host this test
-    // runs on reports isIOS=false. The Apple button should not render.
-    expect(find.byType(AppleLoginButton), findsNothing);
-  });
-
-  testWidgets('tapping the Kakao button invokes AuthNotifier.loginWithKakao',
+  testWidgets('tapping the dev-login button invokes AuthNotifier.loginDev',
       (tester) async {
     final storage = InMemorySecureStorage();
     final api = FakeAuthApi(
-      loginKakaoResponse: buildLoginResponse(),
+      loginDevResponse: buildLoginResponse(
+        user: buildUserDto(nickname: '개발자'),
+        isNewUser: true,
+      ),
     );
     final social = FakeSocialLoginPort(
       kakaoResult: const SocialLoginResult(accessToken: 'kakao-sdk-token'),
@@ -100,22 +85,22 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byType(KakaoLoginButton));
-    // Pump one frame to let the notifier flip to Authenticating, then settle
-    // the async login call.
+    await tester.tap(find.byType(DevLoginButton));
     await tester.pump();
     await tester.pumpAndSettle();
 
-    expect(social.kakaoCalls, 1);
-    expect(api.loginKakaoCalls, 1);
+    expect(api.loginDevCalls, 1);
+    // Dev flow skips the social port — no Kakao/Apple calls should fire.
+    expect(social.kakaoCalls, 0);
+    expect(social.appleCalls, 0);
   });
 
   testWidgets('failure code from backend is surfaced inline', (tester) async {
     final storage = InMemorySecureStorage();
     final api = FakeAuthApi(
-      loginKakaoError: const AuthRepositoryException(
-        code: 'KAKAO_USER_INFO_FAILED',
-        message: '카카오 사용자 정보를 가져올 수 없습니다.',
+      loginDevError: const AuthRepositoryException(
+        code: 'DEV_LOGIN_FAILED',
+        message: '개발용 로그인에 실패했습니다.',
       ),
     );
     final social = FakeSocialLoginPort(
@@ -144,10 +129,10 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await container.read(authNotifierProvider.notifier).loginWithKakao();
+    await container.read(authNotifierProvider.notifier).loginDev();
     await tester.pumpAndSettle();
 
     expect(container.read(authNotifierProvider), isA<AuthFailure>());
-    expect(find.text('카카오 사용자 정보를 가져올 수 없습니다.'), findsOneWidget);
+    expect(find.text('개발용 로그인에 실패했습니다.'), findsOneWidget);
   });
 }

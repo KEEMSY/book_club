@@ -92,6 +92,30 @@ void main() {
       expect(failure.code, 'KAKAO_USER_INFO_FAILED');
     });
 
+    test('loginDev persists tokens and transitions to Authenticated', () async {
+      final storage = InMemorySecureStorage();
+      final api = FakeAuthApi(
+        loginDevResponse: buildLoginResponse(
+          access: 'dev-access',
+          refresh: 'dev-refresh',
+          user: buildUserDto(nickname: '개발자'),
+          isNewUser: true,
+        ),
+      );
+      final notifier = AuthNotifier(
+        buildRepository(api: api, storage: storage),
+      );
+
+      await notifier.loginDev();
+
+      expect(notifier.state, isA<Authenticated>());
+      final Authenticated authed = notifier.state as Authenticated;
+      expect(authed.user.nickname, '개발자');
+      expect(await storage.readAccessToken(), 'dev-access');
+      expect(await storage.readRefreshToken(), 'dev-refresh');
+      expect(api.loginDevCalls, 1);
+    });
+
     test('loginWithApple produces Authenticated when identity_token succeeds',
         () async {
       final api = FakeAuthApi(

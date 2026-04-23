@@ -1,14 +1,15 @@
-import 'dart:io' show Platform;
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../application/auth_providers.dart';
 import '../domain/auth_state.dart';
-import 'widgets/apple_login_button.dart';
-import 'widgets/kakao_login_button.dart';
+// TODO(phase-1-prerelease): 실제 소셜 로그인 복원 시 import 되살리기.
+// import 'dart:io' show Platform;
+// import 'package:flutter/foundation.dart';
+// import 'widgets/apple_login_button.dart';
+// import 'widgets/kakao_login_button.dart';
+import 'widgets/dev_login_button.dart';
 import 'widgets/loading_overlay.dart';
 
 /// Airbnb-toned login screen.
@@ -31,10 +32,6 @@ class LoginScreen extends ConsumerWidget {
     final spacing = theme.extension<AppSpacing>()!;
     final AuthState auth = ref.watch(authNotifierProvider);
     final bool isBusy = auth is Authenticating;
-
-    // iOS-only Apple button. On web/desktop we keep the check safe — Kakao is
-    // still visible there for debugging via the SDK's web flow.
-    final bool showAppleButton = !kIsWeb && Platform.isIOS;
 
     // Surface the last failure inline — a SnackBar would be dismissed by
     // rebuilds during the auth flow. The caption area below reads the failure
@@ -62,14 +59,9 @@ class LoginScreen extends ConsumerWidget {
                   _BottomCtas(
                     spacing: spacing,
                     isBusy: isBusy,
-                    showAppleButton: showAppleButton,
                     failureMessage: failureMessage,
-                    onKakao: () => ref
-                        .read(authNotifierProvider.notifier)
-                        .loginWithKakao(),
-                    onApple: () => ref
-                        .read(authNotifierProvider.notifier)
-                        .loginWithApple(),
+                    onDevLogin: () =>
+                        ref.read(authNotifierProvider.notifier).loginDev(),
                   ),
                 ],
               ),
@@ -147,18 +139,14 @@ class _BottomCtas extends StatelessWidget {
   const _BottomCtas({
     required this.spacing,
     required this.isBusy,
-    required this.showAppleButton,
     required this.failureMessage,
-    required this.onKakao,
-    required this.onApple,
+    required this.onDevLogin,
   });
 
   final AppSpacing spacing;
   final bool isBusy;
-  final bool showAppleButton;
   final String? failureMessage;
-  final VoidCallback onKakao;
-  final VoidCallback onApple;
+  final VoidCallback onDevLogin;
 
   @override
   Widget build(BuildContext context) {
@@ -182,17 +170,24 @@ class _BottomCtas extends StatelessWidget {
             ),
             SizedBox(height: spacing.sm),
           ],
-          KakaoLoginButton(
-            onPressed: onKakao,
+          // TODO(phase-1-prerelease): 실제 소셜 로그인 복원 — Kakao/Apple 버튼 되살리기.
+          // KakaoLoginButton(onPressed: onKakao, isLoading: isBusy),
+          // if (showAppleButton) ...<Widget>[
+          //   SizedBox(height: spacing.sm),
+          //   AppleLoginButton(onPressed: onApple, isLoading: isBusy),
+          // ],
+          DevLoginButton(
+            onPressed: onDevLogin,
             isLoading: isBusy,
           ),
-          if (showAppleButton) ...<Widget>[
-            SizedBox(height: spacing.sm),
-            AppleLoginButton(
-              onPressed: onApple,
-              isLoading: isBusy,
+          SizedBox(height: spacing.sm),
+          Text(
+            'Dev 환경 전용입니다',
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: AppPalette.secondaryGray,
             ),
-          ],
+          ),
           SizedBox(height: spacing.md),
           Text(
             '로그인하면 Book Club 이용약관 및 개인정보처리방침에 동의합니다.',

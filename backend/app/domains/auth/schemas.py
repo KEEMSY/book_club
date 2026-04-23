@@ -34,6 +34,16 @@ class AppleLoginRequest(BaseModel):
     authorization_code: str | None = None
 
 
+class DevLoginRequest(BaseModel):
+    """Dev-only login payload. The router rejects this when ``settings.env``
+    is anything other than ``"dev"`` so the endpoint cannot escape into a
+    production deploy.
+    """
+
+    nickname: str = Field(default="개발자", min_length=1, max_length=32)
+    email: str | None = Field(default=None, max_length=254)
+
+
 class RefreshRequest(BaseModel):
     refresh_token: str = Field(..., min_length=1)
 

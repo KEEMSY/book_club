@@ -32,6 +32,20 @@ Map<String, dynamic> _$$AppleLoginRequestImplToJson(
       'authorization_code': instance.authorizationCode,
     };
 
+_$DevLoginRequestImpl _$$DevLoginRequestImplFromJson(
+        Map<String, dynamic> json) =>
+    _$DevLoginRequestImpl(
+      nickname: json['nickname'] as String? ?? '개발자',
+      email: json['email'] as String?,
+    );
+
+Map<String, dynamic> _$$DevLoginRequestImplToJson(
+        _$DevLoginRequestImpl instance) =>
+    <String, dynamic>{
+      'nickname': instance.nickname,
+      'email': instance.email,
+    };
+
 _$RefreshRequestImpl _$$RefreshRequestImplFromJson(Map<String, dynamic> json) =>
     _$RefreshRequestImpl(
       refreshToken: json['refresh_token'] as String,
