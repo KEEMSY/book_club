@@ -42,3 +42,4 @@
 - [ ] (mobile/reading) 수동 기록 모달에 책 선택기 추가 — 현재는 "첫 읽는 중 책" 컨텍스트만 사용. library detail 의 3-dot 메뉴에서도 진입 가능하도록 — 맥락: M3 Mobile 에서 스코프 최소화 (2026-04-22)
 - [ ] (mobile/reading) 주간 목표 daily slice 계산 — 현재 flat `target_seconds / 7`. 남은 일수 기반 동적 slice 로 재검토 — 맥락: M3 Dashboard `DailyTotalCard` (2026-04-22)
 - [ ] (mobile/reading) TimerRing progress 시각 — 현재 시간당 wrap (`elapsed % 3600 / 3600`). "오늘 목표" 비례 등 대안 UX 검토 — 맥락: M3 구현 시 결정 유보 (2026-04-22)
+- [ ] (mobile/design) 다크 모드 완성 — 현재 대부분의 위젯(dashboard, library, book detail, timer, grade)이 AppPalette.nearBlack · pureWhite · focusedGray 같은 라이트 팔레트 토큰을 하드코딩해 OS 다크 모드 전환 시 텍스트가 배경과 묻힘. 일시적으로 ThemeMode.light 강제. 전체 위젯을 Theme.of(context).colorScheme.onSurface / surface 로 마이그레이션 필요 — 맥락: 사용자 Chrome 테스트에서 등급 카드 가독성 문제로 발견 (2026-04-23)
