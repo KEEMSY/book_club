@@ -37,7 +37,7 @@ class BookEmptyState extends StatelessWidget {
               width: 72,
               height: 72,
               decoration: BoxDecoration(
-                color: AppPalette.rausch.withValues(alpha: 0.10),
+                color: theme.colorScheme.primary.withValues(alpha: 0.10),
                 borderRadius: BorderRadius.all(Radius.circular(radii.md)),
               ),
               child: Icon(
@@ -58,7 +58,7 @@ class BookEmptyState extends StatelessWidget {
                 subtitle!,
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: AppPalette.secondaryGray,
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
             ],

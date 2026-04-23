@@ -21,18 +21,19 @@ class GradeProgress extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
+    final AppShadows shadows = theme.extension<AppShadows>()!;
     final NextGradeThresholds? next = summary.nextGradeThresholds;
 
     if (next == null) {
       return Container(
         padding: EdgeInsets.all(spacing.lg),
         decoration: BoxDecoration(
-          color: AppPalette.pureWhite,
+          color: theme.colorScheme.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: theme.colorScheme.outlineVariant,
           ),
-          boxShadow: AppShadows.light.elevated,
+          boxShadow: shadows.elevated,
         ),
         child: Row(
           children: <Widget>[
@@ -65,9 +66,10 @@ class GradeProgress extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(spacing.lg),
       decoration: BoxDecoration(
-        color: AppPalette.pureWhite,
+        color: theme.colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: AppShadows.light.elevated,
+        border: Border.all(color: theme.colorScheme.outlineVariant),
+        boxShadow: shadows.elevated,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -124,13 +126,13 @@ class _ProgressRow extends StatelessWidget {
             Text(
               label,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: AppPalette.focusedGray,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.72),
               ),
             ),
             Text(
               trailing,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: AppPalette.nearBlack,
+                color: theme.colorScheme.onSurface,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -142,7 +144,7 @@ class _ProgressRow extends StatelessWidget {
           child: LinearProgressIndicator(
             value: ratio,
             minHeight: 8,
-            backgroundColor: AppPalette.lightSurface,
+            backgroundColor: theme.colorScheme.surfaceContainerHighest,
             valueColor: AlwaysStoppedAnimation<Color>(color),
           ),
         ),

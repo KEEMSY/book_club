@@ -94,7 +94,7 @@ class _Hero extends StatelessWidget {
         Text(
           '책으로 연결되는 모든 순간',
           style: theme.textTheme.bodyLarge?.copyWith(
-            color: AppPalette.secondaryGray,
+            color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
         SizedBox(height: spacing.lg),
@@ -120,7 +120,7 @@ class _Illustration extends StatelessWidget {
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          color: AppPalette.rausch.withValues(alpha: 0.10),
+          color: theme.colorScheme.primary.withValues(alpha: 0.10),
           borderRadius: BorderRadius.all(Radius.circular(radius.md)),
         ),
         child: Center(
@@ -185,7 +185,7 @@ class _BottomCtas extends StatelessWidget {
             'Dev 환경 전용입니다',
             textAlign: TextAlign.center,
             style: theme.textTheme.bodySmall?.copyWith(
-              color: AppPalette.secondaryGray,
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
           SizedBox(height: spacing.md),
@@ -193,7 +193,7 @@ class _BottomCtas extends StatelessWidget {
             '로그인하면 Book Club 이용약관 및 개인정보처리방침에 동의합니다.',
             textAlign: TextAlign.center,
             style: theme.textTheme.bodySmall?.copyWith(
-              color: AppPalette.secondaryGray,
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
         ],

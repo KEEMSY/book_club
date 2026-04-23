@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../../../core/theme/app_theme.dart';
 import '../../domain/heatmap_day.dart';
 
 /// GitHub-style 52-week × 7-day 독서 캘린더 heatmap.
@@ -62,6 +61,11 @@ class JanDeeGrid extends StatelessWidget {
     final DateTime startColumnDate =
         currentWeekSunday.subtract(const Duration(days: 7 * (_columns - 1)));
 
+    final ThemeData theme = Theme.of(context);
+    final Color emptyCellBase = Color.alphaBlend(
+      theme.colorScheme.onSurface.withValues(alpha: 0.08),
+      theme.colorScheme.surfaceContainerHighest,
+    );
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         // Available width inside the card = card inner width. Reserve the
@@ -104,6 +108,7 @@ class JanDeeGrid extends StatelessWidget {
           byDate: byDate,
           keyFmt: keyFmt,
           primaryColor: primaryColor,
+          emptyCellColor: emptyCellBase,
           onDayTap: onDayTap,
         );
 
@@ -131,22 +136,27 @@ class JanDeeGrid extends StatelessWidget {
 
   /// Maps a seconds total onto one of 5 opacity buckets. Matches the task
   /// contract: 0 / 1–15m / 16–45m / 46–90m / 91–180m / >180m.
-  static Color _bucketColor(int seconds, Color primary) {
+  ///
+  /// Active buckets blend the grade accent over the theme's surface container
+  /// so the full opacity ladder stays visible on both the light parchment and
+  /// the #161616 dark canvas — a plain `primary.withValues(alpha: 0.15)`
+  /// vanishes on dark because the canvas eats the low-alpha coral.
+  static Color _bucketColor(int seconds, Color primary, Color emptyBase) {
     if (seconds == 0) {
-      return AppPalette.borderGray.withValues(alpha: 0.35);
+      return emptyBase;
     }
     final int minutes = seconds ~/ 60;
     if (minutes <= 15) {
-      return primary.withValues(alpha: 0.15);
+      return Color.alphaBlend(primary.withValues(alpha: 0.22), emptyBase);
     }
     if (minutes <= 45) {
-      return primary.withValues(alpha: 0.35);
+      return Color.alphaBlend(primary.withValues(alpha: 0.45), emptyBase);
     }
     if (minutes <= 90) {
-      return primary.withValues(alpha: 0.60);
+      return Color.alphaBlend(primary.withValues(alpha: 0.70), emptyBase);
     }
     if (minutes <= 180) {
-      return primary.withValues(alpha: 0.85);
+      return Color.alphaBlend(primary.withValues(alpha: 0.90), emptyBase);
     }
     return primary;
   }
@@ -175,6 +185,7 @@ class _GridBody extends StatelessWidget {
     required this.byDate,
     required this.keyFmt,
     required this.primaryColor,
+    required this.emptyCellColor,
     required this.onDayTap,
   });
 
@@ -186,6 +197,7 @@ class _GridBody extends StatelessWidget {
   final Map<String, HeatmapDay> byDate;
   final DateFormat keyFmt;
   final Color primaryColor;
+  final Color emptyCellColor;
   final void Function(HeatmapDay day)? onDayTap;
 
   @override
@@ -239,7 +251,8 @@ class _GridBody extends StatelessWidget {
 
     final HeatmapDay? day = byDate[keyFmt.format(cellDate)];
     final int seconds = day?.totalSeconds ?? 0;
-    final Color color = JanDeeGrid._bucketColor(seconds, primaryColor);
+    final Color color =
+        JanDeeGrid._bucketColor(seconds, primaryColor, emptyCellColor);
 
     return GestureDetector(
       onTap: onDayTap != null && day != null ? () => onDayTap!(day) : null,
@@ -292,7 +305,7 @@ class _MonthLabelsRow extends StatelessWidget {
             child: Text(
               fmt.format(colStart),
               style: theme.textTheme.labelSmall?.copyWith(
-                color: AppPalette.focusedGray,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.72),
               ),
             ),
           ),
@@ -347,7 +360,8 @@ class _DayLabelsColumn extends StatelessWidget {
                       child: Text(
                         _labels[row],
                         style: theme.textTheme.labelSmall?.copyWith(
-                          color: AppPalette.focusedGray,
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.72),
                           fontWeight: FontWeight.w500,
                         ),
                       ),

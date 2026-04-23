@@ -216,23 +216,25 @@ class _StatusPill extends StatelessWidget {
     final theme = Theme.of(context);
     final radii = theme.extension<AppRadius>()!;
 
-    // Pill color reflects the state: reading uses Rausch, completed uses a
-    // deeper plum (luxe/mastery), paused muted gray, dropped subtle strike.
+    // Pill color reflects the state. Reading pulls the theme's primary so the
+    // pill adapts to the dark-mode rauschDark tone; completed retains the plum
+    // editorial accent; paused/dropped route through theme neutrals so they
+    // stay legible on both canvases.
     final Color background;
     final Color foreground;
     switch (status) {
       case BookStatus.reading:
-        background = AppPalette.rausch;
-        foreground = AppPalette.pureWhite;
+        background = theme.colorScheme.primary;
+        foreground = theme.colorScheme.onPrimary;
       case BookStatus.completed:
         background = AppPalette.plusMagenta;
         foreground = AppPalette.pureWhite;
       case BookStatus.paused:
-        background = AppPalette.secondaryGray;
-        foreground = AppPalette.pureWhite;
+        background = theme.colorScheme.onSurface.withValues(alpha: 0.55);
+        foreground = theme.colorScheme.surface;
       case BookStatus.dropped:
-        background = AppPalette.borderGray;
-        foreground = AppPalette.nearBlack;
+        background = theme.colorScheme.surfaceContainerHighest;
+        foreground = theme.colorScheme.onSurface;
     }
 
     return Container(

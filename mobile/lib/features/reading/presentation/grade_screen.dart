@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/grade_theme.dart';
 import '../application/grade_notifier.dart';
 import '../application/grade_state.dart';
 import '../application/reading_providers.dart';
@@ -10,6 +11,21 @@ import 'widgets/elapsed_formatter.dart';
 import 'widgets/grade_badge.dart';
 import 'widgets/grade_progress.dart';
 import 'widgets/streak_card.dart';
+
+String _gradeName(ReaderGrade g) {
+  switch (g) {
+    case ReaderGrade.sprout:
+      return '새싹 독자';
+    case ReaderGrade.explorer:
+      return '탐독자';
+    case ReaderGrade.devoted:
+      return '애독자';
+    case ReaderGrade.passionate:
+      return '열혈 독자';
+    case ReaderGrade.master:
+      return '서재 마스터';
+  }
+}
 
 /// `/grade` — summary screen for the user's reader tier.
 ///
@@ -83,7 +99,31 @@ class _GradeBody extends StatelessWidget {
           child: GradeBadge(
             grade: summary.readerGrade,
             size: 120,
-            showLabel: true,
+          ),
+        ),
+        SizedBox(height: spacing.md),
+        // "Lv.N · <name>" below the badge so the numeric tier is still
+        // legible for users who care about exact level, while the plant
+        // icon above carries the growth metaphor.
+        Center(
+          child: Column(
+            children: <Widget>[
+              Text(
+                'Lv.${summary.grade}',
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: accent,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                _gradeName(summary.readerGrade),
+                style: theme.textTheme.displaySmall?.copyWith(
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+            ],
           ),
         ),
         SizedBox(height: spacing.lg),
@@ -108,12 +148,14 @@ class _TotalsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
+    final AppShadows shadows = theme.extension<AppShadows>()!;
     return Container(
       padding: EdgeInsets.all(spacing.lg),
       decoration: BoxDecoration(
-        color: AppPalette.pureWhite,
+        color: theme.colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: AppShadows.light.elevated,
+        border: Border.all(color: theme.colorScheme.outlineVariant),
+        boxShadow: shadows.elevated,
       ),
       child: Row(
         children: <Widget>[
@@ -124,7 +166,7 @@ class _TotalsCard extends StatelessWidget {
           Container(
             width: 1,
             height: 32,
-            color: AppPalette.borderGray,
+            color: theme.colorScheme.outline,
           ),
           _TotalCell(
             label: '누적 시간',
@@ -192,7 +234,7 @@ class _GradeInfoDialog extends StatelessWidget {
       ('5 · 서재 마스터', '100권', '500시간'),
     ];
     return AlertDialog(
-      backgroundColor: AppPalette.pureWhite,
+      backgroundColor: theme.colorScheme.surface,
       title: const Text('등급 체계'),
       content: Column(
         mainAxisSize: MainAxisSize.min,

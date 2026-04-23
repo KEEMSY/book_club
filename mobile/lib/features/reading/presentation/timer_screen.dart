@@ -94,7 +94,8 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     });
 
     return Scaffold(
-      backgroundColor: AppPalette.foggy,
+      // Let Scaffold inherit the theme's canvas so dark mode lands on #161616
+      // instead of the pinned warm light Foggy.
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         leading: IconButton(
@@ -200,7 +201,7 @@ class _TimerReadout extends ConsumerWidget {
       child: Text(
         formatElapsed(elapsed),
         style: theme.textTheme.displayLarge?.copyWith(
-          color: AppPalette.nearBlack,
+          color: theme.colorScheme.onSurface,
           fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
         ),
       ),
@@ -224,7 +225,7 @@ class _StreakBadge extends ConsumerWidget {
       avatar: const Icon(Icons.local_fire_department_rounded, size: 18),
       label: Text('연속 $streak일 독서 중'),
       labelStyle: theme.textTheme.labelMedium,
-      backgroundColor: AppPalette.lightSurface,
+      backgroundColor: theme.colorScheme.surfaceContainerHigh,
     );
   }
 }

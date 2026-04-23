@@ -53,7 +53,7 @@ class _GoalScreenState extends ConsumerState<GoalScreen>
           controller: _tabController,
           labelColor: accent,
           indicatorColor: accent,
-          unselectedLabelColor: AppPalette.secondaryGray,
+          unselectedLabelColor: theme.colorScheme.onSurfaceVariant,
           tabs: const <Widget>[
             Tab(text: '주간'),
             Tab(text: '월간'),
@@ -440,7 +440,7 @@ class _CreateGoalSheetState extends ConsumerState<_CreateGoalSheet> {
           Text(
             _summaryLine(),
             style: theme.textTheme.bodySmall?.copyWith(
-              color: AppPalette.focusedGray,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.72),
             ),
           ),
           if (_errorMessage != null)
@@ -584,12 +584,12 @@ class _ModeToggle extends StatelessWidget {
         backgroundColor:
             WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> s) {
           if (s.contains(WidgetState.selected)) return accent;
-          return AppPalette.lightSurface;
+          return Theme.of(context).colorScheme.surfaceContainerHigh;
         }),
         foregroundColor:
             WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> s) {
           if (s.contains(WidgetState.selected)) return Colors.white;
-          return AppPalette.nearBlack;
+          return Theme.of(context).colorScheme.onSurface;
         }),
       ),
     );
@@ -634,16 +634,16 @@ class _DailyModeSection extends StatelessWidget {
                 selected: selected == p.minutes,
                 onSelected: (_) => onPresetTap(p.minutes),
                 selectedColor: accent,
-                backgroundColor: AppPalette.lightSurface,
+                backgroundColor: theme.colorScheme.surfaceContainerHigh,
                 labelStyle: theme.textTheme.labelMedium?.copyWith(
                   color: selected == p.minutes
                       ? Colors.white
-                      : AppPalette.nearBlack,
+                      : theme.colorScheme.onSurface,
                 ),
                 side: BorderSide(
                   color: selected == p.minutes
                       ? accent
-                      : AppPalette.borderGray.withValues(alpha: 0.6),
+                      : theme.colorScheme.outline.withValues(alpha: 0.6),
                 ),
               ),
           ],
@@ -658,7 +658,7 @@ class _DailyModeSection extends StatelessWidget {
                 Text(
                   '세부 조정',
                   style: theme.textTheme.labelMedium?.copyWith(
-                    color: AppPalette.focusedGray,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.72),
                   ),
                 ),
                 Icon(
@@ -666,7 +666,7 @@ class _DailyModeSection extends StatelessWidget {
                       ? Icons.expand_less_rounded
                       : Icons.expand_more_rounded,
                   size: 18,
-                  color: AppPalette.focusedGray,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.72),
                 ),
               ],
             ),
@@ -727,16 +727,16 @@ class _ByDaysModeSection extends StatelessWidget {
                 selected: daysSelection == p.days,
                 onSelected: (_) => onDaysTap(p.days),
                 selectedColor: accent,
-                backgroundColor: AppPalette.lightSurface,
+                backgroundColor: theme.colorScheme.surfaceContainerHigh,
                 labelStyle: theme.textTheme.labelMedium?.copyWith(
                   color: daysSelection == p.days
                       ? Colors.white
-                      : AppPalette.nearBlack,
+                      : theme.colorScheme.onSurface,
                 ),
                 side: BorderSide(
                   color: daysSelection == p.days
                       ? accent
-                      : AppPalette.borderGray.withValues(alpha: 0.6),
+                      : theme.colorScheme.outline.withValues(alpha: 0.6),
                 ),
               ),
           ],
@@ -813,8 +813,9 @@ class _Stepper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     return Material(
-      color: AppPalette.lightSurface,
+      color: theme.colorScheme.surfaceContainerHigh,
       shape: const CircleBorder(),
       child: InkWell(
         customBorder: const CircleBorder(),
@@ -822,7 +823,7 @@ class _Stepper extends StatelessWidget {
         child: SizedBox(
           width: 36,
           height: 36,
-          child: Icon(icon, size: 20, color: AppPalette.nearBlack),
+          child: Icon(icon, size: 20, color: theme.colorScheme.onSurface),
         ),
       ),
     );

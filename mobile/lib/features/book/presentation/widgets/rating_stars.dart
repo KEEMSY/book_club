@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
-import '../../../../core/theme/app_theme.dart';
-
 /// 5-star rating selector styled to the Airbnb coral palette.
 ///
 /// [value] is 0..5 (half-stars disabled for simpler validation — backend
@@ -22,20 +20,23 @@ class RatingStars extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     return RatingBar.builder(
       initialRating: value.toDouble(),
       minRating: 0,
       maxRating: 5,
       allowHalfRating: false,
       itemCount: 5,
-      unratedColor: AppPalette.borderGray,
+      unratedColor: theme.colorScheme.outline,
       itemSize: size,
       itemPadding: const EdgeInsets.symmetric(horizontal: 2),
       glow: false,
       onRatingUpdate: (double next) => onChanged(next.round()),
-      itemBuilder: (context, _) => const Icon(
+      // Active star stays on the theme primary — brand-semantic but theme-aware
+      // so dark mode picks up rauschDark without the star vanishing.
+      itemBuilder: (context, _) => Icon(
         Icons.star_rounded,
-        color: AppPalette.rausch,
+        color: theme.colorScheme.primary,
       ),
     );
   }

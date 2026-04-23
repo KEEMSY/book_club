@@ -63,10 +63,11 @@ class _Segment extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final Color background =
-        selected ? theme.colorScheme.primary : AppPalette.lightSurface;
+    final Color background = selected
+        ? theme.colorScheme.primary
+        : theme.colorScheme.surfaceContainerHigh;
     final Color foreground =
-        selected ? AppPalette.pureWhite : AppPalette.nearBlack;
+        selected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface;
 
     return Material(
       color: background,

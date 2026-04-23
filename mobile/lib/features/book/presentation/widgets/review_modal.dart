@@ -124,7 +124,7 @@ class _ReviewModalState extends ConsumerState<ReviewModal> {
           Text(
             widget.userBook.book.title,
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: AppPalette.secondaryGray,
+              color: theme.colorScheme.onSurfaceVariant,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,

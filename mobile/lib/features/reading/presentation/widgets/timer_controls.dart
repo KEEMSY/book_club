@@ -132,16 +132,17 @@ class _CircularControl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     return SizedBox(
       width: 56,
       height: 56,
       child: Material(
-        color: AppPalette.lightSurface,
+        color: theme.colorScheme.surfaceContainerHigh,
         shape: const CircleBorder(),
         child: InkWell(
           customBorder: const CircleBorder(),
           onTap: onPressed,
-          child: Icon(icon, color: AppPalette.nearBlack, size: 28),
+          child: Icon(icon, color: theme.colorScheme.onSurface, size: 28),
         ),
       ),
     );

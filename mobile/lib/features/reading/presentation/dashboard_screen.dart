@@ -219,14 +219,14 @@ class _Header extends StatelessWidget {
         Text(
           greeting,
           style: theme.textTheme.displaySmall?.copyWith(
-            color: AppPalette.nearBlack,
+            color: theme.colorScheme.onSurface,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           '$name님',
           style: theme.textTheme.titleMedium?.copyWith(
-            color: AppPalette.focusedGray,
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.72),
           ),
         ),
       ],
@@ -258,12 +258,12 @@ class _GradeRow extends ConsumerWidget {
       child: Container(
         padding: EdgeInsets.all(spacing.lg),
         decoration: BoxDecoration(
-          color: AppPalette.pureWhite,
+          color: theme.colorScheme.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: theme.colorScheme.outlineVariant,
           ),
-          boxShadow: AppShadows.light.elevated,
+          boxShadow: theme.extension<AppShadows>()!.elevated,
         ),
         child: Row(
           children: <Widget>[
@@ -276,17 +276,17 @@ class _GradeRow extends ConsumerWidget {
                   Text(
                     _title(state),
                     style: theme.textTheme.titleLarge?.copyWith(
-                      color: AppPalette.nearBlack,
+                      color: theme.colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     _subtitle(state),
-                    // bodySmall defaults to onSurfaceVariant (secondaryGray)
-                    // which washes out on the ivory card. Step to focusedGray
-                    // for AA contrast.
+                    // Secondary reading copy — onSurface at 0.72 keeps AA on
+                    // both the warm light card and the #1F1F1F dark card.
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: AppPalette.focusedGray,
+                      color:
+                          theme.colorScheme.onSurface.withValues(alpha: 0.72),
                     ),
                   ),
                 ],
@@ -294,7 +294,7 @@ class _GradeRow extends ConsumerWidget {
             ),
             Icon(
               isError ? Icons.refresh_rounded : Icons.chevron_right_rounded,
-              color: AppPalette.focusedGray,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.72),
             ),
           ],
         ),
@@ -362,12 +362,12 @@ class _HeatmapCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(spacing.lg),
       decoration: BoxDecoration(
-        color: AppPalette.pureWhite,
+        color: theme.colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: theme.colorScheme.outlineVariant,
         ),
-        boxShadow: AppShadows.light.elevated,
+        boxShadow: theme.extension<AppShadows>()!.elevated,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -378,14 +378,14 @@ class _HeatmapCard extends StatelessWidget {
               Text(
                 '독서 캘린더',
                 style: theme.textTheme.titleLarge?.copyWith(
-                  color: AppPalette.nearBlack,
+                  color: theme.colorScheme.onSurface,
                 ),
                 semanticsLabel: '독서 캘린더',
               ),
               Text(
                 '최근 1년',
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: AppPalette.focusedGray,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.72),
                 ),
               ),
             ],
@@ -402,7 +402,8 @@ class _HeatmapCard extends StatelessWidget {
                   child: Text(
                     '독서 캘린더를 불러오지 못했어요',
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: AppPalette.focusedGray,
+                      color:
+                          theme.colorScheme.onSurface.withValues(alpha: 0.72),
                     ),
                   ),
                 ),

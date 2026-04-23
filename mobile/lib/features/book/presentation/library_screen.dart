@@ -255,13 +255,16 @@ class _LibraryCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final radii = Theme.of(context).extension<AppRadius>()!;
+    final ThemeData theme = Theme.of(context);
+    final radii = theme.extension<AppRadius>()!;
     return Container(
       decoration: highlight
           ? BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(radii.md)),
               border: Border.all(
-                color: AppPalette.rausch,
+                // Primary picks up rauschDark automatically on dark theme so
+                // the highlight ring stays brand-correct and visible.
+                color: theme.colorScheme.primary,
                 width: 2,
               ),
             )
@@ -342,7 +345,7 @@ class _LibraryActionsSheet extends ConsumerWidget {
                   vertical: 2,
                 ),
                 decoration: BoxDecoration(
-                  color: AppPalette.lightSurface,
+                  color: theme.colorScheme.surfaceContainerHigh,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text('준비중', style: theme.textTheme.labelMedium),

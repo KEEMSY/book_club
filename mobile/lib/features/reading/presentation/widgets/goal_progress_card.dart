@@ -32,12 +32,14 @@ class GoalProgressCard extends StatelessWidget {
     );
     final int daysRemaining = endDate.difference(todayLocal).inDays;
 
+    final AppShadows shadows = theme.extension<AppShadows>()!;
     return Container(
       padding: EdgeInsets.all(spacing.lg),
       decoration: BoxDecoration(
-        color: AppPalette.pureWhite,
+        color: theme.colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: AppShadows.light.elevated,
+        border: Border.all(color: theme.colorScheme.outlineVariant),
+        boxShadow: shadows.elevated,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -68,7 +70,7 @@ class GoalProgressCard extends StatelessWidget {
             child: LinearProgressIndicator(
               value: progress.percent.clamp(0.0, 1.0),
               minHeight: 10,
-              backgroundColor: AppPalette.lightSurface,
+              backgroundColor: theme.colorScheme.surfaceContainerHighest,
               valueColor: AlwaysStoppedAnimation<Color>(accent),
             ),
           ),

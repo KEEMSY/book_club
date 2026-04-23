@@ -26,6 +26,7 @@ class DevLoginButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
+    final Color brand = theme.colorScheme.primary;
 
     return SizedBox(
       width: double.infinity,
@@ -33,22 +34,22 @@ class DevLoginButton extends StatelessWidget {
       child: OutlinedButton(
         onPressed: isLoading ? null : onPressed,
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppPalette.rausch,
-          side: const BorderSide(color: AppPalette.rausch, width: 1.4),
-          disabledForegroundColor: AppPalette.rausch.withValues(alpha: 0.5),
+          foregroundColor: brand,
+          side: BorderSide(color: brand, width: 1.4),
+          disabledForegroundColor: brand.withValues(alpha: 0.5),
           padding: EdgeInsets.symmetric(horizontal: spacing.md),
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(12)),
           ),
           textStyle: theme.textTheme.labelLarge?.copyWith(
-            color: AppPalette.rausch,
+            color: brand,
             fontWeight: FontWeight.w600,
           ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Icon(Icons.bolt_outlined, size: 18, color: AppPalette.rausch),
+            Icon(Icons.bolt_outlined, size: 18, color: brand),
             SizedBox(width: spacing.sm),
             Text(label),
           ],

@@ -35,15 +35,16 @@ class StreakCard extends StatelessWidget {
       subtitle = '오늘부터 시작해보세요';
     }
 
+    final AppShadows shadows = theme.extension<AppShadows>()!;
     return Container(
       padding: EdgeInsets.all(compact ? spacing.md : spacing.lg),
       decoration: BoxDecoration(
-        color: AppPalette.pureWhite,
+        color: theme.colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: theme.colorScheme.outlineVariant,
         ),
-        boxShadow: AppShadows.light.elevated,
+        boxShadow: shadows.elevated,
       ),
       child: Row(
         children: <Widget>[
@@ -60,18 +61,17 @@ class StreakCard extends StatelessWidget {
                 Text(
                   title,
                   style: theme.textTheme.titleLarge?.copyWith(
-                    color: AppPalette.nearBlack,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   subtitle,
-                  // bodySmall inherits secondaryGray (#6A6A6A) from the theme,
-                  // which undercuts legibility on pureWhite. Step to
-                  // focusedGray (#3F3F3F) — still visibly tertiary but comfort
-                  // reads at arm's length.
+                  // Secondary reading copy — pull from onSurface at 0.72 so the
+                  // line stays AA on both the light parchment card and the
+                  // #1F1F1F dark card without flipping between palette tokens.
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppPalette.focusedGray,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.72),
                   ),
                 ),
               ],

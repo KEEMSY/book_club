@@ -216,7 +216,7 @@ class _TimeRow extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          border: Border.all(color: AppPalette.borderGray),
+          border: Border.all(color: theme.colorScheme.outline),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(

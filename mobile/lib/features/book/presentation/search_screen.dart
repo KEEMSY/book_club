@@ -111,7 +111,7 @@ class _SearchField extends StatelessWidget {
                 tooltip: '지우기',
               ),
         filled: true,
-        fillColor: AppPalette.lightSurface,
+        fillColor: theme.colorScheme.surfaceContainerHigh,
       ),
       style: theme.textTheme.bodyLarge?.copyWith(
         color: theme.colorScheme.onSurface,
@@ -242,7 +242,7 @@ class _ErrorView extends ConsumerWidget {
               message,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppPalette.secondaryGray,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
             ),
             SizedBox(height: spacing.lg),

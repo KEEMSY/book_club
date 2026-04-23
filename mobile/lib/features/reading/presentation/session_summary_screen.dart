@@ -26,7 +26,7 @@ class SessionSummaryScreen extends ConsumerWidget {
     final Duration elapsed = Duration(seconds: completion.durationSec);
 
     return Scaffold(
-      backgroundColor: AppPalette.foggy,
+      // Inherit the theme canvas — Foggy on light, darkCanvas on dark.
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         automaticallyImplyLeading: false,

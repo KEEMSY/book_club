@@ -2,8 +2,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_theme.dart';
-
 /// Large circular progress ring rendered in the centre of the timer screen.
 ///
 /// Draws two concentric arcs: a 30%-alpha background ring routed through the
@@ -34,13 +32,17 @@ class TimerRing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     return SizedBox(
       width: size,
       height: size,
       child: CustomPaint(
         painter: _TimerRingPainter(
           color: color,
-          backgroundColor: AppPalette.borderGray.withValues(alpha: 0.3),
+          // outlineVariant is already tuned per-theme (warm near-white on light,
+          // #2E2E2E on dark) so the track stays visible without the low-alpha
+          // borderGray hack that used to vanish on the dark canvas.
+          backgroundColor: theme.colorScheme.outlineVariant,
           progress: progress.clamp(0.0, 1.0),
           strokeWidth: strokeWidth,
           indeterminate: indeterminate,

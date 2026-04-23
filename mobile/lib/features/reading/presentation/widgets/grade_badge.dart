@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/grade_theme.dart';
 
 /// Circular badge that renders the user's reader grade. Rausch is reserved
 /// for grade 3 (애독자); other grades use their assigned Airbnb hue per
 /// `GradeTheme`.
+///
+/// Each tier carries a plant-growth Material icon instead of a plain numeral
+/// (sprout → growing plant → flower → tree → forest) so the badge *shows*
+/// the "reading as growth" metaphor that the 새싹/탐/애/열혈/마스터 naming
+/// already implies. Icons land pixel-centered via an explicit `Center`
+/// wrapper — a `Text` in a circle used to sit a hair off because baseline
+/// + descender metrics shift the glyph off-axis.
 ///
 /// Use the default constructor once a [ReaderGrade] is available. While the
 /// grade call is Initial / Loading / Failure, prefer [GradeBadge.placeholder]
@@ -43,25 +49,21 @@ class GradeBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (_isPlaceholder) {
-      return _buildPlaceholder();
+      return _buildPlaceholder(context);
     }
     return _buildBadge(context);
   }
 
-  Widget _buildPlaceholder() {
-    // borderCream / stoneGray are not present in AppPalette. We map the
-    // requested semantic tokens to the closest existing Airbnb values:
-    //   borderCream  → AppPalette.foggy  (warm off-white, §2 Foggy)
-    //   borderGray   → AppPalette.borderGray at 60% alpha
-    //   stoneGray    → AppPalette.secondaryGray
+  Widget _buildPlaceholder(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     final Widget circle = Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: AppPalette.foggy,
+        color: theme.colorScheme.surfaceContainerHigh,
         shape: BoxShape.circle,
         border: Border.all(
-          color: AppPalette.borderGray.withValues(alpha: 0.6),
+          color: theme.colorScheme.outlineVariant,
           width: 1,
         ),
       ),
@@ -69,7 +71,7 @@ class GradeBadge extends StatelessWidget {
         child: Icon(
           Icons.auto_awesome_rounded,
           size: size * 0.5,
-          color: AppPalette.secondaryGray,
+          color: theme.colorScheme.onSurfaceVariant,
         ),
       ),
     );
@@ -88,45 +90,60 @@ class GradeBadge extends StatelessWidget {
   Widget _buildBadge(BuildContext context) {
     final theme = Theme.of(context);
     final Color primary = GradeTheme.primaryOf(grade);
+    final Color onPrimary = theme.colorScheme.onPrimary;
     final String label = _label(grade);
-    final int number = _number(grade);
+    final IconData icon = _iconFor(grade);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        Container(
+        SizedBox(
           width: size,
           height: size,
-          decoration: BoxDecoration(
-            color: primary,
-            shape: BoxShape.circle,
-            boxShadow: <BoxShadow>[
-              BoxShadow(
-                color: primary.withValues(alpha: 0.35),
-                blurRadius: 24,
-                offset: const Offset(0, 8),
+          child: Stack(
+            alignment: Alignment.center,
+            children: <Widget>[
+              // Filled disc — grade primary with a soft ambient glow matching
+              // the grade's tone.
+              Container(
+                width: size,
+                height: size,
+                decoration: BoxDecoration(
+                  color: primary,
+                  shape: BoxShape.circle,
+                  boxShadow: <BoxShadow>[
+                    BoxShadow(
+                      color: primary.withValues(alpha: 0.35),
+                      blurRadius: 24,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+              ),
+              // Soft inner ring — subtle medallion treatment that adds depth
+              // without introducing extra chroma. Scales with size so the
+              // 64dp compact badge and the 120dp hero badge both read.
+              Container(
+                width: size - size * 0.12,
+                height: size - size * 0.12,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: onPrimary.withValues(alpha: 0.24),
+                    width: 1.5,
+                  ),
+                ),
+              ),
+              // Plant-growth glyph, explicit Center so the icon lands on the
+              // visual axis of the disc regardless of glyph metrics.
+              Center(
+                child: Icon(
+                  icon,
+                  size: size * 0.5,
+                  color: onPrimary,
+                ),
               ),
             ],
-          ),
-          child: Center(
-            child: Text(
-              '$number',
-              // White-on-grade-fill is already AAA, but some of the lighter
-              // grade hues (beachPeach, rauschLite) get close to 4.5:1 at
-              // thin weights. A soft inner shadow keeps the numeral readable
-              // across every grade without adding chroma.
-              style: theme.textTheme.displayMedium?.copyWith(
-                color: Colors.white,
-                fontSize: size * 0.38,
-                shadows: <Shadow>[
-                  Shadow(
-                    color: Colors.black.withValues(alpha: 0.18),
-                    offset: const Offset(0, 1),
-                    blurRadius: 2,
-                  ),
-                ],
-              ),
-            ),
           ),
         ),
         if (showLabel) ...<Widget>[
@@ -134,7 +151,7 @@ class GradeBadge extends StatelessWidget {
           Text(
             label,
             style: theme.textTheme.titleLarge?.copyWith(
-              color: AppPalette.nearBlack,
+              color: theme.colorScheme.onSurface,
             ),
           ),
         ],
@@ -142,18 +159,21 @@ class GradeBadge extends StatelessWidget {
     );
   }
 
-  int _number(ReaderGrade g) {
+  /// Plant-growth motif: seed/sprout → growing plant → flower → tree →
+  /// forest. Each glyph is a built-in Material rounded icon — no extra
+  /// dependency, guaranteed availability.
+  static IconData _iconFor(ReaderGrade g) {
     switch (g) {
       case ReaderGrade.sprout:
-        return 1;
+        return Icons.spa_rounded;
       case ReaderGrade.explorer:
-        return 2;
+        return Icons.eco_rounded;
       case ReaderGrade.devoted:
-        return 3;
+        return Icons.local_florist_rounded;
       case ReaderGrade.passionate:
-        return 4;
+        return Icons.park_rounded;
       case ReaderGrade.master:
-        return 5;
+        return Icons.forest_rounded;
     }
   }
 

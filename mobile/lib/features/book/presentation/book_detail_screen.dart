@@ -149,7 +149,7 @@ class _ContentState extends State<_Content> {
             Text(
               book.author,
               style: theme.textTheme.bodyLarge?.copyWith(
-                color: AppPalette.secondaryGray,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
             if (book.publisher.isNotEmpty) ...<Widget>[
@@ -225,13 +225,13 @@ class _PublisherChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: AppPalette.lightSurface,
+        color: theme.colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.all(Radius.circular(radii.sm)),
       ),
       child: Text(
         publisher,
         style: theme.textTheme.labelMedium?.copyWith(
-          color: AppPalette.nearBlack,
+          color: theme.colorScheme.onSurface,
           fontWeight: FontWeight.w500,
         ),
       ),

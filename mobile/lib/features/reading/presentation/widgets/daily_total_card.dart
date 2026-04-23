@@ -28,15 +28,16 @@ class DailyTotalCard extends StatelessWidget {
         ? 0
         : (todaySeconds / (weeklyGoalSeconds! / 7)).clamp(0.0, 1.0);
 
+    final AppShadows shadows = theme.extension<AppShadows>()!;
     return Container(
       padding: EdgeInsets.all(spacing.lg),
       decoration: BoxDecoration(
-        color: AppPalette.pureWhite,
+        color: theme.colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: theme.colorScheme.outlineVariant,
         ),
-        boxShadow: AppShadows.light.elevated,
+        boxShadow: shadows.elevated,
       ),
       child: Row(
         children: <Widget>[
@@ -46,18 +47,17 @@ class DailyTotalCard extends StatelessWidget {
               children: <Widget>[
                 Text(
                   '오늘의 독서',
-                  // Default bodyMedium lands on nearBlack via the theme, but
-                  // pinning to focusedGray keeps the label visibly secondary
-                  // while still AA against pureWhite.
+                  // Secondary label — onSurface at 0.72 keeps the hierarchy
+                  // (subdued vs the bold headline) legible on both canvases.
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: AppPalette.focusedGray,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.72),
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   formatDurationKorean(todaySeconds),
                   style: theme.textTheme.displaySmall
-                      ?.copyWith(color: AppPalette.nearBlack),
+                      ?.copyWith(color: theme.colorScheme.onSurface),
                 ),
               ],
             ),
@@ -74,7 +74,7 @@ class DailyTotalCard extends StatelessWidget {
                   child: CircularProgressIndicator(
                     value: progress,
                     strokeWidth: 5,
-                    backgroundColor: AppPalette.lightSurface,
+                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
                     valueColor: AlwaysStoppedAnimation<Color>(accent),
                   ),
                 ),

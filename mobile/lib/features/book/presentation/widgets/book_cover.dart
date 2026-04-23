@@ -47,8 +47,10 @@ class BookCover extends StatelessWidget {
   }
 
   Widget _buildContent(ThemeData theme) {
+    // Brand-tinted placeholder — derive from the theme primary so it picks up
+    // rauschDark automatically in dark mode instead of washing out on #161616.
     final Color placeholderBackground =
-        AppPalette.rausch.withValues(alpha: 0.08);
+        theme.colorScheme.primary.withValues(alpha: 0.10);
     final Color placeholderIcon =
         theme.colorScheme.primary.withValues(alpha: 0.55);
 
