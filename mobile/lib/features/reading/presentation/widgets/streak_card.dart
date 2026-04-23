@@ -40,6 +40,9 @@ class StreakCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppPalette.pureWhite,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: theme.colorScheme.outlineVariant,
+        ),
         boxShadow: AppShadows.light.elevated,
       ),
       child: Row(
@@ -54,11 +57,22 @@ class StreakCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text(title, style: theme.textTheme.titleLarge),
-                const SizedBox(height: 2),
+                Text(
+                  title,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    color: AppPalette.nearBlack,
+                  ),
+                ),
+                const SizedBox(height: 4),
                 Text(
                   subtitle,
-                  style: theme.textTheme.bodySmall,
+                  // bodySmall inherits secondaryGray (#6A6A6A) from the theme,
+                  // which undercuts legibility on pureWhite. Step to
+                  // focusedGray (#3F3F3F) — still visibly tertiary but comfort
+                  // reads at arm's length.
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppPalette.focusedGray,
+                  ),
                 ),
               ],
             ),

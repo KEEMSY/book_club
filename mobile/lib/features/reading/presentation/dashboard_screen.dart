@@ -208,12 +208,26 @@ class _Header extends StatelessWidget {
       greeting = '오늘의 독서, 편안한 저녁';
     }
     final String name = nickname ?? '독자';
+    // Greeting sits as the landing headline in Playfair `displaySmall` (22/600)
+    // with nearBlack ink, so it reads as the editorial entry point rather than
+    // a muted line. Nickname follows in `titleMedium` (16/500) sans — a clear
+    // supporting sub-line per §3 hierarchy.
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(greeting, style: theme.textTheme.bodyLarge),
-        const SizedBox(height: 2),
-        Text('$name님', style: theme.textTheme.displaySmall),
+        Text(
+          greeting,
+          style: theme.textTheme.displaySmall?.copyWith(
+            color: AppPalette.nearBlack,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          '$name님',
+          style: theme.textTheme.titleMedium?.copyWith(
+            color: AppPalette.focusedGray,
+          ),
+        ),
       ],
     );
   }
@@ -236,6 +250,9 @@ class _GradeRow extends ConsumerWidget {
         decoration: BoxDecoration(
           color: AppPalette.pureWhite,
           borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: theme.colorScheme.outlineVariant,
+          ),
           boxShadow: AppShadows.light.elevated,
         ),
         child: Row(
@@ -254,19 +271,26 @@ class _GradeRow extends ConsumerWidget {
                 children: <Widget>[
                   Text(
                     _title(state),
-                    style: theme.textTheme.titleLarge,
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      color: AppPalette.nearBlack,
+                    ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 4),
                   Text(
                     _subtitle(state),
-                    style: theme.textTheme.bodySmall,
+                    // bodySmall defaults to onSurfaceVariant (secondaryGray)
+                    // which washes out on the ivory card. Step to focusedGray
+                    // for AA contrast.
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppPalette.focusedGray,
+                    ),
                   ),
                 ],
               ),
             ),
             const Icon(
               Icons.chevron_right_rounded,
-              color: AppPalette.secondaryGray,
+              color: AppPalette.focusedGray,
             ),
           ],
         ),
@@ -322,6 +346,9 @@ class _HeatmapCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppPalette.pureWhite,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: theme.colorScheme.outlineVariant,
+        ),
         boxShadow: AppShadows.light.elevated,
       ),
       child: Column(
@@ -330,10 +357,18 @@ class _HeatmapCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Text('독서 잔디', style: theme.textTheme.titleLarge),
+              Text(
+                '독서 캘린더',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  color: AppPalette.nearBlack,
+                ),
+                semanticsLabel: '독서 캘린더',
+              ),
               Text(
                 '최근 1년',
-                style: theme.textTheme.bodySmall,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: AppPalette.focusedGray,
+                ),
               ),
             ],
           ),
@@ -347,8 +382,10 @@ class _HeatmapCard extends StatelessWidget {
                 child: Padding(
                   padding: EdgeInsets.symmetric(vertical: spacing.md),
                   child: Text(
-                    '잔디를 불러오지 못했어요',
-                    style: theme.textTheme.bodyMedium,
+                    '독서 캘린더를 불러오지 못했어요',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: AppPalette.focusedGray,
+                    ),
                   ),
                 ),
               ),

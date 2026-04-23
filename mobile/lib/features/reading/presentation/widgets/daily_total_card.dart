@@ -33,6 +33,9 @@ class DailyTotalCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppPalette.pureWhite,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: theme.colorScheme.outlineVariant,
+        ),
         boxShadow: AppShadows.light.elevated,
       ),
       child: Row(
@@ -41,7 +44,15 @@ class DailyTotalCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text('오늘의 독서', style: theme.textTheme.bodyMedium),
+                Text(
+                  '오늘의 독서',
+                  // Default bodyMedium lands on nearBlack via the theme, but
+                  // pinning to focusedGray keeps the label visibly secondary
+                  // while still AA against pureWhite.
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: AppPalette.focusedGray,
+                  ),
+                ),
                 const SizedBox(height: 4),
                 Text(
                   formatDurationKorean(todaySeconds),

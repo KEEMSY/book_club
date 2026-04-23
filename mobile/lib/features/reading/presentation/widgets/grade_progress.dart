@@ -29,6 +29,9 @@ class GradeProgress extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppPalette.pureWhite,
           borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: theme.colorScheme.outlineVariant,
+          ),
           boxShadow: AppShadows.light.elevated,
         ),
         child: Row(
@@ -118,8 +121,19 @@ class _ProgressRow extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            Text(label, style: theme.textTheme.bodyMedium),
-            Text(trailing, style: theme.textTheme.bodyMedium),
+            Text(
+              label,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: AppPalette.focusedGray,
+              ),
+            ),
+            Text(
+              trailing,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: AppPalette.nearBlack,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 6),

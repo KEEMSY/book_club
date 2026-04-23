@@ -88,8 +88,9 @@ void main() {
     // Grade row shows the tier label.
     expect(find.text('탐독자'), findsOneWidget);
 
-    // Heatmap card header.
-    expect(find.text('독서 잔디'), findsOneWidget);
+    // Heatmap card header — uses "독서 캘린더" (renamed from the earlier
+    // slangy "독서 잔디") to match the editorial tone for 20-30대 readers.
+    expect(find.text('독서 캘린더'), findsOneWidget);
 
     // Primary CTA — scroll the ListView until it becomes visible.
     await tester.scrollUntilVisible(

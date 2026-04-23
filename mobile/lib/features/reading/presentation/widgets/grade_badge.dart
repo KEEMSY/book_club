@@ -45,9 +45,20 @@ class GradeBadge extends StatelessWidget {
           child: Center(
             child: Text(
               '$number',
+              // White-on-grade-fill is already AAA, but some of the lighter
+              // grade hues (beachPeach, rauschLite) get close to 4.5:1 at
+              // thin weights. A soft inner shadow keeps the numeral readable
+              // across every grade without adding chroma.
               style: theme.textTheme.displayMedium?.copyWith(
                 color: Colors.white,
                 fontSize: size * 0.38,
+                shadows: <Shadow>[
+                  Shadow(
+                    color: Colors.black.withValues(alpha: 0.18),
+                    offset: const Offset(0, 1),
+                    blurRadius: 2,
+                  ),
+                ],
               ),
             ),
           ),

@@ -6,9 +6,9 @@ import '../../../../core/theme/app_theme.dart';
 
 /// Large circular progress ring rendered in the centre of the timer screen.
 ///
-/// Draws two concentric arcs: a 30%-alpha background ring in
-/// [AppPalette.borderCream] (via the theme outlineVariant) and a foreground
-/// arc in [color] (grade accent via `gradePrimaryProvider`).
+/// Draws two concentric arcs: a 30%-alpha background ring routed through the
+/// theme's `outlineVariant` and a foreground arc in [color] (grade accent via
+/// `gradePrimaryProvider`).
 ///
 /// The arc sweeps clockwise, starting at 12 o'clock, proportional to
 /// [progress] (0..1). When [indeterminate] is true the ring renders a full

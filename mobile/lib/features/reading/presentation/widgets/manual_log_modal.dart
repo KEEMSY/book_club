@@ -72,7 +72,7 @@ class _ManualLogModalState extends ConsumerState<ManualLogModal> {
           Text('수동 기록', style: theme.textTheme.headlineMedium),
           SizedBox(height: spacing.xs),
           Text(
-            '수동 기록은 잔디·등급에 반영되지 않아요. 권수 카운트에만 포함됩니다.',
+            '수동 기록은 독서 캘린더·등급에 반영되지 않아요. 권수 카운트에만 포함됩니다.',
             style: theme.textTheme.bodySmall,
           ),
           SizedBox(height: spacing.lg),
