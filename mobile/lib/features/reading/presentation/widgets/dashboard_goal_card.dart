@@ -6,19 +6,25 @@ import '../../domain/reading_goal.dart';
 
 /// Compact multi-goal summary card shown on the dashboard.
 ///
-/// Renders up to three active goals (yearly → monthly → weekly) as stacked
-/// rows with a LinearProgressIndicator and "Xh / 목표 Yh" annotation.
-/// Uses the same card shell as [StreakCard] for visual consistency.
+/// When [items] is non-empty, renders yearly → monthly → weekly progress rows
+/// with a LinearProgressIndicator and "Xh / 목표 Yh" annotation.
+/// When [items] is empty, renders a CTA shell so the card never collapses to
+/// nothing — the user sees an invitation to set a first goal rather than a
+/// missing section.
 class DashboardGoalCard extends StatelessWidget {
   const DashboardGoalCard({
     super.key,
     required this.items,
     required this.accent,
+    this.onAddGoal,
   });
 
   /// Active goal progress list from [GoalLoaded.items].
   final List<GoalProgress> items;
   final Color accent;
+
+  /// Optional tap handler for the empty-state CTA ("목표 추가" button).
+  final VoidCallback? onAddGoal;
 
   @override
   Widget build(BuildContext context) {
@@ -41,16 +47,52 @@ class DashboardGoalCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
-            '목표 진행률',
-            style: theme.textTheme.titleLarge?.copyWith(
-              color: theme.colorScheme.onSurface,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Text(
+                '목표 진행률',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+              if (ordered.isEmpty)
+                TextButton.icon(
+                  onPressed: onAddGoal,
+                  icon: const Icon(Icons.add, size: 16),
+                  label: const Text('목표 추가'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: accent,
+                    padding: EdgeInsets.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                ),
+            ],
           ),
-          SizedBox(height: spacing.md),
-          for (int i = 0; i < ordered.length; i++) ...<Widget>[
-            _GoalRow(progress: ordered[i], accent: accent),
-            if (i < ordered.length - 1) SizedBox(height: spacing.md),
+          if (ordered.isEmpty) ...<Widget>[
+            SizedBox(height: spacing.md),
+            Row(
+              children: <Widget>[
+                Icon(
+                  Icons.flag_outlined,
+                  size: 20,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                SizedBox(width: spacing.xs),
+                Text(
+                  '아직 설정된 목표가 없어요',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ] else ...<Widget>[
+            SizedBox(height: spacing.md),
+            for (int i = 0; i < ordered.length; i++) ...<Widget>[
+              _GoalRow(progress: ordered[i], accent: accent),
+              if (i < ordered.length - 1) SizedBox(height: spacing.md),
+            ],
           ],
         ],
       ),

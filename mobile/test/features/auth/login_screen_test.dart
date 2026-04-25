@@ -60,7 +60,7 @@ void main() {
     expect(find.text('책으로 연결되는 모든 순간'), findsOneWidget);
     expect(find.byType(DevLoginButton), findsOneWidget);
     expect(find.text('개발용 로그인'), findsOneWidget);
-    expect(find.text('Dev 환경 전용입니다'), findsOneWidget);
+    expect(find.text('Dev 환경 전용'), findsOneWidget);
     expect(
       find.text('로그인하면 Book Club 이용약관 및 개인정보처리방침에 동의합니다.'),
       findsOneWidget,

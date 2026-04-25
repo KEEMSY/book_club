@@ -1,15 +1,15 @@
+import 'dart:io' show Platform;
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../application/auth_providers.dart';
 import '../domain/auth_state.dart';
-// TODO(phase-1-prerelease): 실제 소셜 로그인 복원 시 import 되살리기.
-// import 'dart:io' show Platform;
-// import 'package:flutter/foundation.dart';
-// import 'widgets/apple_login_button.dart';
-// import 'widgets/kakao_login_button.dart';
+import 'widgets/apple_login_button.dart';
 import 'widgets/dev_login_button.dart';
+import 'widgets/kakao_login_button.dart';
 import 'widgets/loading_overlay.dart';
 
 /// Airbnb-toned login screen.
@@ -38,6 +38,11 @@ class LoginScreen extends ConsumerWidget {
     // state and shows a single-line apology with the backend's message.
     final String? failureMessage = auth is AuthFailure ? auth.message : null;
 
+    // Dev-mode flag: show DevLoginButton in addition to social buttons so local
+    // dev flows remain usable without Kakao credentials.
+    const bool isDevMode = bool.fromEnvironment('SHOW_DEV_LOGIN', defaultValue: true);
+    final bool showApple = !kIsWeb && Platform.isIOS;
+
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       body: SafeArea(
@@ -60,6 +65,12 @@ class LoginScreen extends ConsumerWidget {
                     spacing: spacing,
                     isBusy: isBusy,
                     failureMessage: failureMessage,
+                    showApple: showApple,
+                    showDevLogin: isDevMode,
+                    onKakao: () =>
+                        ref.read(authNotifierProvider.notifier).loginWithKakao(),
+                    onApple: () =>
+                        ref.read(authNotifierProvider.notifier).loginWithApple(),
                     onDevLogin: () =>
                         ref.read(authNotifierProvider.notifier).loginDev(),
                   ),
@@ -140,12 +151,20 @@ class _BottomCtas extends StatelessWidget {
     required this.spacing,
     required this.isBusy,
     required this.failureMessage,
+    required this.showApple,
+    required this.showDevLogin,
+    required this.onKakao,
+    required this.onApple,
     required this.onDevLogin,
   });
 
   final AppSpacing spacing;
   final bool isBusy;
   final String? failureMessage;
+  final bool showApple;
+  final bool showDevLogin;
+  final VoidCallback onKakao;
+  final VoidCallback onApple;
   final VoidCallback onDevLogin;
 
   @override
@@ -170,24 +189,24 @@ class _BottomCtas extends StatelessWidget {
             ),
             SizedBox(height: spacing.sm),
           ],
-          // TODO(phase-1-prerelease): 실제 소셜 로그인 복원 — Kakao/Apple 버튼 되살리기.
-          // KakaoLoginButton(onPressed: onKakao, isLoading: isBusy),
-          // if (showAppleButton) ...<Widget>[
-          //   SizedBox(height: spacing.sm),
-          //   AppleLoginButton(onPressed: onApple, isLoading: isBusy),
-          // ],
-          DevLoginButton(
-            onPressed: onDevLogin,
-            isLoading: isBusy,
-          ),
-          SizedBox(height: spacing.sm),
-          Text(
-            'Dev 환경 전용입니다',
-            textAlign: TextAlign.center,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
+          KakaoLoginButton(onPressed: onKakao, isLoading: isBusy),
+          if (showApple) ...<Widget>[
+            SizedBox(height: spacing.sm),
+            AppleLoginButton(onPressed: onApple, isLoading: isBusy),
+          ],
+          if (showDevLogin) ...<Widget>[
+            SizedBox(height: spacing.sm),
+            DevLoginButton(onPressed: onDevLogin, isLoading: isBusy),
+            SizedBox(height: spacing.xs),
+            Text(
+              'Dev 환경 전용',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                fontSize: 11,
+              ),
             ),
-          ),
+          ],
           SizedBox(height: spacing.md),
           Text(
             '로그인하면 Book Club 이용약관 및 개인정보처리방침에 동의합니다.',

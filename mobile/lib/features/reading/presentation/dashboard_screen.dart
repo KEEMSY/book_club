@@ -115,8 +115,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               ),
               SizedBox(height: spacing.md),
             ],
-            if (prefs.showGoal && goalItems.isNotEmpty) ...<Widget>[
-              DashboardGoalCard(items: goalItems, accent: accent),
+            if (prefs.showGoal) ...<Widget>[
+              DashboardGoalCard(
+                items: goalItems,
+                accent: accent,
+                onAddGoal: () => GoRouter.of(context).push('/goals'),
+              ),
               SizedBox(height: spacing.md),
             ],
             if (prefs.showGrade) ...<Widget>[

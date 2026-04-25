@@ -1,0 +1,20 @@
+# Book Club Flutter — dart-define 예시
+# 이 파일을 .dart_defines 로 복사한 뒤 실제 값을 채워 넣으세요.
+# .dart_defines 는 .gitignore 에 의해 커밋되지 않습니다.
+#
+# 사용법:
+#   flutter run  $(cat .dart_defines | grep -v '^#' | sed 's/^/--dart-define=/' | tr '\n' ' ')
+#   flutter build ios $(cat .dart_defines | grep -v '^#' | sed 's/^/--dart-define=/' | tr '\n' ' ')
+
+# ── 카카오 ─────────────────────────────────────────────────
+# 발급 위치: https://developers.kakao.com → 내 애플리케이션 → 앱 키 → 네이티브 앱 키
+KAKAO_NATIVE_APP_KEY=your_kakao_native_app_key_here
+
+# ── API 서버 주소 ────────────────────────────────────────────
+# 로컬 개발: 안드로이드 에뮬레이터는 10.0.2.2, iOS 시뮬레이터는 localhost
+# 스테이징/프로덕션: 실제 서버 URL
+# API_BASE_URL=http://localhost:8000
+
+# ── 개발용 로그인 버튼 표시 여부 ────────────────────────────
+# 프로덕션 빌드에서는 false 로 설정하여 Dev 버튼을 완전히 숨깁니다.
+# SHOW_DEV_LOGIN=false
