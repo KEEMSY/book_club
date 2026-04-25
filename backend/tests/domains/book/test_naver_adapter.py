@@ -130,6 +130,21 @@ async def test_naver_auth_error_maps_to_naver_book_error(
 
 
 @pytest.mark.asyncio
+async def test_naver_http_image_url_upgraded_to_https(
+    naver_adapter: NaverBookAdapter,
+) -> None:
+    payload = _load("naver/search_success.json")
+    # Inject an http:// image URL to verify the adapter upgrades it.
+    payload["items"][0]["image"] = "http://bookthumb-phinf.pstatic.net/cover/001/001/cover1.jpg"
+
+    with respx.mock(assert_all_called=True) as mock:
+        mock.get(_NAVER_URL).mock(return_value=httpx.Response(200, json=payload))
+        result = await naver_adapter.search("query")
+
+    assert result.items[0].cover_url == "https://bookthumb-phinf.pstatic.net/cover/001/001/cover1.jpg"
+
+
+@pytest.mark.asyncio
 async def test_naver_pagination_uses_1_based_start(
     naver_adapter: NaverBookAdapter,
 ) -> None:

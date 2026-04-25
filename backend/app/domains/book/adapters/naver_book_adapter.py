@@ -14,6 +14,8 @@ Known provider quirks we handle here so the service layer stays clean:
   space-separated pair. We always extract the 13-digit form; if neither
   slot contains 13 digits the item is dropped.
 - ``description`` also sometimes contains ``<b>`` tags; same stripping.
+- ``image`` URLs are HTTP — we upgrade to HTTPS so iOS ATS and Android 9+
+  cleartext policy don't silently drop them on the client side.
 """
 
 from __future__ import annotations
@@ -51,6 +53,13 @@ def _extract_isbn13(raw: str | None) -> str | None:
         return None
     match = _ISBN13_RE.search(raw)
     return match.group(0) if match else None
+
+
+def _upgrade_to_https(url: str | None) -> str | None:
+    """Rewrite http:// → https:// for Naver CDN image URLs."""
+    if url and url.startswith("http://"):
+        return "https://" + url[7:]
+    return url
 
 
 class NaverBookAdapter:
@@ -116,7 +125,7 @@ class NaverBookAdapter:
             description = _strip_bold(description_raw).strip() or None
             author = _normalize_authors(author_raw) or "알 수 없음"
             publisher = publisher_raw.strip() if isinstance(publisher_raw, str) else None
-            cover_url = image_raw if isinstance(image_raw, str) and image_raw else None
+            cover_url = _upgrade_to_https(image_raw if isinstance(image_raw, str) and image_raw else None)
 
             items.append(
                 ExternalBook(
