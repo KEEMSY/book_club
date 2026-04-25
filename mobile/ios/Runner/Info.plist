@@ -44,8 +44,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<!-- Replace with `kakao<NATIVE_APP_KEY>` at CI build time. -->
-				<string>kakao0000000000000000000000000000</string>
+				<string>kakao82781f9e394c2f5f3e29e499c080c956</string>
 			</array>
 		</dict>
 	</array>
