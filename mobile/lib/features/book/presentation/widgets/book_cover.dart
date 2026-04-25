@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_theme.dart';
@@ -31,39 +30,33 @@ class BookCover extends StatelessWidget {
     final BorderRadius radius =
         borderRadius ?? BorderRadius.all(Radius.circular(radii.sm));
 
-    final Widget child = AspectRatio(
-      aspectRatio: 2 / 3,
-      child: _buildContent(theme),
-    );
-
     return SizedBox(
       width: width,
       height: height,
       child: ClipRRect(
         borderRadius: radius,
-        child: child,
+        child: AspectRatio(
+          aspectRatio: 2 / 3,
+          child: _buildContent(theme),
+        ),
       ),
     );
   }
 
   Widget _buildContent(ThemeData theme) {
-    // Brand-tinted placeholder — derive from the theme primary so it picks up
-    // rauschDark automatically in dark mode instead of washing out on #161616.
-    final Color placeholderBackground =
-        theme.colorScheme.primary.withValues(alpha: 0.10);
-    final Color placeholderIcon =
-        theme.colorScheme.primary.withValues(alpha: 0.55);
+    final Color bg = theme.colorScheme.primary.withValues(alpha: 0.10);
+    final Color ic = theme.colorScheme.primary.withValues(alpha: 0.55);
 
     if (coverUrl == null || coverUrl!.isEmpty) {
-      return _placeholder(placeholderBackground, placeholderIcon);
+      return _placeholder(bg, ic);
     }
-    return CachedNetworkImage(
-      imageUrl: coverUrl!,
+
+    return Image.network(
+      coverUrl!,
       fit: fit,
-      placeholder: (_, __) =>
-          _placeholder(placeholderBackground, placeholderIcon),
-      errorWidget: (_, __, ___) =>
-          _placeholder(placeholderBackground, placeholderIcon),
+      loadingBuilder: (_, child, progress) =>
+          progress == null ? child : _shimmer(bg),
+      errorBuilder: (_, __, ___) => _placeholder(bg, ic),
     );
   }
 
@@ -71,11 +64,11 @@ class BookCover extends StatelessWidget {
     return Container(
       color: background,
       alignment: Alignment.center,
-      child: Icon(
-        Icons.menu_book_rounded,
-        size: 28,
-        color: icon,
-      ),
+      child: Icon(Icons.menu_book_rounded, size: 28, color: icon),
     );
+  }
+
+  Widget _shimmer(Color color) {
+    return Container(color: color);
   }
 }
