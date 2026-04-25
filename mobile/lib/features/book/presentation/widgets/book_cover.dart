@@ -1,6 +1,16 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
+import '../../../../core/network/dio_provider.dart';
 import '../../../../core/theme/app_theme.dart';
+
+/// Rewrites external CDN cover URLs to go through the backend proxy on web.
+/// On non-web platforms the URL is returned unchanged.
+String? _resolveCoverUrl(String? url) {
+  if (!kIsWeb || url == null || url.isEmpty) return url;
+  final base = resolveApiBaseUrl();
+  return '$base/books/cover-proxy?url=${Uri.encodeComponent(url)}';
+}
 
 /// Book cover thumbnail rendered at the canonical 2:3 aspect ratio.
 ///
@@ -47,12 +57,13 @@ class BookCover extends StatelessWidget {
     final Color bg = theme.colorScheme.primary.withValues(alpha: 0.10);
     final Color ic = theme.colorScheme.primary.withValues(alpha: 0.55);
 
-    if (coverUrl == null || coverUrl!.isEmpty) {
+    final String? url = _resolveCoverUrl(coverUrl);
+    if (url == null || url.isEmpty) {
       return _placeholder(bg, ic);
     }
 
     return Image.network(
-      coverUrl!,
+      url,
       fit: fit,
       loadingBuilder: (_, child, progress) =>
           progress == null ? child : _shimmer(bg),

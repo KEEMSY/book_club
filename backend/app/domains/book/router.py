@@ -8,11 +8,14 @@ catches domain exceptions; the global handler translates them (CLAUDE.md
 
 from __future__ import annotations
 
+import logging
 from datetime import datetime
 from typing import Annotated, Literal
+from urllib.parse import urlparse
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, status
+import httpx
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 
 from app.core.deps import get_current_user_id
 from app.domains.book.models import UserBookStatus
@@ -28,6 +31,20 @@ from app.domains.book.schemas import (
     UserBookPublic,
 )
 from app.domains.book.service import BookService
+
+logger = logging.getLogger(__name__)
+
+# Allowed CDN hosts for the cover proxy — prevents SSRF to internal addresses.
+_ALLOWED_COVER_HOSTS: frozenset[str] = frozenset(
+    {
+        "shopping-phinf.pstatic.net",
+        "bookthumb-phinf.pstatic.net",
+        "book.pstatic.net",
+        "ssl.pstatic.net",
+        "search1.kakaocdn.net",
+        "t1.kakaocdn.net",
+    }
+)
 
 router = APIRouter(tags=["book"])
 
@@ -58,6 +75,37 @@ async def search_books(
         page=result.page,
         size=result.size,
         has_more=result.has_more,
+    )
+
+
+@router.get("/books/cover-proxy", include_in_schema=False)
+async def proxy_book_cover(url: Annotated[str, Query()]) -> Response:
+    """Fetch a book cover from an external CDN and relay it with CORS headers.
+
+    Exists solely to let Flutter Web load Naver/Kakao CDN images that do not
+    set Access-Control-Allow-Origin. Only whitelisted CDN hosts are allowed to
+    prevent SSRF abuse.
+    """
+    parsed = urlparse(url)
+    if parsed.scheme not in ("http", "https") or parsed.hostname not in _ALLOWED_COVER_HOSTS:
+        raise HTTPException(status_code=400, detail="URL not allowed")
+
+    try:
+        async with httpx.AsyncClient(timeout=8.0, follow_redirects=True) as client:
+            resp = await client.get(url)
+            resp.raise_for_status()
+    except httpx.HTTPError as exc:
+        logger.warning("cover_proxy failed url=%s err=%s", url, exc)
+        raise HTTPException(status_code=502, detail="Failed to fetch cover") from exc
+
+    content_type = resp.headers.get("content-type", "image/jpeg")
+    return Response(
+        content=resp.content,
+        media_type=content_type,
+        headers={
+            "Cache-Control": "public, max-age=86400",
+            "Access-Control-Allow-Origin": "*",
+        },
     )
 
 
