@@ -199,22 +199,24 @@ class _TestableNotificationService(NotificationService):
                 )
 
     async def on_grade_up(self, event: object) -> None:
+        from app.domains.notification.service import _GRADE_NAMES, _TIER_ROMAN
         from app.domains.reading.events import UserGradeRecomputed as _UGR
 
         if not isinstance(event, _UGR):
             return
-        if event.new_grade <= event.old_grade:
+        if (event.new_grade, event.new_tier) <= (event.old_grade, event.old_tier):
             return
 
-        grade_names = ["새싹", "새싹+", "초록이", "숲속이", "숲속이+"]
-        grade_name = grade_names[min(event.new_grade - 1, len(grade_names) - 1)]
+        grade_name = _GRADE_NAMES.get(event.new_grade, "마스터")
+        tier_roman = _TIER_ROMAN.get(event.new_tier, "")
+        label = f"{grade_name} {tier_roman}".strip()
 
         notif = self._make_notification(
             user_id=event.user_id,
             ntype=NotificationType.GRADE_UP,
-            title=f"등급 상승! {grade_name}이 됐어요",
-            body=f"독서 실력이 향상되어 {grade_name} 등급에 도달했습니다.",
-            data={"new_grade": str(event.new_grade)},
+            title=f"등급 상승! {label}이 됐어요",
+            body=f"독서 실력이 향상되어 {label} 등급에 도달했습니다.",
+            data={"new_grade": str(event.new_grade), "new_tier": str(event.new_tier)},
         )
         tokens = await self.device_tokens.get_active_tokens(event.user_id)
         if tokens:
@@ -222,7 +224,7 @@ class _TestableNotificationService(NotificationService):
                 tokens,
                 notif.title,
                 notif.body,
-                {"grade": str(event.new_grade)},
+                {"grade": str(event.new_grade), "tier": str(event.new_tier)},
             )
 
 
@@ -334,7 +336,8 @@ async def test_on_comment_added_notifies_parent_author() -> None:
 
 
 @pytest.mark.asyncio
-async def test_on_grade_up_notifies_user() -> None:
+async def test_on_grade_up_notifies_user_on_grade_advance() -> None:
+    """Grade advance (1→2, tier 1→1) fires push with correct label."""
     push = FakePushAdapter()
     user_id = uuid4()
 
@@ -343,7 +346,9 @@ async def test_on_grade_up_notifies_user() -> None:
     event = UserGradeRecomputed(
         user_id=user_id,
         old_grade=1,
+        old_tier=3,
         new_grade=2,
+        new_tier=1,
         streak_days=5,
     )
     await svc.on_grade_up(event)
@@ -351,13 +356,39 @@ async def test_on_grade_up_notifies_user() -> None:
     assert len(svc._notifications) == 1
     assert svc._notifications[0].user_id == user_id
     assert svc._notifications[0].ntype == NotificationType.GRADE_UP.value
-    assert "새싹+" in svc._notifications[0].title
+    # "탐독자 I" should appear in the title.
+    assert "탐독자" in svc._notifications[0].title
     assert len(push.calls) == 1
     assert push.calls[0]["tokens"] == ["tok-grade"]
 
 
 @pytest.mark.asyncio
-async def test_on_grade_up_skips_same_grade() -> None:
+async def test_on_grade_up_notifies_user_on_tier_advance() -> None:
+    """Tier advance within the same grade (2-I → 2-II) also fires push."""
+    push = FakePushAdapter()
+    user_id = uuid4()
+
+    svc = _TestableNotificationService(push, {user_id: ["tok-tier"]})
+
+    event = UserGradeRecomputed(
+        user_id=user_id,
+        old_grade=2,
+        old_tier=1,
+        new_grade=2,
+        new_tier=2,
+        streak_days=3,
+    )
+    await svc.on_grade_up(event)
+
+    assert len(svc._notifications) == 1
+    assert "탐독자" in svc._notifications[0].title
+    assert "II" in svc._notifications[0].title
+    assert len(push.calls) == 1
+
+
+@pytest.mark.asyncio
+async def test_on_grade_up_skips_same_grade_and_tier() -> None:
+    """Recomputation with no grade/tier change produces no notification."""
     push = FakePushAdapter()
     user_id = uuid4()
 
@@ -366,11 +397,35 @@ async def test_on_grade_up_skips_same_grade() -> None:
     event = UserGradeRecomputed(
         user_id=user_id,
         old_grade=3,
+        old_tier=2,
         new_grade=3,
+        new_tier=2,
         streak_days=10,
     )
     await svc.on_grade_up(event)
 
-    # Grade did not increase: no notification, no push.
+    # Grade and tier did not change: no notification, no push.
+    assert len(svc._notifications) == 0
+    assert len(push.calls) == 0
+
+
+@pytest.mark.asyncio
+async def test_on_grade_up_skips_regression() -> None:
+    """Regression (new < old) is silently ignored."""
+    push = FakePushAdapter()
+    user_id = uuid4()
+
+    svc = _TestableNotificationService(push, {user_id: ["tok-grade"]})
+
+    event = UserGradeRecomputed(
+        user_id=user_id,
+        old_grade=3,
+        old_tier=2,
+        new_grade=2,
+        new_tier=3,
+        streak_days=0,
+    )
+    await svc.on_grade_up(event)
+
     assert len(svc._notifications) == 0
     assert len(push.calls) == 0

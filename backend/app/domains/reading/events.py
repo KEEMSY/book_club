@@ -32,11 +32,13 @@ class ReadingSessionCompleted:
 
 @dataclass(frozen=True, slots=True)
 class UserGradeRecomputed:
-    """Fired after ``ReadingSessionCompleted`` causes a grade snapshot to
-    change. M5 push handlers pick this up to send a grade-up notification.
+    """Fired after ``ReadingSessionCompleted`` causes a grade or tier snapshot
+    to change.  M5 push handlers pick this up to send a grade-up notification.
     """
 
     user_id: UUID
     old_grade: int
+    old_tier: int
     new_grade: int
+    new_tier: int
     streak_days: int

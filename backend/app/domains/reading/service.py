@@ -65,7 +65,7 @@ from app.domains.reading.events import (
     ReadingSessionCompleted,
     UserGradeRecomputed,
 )
-from app.domains.reading.grade_policy import calculate_grade, next_threshold
+from app.domains.reading.grade_policy import calculate_grade_tier, next_threshold
 from app.domains.reading.models import Goal, GoalPeriod, ReadingSession
 from app.domains.reading.ports import (
     DailyStatRepositoryPort,
@@ -162,7 +162,9 @@ class ReadingService:
         # response reflects the post-completion grade. This is the
         # canonical write path; the event below is for cross-domain
         # consumers (M5 push notifier, etc.), not a second writer.
-        grade_before = (await self.user_grades.get_or_init(user_id)).grade
+        snapshot_before = await self.user_grades.get_or_init(user_id)
+        grade_before = snapshot_before.grade
+        tier_before = snapshot_before.tier
         grade_after = await self._apply_session_completion(
             user_id=user_id,
             duration_sec=duration_sec,
@@ -182,12 +184,14 @@ class ReadingService:
                 source="timer",
             )
         )
-        if grade_after.grade != grade_before:
+        if (grade_after.grade, grade_after.tier) != (grade_before, tier_before):
             self.stage_event(
                 UserGradeRecomputed(
                     user_id=user_id,
                     old_grade=grade_before,
+                    old_tier=tier_before,
                     new_grade=grade_after.grade,
+                    new_tier=grade_after.tier,
                     streak_days=grade_after.streak_days,
                 )
             )
@@ -341,8 +345,8 @@ class ReadingService:
         current = await self.user_grades.get_or_init(user_id)
         total_seconds = current.total_seconds + duration_sec
         total_books = await self.book_query.count_completed_books(user_id=user_id)
-        # 3) grade under AND semantics
-        grade = calculate_grade(total_books=total_books, total_seconds=total_seconds)
+        # 3) grade + tier under AND semantics
+        grade, tier = calculate_grade_tier(total_books=total_books, total_seconds=total_seconds)
         # 4) streak
         streak_days, longest_streak, last_date = update_streak(
             previous_last_date=current.streak_last_date,
@@ -356,12 +360,14 @@ class ReadingService:
             total_books=total_books,
             total_seconds_delta=duration_sec,
             grade=grade,
+            tier=tier,
             streak_days=streak_days,
             longest_streak=longest_streak,
             streak_last_date=last_date,
         )
         return GradeSummary(
             grade=grade,
+            tier=tier,
             total_books=total_books,
             total_seconds=total_seconds,
             streak_days=streak_days,
@@ -373,6 +379,7 @@ class ReadingService:
         row = await self.user_grades.get_or_init(user_id)
         return GradeSummary(
             grade=row.grade,
+            tier=row.tier,
             total_books=row.total_books,
             total_seconds=row.total_seconds,
             streak_days=row.streak_days,

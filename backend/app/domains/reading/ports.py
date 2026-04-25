@@ -55,6 +55,7 @@ class GradeSummary:
     """Service-shape grade snapshot returned by ``ReadingService.get_grade``."""
 
     grade: int
+    tier: int
     total_books: int
     total_seconds: int
     streak_days: int
@@ -146,6 +147,7 @@ class UserGradeRepositoryPort(Protocol):
         total_books: int | None = None,
         total_seconds_delta: int | None = None,
         grade: int | None = None,
+        tier: int | None = None,
         streak_days: int | None = None,
         longest_streak: int | None = None,
         streak_last_date: date | None = None,

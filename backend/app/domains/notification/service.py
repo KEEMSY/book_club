@@ -32,8 +32,17 @@ from app.domains.reading.events import UserGradeRecomputed
 
 logger = logging.getLogger(__name__)
 
-# Grade display names indexed by grade value (1-based, capped at 5).
-_GRADE_NAMES = ["새싹", "새싹+", "초록이", "숲속이", "숲속이+"]
+# Grade display names indexed by grade value (1-based).
+_GRADE_NAMES = {
+    1: "새싹",
+    2: "탐독자",
+    3: "애독자",
+    4: "열혈 독자",
+    5: "서재 마스터",
+}
+
+# Roman numerals for tier display in push notification copy.
+_TIER_ROMAN = {1: "I", 2: "II", 3: "III"}
 
 
 @dataclass(slots=True)
@@ -141,24 +150,27 @@ class NotificationService:
             )
 
     async def on_grade_up(self, event: object) -> None:
-        """Push a grade-up notification when the user crosses a grade boundary.
+        """Push a grade-up notification when the user crosses a grade or tier boundary.
 
-        Same-grade recomputations (no actual change) are silently ignored.
+        Events where neither grade nor tier advanced are silently ignored.
         """
         if not isinstance(event, UserGradeRecomputed):
             return
-        if event.new_grade <= event.old_grade:
+        if (event.new_grade, event.new_tier) <= (event.old_grade, event.old_tier):
             return
 
-        grade_name = _GRADE_NAMES[min(event.new_grade - 1, len(_GRADE_NAMES) - 1)]
+        grade_name = _GRADE_NAMES.get(event.new_grade, "마스터")
+        tier_roman = _TIER_ROMAN.get(event.new_tier, "")
+        label = f"{grade_name} {tier_roman}".strip()
+
         async with self.sessionmaker() as session:
             notif = await self._save_notification(
                 session,
                 user_id=event.user_id,
                 ntype=NotificationType.GRADE_UP,
-                title=f"등급 상승! {grade_name}이 됐어요",
-                body=f"독서 실력이 향상되어 {grade_name} 등급에 도달했습니다.",
-                data={"new_grade": str(event.new_grade)},
+                title=f"등급 상승! {label}이 됐어요",
+                body=f"독서 실력이 향상되어 {label} 등급에 도달했습니다.",
+                data={"new_grade": str(event.new_grade), "new_tier": str(event.new_tier)},
             )
             tokens = await self.device_tokens.get_active_tokens(event.user_id)
             await session.commit()
@@ -168,7 +180,7 @@ class NotificationService:
                 tokens,
                 notif.title,
                 notif.body,
-                {"grade": str(event.new_grade)},
+                {"grade": str(event.new_grade), "tier": str(event.new_tier)},
             )
 
     async def run_weekly_report_batch(self) -> None:

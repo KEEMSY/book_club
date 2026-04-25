@@ -53,9 +53,10 @@ def _session_row(user_id: UUID, user_book_id: UUID | None = None) -> ReadingSess
     return row
 
 
-def _grade_summary(grade: int = 1) -> GradeSummary:
+def _grade_summary(grade: int = 1, tier: int = 1) -> GradeSummary:
     return GradeSummary(
         grade=grade,
+        tier=tier,
         total_books=0,
         total_seconds=0,
         streak_days=0,

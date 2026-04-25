@@ -220,6 +220,7 @@ class UserGradeRepository:
         total_books: int | None = None,
         total_seconds_delta: int | None = None,
         grade: int | None = None,
+        tier: int | None = None,
         streak_days: int | None = None,
         longest_streak: int | None = None,
         streak_last_date: date | None = None,
@@ -231,6 +232,8 @@ class UserGradeRepository:
             row.total_seconds = row.total_seconds + total_seconds_delta
         if grade is not None:
             row.grade = grade
+        if tier is not None:
+            row.tier = tier
         if streak_days is not None:
             row.streak_days = streak_days
         if longest_streak is not None:

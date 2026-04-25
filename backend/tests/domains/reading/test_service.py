@@ -140,6 +140,7 @@ class FakeUserGradeRepo:
             row = UserGrade(
                 user_id=user_id,
                 grade=1,
+                tier=1,
                 total_books=0,
                 total_seconds=0,
                 streak_days=0,
@@ -156,6 +157,7 @@ class FakeUserGradeRepo:
         total_books: int | None = None,
         total_seconds_delta: int | None = None,
         grade: int | None = None,
+        tier: int | None = None,
         streak_days: int | None = None,
         longest_streak: int | None = None,
         streak_last_date: date | None = None,
@@ -167,6 +169,8 @@ class FakeUserGradeRepo:
             row.total_seconds = row.total_seconds + total_seconds_delta
         if grade is not None:
             row.grade = grade
+        if tier is not None:
+            row.tier = tier
         if streak_days is not None:
             row.streak_days = streak_days
         if longest_streak is not None:
@@ -414,7 +418,9 @@ async def test_end_session_grade_up_stages_user_grade_recomputed() -> None:
     recomputed = [e for e in staged if isinstance(e, UserGradeRecomputed)]
     assert len(recomputed) == 1
     assert recomputed[0].old_grade == 1
+    assert recomputed[0].old_tier == 1
     assert recomputed[0].new_grade == 2
+    assert recomputed[0].new_tier == 1
 
 
 # --- manual session -------------------------------------------------------

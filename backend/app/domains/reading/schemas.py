@@ -73,10 +73,13 @@ class ReadingSessionPublic(BaseModel):
 class GradeThresholdPublic(BaseModel):
     target_books: int
     target_seconds: int
+    next_grade: int
+    next_tier: int
 
 
 class GradeSummaryPublic(BaseModel):
     grade: int
+    tier: int
     total_books: int
     total_seconds: int
     streak_days: int
@@ -85,14 +88,29 @@ class GradeSummaryPublic(BaseModel):
 
     @classmethod
     def from_summary(cls, s: GradeSummary) -> GradeSummaryPublic:
+        from app.domains.reading.grade_policy import TIER_THRESHOLDS
+
         thresh: GradeThresholdPublic | None = None
         if s.next_grade_thresholds is not None:
+            # Determine the next (grade, tier) pair from TIER_THRESHOLDS.
+            next_entry = next(
+                (
+                    (g, t)
+                    for g, t, b, sec in TIER_THRESHOLDS
+                    if b == s.next_grade_thresholds.target_books
+                    and sec == s.next_grade_thresholds.target_seconds
+                ),
+                (s.grade + 1, 1),  # fallback: next grade tier-1
+            )
             thresh = GradeThresholdPublic(
                 target_books=s.next_grade_thresholds.target_books,
                 target_seconds=s.next_grade_thresholds.target_seconds,
+                next_grade=next_entry[0],
+                next_tier=next_entry[1],
             )
         return cls(
             grade=s.grade,
+            tier=s.tier,
             total_books=s.total_books,
             total_seconds=s.total_seconds,
             streak_days=s.streak_days,

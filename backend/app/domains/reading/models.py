@@ -150,6 +150,7 @@ class UserGrade(Base):
     __tablename__ = "user_grades"
     __table_args__ = (
         CheckConstraint("grade >= 1 AND grade <= 5", name="ck_user_grades_grade_range"),
+        CheckConstraint("tier >= 1 AND tier <= 3", name="ck_user_grades_tier_range"),
     )
 
     user_id: Mapped[uuid.UUID] = mapped_column(
@@ -158,6 +159,7 @@ class UserGrade(Base):
         primary_key=True,
     )
     grade: Mapped[int] = mapped_column(SmallInteger, nullable=False, default=1)
+    tier: Mapped[int] = mapped_column(Integer, nullable=False, server_default="1")
     total_books: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     total_seconds: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     streak_days: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
