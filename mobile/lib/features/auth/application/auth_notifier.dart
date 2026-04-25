@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -53,9 +55,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       final AuthUser user = await doLogin();
       _setState(AuthState.authenticated(user));
-      // Device token registration is deferred to M5 per the Phase 1 plan —
-      // we don't have FCM wired yet, and passing a placeholder would pollute
-      // the backend DeviceToken table with noise. See report.
+      // TODO(M6): 실 FCM 토큰 등록. 현재 dev-placeholder로 백엔드 연결 확인.
+      // ignore: discarded_futures
+      _repository.registerDeviceToken(
+        token: 'dev-placeholder-token',
+        platform: kIsWeb ? 'web' : (Platform.isIOS ? 'ios' : 'aos'),
+      );
     } on SocialLoginCancelled {
       _setState(const AuthState.unauthenticated());
     } on SocialLoginFailed catch (e) {

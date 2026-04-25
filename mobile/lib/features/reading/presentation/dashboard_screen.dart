@@ -24,6 +24,7 @@ import 'widgets/grade_badge.dart';
 import 'widgets/jan_dee_grid.dart';
 import 'widgets/manual_log_modal.dart';
 import 'widgets/streak_card.dart';
+import '../../notification/presentation/notification_screen.dart';
 
 /// `/home` — the post-login landing.
 ///
@@ -126,7 +127,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           ],
         ),
       ),
-      floatingActionButton: _TopActions(onManual: _onManualLog),
+      floatingActionButton: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const NotificationBell(),
+          _TopActions(onManual: _onManualLog),
+        ],
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
     );
   }

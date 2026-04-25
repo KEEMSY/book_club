@@ -4,6 +4,8 @@ import 'package:book_club/features/auth/application/auth_providers.dart';
 import 'package:book_club/features/auth/domain/auth_state.dart';
 import 'package:book_club/features/auth/domain/auth_user.dart';
 import 'package:book_club/features/book/application/book_providers.dart';
+import 'package:book_club/features/notification/data/notification_models.dart';
+import 'package:book_club/features/notification/data/notification_repository.dart';
 import 'package:book_club/features/reading/application/grade_notifier.dart';
 import 'package:book_club/features/reading/application/grade_state.dart';
 import 'package:book_club/features/reading/application/reading_providers.dart';
@@ -18,6 +20,27 @@ import 'package:google_fonts/google_fonts.dart';
 import '../auth/fakes.dart' as auth_fakes;
 import '../book/fakes.dart' show FakeBookRepository;
 import 'fakes.dart';
+
+/// No-op [NotificationRepository] stub — prevents DashboardScreen's
+/// [NotificationBell] from spawning live HTTP requests inside widget tests.
+class _FakeNotificationRepository implements NotificationRepository {
+  const _FakeNotificationRepository();
+
+  @override
+  Future<NotificationListResponse> getNotifications({
+    String? cursor,
+    int limit = 20,
+  }) async => const NotificationListResponse(items: [], unreadCount: 0);
+
+  @override
+  Future<void> markRead(String id) async {}
+
+  @override
+  Future<int> getUnreadCount() async => 0;
+
+  @override
+  Future<WeeklyReportResponse?> getWeeklyReport(String weekDate) async => null;
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -68,6 +91,8 @@ void main() {
               ),
             ),
           ),
+          notificationRepositoryProvider
+              .overrideWithValue(const _FakeNotificationRepository()),
         ],
         child: MaterialApp(
           theme: AppTheme.light,
@@ -187,6 +212,8 @@ Future<void> _pumpDashboard(
             gradeState,
           ),
         ),
+        notificationRepositoryProvider
+            .overrideWithValue(const _FakeNotificationRepository()),
       ],
       child: MaterialApp(
         theme: AppTheme.light,

@@ -9,6 +9,8 @@ import '../../features/book/presentation/book_detail_screen.dart';
 import '../../features/book/presentation/library_screen.dart';
 import '../../features/book/presentation/search_screen.dart';
 import '../../features/feed/presentation/post_compose_screen.dart';
+import '../../features/notification/presentation/notification_screen.dart';
+import '../../features/notification/presentation/weekly_report_screen.dart';
 import '../../features/reading/presentation/dashboard_screen.dart';
 import '../../features/reading/presentation/goal_screen.dart';
 import '../../features/reading/presentation/grade_screen.dart';
@@ -33,6 +35,10 @@ class AppRoutes {
   static const search = '/search';
   static const library = '/library';
   static String bookDetail(String id) => '/books/$id';
+
+  // M5 destinations.
+  static const notifications = '/notifications';
+  static const weeklyReport = '/reports/weekly';
 }
 
 /// Adapter that bridges a Riverpod [ValueNotifier]-free state stream into a
@@ -134,6 +140,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.goals,
         parentNavigatorKey: _rootKey,
         builder: (context, state) => const GoalScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.notifications,
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) => const NotificationScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.weeklyReport,
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) {
+          final String? week = state.uri.queryParameters['week'];
+          return WeeklyReportScreen(weekStart: week);
+        },
       ),
       // Three-tab StatefulShellRoute — 홈 · 검색 · 서재.
       StatefulShellRoute.indexedStack(
