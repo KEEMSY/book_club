@@ -166,4 +166,6 @@ class UserBook(Base):
         onupdate=func.now(),
     )
 
-    book: Mapped[Book] = relationship("Book", back_populates="user_books")
+    # selectin: async sessions cannot lazy-load; always eager-load the book
+    # so router serializers can access ub.book without a greenlet error.
+    book: Mapped[Book] = relationship("Book", back_populates="user_books", lazy="selectin")

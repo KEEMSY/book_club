@@ -136,7 +136,7 @@ class _Body extends StatelessWidget {
           subtitle: '제목이나 저자를 입력하면 바로 찾아드려요.',
         );
       case BookSearchLoading():
-        return const Center(child: CircularProgressIndicator());
+        return const _SkeletonList();
       case BookSearchError(:final String code, :final String message):
         return _ErrorView(code: code, message: message);
       case BookSearchLoaded(
@@ -252,6 +252,144 @@ class _ErrorView extends ConsumerWidget {
               child: const Text('다시 시도'),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Shimmer-style skeleton list shown while the first search page loads.
+///
+/// Renders 8 placeholder rows that match the [BookCard] list layout exactly —
+/// same cover dimensions, same text line count — so the transition to real
+/// content causes no layout shift. The grey boxes pulse via [_ShimmerBox],
+/// which uses a simple opacity animation rather than an external package.
+class _SkeletonList extends StatelessWidget {
+  const _SkeletonList();
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = Theme.of(context).extension<AppSpacing>()!;
+    return ListView.separated(
+      physics: const NeverScrollableScrollPhysics(),
+      padding: EdgeInsets.symmetric(vertical: spacing.sm),
+      itemCount: 8,
+      separatorBuilder: (_, __) => const Divider(height: 0.5),
+      itemBuilder: (_, __) => const _SkeletonCard(),
+    );
+  }
+}
+
+class _SkeletonCard extends StatelessWidget {
+  const _SkeletonCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+    final Color base = theme.colorScheme.surfaceContainerHigh;
+
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: spacing.md,
+        vertical: spacing.sm,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          // Cover placeholder — matches BookCover 56×80 size
+          _ShimmerBox(width: 56, height: 80, radius: 6, color: base),
+          SizedBox(width: spacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                const SizedBox(height: 4),
+                // Title line 1
+                _ShimmerBox(
+                  width: double.infinity,
+                  height: 14,
+                  radius: 4,
+                  color: base,
+                ),
+                SizedBox(height: spacing.xs),
+                // Title line 2 (shorter)
+                _ShimmerBox(
+                  width: 160,
+                  height: 14,
+                  radius: 4,
+                  color: base,
+                ),
+                SizedBox(height: spacing.sm),
+                // Author
+                _ShimmerBox(
+                  width: 100,
+                  height: 12,
+                  radius: 4,
+                  color: base,
+                ),
+                SizedBox(height: spacing.xs / 2),
+                // Publisher
+                _ShimmerBox(
+                  width: 72,
+                  height: 11,
+                  radius: 4,
+                  color: base,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Single grey box that pulses between 40 % and 80 % opacity to create a
+/// shimmer effect without an external package.
+class _ShimmerBox extends StatefulWidget {
+  const _ShimmerBox({
+    required this.width,
+    required this.height,
+    required this.radius,
+    required this.color,
+  });
+
+  final double width;
+  final double height;
+  final double radius;
+  final Color color;
+
+  @override
+  State<_ShimmerBox> createState() => _ShimmerBoxState();
+}
+
+class _ShimmerBoxState extends State<_ShimmerBox>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 900),
+  )..repeat(reverse: true);
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _ctrl,
+      builder: (_, __) => Opacity(
+        opacity: 0.4 + 0.4 * _ctrl.value,
+        child: Container(
+          width: widget.width,
+          height: widget.height,
+          decoration: BoxDecoration(
+            color: widget.color,
+            borderRadius: BorderRadius.circular(widget.radius),
+          ),
         ),
       ),
     );

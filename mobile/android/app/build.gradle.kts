@@ -24,7 +24,7 @@ android {
         // name `mission-driven` is collapsed to `missiondriven` on Android.
         // iOS bundle identifier keeps the hyphen per spec.
         applicationId = "kr.missiondriven.bookclub"
-        minSdk = 21
+        minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
