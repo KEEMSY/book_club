@@ -8,6 +8,7 @@ import '../../features/auth/presentation/login_screen.dart';
 import '../../features/book/presentation/book_detail_screen.dart';
 import '../../features/book/presentation/library_screen.dart';
 import '../../features/book/presentation/search_screen.dart';
+import '../../features/feed/presentation/post_compose_screen.dart';
 import '../../features/reading/presentation/dashboard_screen.dart';
 import '../../features/reading/presentation/goal_screen.dart';
 import '../../features/reading/presentation/grade_screen.dart';
@@ -98,6 +99,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           final String id = state.pathParameters['id']!;
           return BookDetailScreen(bookId: id);
         },
+        routes: <RouteBase>[
+          // Compose surface stacked above the detail screen — full-screen
+          // modal route owned by the root navigator.
+          GoRoute(
+            path: 'posts/new',
+            parentNavigatorKey: _rootKey,
+            builder: (context, state) {
+              final String id = state.pathParameters['id']!;
+              return PostComposeScreen(bookId: id);
+            },
+          ),
+        ],
       ),
       // Timer lives above the shell so the session UI takes the full screen
       // without the bottom-nav strip stealing focus.

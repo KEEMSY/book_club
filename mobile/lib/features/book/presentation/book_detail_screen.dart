@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../feed/presentation/book_feed_section.dart';
 import '../application/book_detail_notifier.dart';
 import '../application/book_detail_state.dart';
 import '../domain/book.dart';
@@ -104,6 +105,13 @@ class _Content extends StatefulWidget {
 
 class _ContentState extends State<_Content> {
   bool _expanded = false;
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -119,6 +127,7 @@ class _ContentState extends State<_Content> {
 
     return SafeArea(
       child: SingleChildScrollView(
+        controller: _scrollController,
         padding: EdgeInsets.fromLTRB(
           spacing.lg,
           spacing.sm,
@@ -169,6 +178,11 @@ class _ContentState extends State<_Content> {
               state: widget.libraryState,
               onAdd: widget.onAdd,
               onGoToLibrary: widget.onGoToLibrary,
+            ),
+            SizedBox(height: spacing.xl),
+            BookFeedSection(
+              bookId: book.id,
+              scrollController: _scrollController,
             ),
           ],
         ),
