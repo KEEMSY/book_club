@@ -61,6 +61,11 @@ class Settings(BaseSettings):
         ]
     )
 
+    # Firebase credentials for FCM push notifications. Left empty in dev so
+    # NullPushAdapter is selected automatically (CLAUDE.md §2 push stack).
+    firebase_credentials_json: str = Field(default="")
+    firebase_project_id: str = Field(default="")
+
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:

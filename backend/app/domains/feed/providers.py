@@ -25,6 +25,8 @@ from app.domains.feed.repository import (
     ReactionRepository,
 )
 from app.domains.feed.service import FeedService
+from app.domains.reading.providers import get_event_bus
+from app.shared.event_bus import commit_and_publish, stage_event
 
 
 class _FeedBookQueryAdapter:
@@ -64,15 +66,25 @@ class _FeedUserQueryAdapter:
 def get_feed_service(
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> FeedService:
-    """Construct a FeedService wired with live repositories and the R2
-    image storage adapter.
+    """Construct a FeedService wired with live repositories, R2 image storage,
+    and the process-wide event bus so feed events propagate to notification.
     """
+    bus = get_event_bus()
+
+    def _stage(event: object) -> None:
+        stage_event(session, event)
+
+    # One-shot after_commit hook ties event delivery to the request transaction.
+    commit_and_publish(session, bus)
+
     return FeedService(
         posts=PostRepository(session),
         reactions=ReactionRepository(session),
         comments=CommentRepository(session),
         image_storage=R2ImageStorageAdapter(),
         book_query=_FeedBookQueryAdapter(BookRepository(session)),
+        bus=bus,
+        stage_event=_stage,
     )
 
 

@@ -31,11 +31,13 @@ Business rules captured here (the spec the service is responsible for):
 from __future__ import annotations
 
 import uuid as uuid_lib
-from dataclasses import dataclass
+from collections.abc import Callable
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from uuid import UUID
 
 from app.core.exceptions import ConflictError, NotFoundError
+from app.domains.feed.events import CommentAdded, PostCreated, ReactionAdded
 from app.domains.feed.models import Comment, Post, PostType, ReactionType
 from app.domains.feed.ports import (
     CommentRepositoryPort,
@@ -46,6 +48,7 @@ from app.domains.feed.ports import (
     PresignedUpload,
     ReactionRepositoryPort,
 )
+from app.shared.event_bus import EventBus
 
 _CONTENT_MAX = 2000
 _COMMENT_MAX = 1000
@@ -92,6 +95,10 @@ class FeedService:
     comments: CommentRepositoryPort
     image_storage: ImageStoragePort
     book_query: FeedBookQueryPort
+    # Optional fields keep backward compatibility with existing tests that do
+    # not wire an event bus (the notification domain depends on these events).
+    bus: EventBus | None = field(default=None)
+    stage_event: Callable[[object], None] | None = field(default=None)
 
     async def request_image_upload(
         self,
@@ -136,13 +143,16 @@ class FeedService:
         if not await self.book_query.book_exists(book_id):
             raise NotFoundError("book not found", code="BOOK_NOT_FOUND")
 
-        return await self.posts.create(
+        post = await self.posts.create(
             user_id=user_id,
             book_id=book_id,
             post_type=post_type,
             content=content,
             image_keys=image_keys,
         )
+        if self.stage_event is not None:
+            self.stage_event(PostCreated(post_id=post.id, book_id=book_id, author_id=user_id))
+        return post
 
     async def list_posts_by_book(
         self,
@@ -208,6 +218,15 @@ class FeedService:
         else:
             await self.reactions.add(post_id=post_id, user_id=user_id, reaction_type=reaction_type)
             state = "added"
+            if self.stage_event is not None:
+                self.stage_event(
+                    ReactionAdded(
+                        post_id=post_id,
+                        reactor_id=user_id,
+                        post_author_id=post.user_id,
+                        reaction_type=reaction_type.value,
+                    )
+                )
 
         counts = await self.reactions.aggregate_for_post(post_id)
         return ReactionToggleResult(state=state, counts=counts)
@@ -229,6 +248,7 @@ class FeedService:
         if post is None:
             raise NotFoundError("post not found", code="POST_NOT_FOUND")
 
+        parent_author_id: UUID | None = None
         if parent_id is not None:
             parent = await self.comments.get_by_id(parent_id)
             if parent is None or parent.post_id != post_id:
@@ -239,13 +259,25 @@ class FeedService:
                     "comment depth exceeded",
                     code="COMMENT_DEPTH_EXCEEDED",
                 )
+            parent_author_id = parent.user_id
 
-        return await self.comments.create(
+        comment = await self.comments.create(
             user_id=user_id,
             post_id=post_id,
             parent_id=parent_id,
             content=content,
         )
+        if self.stage_event is not None:
+            self.stage_event(
+                CommentAdded(
+                    comment_id=comment.id,
+                    post_id=post_id,
+                    commenter_id=user_id,
+                    post_author_id=post.user_id,
+                    parent_author_id=parent_author_id,
+                )
+            )
+        return comment
 
     async def list_comments(
         self,
@@ -283,11 +315,14 @@ def _parse_iso_cursor(cursor: str | None) -> datetime | None:
 
 
 __all__ = [
+    "CommentAdded",
     "CommentPage",
     "FeedPage",
     "FeedService",
+    "PostCreated",
     "PostFeedItem",
     "PostType",
+    "ReactionAdded",
     "ReactionToggleResult",
     "ReactionType",
 ]
