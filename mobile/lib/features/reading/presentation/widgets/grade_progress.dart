@@ -117,6 +117,7 @@ class _ProgressRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final bool reduceMotion = MediaQuery.of(context).disableAnimations;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -141,11 +142,26 @@ class _ProgressRow extends StatelessWidget {
         const SizedBox(height: 6),
         ClipRRect(
           borderRadius: BorderRadius.circular(4),
-          child: LinearProgressIndicator(
-            value: ratio,
-            minHeight: 8,
-            backgroundColor: theme.colorScheme.surfaceContainerHighest,
-            valueColor: AlwaysStoppedAnimation<Color>(color),
+          // TweenAnimationBuilder runs once on mount (begin: 0 → end: ratio)
+          // and again whenever ratio changes — Flutter interpolates from
+          // the previous end to the new end automatically. When the ratio
+          // hasn't changed across a rebuild, no animation runs. Reduce-
+          // motion flips the duration to zero so the bar paints its final
+          // value on the first frame.
+          child: TweenAnimationBuilder<double>(
+            tween: Tween<double>(begin: 0.0, end: ratio),
+            duration: reduceMotion
+                ? Duration.zero
+                : const Duration(milliseconds: 800),
+            curve: Curves.easeOutCubic,
+            builder: (BuildContext _, double value, Widget? __) {
+              return LinearProgressIndicator(
+                value: value,
+                minHeight: 8,
+                backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                valueColor: AlwaysStoppedAnimation<Color>(color),
+              );
+            },
           ),
         ),
       ],

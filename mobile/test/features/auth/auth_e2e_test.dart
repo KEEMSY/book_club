@@ -31,6 +31,14 @@ void main() {
   GoogleFonts.config.allowRuntimeFetching = false;
 
   testWidgets('dev-login → /home → /library → logout → /login', (tester) async {
+    // Disable platform-level animations for the test — the dashboard's
+    // GradeBadge runs an always-on glow pulse in production, and a repeat
+    // controller would trap pumpAndSettle. The badge's reduce-motion path
+    // honors this flag and renders the resting state instead.
+    tester.platformDispatcher.accessibilityFeaturesTestValue =
+        const FakeAccessibilityFeatures(disableAnimations: true);
+    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
+
     final storage = InMemorySecureStorage();
     final api = FakeAuthApi(
       loginDevResponse: buildLoginResponse(

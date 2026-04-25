@@ -44,9 +44,14 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.light,
-          home: const Scaffold(
-            body: Center(
-              child: GradeBadge(grade: ReaderGrade.devoted, size: 120),
+          home: const MediaQuery(
+            // Disable animations so the geometry assertion measures the
+            // resting state, not a frame mid-entrance tween.
+            data: MediaQueryData(disableAnimations: true),
+            child: Scaffold(
+              body: Center(
+                child: GradeBadge(grade: ReaderGrade.devoted, size: 120),
+              ),
             ),
           ),
         ),
@@ -107,9 +112,14 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.dark,
-          home: const Scaffold(
-            body: Center(
-              child: GradeBadge(grade: ReaderGrade.master, size: 120),
+          home: const MediaQuery(
+            // Disable animations so the always-on glow controller doesn't
+            // trap pump() in its repeat loop on this smoke test.
+            data: MediaQueryData(disableAnimations: true),
+            child: Scaffold(
+              body: Center(
+                child: GradeBadge(grade: ReaderGrade.master, size: 120),
+              ),
             ),
           ),
         ),
@@ -118,5 +128,61 @@ void main() {
 
       expect(find.byIcon(Icons.forest_rounded), findsOneWidget);
     });
+
+    testWidgets(
+      'reduce-motion renders final state without spawning glow ticker',
+      (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.light,
+            home: const MediaQuery(
+              data: MediaQueryData(disableAnimations: true),
+              child: Scaffold(
+                body: Center(
+                  child: GradeBadge(grade: ReaderGrade.devoted, size: 120),
+                ),
+              ),
+            ),
+          ),
+        );
+        // pumpAndSettle is safe under disableAnimations because no
+        // repeating controller was created — confirms the branch.
+        await tester.pumpAndSettle();
+
+        expect(find.byIcon(Icons.local_florist_rounded), findsOneWidget);
+        // After settle, the badge should be at its resting size (icon at
+        // 50% of badge size — no entrance scaling residue).
+        final Rect iconRect =
+            tester.getRect(find.byIcon(Icons.local_florist_rounded));
+        expect(iconRect.width, closeTo(60, 0.5));
+      },
+    );
+
+    testWidgets(
+      'mount entrance settles the badge at its final size and full opacity',
+      (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.light,
+            home: const Scaffold(
+              body: Center(
+                child: GradeBadge(grade: ReaderGrade.passionate, size: 120),
+              ),
+            ),
+          ),
+        );
+        // Drive past the 420ms entrance. We can't pumpAndSettle (the glow
+        // pulse loops forever), so step beyond the entrance window and
+        // assert on the resting geometry.
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 500));
+
+        final Rect iconRect = tester.getRect(find.byIcon(Icons.park_rounded));
+        // 50% of 120dp = 60dp at rest. Mount tween caps at scale 1.0
+        // (easeOutBack overshoots and returns), so the post-window value
+        // is the resting size.
+        expect(iconRect.width, closeTo(60, 0.5));
+      },
+    );
   });
 }
