@@ -540,6 +540,9 @@ TDD: 경계값 10 가지 이상 케이스.
 
 ## Changelog
 
+- **0.1.7** (2026-04-25) — **Milestone 5 (Notification · 주간 리포트 · FCM 기반) 완료.** 태그 `v0.0.6-m5`.
+  - Backend (271 pass): Notification · WeeklyReport 모델 + 0006 마이그레이션, PushPort / NullPushAdapter(dev) / FcmPushAdapter(M6 stub), NotificationService(ReactionAdded/CommentAdded/UserGradeRecomputed 구독 + run_weekly_report_batch 배치), APScheduler 매주 일요일 21시 KST, 4 라우터(`GET /notifications` · `POST /{id}/read` · `GET /unread-count` · `GET /reports/weekly`), feed 이벤트 버스 연결(PostCreated · ReactionAdded · CommentAdded 발행), main.py lifespan에서 구독 등록 + 스케줄러 시작.
+  - Mobile (134 pass): notification feature 4레이어(NotificationApi · NotificationRepository · NotificationNotifier · NotificationScreen/WeeklyReportScreen), NotificationBell 위젯 DashboardScreen 배치(미읽음 배지), WeeklyReportScreen 주 선택 + 독서 통계 카드, 로그인 성공 후 dev-placeholder 디바이스 토큰 등록(M6: 실 FCM 대체 예정).
 - **0.1.6** (2026-04-25) — **Milestone 4 (Feed — 책 그룹 포스트 · 리액션 · 댓글) 완료.** 태그 `v0.0.5-m4`.
   - Backend (6 커밋, 265 pass): Post · Reaction · Comment 모델 + 0005 마이그레이션, Port/Adapter, FeedService(컨텐츠 max 2000자 / 이미지 max 4장 / 리액션 토글 added·removed + counts 즉시 반환 / 댓글 1단계 깊이 가드 / image_key 접두사 소유권 검증), R2 사전서명 PUT URL 어댑터, 7 라우터(`/uploads/presign-image` · `/books/{id}/posts` · `/posts/{id}/reactions` · `/posts/{id}/comments` · `DELETE /comments/{id}` 등). worktree 격리에서 등급 애니메이션과 병렬 진행.
   - Mobile (6 커밋, 134 pass · 28 신규): Feed feature 4레이어, retrofit FeedApi · ImageUploader (3-step presign→PUT→key), BookFeedSection 책 상세 하단 무한 스크롤 마운트, PostComposeScreen (4-way 타입 chips · 2000자 카운터 · image_picker max 4장 · Editing→Uploading→Posting state machine), ReactionBar (5종 토글 + 응답 counts 즉시 반영 · light haptic · 다크 라이트 자동 적응), CommentsSheet (DraggableScrollableSheet · 1단계 답글 28dp 들여쓰기 · 인라인 컴포저 · COMMENT_DEPTH_EXCEEDED inline 가드).
