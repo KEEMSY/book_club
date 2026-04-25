@@ -18,6 +18,9 @@ class NextGradeThresholds with _$NextGradeThresholds {
 ///
 /// [grade] is the raw 1..5 integer from the backend. Call [readerGrade] to
 /// map it onto the Flutter [ReaderGrade] enum used by `GradeTheme`.
+///
+/// [tier] is a 1–3 sub-division within each grade (added in backend v2).
+/// Defaults to 1 so existing API responses without the field remain valid.
 @freezed
 class GradeSummary with _$GradeSummary {
   const GradeSummary._();
@@ -29,6 +32,7 @@ class GradeSummary with _$GradeSummary {
     required int streakDays,
     required int longestStreak,
     NextGradeThresholds? nextGradeThresholds,
+    @Default(1) int tier,
   }) = _GradeSummary;
 
   ReaderGrade get readerGrade {

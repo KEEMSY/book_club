@@ -27,6 +27,18 @@ String _gradeName(ReaderGrade g) {
   }
 }
 
+/// Returns a grade title that includes the Roman tier suffix when applicable.
+/// Grade 5 (마스터) has no sub-tier, so it never gets a suffix.
+String _gradeTitleWithTier(GradeSummary summary) {
+  final String name = _gradeName(summary.readerGrade);
+  if (summary.grade < 5 && summary.tier > 1) {
+    final String roman =
+        const <int, String>{1: 'I', 2: 'II', 3: 'III'}[summary.tier] ?? 'I';
+    return '$name $roman';
+  }
+  return name;
+}
+
 /// `/grade` — summary screen for the user's reader tier.
 ///
 /// Top: 120dp circular GradeBadge in the grade's primary accent.
@@ -54,9 +66,13 @@ class _GradeScreenState extends ConsumerState<GradeScreen> {
     final Color accent = ref.watch(gradePrimaryProvider);
     final GradeState state = ref.watch(gradeNotifierProvider);
 
+    final String appBarTitle = state is GradeLoaded
+        ? _gradeTitleWithTier(state.summary)
+        : '나의 등급';
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('나의 등급', style: theme.textTheme.titleLarge),
+        title: Text(appBarTitle, style: theme.textTheme.titleLarge),
       ),
       body: RefreshIndicator(
         onRefresh: () => ref.read(gradeNotifierProvider.notifier).refresh(),
@@ -98,6 +114,7 @@ class _GradeBody extends StatelessWidget {
         Center(
           child: GradeBadge(
             grade: summary.readerGrade,
+            tier: summary.tier,
             size: 120,
           ),
         ),
@@ -118,7 +135,7 @@ class _GradeBody extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                _gradeName(summary.readerGrade),
+                _gradeTitleWithTier(summary),
                 style: theme.textTheme.displaySmall?.copyWith(
                   color: theme.colorScheme.onSurface,
                 ),

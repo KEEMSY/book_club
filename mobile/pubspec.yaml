@@ -73,6 +73,11 @@ dependencies:
   # don't depend on dart:io paths.
   image_picker: ^1.1.2
 
+  # Dashboard section visibility prefs (M3 · Feature 2). Persists the user's
+  # show/hide toggle for Streak / Goal / Grade / Heatmap sections across
+  # cold restarts. Tiny footprint — no native channel beyond the plugin.
+  shared_preferences: ^2.3.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

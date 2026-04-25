@@ -56,11 +56,13 @@ void main() {
         expect(find.text('애독자(으)로 올라섰어요'), findsOneWidget);
 
         // Badge should be at scale 1.0 at rest. The internal GradeBadge
-        // sizes its icon to 50% of the badge size (56dp → 28dp).
+        // sizes its icon to 50% of the badge size (56dp → 28dp). The icon
+        // is inside a Transform.rotate (±6° sway from the glow pulse), so
+        // the measured bounding rect varies with the animation phase.
         final Finder iconFinder = find.byIcon(Icons.local_florist_rounded);
         expect(iconFinder, findsOneWidget);
         final Rect iconRect = tester.getRect(iconFinder);
-        expect(iconRect.width, closeTo(28, 0.5));
+        expect(iconRect.width, closeTo(28, 4));
       },
     );
 

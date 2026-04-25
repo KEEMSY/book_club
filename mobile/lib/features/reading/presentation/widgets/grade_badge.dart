@@ -28,6 +28,7 @@ class GradeBadge extends StatelessWidget {
   const GradeBadge({
     super.key,
     required this.grade,
+    this.tier,
     this.size = 120,
     this.showLabel = false,
   })  : _isPlaceholder = false,
@@ -43,11 +44,18 @@ class GradeBadge extends StatelessWidget {
     this.size = 64,
     bool shimmer = false,
   })  : grade = ReaderGrade.sprout, // unused in placeholder branch
+        tier = null,
         showLabel = false,
         _isPlaceholder = true,
         _shimmer = shimmer;
 
   final ReaderGrade grade;
+
+  /// Sub-tier within the grade (1–3). Null hides the pill overlay entirely.
+  /// Grade 5 (서재 마스터) never shows a tier — there is no sub-division at
+  /// the top tier.
+  final int? tier;
+
   final double size;
   final bool showLabel;
   final bool _isPlaceholder;
@@ -102,7 +110,7 @@ class GradeBadge extends StatelessWidget {
     final IconData icon = _iconFor(grade);
     final bool reduceMotion = MediaQuery.of(context).disableAnimations;
 
-    final Widget badgeStack = SizedBox(
+    final Widget animatedBadge = SizedBox(
       width: size,
       height: size,
       // Re-key on grade so 승급 plays the entrance animation again — a fresh
@@ -117,6 +125,43 @@ class GradeBadge extends StatelessWidget {
         reduceMotion: reduceMotion,
       ),
     );
+
+    // Wrap in a Stack only when a tier pill should be shown — grade 5
+    // (마스터) has no sub-tier so the pill is always suppressed there.
+    final bool showTier =
+        tier != null && tier! > 0 && grade != ReaderGrade.master;
+
+    final Widget badgeStack = showTier
+        ? Stack(
+            clipBehavior: Clip.none,
+            children: <Widget>[
+              animatedBadge,
+              Positioned(
+                right: 0,
+                bottom: size * 0.05,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: onPrimary,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    _tierRoman(tier!),
+                    style: TextStyle(
+                      fontSize: size * 0.13,
+                      fontWeight: FontWeight.w700,
+                      color: primary,
+                      height: 1,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          )
+        : animatedBadge;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -134,6 +179,10 @@ class GradeBadge extends StatelessWidget {
       ],
     );
   }
+
+  /// Maps a tier integer to its Roman numeral label.
+  static String _tierRoman(int t) =>
+      const <int, String>{1: 'I', 2: 'II', 3: 'III'}[t] ?? 'I';
 
   /// Plant-growth motif: seed/sprout → growing plant → flower → tree →
   /// forest. Each glyph is a built-in Material rounded icon — no extra
@@ -209,7 +258,7 @@ class _AnimatedBadgeState extends State<_AnimatedBadge>
     if (!widget.reduceMotion) {
       _glow = AnimationController(
         vsync: this,
-        duration: const Duration(milliseconds: 2200),
+        duration: const Duration(milliseconds: 1800),
       )..repeat(reverse: true);
     }
   }
@@ -225,7 +274,7 @@ class _AnimatedBadgeState extends State<_AnimatedBadge>
     } else if (!widget.reduceMotion && _glow == null) {
       _glow = AnimationController(
         vsync: this,
-        duration: const Duration(milliseconds: 2200),
+        duration: const Duration(milliseconds: 1800),
       )..repeat(reverse: true);
     }
   }
@@ -255,9 +304,9 @@ class _AnimatedBadgeState extends State<_AnimatedBadge>
         // CurvedAnimation reference whose disposal would shadow the
         // controller's lifecycle.
         final double t = Curves.easeInOut.transform(_glow!.value);
-        // 0.18 → 0.32 → 0.18 (controller is reverse-repeated, so t already
-        // ping-pongs 0 → 1 → 0).
-        final double alpha = 0.18 + (0.32 - 0.18) * t;
+        // 0.12 → 0.55 → 0.12 — wide range makes the pulse clearly visible
+        // without strobing; easeInOut keeps transitions smooth.
+        final double alpha = 0.12 + (0.55 - 0.12) * t;
         return _buildCore(animatedGlowAlpha: alpha);
       },
     );
@@ -267,13 +316,13 @@ class _AnimatedBadgeState extends State<_AnimatedBadge>
     // remounts this and replays the entrance.
     return TweenAnimationBuilder<double>(
       tween: Tween<double>(begin: 0.0, end: 1.0),
-      duration: const Duration(milliseconds: 420),
+      duration: const Duration(milliseconds: 550),
       curve: Curves.easeOutBack,
       builder: (BuildContext _, double t, Widget? child) {
-        // Curves.easeOutBack overshoots ~10% by default; that's the
-        // "subtle pop" called for. Scale starts at 0.85.
-        final double scale = 0.85 + (1.0 - 0.85) * t;
-        final double opacity = t.clamp(0.0, 1.0);
+        // Scale 0.5 → 1.0 with easeOutBack overshoot — clearly perceptible
+        // bounce on mount and on grade-up (re-key triggers replay).
+        final double scale = 0.5 + (1.0 - 0.5) * t;
+        final double opacity = (t * 2.0).clamp(0.0, 1.0);
         return Opacity(
           opacity: opacity,
           child: Transform.scale(scale: scale, child: child),
@@ -326,14 +375,23 @@ class _AnimatedBadgeState extends State<_AnimatedBadge>
             ),
           ),
         ),
-        // Plant-growth glyph, explicit Center so the icon lands on the
-        // visual axis of the disc regardless of glyph metrics.
+        // Plant-growth glyph. When the glow controller is active, the icon
+        // sways ±6° in sync with the pulse so the animation reads on the
+        // icon itself, not just the outer shadow.
         Center(
-          child: Icon(
-            widget.icon,
-            size: size * 0.5,
-            color: onPrimary,
-          ),
+          child: _glow != null
+              ? AnimatedBuilder(
+                  animation: _glow!,
+                  builder: (BuildContext _, Widget? child) {
+                    final double t =
+                        Curves.easeInOut.transform(_glow!.value);
+                    // ±6° sway — slow enough to feel organic, not jittery.
+                    final double angle = (t - 0.5) * 2 * 0.105; // ≈ ±6°
+                    return Transform.rotate(angle: angle, child: child);
+                  },
+                  child: Icon(widget.icon, size: size * 0.5, color: onPrimary),
+                )
+              : Icon(widget.icon, size: size * 0.5, color: onPrimary),
         ),
       ],
     );

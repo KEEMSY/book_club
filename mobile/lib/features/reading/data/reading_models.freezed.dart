@@ -465,6 +465,7 @@ mixin _$GradeSummaryDto {
   int get longestStreak => throw _privateConstructorUsedError;
   NextGradeThresholdsDto? get nextGradeThresholds =>
       throw _privateConstructorUsedError;
+  int get tier => throw _privateConstructorUsedError;
 
   /// Serializes this GradeSummaryDto to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -488,7 +489,8 @@ abstract class $GradeSummaryDtoCopyWith<$Res> {
       int totalSeconds,
       int streakDays,
       int longestStreak,
-      NextGradeThresholdsDto? nextGradeThresholds});
+      NextGradeThresholdsDto? nextGradeThresholds,
+      int tier});
 
   $NextGradeThresholdsDtoCopyWith<$Res>? get nextGradeThresholds;
 }
@@ -514,6 +516,7 @@ class _$GradeSummaryDtoCopyWithImpl<$Res, $Val extends GradeSummaryDto>
     Object? streakDays = null,
     Object? longestStreak = null,
     Object? nextGradeThresholds = freezed,
+    Object? tier = null,
   }) {
     return _then(_value.copyWith(
       grade: null == grade
@@ -540,6 +543,10 @@ class _$GradeSummaryDtoCopyWithImpl<$Res, $Val extends GradeSummaryDto>
           ? _value.nextGradeThresholds
           : nextGradeThresholds // ignore: cast_nullable_to_non_nullable
               as NextGradeThresholdsDto?,
+      tier: null == tier
+          ? _value.tier
+          : tier // ignore: cast_nullable_to_non_nullable
+              as int,
     ) as $Val);
   }
 
@@ -573,7 +580,8 @@ abstract class _$$GradeSummaryDtoImplCopyWith<$Res>
       int totalSeconds,
       int streakDays,
       int longestStreak,
-      NextGradeThresholdsDto? nextGradeThresholds});
+      NextGradeThresholdsDto? nextGradeThresholds,
+      int tier});
 
   @override
   $NextGradeThresholdsDtoCopyWith<$Res>? get nextGradeThresholds;
@@ -598,6 +606,7 @@ class __$$GradeSummaryDtoImplCopyWithImpl<$Res>
     Object? streakDays = null,
     Object? longestStreak = null,
     Object? nextGradeThresholds = freezed,
+    Object? tier = null,
   }) {
     return _then(_$GradeSummaryDtoImpl(
       grade: null == grade
@@ -624,6 +633,10 @@ class __$$GradeSummaryDtoImplCopyWithImpl<$Res>
           ? _value.nextGradeThresholds
           : nextGradeThresholds // ignore: cast_nullable_to_non_nullable
               as NextGradeThresholdsDto?,
+      tier: null == tier
+          ? _value.tier
+          : tier // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -637,7 +650,8 @@ class _$GradeSummaryDtoImpl extends _GradeSummaryDto {
       required this.totalSeconds,
       required this.streakDays,
       required this.longestStreak,
-      this.nextGradeThresholds})
+      this.nextGradeThresholds,
+      this.tier = 1})
       : super._();
 
   factory _$GradeSummaryDtoImpl.fromJson(Map<String, dynamic> json) =>
@@ -655,10 +669,13 @@ class _$GradeSummaryDtoImpl extends _GradeSummaryDto {
   final int longestStreak;
   @override
   final NextGradeThresholdsDto? nextGradeThresholds;
+  @override
+  @JsonKey()
+  final int tier;
 
   @override
   String toString() {
-    return 'GradeSummaryDto(grade: $grade, totalBooks: $totalBooks, totalSeconds: $totalSeconds, streakDays: $streakDays, longestStreak: $longestStreak, nextGradeThresholds: $nextGradeThresholds)';
+    return 'GradeSummaryDto(grade: $grade, totalBooks: $totalBooks, totalSeconds: $totalSeconds, streakDays: $streakDays, longestStreak: $longestStreak, nextGradeThresholds: $nextGradeThresholds, tier: $tier)';
   }
 
   @override
@@ -676,13 +693,14 @@ class _$GradeSummaryDtoImpl extends _GradeSummaryDto {
             (identical(other.longestStreak, longestStreak) ||
                 other.longestStreak == longestStreak) &&
             (identical(other.nextGradeThresholds, nextGradeThresholds) ||
-                other.nextGradeThresholds == nextGradeThresholds));
+                other.nextGradeThresholds == nextGradeThresholds) &&
+            (identical(other.tier, tier) || other.tier == tier));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, grade, totalBooks, totalSeconds,
-      streakDays, longestStreak, nextGradeThresholds);
+      streakDays, longestStreak, nextGradeThresholds, tier);
 
   /// Create a copy of GradeSummaryDto
   /// with the given fields replaced by the non-null parameter values.
@@ -703,13 +721,13 @@ class _$GradeSummaryDtoImpl extends _GradeSummaryDto {
 
 abstract class _GradeSummaryDto extends GradeSummaryDto {
   const factory _GradeSummaryDto(
-          {required final int grade,
-          required final int totalBooks,
-          required final int totalSeconds,
-          required final int streakDays,
-          required final int longestStreak,
-          final NextGradeThresholdsDto? nextGradeThresholds}) =
-      _$GradeSummaryDtoImpl;
+      {required final int grade,
+      required final int totalBooks,
+      required final int totalSeconds,
+      required final int streakDays,
+      required final int longestStreak,
+      final NextGradeThresholdsDto? nextGradeThresholds,
+      final int tier}) = _$GradeSummaryDtoImpl;
   const _GradeSummaryDto._() : super._();
 
   factory _GradeSummaryDto.fromJson(Map<String, dynamic> json) =
@@ -727,6 +745,8 @@ abstract class _GradeSummaryDto extends GradeSummaryDto {
   int get longestStreak;
   @override
   NextGradeThresholdsDto? get nextGradeThresholds;
+  @override
+  int get tier;
 
   /// Create a copy of GradeSummaryDto
   /// with the given fields replaced by the non-null parameter values.

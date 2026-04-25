@@ -173,6 +173,7 @@ mixin _$GradeSummary {
   int get longestStreak => throw _privateConstructorUsedError;
   NextGradeThresholds? get nextGradeThresholds =>
       throw _privateConstructorUsedError;
+  int get tier => throw _privateConstructorUsedError;
 
   /// Create a copy of GradeSummary
   /// with the given fields replaced by the non-null parameter values.
@@ -193,7 +194,8 @@ abstract class $GradeSummaryCopyWith<$Res> {
       int totalSeconds,
       int streakDays,
       int longestStreak,
-      NextGradeThresholds? nextGradeThresholds});
+      NextGradeThresholds? nextGradeThresholds,
+      int tier});
 
   $NextGradeThresholdsCopyWith<$Res>? get nextGradeThresholds;
 }
@@ -219,6 +221,7 @@ class _$GradeSummaryCopyWithImpl<$Res, $Val extends GradeSummary>
     Object? streakDays = null,
     Object? longestStreak = null,
     Object? nextGradeThresholds = freezed,
+    Object? tier = null,
   }) {
     return _then(_value.copyWith(
       grade: null == grade
@@ -245,6 +248,10 @@ class _$GradeSummaryCopyWithImpl<$Res, $Val extends GradeSummary>
           ? _value.nextGradeThresholds
           : nextGradeThresholds // ignore: cast_nullable_to_non_nullable
               as NextGradeThresholds?,
+      tier: null == tier
+          ? _value.tier
+          : tier // ignore: cast_nullable_to_non_nullable
+              as int,
     ) as $Val);
   }
 
@@ -278,7 +285,8 @@ abstract class _$$GradeSummaryImplCopyWith<$Res>
       int totalSeconds,
       int streakDays,
       int longestStreak,
-      NextGradeThresholds? nextGradeThresholds});
+      NextGradeThresholds? nextGradeThresholds,
+      int tier});
 
   @override
   $NextGradeThresholdsCopyWith<$Res>? get nextGradeThresholds;
@@ -303,6 +311,7 @@ class __$$GradeSummaryImplCopyWithImpl<$Res>
     Object? streakDays = null,
     Object? longestStreak = null,
     Object? nextGradeThresholds = freezed,
+    Object? tier = null,
   }) {
     return _then(_$GradeSummaryImpl(
       grade: null == grade
@@ -329,6 +338,10 @@ class __$$GradeSummaryImplCopyWithImpl<$Res>
           ? _value.nextGradeThresholds
           : nextGradeThresholds // ignore: cast_nullable_to_non_nullable
               as NextGradeThresholds?,
+      tier: null == tier
+          ? _value.tier
+          : tier // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -342,7 +355,8 @@ class _$GradeSummaryImpl extends _GradeSummary {
       required this.totalSeconds,
       required this.streakDays,
       required this.longestStreak,
-      this.nextGradeThresholds})
+      this.nextGradeThresholds,
+      this.tier = 1})
       : super._();
 
   @override
@@ -357,10 +371,13 @@ class _$GradeSummaryImpl extends _GradeSummary {
   final int longestStreak;
   @override
   final NextGradeThresholds? nextGradeThresholds;
+  @override
+  @JsonKey()
+  final int tier;
 
   @override
   String toString() {
-    return 'GradeSummary(grade: $grade, totalBooks: $totalBooks, totalSeconds: $totalSeconds, streakDays: $streakDays, longestStreak: $longestStreak, nextGradeThresholds: $nextGradeThresholds)';
+    return 'GradeSummary(grade: $grade, totalBooks: $totalBooks, totalSeconds: $totalSeconds, streakDays: $streakDays, longestStreak: $longestStreak, nextGradeThresholds: $nextGradeThresholds, tier: $tier)';
   }
 
   @override
@@ -378,12 +395,13 @@ class _$GradeSummaryImpl extends _GradeSummary {
             (identical(other.longestStreak, longestStreak) ||
                 other.longestStreak == longestStreak) &&
             (identical(other.nextGradeThresholds, nextGradeThresholds) ||
-                other.nextGradeThresholds == nextGradeThresholds));
+                other.nextGradeThresholds == nextGradeThresholds) &&
+            (identical(other.tier, tier) || other.tier == tier));
   }
 
   @override
   int get hashCode => Object.hash(runtimeType, grade, totalBooks, totalSeconds,
-      streakDays, longestStreak, nextGradeThresholds);
+      streakDays, longestStreak, nextGradeThresholds, tier);
 
   /// Create a copy of GradeSummary
   /// with the given fields replaced by the non-null parameter values.
@@ -401,7 +419,8 @@ abstract class _GradeSummary extends GradeSummary {
       required final int totalSeconds,
       required final int streakDays,
       required final int longestStreak,
-      final NextGradeThresholds? nextGradeThresholds}) = _$GradeSummaryImpl;
+      final NextGradeThresholds? nextGradeThresholds,
+      final int tier}) = _$GradeSummaryImpl;
   const _GradeSummary._() : super._();
 
   @override
@@ -416,6 +435,8 @@ abstract class _GradeSummary extends GradeSummary {
   int get longestStreak;
   @override
   NextGradeThresholds? get nextGradeThresholds;
+  @override
+  int get tier;
 
   /// Create a copy of GradeSummary
   /// with the given fields replaced by the non-null parameter values.

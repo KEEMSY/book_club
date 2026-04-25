@@ -9,6 +9,7 @@ import '../../book/application/library_notifier.dart';
 import '../../book/application/library_state.dart';
 import '../../book/domain/book_status.dart';
 import '../../book/domain/user_book.dart';
+import '../application/dashboard_prefs_notifier.dart';
 import '../application/goal_notifier.dart';
 import '../application/goal_state.dart';
 import '../application/grade_notifier.dart';
@@ -16,10 +17,14 @@ import '../application/grade_state.dart';
 import '../application/heatmap_notifier.dart';
 import '../application/heatmap_state.dart';
 import '../application/reading_providers.dart';
+import '../domain/dashboard_prefs.dart';
 import '../domain/goal_period.dart';
 import '../domain/grade_summary.dart';
 import '../domain/heatmap_day.dart';
+import '../domain/reading_goal.dart';
+import 'dashboard_settings_sheet.dart';
 import 'widgets/daily_total_card.dart';
+import 'widgets/dashboard_goal_card.dart';
 import 'widgets/grade_badge.dart';
 import 'widgets/jan_dee_grid.dart';
 import 'widgets/manual_log_modal.dart';
@@ -67,12 +72,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final HeatmapState heatmapState = ref.watch(heatmapNotifierProvider);
     final GoalState goalState = ref.watch(goalNotifierProvider);
     final AuthState authState = ref.watch(authNotifierProvider);
+    final DashboardPrefs prefs = ref.watch(dashboardPrefsProvider);
     final String? nickname =
         authState is Authenticated ? authState.user.nickname : null;
 
     final int? weeklyGoalSeconds =
         goalState is GoalLoaded ? _weeklyGoal(goalState) : null;
     final int todaySeconds = _todaySeconds(heatmapState);
+    final List<GoalProgress> goalItems =
+        goalState is GoalLoaded ? goalState.items : const <GoalProgress>[];
 
     return Scaffold(
       body: RefreshIndicator(
@@ -100,15 +108,25 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               accent: accent,
             ),
             SizedBox(height: spacing.md),
-            StreakCard(
-              streak: _streak(gradeState),
-              longest: _longest(gradeState),
-            ),
-            SizedBox(height: spacing.md),
-            _GradeRow(state: gradeState, accent: accent),
-            SizedBox(height: spacing.md),
-            _HeatmapCard(state: heatmapState, accent: accent),
-            SizedBox(height: spacing.lg),
+            if (prefs.showStreak) ...<Widget>[
+              StreakCard(
+                streak: _streak(gradeState),
+                longest: _longest(gradeState),
+              ),
+              SizedBox(height: spacing.md),
+            ],
+            if (prefs.showGoal && goalItems.isNotEmpty) ...<Widget>[
+              DashboardGoalCard(items: goalItems, accent: accent),
+              SizedBox(height: spacing.md),
+            ],
+            if (prefs.showGrade) ...<Widget>[
+              _GradeRow(state: gradeState, accent: accent),
+              SizedBox(height: spacing.md),
+            ],
+            if (prefs.showHeatmap) ...<Widget>[
+              _HeatmapCard(state: heatmapState, accent: accent),
+              SizedBox(height: spacing.lg),
+            ],
             SizedBox(
               width: double.infinity,
               child: FilledButton.icon(
@@ -311,8 +329,11 @@ class _GradeRow extends ConsumerWidget {
 
   Widget _buildBadge(GradeState state) {
     return switch (state) {
-      GradeLoaded(:final summary) =>
-        GradeBadge(grade: summary.readerGrade, size: 64),
+      GradeLoaded(:final summary) => GradeBadge(
+          grade: summary.readerGrade,
+          tier: summary.tier,
+          size: 64,
+        ),
       GradeLoading() => const GradeBadge.placeholder(size: 64, shimmer: true),
       GradeInitial() || GradeError() => const GradeBadge.placeholder(size: 64),
     };
@@ -320,18 +341,22 @@ class _GradeRow extends ConsumerWidget {
 
   String _title(GradeState state) {
     if (state is GradeLoaded) {
-      switch (state.summary.grade) {
-        case 1:
-          return '새싹 독자';
-        case 2:
-          return '탐독자';
-        case 3:
-          return '애독자';
-        case 4:
-          return '열혈 독자';
-        case 5:
-          return '서재 마스터';
+      final String name = switch (state.summary.grade) {
+        1 => '새싹 독자',
+        2 => '탐독자',
+        3 => '애독자',
+        4 => '열혈 독자',
+        5 => '서재 마스터',
+        _ => '나의 등급',
+      };
+      // 마스터 등급은 tier 표시 없음
+      if (state.summary.grade < 5 && state.summary.tier > 1) {
+        final String roman =
+            const <int, String>{1: 'I', 2: 'II', 3: 'III'}[state.summary.tier] ??
+                'I';
+        return '$name $roman';
       }
+      return name;
     }
     return '나의 등급';
   }
@@ -352,7 +377,9 @@ class _GradeRow extends ConsumerWidget {
     final int secDiff = (next.targetSeconds - summary.totalSeconds)
         .clamp(0, next.targetSeconds);
     final int hours = secDiff ~/ 3600;
-    return '다음 등급까지 $bookDiff권 · $hours시간 남음';
+    // tier가 1보다 크면 아직 같은 등급 내 구간을 이동 중
+    final String label = summary.tier > 1 ? '다음 구간까지' : '다음 등급까지';
+    return '$label $bookDiff권 · $hours시간 남음';
   }
 }
 
@@ -466,25 +493,28 @@ class _TopActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 8, right: 4),
-      child: PopupMenuButton<String>(
+    return PopupMenuButton<String>(
         icon: const Icon(Icons.more_vert_rounded),
         onSelected: (String value) {
           switch (value) {
             case 'manual':
               onManual();
-              break;
             case 'goals':
               GoRouter.of(context).push('/goals');
-              break;
+            case 'settings':
+              showModalBottomSheet<void>(
+                context: context,
+                builder: (_) => const DashboardSettingsSheet(),
+                isScrollControlled: true,
+                useSafeArea: true,
+              );
           }
         },
         itemBuilder: (_) => const <PopupMenuEntry<String>>[
           PopupMenuItem<String>(value: 'manual', child: Text('수동 기록')),
           PopupMenuItem<String>(value: 'goals', child: Text('독서 목표')),
+          PopupMenuItem<String>(value: 'settings', child: Text('홈 설정')),
         ],
-      ),
     );
   }
 }

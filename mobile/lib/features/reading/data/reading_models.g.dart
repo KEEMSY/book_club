@@ -56,6 +56,7 @@ _$GradeSummaryDtoImpl _$$GradeSummaryDtoImplFromJson(
           ? null
           : NextGradeThresholdsDto.fromJson(
               json['next_grade_thresholds'] as Map<String, dynamic>),
+      tier: (json['tier'] as num?)?.toInt() ?? 1,
     );
 
 Map<String, dynamic> _$$GradeSummaryDtoImplToJson(
@@ -67,6 +68,7 @@ Map<String, dynamic> _$$GradeSummaryDtoImplToJson(
       'streak_days': instance.streakDays,
       'longest_streak': instance.longestStreak,
       'next_grade_thresholds': instance.nextGradeThresholds?.toJson(),
+      'tier': instance.tier,
     };
 
 _$SessionCompletionDtoImpl _$$SessionCompletionDtoImplFromJson(

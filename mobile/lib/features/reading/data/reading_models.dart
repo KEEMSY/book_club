@@ -61,6 +61,8 @@ class NextGradeThresholdsDto with _$NextGradeThresholdsDto {
 }
 
 /// Mirror of backend `GradeSummaryPublic`.
+///
+/// [tier] defaults to 1 for API responses that predate the tier field.
 @freezed
 class GradeSummaryDto with _$GradeSummaryDto {
   const GradeSummaryDto._();
@@ -72,6 +74,7 @@ class GradeSummaryDto with _$GradeSummaryDto {
     required int streakDays,
     required int longestStreak,
     NextGradeThresholdsDto? nextGradeThresholds,
+    @Default(1) int tier,
   }) = _GradeSummaryDto;
 
   factory GradeSummaryDto.fromJson(Map<String, dynamic> json) =>
@@ -85,6 +88,7 @@ class GradeSummaryDto with _$GradeSummaryDto {
       streakDays: streakDays,
       longestStreak: longestStreak,
       nextGradeThresholds: nextGradeThresholds?.toDomain(),
+      tier: tier,
     );
   }
 }
