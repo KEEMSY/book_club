@@ -82,76 +82,81 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final List<GoalProgress> goalItems =
         goalState is GoalLoaded ? goalState.items : const <GoalProgress>[];
 
+    // Bottom safe-area height so the floating read button sits above the home
+    // indicator on iPhone or the nav bar on Android.
+    final double bottomInset = MediaQuery.paddingOf(context).bottom;
+
     return Scaffold(
-      body: RefreshIndicator(
-        color: accent,
-        onRefresh: () async {
-          await Future.wait<void>(<Future<void>>[
-            ref.read(gradeNotifierProvider.notifier).refresh(),
-            ref.read(heatmapNotifierProvider.notifier).invalidate(),
-            ref.read(goalNotifierProvider.notifier).refresh(),
-          ]);
-        },
-        child: ListView(
-          padding: EdgeInsets.fromLTRB(
-            spacing.lg,
-            spacing.md,
-            spacing.lg,
-            100,
-          ),
-          children: <Widget>[
-            _Header(nickname: nickname),
-            SizedBox(height: spacing.lg),
-            DailyTotalCard(
-              todaySeconds: todaySeconds,
-              weeklyGoalSeconds: weeklyGoalSeconds,
-              accent: accent,
-            ),
-            SizedBox(height: spacing.md),
-            if (prefs.showStreak) ...<Widget>[
-              StreakCard(
-                streak: _streak(gradeState),
-                longest: _longest(gradeState),
+      body: Stack(
+        children: <Widget>[
+          RefreshIndicator(
+            color: accent,
+            onRefresh: () async {
+              await Future.wait<void>(<Future<void>>[
+                ref.read(gradeNotifierProvider.notifier).refresh(),
+                ref.read(heatmapNotifierProvider.notifier).invalidate(),
+                ref.read(goalNotifierProvider.notifier).refresh(),
+              ]);
+            },
+            child: ListView(
+              // Bottom padding = button height (56) + gap (16) + safe-area so
+              // the last card is never hidden behind the floating button.
+              padding: EdgeInsets.fromLTRB(
+                spacing.lg,
+                spacing.md,
+                spacing.lg,
+                56 + 16 + bottomInset + spacing.lg,
               ),
-              SizedBox(height: spacing.md),
-            ],
-            if (prefs.showGoal) ...<Widget>[
-              DashboardGoalCard(
-                items: goalItems,
-                accent: accent,
-                onAddGoal: () => GoRouter.of(context).push('/goals'),
-              ),
-              SizedBox(height: spacing.md),
-            ],
-            if (prefs.showGrade) ...<Widget>[
-              _GradeRow(state: gradeState, accent: accent),
-              SizedBox(height: spacing.md),
-            ],
-            if (prefs.showHeatmap) ...<Widget>[
-              _HeatmapCard(state: heatmapState, accent: accent),
-              SizedBox(height: spacing.lg),
-            ],
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton.icon(
-                onPressed: () => _startReading(context),
-                icon: const Icon(Icons.play_arrow_rounded),
-                label: const Text('지금 읽기 시작'),
-                style: FilledButton.styleFrom(
-                  backgroundColor: accent,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 18),
-                  shape: const StadiumBorder(),
-                  textStyle: theme.textTheme.labelLarge?.copyWith(fontSize: 17),
+              children: <Widget>[
+                _Header(nickname: nickname),
+                SizedBox(height: spacing.lg),
+                DailyTotalCard(
+                  todaySeconds: todaySeconds,
+                  weeklyGoalSeconds: weeklyGoalSeconds,
+                  accent: accent,
                 ),
-              ),
+                SizedBox(height: spacing.md),
+                if (prefs.showStreak) ...<Widget>[
+                  StreakCard(
+                    streak: _streak(gradeState),
+                    longest: _longest(gradeState),
+                  ),
+                  SizedBox(height: spacing.md),
+                ],
+                if (prefs.showGoal) ...<Widget>[
+                  DashboardGoalCard(
+                    items: goalItems,
+                    accent: accent,
+                    onAddGoal: () => GoRouter.of(context).push('/goals'),
+                  ),
+                  SizedBox(height: spacing.md),
+                ],
+                if (prefs.showGrade) ...<Widget>[
+                  _GradeRow(state: gradeState, accent: accent),
+                  SizedBox(height: spacing.md),
+                ],
+                if (prefs.showHeatmap) ...<Widget>[
+                  _HeatmapCard(state: heatmapState, accent: accent),
+                ],
+              ],
             ),
-          ],
-        ),
+          ),
+          // Floating "지금 읽기 시작" button — always visible regardless of
+          // scroll position. Positioned above the system home indicator.
+          Positioned(
+            left: spacing.lg,
+            right: spacing.lg,
+            bottom: bottomInset + spacing.md,
+            child: _StartReadingButton(
+              accent: accent,
+              onPressed: () => _startReading(context),
+            ),
+          ),
+        ],
       ),
       floatingActionButton: Row(
         mainAxisSize: MainAxisSize.min,
-        children: [
+        children: <Widget>[
           const NotificationBell(),
           _TopActions(onManual: _onManualLog),
         ],
@@ -519,6 +524,46 @@ class _TopActions extends StatelessWidget {
           PopupMenuItem<String>(value: 'goals', child: Text('독서 목표')),
           PopupMenuItem<String>(value: 'settings', child: Text('홈 설정')),
         ],
+    );
+  }
+}
+
+/// Pill-shaped "지금 읽기 시작" button pinned at the bottom of the dashboard.
+///
+/// Lives outside the scroll view so it stays visible at all scroll positions.
+/// The blur + semi-transparent backdrop prevents the button from visually
+/// clashing with list content that scrolls beneath it.
+class _StartReadingButton extends StatelessWidget {
+  const _StartReadingButton({
+    required this.accent,
+    required this.onPressed,
+  });
+
+  final Color accent;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return SizedBox(
+      width: double.infinity,
+      height: 56,
+      child: FilledButton.icon(
+        onPressed: onPressed,
+        icon: const Icon(Icons.play_arrow_rounded, size: 22),
+        label: const Text('지금 읽기 시작'),
+        style: FilledButton.styleFrom(
+          backgroundColor: accent,
+          foregroundColor: Colors.white,
+          shape: const StadiumBorder(),
+          textStyle: theme.textTheme.labelLarge?.copyWith(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+          elevation: 4,
+          shadowColor: accent.withValues(alpha: 0.4),
+        ),
+      ),
     );
   }
 }
