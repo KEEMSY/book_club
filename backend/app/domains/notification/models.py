@@ -39,6 +39,7 @@ class NotificationType(enum.StrEnum):
     COMMENT = "comment"
     GRADE_UP = "grade_up"
     WEEKLY_REPORT = "weekly_report"
+    FOLLOW_RECEIVED = "follow_received"
 
 
 class Notification(Base):

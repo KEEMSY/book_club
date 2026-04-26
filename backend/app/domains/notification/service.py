@@ -149,6 +149,33 @@ class NotificationService:
                 {"comment_id": str(event.comment_id)},
             )
 
+    async def on_follow_received(self, event: object) -> None:
+        """Create an in-app notification when a user receives a new follower."""
+        from app.domains.social.events import FollowReceived
+
+        if not isinstance(event, FollowReceived):
+            return
+
+        async with self.sessionmaker() as session:
+            notif = await self._save_notification(
+                session,
+                user_id=event.followee_id,
+                ntype=NotificationType.FOLLOW_RECEIVED,
+                title="새 팔로워가 생겼어요",
+                body="회원님을 팔로우한 사람이 있습니다.",
+                data={"follower_id": str(event.follower_id)},
+            )
+            tokens = await self.device_tokens.get_active_tokens(event.followee_id)
+            await session.commit()
+
+        if tokens:
+            await self.push.send_to_tokens(
+                tokens,
+                notif.title,
+                notif.body,
+                {"follower_id": str(event.follower_id)},
+            )
+
     async def on_grade_up(self, event: object) -> None:
         """Push a grade-up notification when the user crosses a grade or tier boundary.
 

@@ -24,6 +24,7 @@ from app.domains.auth.schemas import (
     LoginResponse,
     RefreshRequest,
     RefreshResponse,
+    UpdateProfileRequest,
     UserPublic,
 )
 from app.domains.auth.service import AuthService
@@ -115,6 +116,20 @@ async def get_me(
     service: Annotated[AuthService, Depends(get_auth_service)],
 ) -> UserPublic:
     user = await service.get_me(user_id=UUID(user_id))
+    return UserPublic.model_validate(user)
+
+
+@router.patch("/auth/me", response_model=UserPublic)
+async def update_me(
+    body: UpdateProfileRequest,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[AuthService, Depends(get_auth_service)],
+) -> UserPublic:
+    user = await service.update_profile(
+        user_id=UUID(user_id),
+        nickname=body.nickname,
+        bio=body.bio,
+    )
     return UserPublic.model_validate(user)
 
 

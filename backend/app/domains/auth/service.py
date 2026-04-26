@@ -163,6 +163,15 @@ class AuthService:
             raise NotFoundError("user not found", code="USER_NOT_FOUND")
         return user
 
+    async def update_profile(
+        self,
+        *,
+        user_id: UUID,
+        nickname: str | None,
+        bio: str | None,
+    ) -> User:
+        return await self.users.update_profile(user_id, nickname, bio)
+
     async def delete_account(self, *, user_id: UUID) -> None:
         now = datetime.now(tz=UTC)
         await self.users.soft_delete(user_id, now)

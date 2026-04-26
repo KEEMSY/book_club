@@ -59,6 +59,7 @@ class UserPublic(BaseModel):
     id: UUID
     nickname: str
     profile_image_url: str | None
+    bio: str | None
     email: str | None
     created_at: datetime
     provider: Literal["kakao", "apple"]
@@ -66,6 +67,12 @@ class UserPublic(BaseModel):
     @classmethod
     def from_user(cls, user: User) -> UserPublic:
         return cls.model_validate(user)
+
+
+class UpdateProfileRequest(BaseModel):
+    nickname: str | None = Field(default=None, min_length=1, max_length=64)
+    # An explicit None clears the bio; omitting the field leaves it unchanged.
+    bio: str | None = Field(default=None, max_length=200)
 
 
 class LoginResponse(BaseModel):

@@ -21,6 +21,8 @@ from app.domains.notification.router import router as notification_router
 from app.domains.reading.events import UserGradeRecomputed
 from app.domains.reading.providers import get_event_bus
 from app.domains.reading.router import router as reading_router
+from app.domains.social.events import FollowReceived
+from app.domains.social.router import router as social_router
 
 
 @asynccontextmanager
@@ -32,6 +34,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     bus.subscribe(ReactionAdded, notification_svc.on_reaction_added)
     bus.subscribe(CommentAdded, notification_svc.on_comment_added)
     bus.subscribe(UserGradeRecomputed, notification_svc.on_grade_up)
+    bus.subscribe(FollowReceived, notification_svc.on_follow_received)
 
     scheduler = create_scheduler(notification_svc)
     scheduler.start()
@@ -72,6 +75,7 @@ def create_app() -> FastAPI:
     app.include_router(reading_router)
     app.include_router(feed_router)
     app.include_router(notification_router)
+    app.include_router(social_router)
 
     return app
 

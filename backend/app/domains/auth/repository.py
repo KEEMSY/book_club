@@ -81,6 +81,25 @@ class UserRepository:
         user.deleted_at = at
         await self._session.flush()
 
+    async def update_profile(
+        self,
+        user_id: UUID,
+        nickname: str | None,
+        bio: str | None,
+    ) -> User:
+        from app.core.exceptions import NotFoundError
+
+        user = await self._session.get(User, user_id)
+        if user is None or user.deleted_at is not None:
+            raise NotFoundError("user not found", code="USER_NOT_FOUND")
+        if nickname is not None:
+            user.nickname = nickname
+        if bio is not None:
+            user.bio = bio
+        await self._session.flush()
+        await self._session.refresh(user)
+        return user
+
 
 class DeviceTokenRepository:
     """Persistence adapter for :class:`DeviceToken`."""

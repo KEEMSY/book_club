@@ -56,6 +56,13 @@ class UserRepositoryPort(Protocol):
 
     async def soft_delete(self, user_id: UUID, at: datetime) -> None: ...
 
+    async def update_profile(
+        self,
+        user_id: UUID,
+        nickname: str | None,
+        bio: str | None,
+    ) -> User: ...
+
 
 class DeviceTokenRepositoryPort(Protocol):
     async def upsert(self, user_id: UUID, token: str, platform: DevicePlatform) -> DeviceToken: ...

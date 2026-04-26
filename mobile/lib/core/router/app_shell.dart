@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/reading/application/reading_providers.dart';
 
-/// Bottom-nav shell for the three M3 destinations (홈 · 검색 · 서재).
+/// Bottom-nav shell for the four M7 destinations (홈 · 검색 · 서재 · 커뮤니티).
 ///
 /// Selected-state tint follows `gradePrimaryProvider` so grade-up events
 /// shift the active-tab icon/label in lockstep with the rest of the
@@ -48,6 +48,12 @@ class AppShell extends ConsumerWidget {
             icon: const Icon(CupertinoIcons.book),
             selectedIcon: Icon(CupertinoIcons.book_fill, color: accent),
             label: '서재',
+          ),
+          NavigationDestination(
+            icon: const Icon(CupertinoIcons.person_2),
+            selectedIcon:
+                Icon(CupertinoIcons.person_2_fill, color: accent),
+            label: '커뮤니티',
           ),
         ],
       ),

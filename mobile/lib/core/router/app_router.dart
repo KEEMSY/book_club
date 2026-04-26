@@ -8,6 +8,10 @@ import '../../features/auth/presentation/login_screen.dart';
 import '../../features/book/presentation/book_detail_screen.dart';
 import '../../features/book/presentation/library_screen.dart';
 import '../../features/book/presentation/search_screen.dart';
+import '../../features/community/presentation/community_home_screen.dart';
+import '../../features/community/presentation/follower_list_screen.dart';
+import '../../features/community/presentation/following_list_screen.dart';
+import '../../features/community/presentation/user_profile_screen.dart';
 import '../../features/feed/presentation/post_compose_screen.dart';
 import '../../features/notification/presentation/notification_screen.dart';
 import '../../features/notification/presentation/weekly_report_screen.dart';
@@ -39,6 +43,12 @@ class AppRoutes {
   // M5 destinations.
   static const notifications = '/notifications';
   static const weeklyReport = '/reports/weekly';
+
+  // M7 destinations.
+  static const community = '/community';
+  static String userProfile(String userId) => '/users/$userId/profile';
+  static String userFollowers(String userId) => '/users/$userId/followers';
+  static String userFollowing(String userId) => '/users/$userId/following';
 }
 
 /// Adapter that bridges a Riverpod [ValueNotifier]-free state stream into a
@@ -60,6 +70,7 @@ class _AuthStateListenable extends ChangeNotifier {
 final _shellHomeKey = GlobalKey<NavigatorState>();
 final _shellSearchKey = GlobalKey<NavigatorState>();
 final _shellLibraryKey = GlobalKey<NavigatorState>();
+final _shellCommunityKey = GlobalKey<NavigatorState>();
 final _rootKey = GlobalKey<NavigatorState>();
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -154,7 +165,33 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return WeeklyReportScreen(weekStart: week);
         },
       ),
-      // Three-tab StatefulShellRoute — 홈 · 검색 · 서재.
+      // User profile — pushed above the shell so the nav bar disappears and
+      // the AppBar back-arrow pops cleanly regardless of originating tab.
+      GoRoute(
+        path: '/users/:id/profile',
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) {
+          final String id = state.pathParameters['id']!;
+          return UserProfileScreen(userId: id);
+        },
+      ),
+      GoRoute(
+        path: '/users/:id/followers',
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) {
+          final String id = state.pathParameters['id']!;
+          return FollowerListScreen(userId: id);
+        },
+      ),
+      GoRoute(
+        path: '/users/:id/following',
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) {
+          final String id = state.pathParameters['id']!;
+          return FollowingListScreen(userId: id);
+        },
+      ),
+      // Four-tab StatefulShellRoute — 홈 · 검색 · 서재 · 커뮤니티.
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
             AppShell(navigationShell: navigationShell),
@@ -187,6 +224,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                       state.uri.queryParameters['highlight'];
                   return LibraryScreen(highlightUserBookId: highlight);
                 },
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: _shellCommunityKey,
+            routes: <RouteBase>[
+              GoRoute(
+                path: AppRoutes.community,
+                builder: (context, state) => const CommunityHomeScreen(),
               ),
             ],
           ),
