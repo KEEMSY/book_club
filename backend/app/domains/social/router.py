@@ -155,7 +155,7 @@ async def my_blocks(
 async def explore_users(
     user_id: Annotated[str, Depends(get_current_user_id)],
     service: Annotated[SocialService, Depends(get_social_service)],
-    q: Annotated[str, Query(min_length=1, max_length=64)] = "",
+    q: Annotated[str, Query(max_length=64)] = "",
     cursor: Annotated[str | None, Query()] = None,
     limit: Annotated[int, Query(ge=1, le=50)] = 20,
 ) -> UserSummaryPage:
