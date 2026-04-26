@@ -54,4 +54,11 @@ abstract class SocialApi {
     @Path('userId') String userId,
     @Body() Map<String, String> body,
   );
+
+  @GET('/social/users/explore')
+  Future<UserSummaryPage> exploreUsers({
+    @Query('q') String q = '',
+    @Query('cursor') String? cursor,
+    @Query('limit') int limit = 20,
+  });
 }

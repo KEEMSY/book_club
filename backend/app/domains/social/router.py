@@ -151,6 +151,17 @@ async def my_blocks(
 # ---------------------------------------------------------------------------
 
 
+@router.get("/users/explore", response_model=UserSummaryPage)
+async def explore_users(
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[SocialService, Depends(get_social_service)],
+    q: Annotated[str, Query(min_length=1, max_length=64)] = "",
+    cursor: Annotated[str | None, Query()] = None,
+    limit: Annotated[int, Query(ge=1, le=50)] = 20,
+) -> UserSummaryPage:
+    return await service.search_users(UUID(user_id), q, cursor, limit)
+
+
 @router.post(
     "/reports/posts/{post_id}",
     status_code=status.HTTP_204_NO_CONTENT,

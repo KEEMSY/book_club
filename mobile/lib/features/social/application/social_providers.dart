@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/network/dio_provider.dart';
 import '../data/social_api.dart';
 import '../data/social_repository.dart';
+import '../domain/user_summary.dart';
 
 final socialApiProvider = Provider<SocialApi>((ref) {
   return SocialApi(ref.watch(dioProvider));
@@ -43,3 +44,9 @@ final followNotifierProvider =
     AutoDisposeNotifierProvider<FollowNotifier, AsyncValue<void>>(
   FollowNotifier.new,
 );
+
+/// Debounced user search — auto-disposes when query changes or widget unmounts.
+final exploreUsersProvider =
+    AutoDisposeFutureProvider.family<UserSummaryPage, String>((ref, query) {
+  return ref.watch(socialRepositoryProvider).exploreUsers(q: query);
+});

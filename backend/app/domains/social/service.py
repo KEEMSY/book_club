@@ -163,6 +163,33 @@ class SocialService:
             )
         return UserSummaryPage(items=items, next_cursor=next_cursor)
 
+    async def search_users(
+        self,
+        actor_id: UUID,
+        q: str,
+        cursor: str | None,
+        limit: int,
+    ) -> UserSummaryPage:
+        """Search users by nickname. Excludes actor and users who blocked actor."""
+        q = q.strip()
+        if not q:
+            return UserSummaryPage(items=[], next_cursor=None)
+        clamped = max(_PAGE_MIN, min(limit, _PAGE_MAX))
+        users, next_cursor = await self.repo.search_users(actor_id, q, cursor, clamped)
+        items = []
+        for u in users:
+            is_following = await self.repo.is_following(actor_id, u.id)
+            items.append(
+                UserSummary(
+                    id=u.id,
+                    nickname=u.nickname,
+                    profile_image_url=u.profile_image_url,
+                    bio=u.bio,
+                    is_following=is_following,
+                )
+            )
+        return UserSummaryPage(items=items, next_cursor=next_cursor)
+
     async def get_blocks(
         self,
         actor_id: UUID,

@@ -275,3 +275,44 @@ class SocialRepository:
         )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none() is not None
+
+    # ------------------------------------------------------------------
+    # User search / explore
+    # ------------------------------------------------------------------
+
+    async def search_users(
+        self,
+        actor_id: UUID,
+        q: str,
+        cursor: str | None,
+        limit: int,
+    ) -> tuple[list[User], str | None]:
+        """ILIKE nickname search, excludes actor and users who blocked actor."""
+        from sqlalchemy import not_
+
+        blocked_subq = select(Block.blocker_id).where(Block.blocked_id == actor_id)
+        conditions: list[object] = [
+            User.id != actor_id,
+            User.deleted_at.is_(None),
+            User.nickname.ilike(f"%{q}%"),
+            not_(User.id.in_(blocked_subq)),
+        ]
+        if cursor:
+            cursor_dt = _decode_cursor(cursor)
+            if cursor_dt is not None:
+                conditions.append(User.created_at < cursor_dt)
+
+        stmt = (
+            select(User)
+            .where(and_(*conditions))
+            .order_by(User.created_at.desc())
+            .limit(limit)
+        )
+        result = await self._session.execute(stmt)
+        users = list(result.scalars().all())
+
+        next_cursor: str | None = None
+        if len(users) == limit:
+            next_cursor = _encode_cursor(users[-1].created_at)
+
+        return users, next_cursor

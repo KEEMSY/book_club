@@ -85,3 +85,13 @@ class SocialRepositoryPort(Protocol):
         target_type: str,
         target_id: UUID,
     ) -> bool: ...
+
+    async def search_users(
+        self,
+        actor_id: UUID,
+        q: str,
+        cursor: str | None,
+        limit: int,
+    ) -> tuple[list[User], str | None]:
+        """Nickname ILIKE search. Excludes actor and users who blocked actor."""
+        ...

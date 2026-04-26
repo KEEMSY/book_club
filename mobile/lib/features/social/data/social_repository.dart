@@ -65,6 +65,13 @@ class SocialRepository {
   Future<void> reportUser(String userId, {required String reason}) =>
       _call(() => _api.reportUser(userId, {'reason': reason}));
 
+  Future<UserSummaryPage> exploreUsers({
+    required String q,
+    String? cursor,
+    int limit = 20,
+  }) =>
+      _call(() => _api.exploreUsers(q: q, cursor: cursor, limit: limit));
+
   Future<T> _call<T>(Future<T> Function() fn) async {
     try {
       return await fn();
