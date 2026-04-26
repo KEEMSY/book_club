@@ -6,6 +6,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../feed/presentation/book_feed_section.dart';
 import '../application/book_detail_notifier.dart';
 import '../application/book_detail_state.dart';
+import '../application/library_notifier.dart';
 import '../domain/book.dart';
 import 'widgets/book_cover.dart';
 
@@ -60,6 +61,9 @@ class BookDetailScreen extends ConsumerWidget {
                   .read(bookDetailNotifierProvider(bookId).notifier)
                   .addToLibrary();
               if (userBook != null) {
+                ref
+                    .read(libraryNotifierProvider.notifier)
+                    .upsert(userBook);
                 messenger.showSnackBar(
                   const SnackBar(content: Text('서재에 담겼어요')),
                 );

@@ -1,6 +1,7 @@
 import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Abstract bridge between the timer state and a platform-specific
@@ -37,14 +38,44 @@ class IosNullBridge implements BackgroundTimerBridge {
   Future<void> stop() async {}
 }
 
-/// Android implementation backed by `flutter_background_service` (the
-/// package is imported lazily via a plugin call boundary so the iOS binary
-/// does not link against it).
-///
-/// The concrete implementation of the service isolate lives in
-/// `android/app/src/main/.../ForegroundService.kt` (registered by the
-/// package); this Dart bridge only surfaces high-level start/stop/update
-/// calls that the notifier invokes.
+/// Initializes the flutter_background_service plugin on first call so the
+/// foreground notification channel is registered before [start] fires.
+Future<void> initBackgroundService() async {
+  final service = FlutterBackgroundService();
+  await service.configure(
+    androidConfiguration: AndroidConfiguration(
+      onStart: _onServiceStart,
+      autoStart: false,
+      isForegroundMode: true,
+      notificationChannelId: 'book_club_timer',
+      initialNotificationTitle: '독서 중',
+      initialNotificationContent: '00:00:00',
+      foregroundServiceNotificationId: 8801,
+      foregroundServiceTypes: <AndroidForegroundType>[
+        AndroidForegroundType.dataSync,
+      ],
+    ),
+    iosConfiguration: IosConfiguration(autoStart: false),
+  );
+}
+
+@pragma('vm:entry-point')
+void _onServiceStart(ServiceInstance service) {
+  service.on('update').listen((Map<String, dynamic>? data) {
+    final String elapsed = data?['elapsed'] as String? ?? '00:00:00';
+    if (service is AndroidServiceInstance) {
+      service.setForegroundNotificationInfo(
+        title: '독서 중',
+        content: elapsed,
+      );
+    }
+  });
+  service.on('stop').listen((_) => service.stopSelf());
+}
+
+/// Android implementation backed by `flutter_background_service`.
+/// The manifest entries (service declaration + FOREGROUND_SERVICE permissions)
+/// live in `android/app/src/main/AndroidManifest.xml`.
 class AndroidForegroundServiceBridge implements BackgroundTimerBridge {
   const AndroidForegroundServiceBridge();
 
@@ -53,33 +84,35 @@ class AndroidForegroundServiceBridge implements BackgroundTimerBridge {
     required String userBookId,
     required String sessionId,
   }) async {
-    // Intentional no-op when not on Android or when the service plugin is
-    // unavailable — the package's `startService()` call requires the
-    // Android-specific platform channel which is absent in tests / iOS.
     if (kIsWeb || !Platform.isAndroid) return;
-    // Real start is gated behind a try/catch so a missing channel
-    // registration (test harness, debug build without native pair) never
-    // crashes the session lifecycle.
     try {
-      // Implementation detail: the plugin is invoked via its generated
-      // `FlutterBackgroundService().startService()` API. We defer the actual
-      // invocation to a late binding so tests that stub this bridge don't
-      // pull in the plugin.
+      await initBackgroundService();
+      await FlutterBackgroundService().startService();
     } catch (_) {
-      // Swallow — the timer keeps ticking even without the FG service.
+      // Timer keeps ticking even if the FG service fails to start.
     }
   }
 
   @override
   Future<void> update({required Duration elapsed}) async {
     if (kIsWeb || !Platform.isAndroid) return;
-    // Push the new HH:MM:SS title to the persistent notification via the
-    // service's invoke channel. Intentionally keeps the frequency to 1Hz.
+    try {
+      final String label =
+          '${elapsed.inHours.toString().padLeft(2, '0')}:'
+          '${(elapsed.inMinutes % 60).toString().padLeft(2, '0')}:'
+          '${(elapsed.inSeconds % 60).toString().padLeft(2, '0')}';
+      FlutterBackgroundService().invoke('update', <String, dynamic>{
+        'elapsed': label,
+      });
+    } catch (_) {}
   }
 
   @override
   Future<void> stop() async {
     if (kIsWeb || !Platform.isAndroid) return;
+    try {
+      FlutterBackgroundService().invoke('stop');
+    } catch (_) {}
   }
 }
 

@@ -18,7 +18,7 @@ void main() {
           ),
         ].cast();
 
-      final notifier = HeatmapNotifier(repo);
+      final notifier = HeatmapNotifier(repo, DateTime.now().year);
 
       await notifier.load();
       expect(notifier.state, isA<HeatmapLoaded>());
@@ -42,7 +42,7 @@ void main() {
           message: '네트워크 오류가 발생했습니다',
         );
 
-      final notifier = HeatmapNotifier(repo);
+      final notifier = HeatmapNotifier(repo, DateTime.now().year);
       await notifier.load();
 
       expect(notifier.state, isA<HeatmapError>());
@@ -52,7 +52,7 @@ void main() {
 
     test('invalidate triggers a forced refresh', () async {
       final repo = FakeReadingRepository();
-      final notifier = HeatmapNotifier(repo);
+      final notifier = HeatmapNotifier(repo, DateTime.now().year);
       await notifier.load();
       final int before = repo.heatmapCalls.length;
       await notifier.invalidate();

@@ -1,5 +1,6 @@
 import 'dart:io' show Platform;
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
 import 'social_login_port.dart';
@@ -37,8 +38,8 @@ class KakaoLoginAdapter {
   }
 
   Future<OAuthToken> _requestToken() async {
-    // Android/iOS both have KakaoTalk; web fallback is defined by the SDK.
-    if (!Platform.isIOS && !Platform.isAndroid) {
+    // Web can't call Platform.isIOS/isAndroid — always use account flow there.
+    if (kIsWeb || (!Platform.isIOS && !Platform.isAndroid)) {
       return UserApi.instance.loginWithKakaoAccount();
     }
     final bool talkInstalled = await isKakaoTalkInstalled();

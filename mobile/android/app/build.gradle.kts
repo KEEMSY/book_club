@@ -36,7 +36,7 @@ android {
         // secrets. Runtime login will error out until a real key is set.
         val kakaoNativeAppKey: String =
             (project.findProperty("kakaoNativeAppKey") as String?)
-                ?: "0000000000000000000000000000"
+                ?: "82781f9e394c2f5f3e29e499c080c956"
         manifestPlaceholders["kakaoNativeAppKey"] = kakaoNativeAppKey
     }
 

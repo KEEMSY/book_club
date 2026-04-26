@@ -23,10 +23,18 @@ class DailyTotalCard extends StatelessWidget {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
 
-    // Daily slice of the weekly goal (e.g. 7 hours/week → 1h/day target).
-    final double progress = weeklyGoalSeconds == null || weeklyGoalSeconds == 0
-        ? 0
-        : (todaySeconds / (weeklyGoalSeconds! / 7)).clamp(0.0, 1.0);
+    // Dynamic daily slice: remaining goal seconds spread across days left in the
+    // week (Mon-based). On Monday the target is goal/7; by Sunday it's goal/1.
+    // This nudges the user to catch up if they've been light earlier in the week.
+    final double progress;
+    if (weeklyGoalSeconds == null || weeklyGoalSeconds == 0) {
+      progress = 0;
+    } else {
+      final int weekday = DateTime.now().weekday; // Mon=1 … Sun=7
+      final int daysLeft = 8 - weekday; // 7 on Mon, 1 on Sun
+      final double dailyTarget = weeklyGoalSeconds! / daysLeft;
+      progress = (todaySeconds / dailyTarget).clamp(0.0, 1.0);
+    }
 
     final AppShadows shadows = theme.extension<AppShadows>()!;
     return Container(

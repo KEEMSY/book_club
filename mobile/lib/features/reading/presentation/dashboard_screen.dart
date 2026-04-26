@@ -53,7 +53,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(gradeNotifierProvider.notifier).load();
-      ref.read(heatmapNotifierProvider.notifier).load();
+      ref.read(heatmapNotifierProvider(DateTime.now().year).notifier).load();
       ref.read(goalNotifierProvider.notifier).load();
       // Warm the "읽는 중" library tab so the start-reading CTA has a book
       // context to jump straight into.
@@ -69,7 +69,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final spacing = theme.extension<AppSpacing>()!;
     final Color accent = ref.watch(gradePrimaryProvider);
     final GradeState gradeState = ref.watch(gradeNotifierProvider);
-    final HeatmapState heatmapState = ref.watch(heatmapNotifierProvider);
+    final HeatmapState heatmapState =
+        ref.watch(heatmapNotifierProvider(DateTime.now().year));
     final GoalState goalState = ref.watch(goalNotifierProvider);
     final AuthState authState = ref.watch(authNotifierProvider);
     final DashboardPrefs prefs = ref.watch(dashboardPrefsProvider);
@@ -94,7 +95,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             onRefresh: () async {
               await Future.wait<void>(<Future<void>>[
                 ref.read(gradeNotifierProvider.notifier).refresh(),
-                ref.read(heatmapNotifierProvider.notifier).invalidate(),
+                ref
+                    .read(heatmapNotifierProvider(DateTime.now().year).notifier)
+                    .invalidate(),
                 ref.read(goalNotifierProvider.notifier).refresh(),
               ]);
             },
@@ -136,7 +139,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   SizedBox(height: spacing.md),
                 ],
                 if (prefs.showHeatmap) ...<Widget>[
-                  _HeatmapCard(state: heatmapState, accent: accent),
+                  _HeatmapCard(accent: accent),
                 ],
               ],
             ),
@@ -392,24 +395,42 @@ class _GradeRow extends ConsumerWidget {
   }
 }
 
-class _HeatmapCard extends StatelessWidget {
-  const _HeatmapCard({required this.state, required this.accent});
+class _HeatmapCard extends ConsumerStatefulWidget {
+  const _HeatmapCard({required this.accent});
 
-  final HeatmapState state;
   final Color accent;
 
   @override
+  ConsumerState<_HeatmapCard> createState() => _HeatmapCardState();
+}
+
+class _HeatmapCardState extends ConsumerState<_HeatmapCard> {
+  static final int _minYear = 2020;
+  late int _year = DateTime.now().year;
+
+  void _changeYear(int year) {
+    setState(() => _year = year);
+    // Trigger load for this year if it hasn't been fetched yet.
+    ref.read(heatmapNotifierProvider(year).notifier).load();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final HeatmapState state = ref.watch(heatmapNotifierProvider(_year));
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
+    final int thisYear = DateTime.now().year;
+    final Color mutedColor =
+        theme.colorScheme.onSurface.withValues(alpha: 0.72);
+    final Color disabledColor =
+        theme.colorScheme.onSurface.withValues(alpha: 0.24);
+
     return Container(
       padding: EdgeInsets.all(spacing.lg),
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: theme.colorScheme.outlineVariant,
-        ),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
         boxShadow: theme.extension<AppShadows>()!.elevated,
       ),
       child: Column(
@@ -425,11 +446,47 @@ class _HeatmapCard extends StatelessWidget {
                 ),
                 semanticsLabel: '독서 캘린더',
               ),
-              Text(
-                '최근 1년',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.72),
-                ),
+              // Year navigation: ← 2025년 →
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  SizedBox(
+                    width: 28,
+                    height: 28,
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      iconSize: 16,
+                      icon: Icon(
+                        Icons.chevron_left,
+                        color: _year > _minYear ? mutedColor : disabledColor,
+                      ),
+                      onPressed:
+                          _year > _minYear ? () => _changeYear(_year - 1) : null,
+                      tooltip: '이전 연도',
+                    ),
+                  ),
+                  Text(
+                    '$_year년',
+                    style: theme.textTheme.bodySmall
+                        ?.copyWith(color: mutedColor),
+                  ),
+                  SizedBox(
+                    width: 28,
+                    height: 28,
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      iconSize: 16,
+                      icon: Icon(
+                        Icons.chevron_right,
+                        color: _year < thisYear ? mutedColor : disabledColor,
+                      ),
+                      onPressed: _year < thisYear
+                          ? () => _changeYear(_year + 1)
+                          : null,
+                      tooltip: '다음 연도',
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -444,16 +501,15 @@ class _HeatmapCard extends StatelessWidget {
                   padding: EdgeInsets.symmetric(vertical: spacing.md),
                   child: Text(
                     '독서 캘린더를 불러오지 못했어요',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color:
-                          theme.colorScheme.onSurface.withValues(alpha: 0.72),
-                    ),
+                    style: theme.textTheme.bodyMedium
+                        ?.copyWith(color: mutedColor),
                   ),
                 ),
               ),
             HeatmapLoaded(:final days) => JanDeeGrid(
                 days: days,
-                primaryColor: accent,
+                year: _year,
+                primaryColor: widget.accent,
                 onDayTap: (HeatmapDay day) => _showDaySheet(context, day),
               ),
           },

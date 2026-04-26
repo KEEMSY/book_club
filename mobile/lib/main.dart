@@ -1,30 +1,26 @@
-import 'dart:developer' as developer;
-
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
 import 'app.dart';
 
 /// Kakao native-app key. Supplied via `--dart-define=KAKAO_NATIVE_APP_KEY=...`
-/// in release / staging builds. Falls back to `dev-placeholder` for local runs
-/// without credentials — the placeholder is rejected by Kakao's server on the
-/// first OAuth call, which is the intended behaviour in dev mode.
+/// in CI/release builds. Falls back to the registered key so `flutter run`
+/// works without extra flags — the same key is already embedded in Info.plist
+/// and AndroidManifest.xml, so there is no additional secret exposure here.
 const String _kakaoNativeAppKey = String.fromEnvironment(
   'KAKAO_NATIVE_APP_KEY',
-  defaultValue: 'dev-placeholder',
+  defaultValue: '82781f9e394c2f5f3e29e499c080c956',
 );
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  if (_kakaoNativeAppKey == 'dev-placeholder') {
-    developer.log(
-      'KAKAO_NATIVE_APP_KEY not set (--dart-define missing). '
-      'Kakao login will fail until a real key is supplied.',
-      name: 'BookClub/auth',
-    );
-  }
+  // Preload Playfair Display before the first frame so CanvasKit has the Latin
+  // serif registered before text layout begins. NotoSansKR is bundled as a
+  // Flutter font asset and is always available without a network fetch.
+  await GoogleFonts.pendingFonts([GoogleFonts.playfairDisplay()]);
 
   KakaoSdk.init(nativeAppKey: _kakaoNativeAppKey);
 

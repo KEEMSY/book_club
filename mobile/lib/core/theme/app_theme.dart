@@ -529,8 +529,16 @@ class AppTheme {
   /// mobile hero headlines read intimate at ~40px / w500 (the HomeScreen
   /// "Book Club" headline) rather than the web's 28px Section Heading.
   static TextTheme buildTextTheme(Color onSurface, Color mutedOnSurface) {
-    final TextStyle serifBase = GoogleFonts.playfairDisplay(color: onSurface);
-    final TextStyle sansBase = GoogleFonts.inter(color: onSurface);
+    // NotoSansKR is bundled as a Flutter font asset (variable font, all weights).
+    // This replaces the former google_fonts Inter which had no Korean glyphs and
+    // caused tofu characters on Flutter Web CanvasKit. Bundling avoids the
+    // per-weight lazy download that caused broken text while fonts were fetching.
+    const String koreanSans = 'NotoSansKR';
+    final TextStyle sansBase = TextStyle(fontFamily: koreanSans, color: onSurface);
+    // Playfair Display (google_fonts, Latin serif) for hero/display text.
+    // Korean book titles fall back to the bundled NotoSansKR.
+    final TextStyle serifBase = GoogleFonts.playfairDisplay(color: onSurface)
+        .copyWith(fontFamilyFallback: const [koreanSans]);
 
     return TextTheme(
       // Mobile hero serif — 40 / 500 / 1.15 / -0.44 (upsized from DESIGN.md

@@ -71,7 +71,9 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
       if (next is TimerCompleted) {
         final gradeNotifier = ref.read(gradeNotifierProvider.notifier);
         gradeNotifier.applySessionCompletion(next.completion);
-        ref.read(heatmapNotifierProvider.notifier).invalidate();
+        ref
+            .read(heatmapNotifierProvider(DateTime.now().year).notifier)
+            .invalidate();
         // Push the summary screen, then pop back to the dashboard once the
         // user acknowledges.
         final NavigatorState nav = Navigator.of(context);

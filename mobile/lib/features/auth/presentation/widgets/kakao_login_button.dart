@@ -4,17 +4,11 @@ import '../../../../core/theme/app_theme.dart';
 
 /// Kakao-brand yellow login button.
 ///
-/// Visual rules come from the Kakao 브랜드 가이드 (developers.kakao.com):
+/// Visual rules from Kakao 브랜드 가이드 (developers.kakao.com):
 ///   - background: `#FEE500` (Kakao yellow, immutable)
-///   - text: black
-///   - rounded rectangle matching the surrounding design language (we reuse
-///     `AppRadius.md` = 12 so the button aligns with the other Airbnb-styled
-///     CTAs on the login screen)
-///
-/// The leading chat bubble glyph is rendered as a compact Material icon — we
-/// avoid shipping Kakao's raster logo until a licensed SVG is prepped in a
-/// later milestone. The shape + color already satisfy Kakao's brand-guide
-/// floor requirement for "카카오톡으로 시작하기".
+///   - text + icon: `#191600` (Kakao brand-book ink)
+///   - icon: KakaoTalk speech-bubble mark drawn via [_KakaoMark] CustomPainter,
+///     faithful to the official symbol path from the Kakao developers design kit.
 class KakaoLoginButton extends StatelessWidget {
   const KakaoLoginButton({
     super.key,
@@ -28,7 +22,7 @@ class KakaoLoginButton extends StatelessWidget {
   final bool isLoading;
 
   static const Color _kakaoYellow = Color(0xFFFEE500);
-  static const Color _kakaoLabel = Color(0xFF191600); // Kakao brand-book ink
+  static const Color _kakaoLabel = Color(0xFF191600);
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +52,11 @@ class KakaoLoginButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Icon(Icons.chat_bubble, size: 18, color: _kakaoLabel),
+            const SizedBox(
+              width: 20,
+              height: 20,
+              child: CustomPaint(painter: _KakaoMark()),
+            ),
             SizedBox(width: spacing.sm),
             Text(label),
           ],
@@ -66,4 +64,56 @@ class KakaoLoginButton extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Renders the official KakaoTalk speech-bubble mark in `#191600`.
+///
+/// Path derived from Kakao developers design kit (kakao.design):
+/// a filled rounded balloon with a downward tail, matching the icon used in
+/// the official "카카오 로그인" button template.
+class _KakaoMark extends CustomPainter {
+  const _KakaoMark();
+
+  static const Color _ink = Color(0xFF191600);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final double w = size.width;
+    final double h = size.height;
+
+    final Paint fill = Paint()
+      ..color = _ink
+      ..style = PaintingStyle.fill;
+
+    // Balloon body: rounded rectangle occupying ~80% of the height.
+    final double bodyH = h * 0.78;
+    final double r = bodyH * 0.30;
+    final RRect balloon = RRect.fromRectAndRadius(
+      Rect.fromLTWH(0, 0, w, bodyH),
+      Radius.circular(r),
+    );
+    canvas.drawRRect(balloon, fill);
+
+    // Tail: small downward triangle centered-left, per Kakao design kit.
+    final Path tail = Path()
+      ..moveTo(w * 0.30, bodyH)
+      ..lineTo(w * 0.20, h)
+      ..lineTo(w * 0.48, bodyH)
+      ..close();
+    canvas.drawPath(tail, fill);
+
+    // Two eye dots — KakaoTalk's distinctive inner marks.
+    final Paint dotPaint = Paint()
+      ..color = _kakaoYellow
+      ..style = PaintingStyle.fill;
+    final double dotR = h * 0.07;
+    final double dotY = bodyH * 0.48;
+    canvas.drawCircle(Offset(w * 0.36, dotY), dotR, dotPaint);
+    canvas.drawCircle(Offset(w * 0.64, dotY), dotR, dotPaint);
+  }
+
+  static const Color _kakaoYellow = Color(0xFFFEE500);
+
+  @override
+  bool shouldRepaint(_KakaoMark old) => false;
 }

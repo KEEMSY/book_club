@@ -3,6 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../book/application/library_notifier.dart';
+import '../../../book/application/library_state.dart';
+import '../../../book/domain/book_status.dart';
+import '../../../book/domain/user_book.dart';
 import '../../application/reading_providers.dart';
 import '../../data/reading_repository.dart';
 
@@ -12,14 +16,18 @@ import '../../data/reading_repository.dart';
 /// grade policy — only toward the book-count. The sheet surfaces this
 /// disclaimer inline so users aren't surprised when the timer dashboard
 /// stats stay unchanged after submission.
+///
+/// When [userBookId] is null the sheet renders an inline book picker that
+/// loads the user's "읽는 중" library. Pass a non-null [userBookId] to skip
+/// the picker (e.g. when called from the library detail 3-dot menu).
 class ManualLogModal extends ConsumerStatefulWidget {
-  const ManualLogModal({super.key, required this.userBookId});
+  const ManualLogModal({super.key, this.userBookId});
 
-  final String userBookId;
+  final String? userBookId;
 
   static Future<void> show(
     BuildContext context, {
-    required String userBookId,
+    String? userBookId,
   }) {
     return showModalBottomSheet<void>(
       context: context,
@@ -44,7 +52,25 @@ class _ManualLogModalState extends ConsumerState<ManualLogModal> {
   bool _saving = false;
   String? _errorMessage;
 
+  // Selected book when userBookId is not pre-supplied.
+  String? _selectedUserBookId;
+  String? _selectedBookTitle;
+
   static final DateFormat _displayFmt = DateFormat('yyyy-MM-dd HH:mm');
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedUserBookId = widget.userBookId;
+    if (widget.userBookId == null) {
+      // Kick off library load so the picker has data.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref
+            .read(libraryNotifierProvider.notifier)
+            .ensureLoaded(BookStatus.reading);
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -76,6 +102,19 @@ class _ManualLogModalState extends ConsumerState<ManualLogModal> {
             style: theme.textTheme.bodySmall,
           ),
           SizedBox(height: spacing.lg),
+          if (widget.userBookId == null) ...<Widget>[
+            _BookPicker(
+              selectedUserBookId: _selectedUserBookId,
+              selectedTitle: _selectedBookTitle,
+              onSelected: (String id, String title) {
+                setState(() {
+                  _selectedUserBookId = id;
+                  _selectedBookTitle = title;
+                });
+              },
+            ),
+            SizedBox(height: spacing.md),
+          ],
           _TimeRow(
             label: '시작 시각',
             value: _startedAt,
@@ -157,6 +196,11 @@ class _ManualLogModalState extends ConsumerState<ManualLogModal> {
   }
 
   Future<void> _submit() async {
+    final String? bookId = _selectedUserBookId;
+    if (bookId == null) {
+      setState(() => _errorMessage = '책을 선택해주세요');
+      return;
+    }
     if (!_endedAt.isAfter(_startedAt)) {
       setState(() => _errorMessage = '종료 시각이 시작 시각보다 늦어야 해요');
       return;
@@ -172,7 +216,7 @@ class _ManualLogModalState extends ConsumerState<ManualLogModal> {
     });
     try {
       await ref.read(readingRepositoryProvider).logManualSession(
-            userBookId: widget.userBookId,
+            userBookId: bookId,
             startedAt: _startedAt,
             endedAt: _endedAt,
             note: _noteController.text.trim().isEmpty
@@ -193,6 +237,101 @@ class _ManualLogModalState extends ConsumerState<ManualLogModal> {
         _errorMessage = '저장하지 못했어요. 잠시 후 다시 시도해주세요.';
       });
     }
+  }
+}
+
+/// Inline book picker — shows the "읽는 중" library as a scrollable chip list.
+class _BookPicker extends ConsumerWidget {
+  const _BookPicker({
+    required this.selectedUserBookId,
+    required this.selectedTitle,
+    required this.onSelected,
+  });
+
+  final String? selectedUserBookId;
+  final String? selectedTitle;
+  final void Function(String id, String title) onSelected;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final libraryMap = ref.watch(libraryNotifierProvider);
+    final LibraryListState listState =
+        libraryMap[BookStatus.reading] ?? const LibraryListState.initial();
+
+    final List<UserBook> books = switch (listState) {
+      LibraryListLoaded(:final items) => items,
+      _ => const <UserBook>[],
+    };
+
+    if (listState is LibraryListLoading && books.isEmpty) {
+      return const SizedBox(
+        height: 48,
+        child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+      );
+    }
+
+    if (books.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        decoration: BoxDecoration(
+          border: Border.all(color: theme.colorScheme.outline),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          '읽는 중인 책이 없어요',
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          '책 선택',
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.72),
+          ),
+        ),
+        const SizedBox(height: 8),
+        SizedBox(
+          height: 40,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: books.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 8),
+            itemBuilder: (context, index) {
+              final UserBook ub = books[index];
+              final bool selected = ub.id == selectedUserBookId;
+              return ChoiceChip(
+                label: Text(
+                  ub.book.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                selected: selected,
+                onSelected: (_) => onSelected(ub.id, ub.book.title),
+              );
+            },
+          ),
+        ),
+        if (selectedTitle != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Text(
+              '선택됨: $selectedTitle',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+      ],
+    );
   }
 }
 

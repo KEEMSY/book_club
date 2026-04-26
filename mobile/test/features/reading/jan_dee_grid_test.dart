@@ -31,6 +31,7 @@ void main() {
           body: SingleChildScrollView(
             child: JanDeeGrid(
               days: days.cast(),
+              year: DateTime.now().year,
               primaryColor: GradeTheme.primaryOf(ReaderGrade.devoted),
             ),
           ),
@@ -60,6 +61,7 @@ void main() {
           body: SingleChildScrollView(
             child: JanDeeGrid(
               days: const <dynamic>[].cast(),
+              year: DateTime.now().year,
               primaryColor: GradeTheme.primaryOf(ReaderGrade.sprout),
             ),
           ),

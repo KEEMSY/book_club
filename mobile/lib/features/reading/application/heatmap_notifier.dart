@@ -5,31 +5,41 @@ import '../domain/heatmap_day.dart';
 import 'heatmap_state.dart';
 import 'reading_providers.dart';
 
-/// Manages the rolling 365-day jan-dee heatmap fetch.
+/// Manages the heatmap fetch for a specific [year].
 ///
-/// Cache policy:
-///   * Single fetch on `load()`; subsequent calls return the cached result
-///     unless `force: true` is passed (pull-to-refresh) or a completed timer
-///     session invalidates the window.
-///   * Backend clamps the range to <= 366 days so we never ask for more than
-///     a year at a time.
+/// Parameterised as a family provider so the dashboard can always watch
+/// the current-year notifier for `todaySeconds`, while the `_HeatmapCard`
+/// independently loads whichever year the user has navigated to. Each year's
+/// data is cached for the lifetime of its listener.
+///
+/// Date range:
+///   * Current year: Jan 1 → today (live window, re-fetched on invalidate).
+///   * Past year:    Jan 1 → Dec 31 (static; re-fetched only when forced).
 class HeatmapNotifier extends StateNotifier<HeatmapState> {
-  HeatmapNotifier(this._repository) : super(const HeatmapState.initial());
+  HeatmapNotifier(this._repository, this._year)
+      : super(const HeatmapState.initial());
 
   final ReadingRepository _repository;
+  final int _year;
 
-  /// Loads the trailing 365-day window ending on `today`. Idempotent when a
-  /// loaded state already covers an overlapping window unless [force] is set.
   Future<void> load({bool force = false}) async {
     final DateTime now = DateTime.now();
-    final DateTime to = DateTime(now.year, now.month, now.day);
-    final DateTime from = to.subtract(const Duration(days: 364));
+    final DateTime from;
+    final DateTime to;
+
+    if (_year == now.year) {
+      // GitHub-style rolling window: trailing 365 days ending today.
+      to = DateTime(now.year, now.month, now.day);
+      from = to.subtract(const Duration(days: 364));
+    } else {
+      // Full calendar year for past years.
+      from = DateTime(_year, 1, 1);
+      to = DateTime(_year, 12, 31);
+    }
 
     if (!force && state is HeatmapLoaded) {
-      final loaded = state as HeatmapLoaded;
-      if (loaded.to == to && loaded.from == from) {
-        return;
-      }
+      final HeatmapLoaded loaded = state as HeatmapLoaded;
+      if (loaded.from == from && loaded.to == to) return;
     }
 
     state = const HeatmapState.loading();
@@ -42,12 +52,10 @@ class HeatmapNotifier extends StateNotifier<HeatmapState> {
     }
   }
 
-  /// Called by the timer notifier's completion observer to force a refresh
-  /// without touching the UI caller.
   Future<void> invalidate() => load(force: true);
 }
 
-final heatmapNotifierProvider =
-    StateNotifierProvider<HeatmapNotifier, HeatmapState>((ref) {
-  return HeatmapNotifier(ref.watch(readingRepositoryProvider));
-});
+final heatmapNotifierProvider = StateNotifierProvider.family<HeatmapNotifier,
+    HeatmapState, int>(
+  (ref, year) => HeatmapNotifier(ref.watch(readingRepositoryProvider), year),
+);

@@ -3,47 +3,41 @@ import 'package:intl/intl.dart';
 
 import '../../domain/heatmap_day.dart';
 
-/// GitHub-style 52-week × 7-day 독서 캘린더 heatmap.
+/// GitHub-style 독서 캘린더 heatmap anchored to a calendar year.
 ///
 /// (Class and file names keep the `JanDee` / `jan_dee_grid` identifier to
 /// avoid cross-file rename churn — user-facing strings all render as
 /// "독서 캘린더" instead of the earlier slang "독서 잔디".)
 ///
-/// The cells run left-to-right, oldest to newest; the rightmost column is
-/// the current week. Cell size is computed from the parent constraints via
-/// [LayoutBuilder] so the grid always fills the card's inner width — the
-/// trailing edge sits flush with the last week column, with no right-edge
-/// whitespace. Falls back to horizontal scrolling only when the card is too
-/// narrow to fit 52 weeks at the minimum legible cell size.
+/// Unlike the earlier rolling 52-week window this widget is year-anchored:
+///   * [year] determines the date range displayed.
+///   * Columns run from the Sunday of the week that contains Jan 1 of [year]
+///     to the Sunday of the week that contains Dec 31 (past years) or today
+///     (current year). This aligns month boundaries cleanly at January.
+///   * Current year: future weeks are omitted so the grid grows as the year
+///     progresses — early in the year cells are large and easy to read; by
+///     year-end the grid is full-width, same density as before.
+///   * Past years: the full 52–53-week span is shown, using horizontal scroll
+///     when cells would fall below the 8dp minimum legible size.
 class JanDeeGrid extends StatelessWidget {
   const JanDeeGrid({
     super.key,
     required this.days,
     required this.primaryColor,
+    required this.year,
     this.onDayTap,
   });
 
   final List<HeatmapDay> days;
   final Color primaryColor;
+  final int year;
   final void Function(HeatmapDay day)? onDayTap;
 
   static const int _rows = 7;
-  static const int _columns = 52;
 
-  // Layout constants. Width of the 월/수/금 day-label column, and the gap
-  // between cells. The label column is snug (24dp) so cells claim as much
-  // horizontal real estate as possible — the user-facing ask was "cells fill
-  // the card edge to edge".
   static const double _dayLabelWidth = 24;
   static const double _cellGap = 2;
-
-  // Minimum cell size under which the grid stops fitting statically and
-  // must fall back to horizontal scrolling. 8dp still reads as a distinct
-  // cell on high-DPI displays without touching AA contrast.
   static const double _minCellSize = 8;
-
-  // Upper bound on cell size so the grid doesn't balloon on tablet widths —
-  // Airbnb's listing cards cap visual density around the same 12–16dp tile.
   static const double _maxCellSize = 16;
 
   @override
@@ -51,60 +45,57 @@ class JanDeeGrid extends StatelessWidget {
     final Map<String, HeatmapDay> byDate = <String, HeatmapDay>{
       for (final HeatmapDay d in days) _dateKey(d.date): d,
     };
-    final keyFmt = DateFormat('yyyy-MM-dd');
+    final DateFormat keyFmt = DateFormat('yyyy-MM-dd');
 
-    // Anchor: the most recent Sunday (rightmost column, row 6).
     final DateTime today = _truncateDay(DateTime.now());
-    final int weekdayIndex = today.weekday % 7; // Sunday = 0
-    final DateTime currentWeekSunday =
-        today.subtract(Duration(days: weekdayIndex));
-    final DateTime startColumnDate =
-        currentWeekSunday.subtract(const Duration(days: 7 * (_columns - 1)));
+    final int thisYear = DateTime.now().year;
+
+    final DateTime startColumnDate;
+    final int columns;
+
+    if (year == thisYear) {
+      // GitHub-style: 52-week rolling window ending at today's Sunday.
+      final DateTime endColumnSunday =
+          today.subtract(Duration(days: today.weekday % 7));
+      startColumnDate =
+          endColumnSunday.subtract(const Duration(days: 7 * 51));
+      columns = 52;
+    } else {
+      // Full calendar year for past years.
+      final DateTime jan1 = DateTime(year, 1, 1);
+      startColumnDate = jan1.subtract(Duration(days: jan1.weekday % 7));
+      final DateTime dec31 = DateTime(year, 12, 31);
+      final DateTime endColumnSunday =
+          dec31.subtract(Duration(days: dec31.weekday % 7));
+      columns = endColumnSunday.difference(startColumnDate).inDays ~/ 7 + 1;
+    }
 
     final ThemeData theme = Theme.of(context);
     final Color emptyCellBase = Color.alphaBlend(
       theme.colorScheme.onSurface.withValues(alpha: 0.08),
       theme.colorScheme.surfaceContainerHighest,
     );
+
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        // Available width inside the card = card inner width. Reserve the
-        // day-label column on the left; the remainder is divided across
-        // 52 columns with 51 inter-column gaps.
-        //
-        //   cellSize = (available - 51 * gap) / 52
-        //
-        // On a 375dp phone card with 24dp horizontal padding each side:
-        //   card inner width   = 375 - 48      = 327dp
-        //   available for grid = 327 - 24      = 303dp   (label column)
-        //   cellSize           = (303 - 51*2)/52 = 201/52 ≈ 3.87dp  ← too small
-        //
-        // In practice the dashboard card has narrower padding (spacing.lg
-        // = 24 inside the card) so the `_HeatmapCard` inner width lands
-        // closer to 327dp. 3.87dp is below our 8dp minimum — the widget
-        // falls back to horizontal scroll in that case. On a wider card
-        // (tablet, desktop web) the cell size scales up cleanly to the
-        // 16dp cap.
         final double available = constraints.maxWidth - _dayLabelWidth;
         final double rawCellSize =
-            (available - (_columns - 1) * _cellGap) / _columns;
+            (available - (columns - 1) * _cellGap) / columns;
         final double cellSize =
             rawCellSize.clamp(_minCellSize, _maxCellSize).toDouble();
 
-        // Total width the grid needs at this cell size. When the raw size
-        // is below the minimum clamp, `gridWidth` exceeds `available` and
-        // we flip to scroll mode (anchored at the trailing edge so "today"
-        // remains visible). Otherwise the grid fills the card exactly.
         final double gridWidth =
-            _columns * cellSize + (_columns - 1) * _cellGap;
+            columns * cellSize + (columns - 1) * _cellGap;
         final bool needsScroll = rawCellSize < _minCellSize;
 
         final Widget gridBody = _GridBody(
           cellSize: cellSize,
           cellGap: _cellGap,
           today: today,
-          currentWeekSunday: currentWeekSunday,
+          year: year,
+          thisYear: thisYear,
           startColumnDate: startColumnDate,
+          columns: columns,
           byDate: byDate,
           keyFmt: keyFmt,
           primaryColor: primaryColor,
@@ -118,10 +109,6 @@ class JanDeeGrid extends StatelessWidget {
             child: gridBody,
           );
         }
-        // Fallback: card is too narrow for 52 weeks at the minimum cell
-        // size — scroll horizontally with the trailing edge anchored so
-        // the current week ("today") stays flush with the card's right
-        // edge after layout.
         return SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           reverse: true,
@@ -134,17 +121,8 @@ class JanDeeGrid extends StatelessWidget {
     );
   }
 
-  /// Maps a seconds total onto one of 5 opacity buckets. Matches the task
-  /// contract: 0 / 1–15m / 16–45m / 46–90m / 91–180m / >180m.
-  ///
-  /// Active buckets blend the grade accent over the theme's surface container
-  /// so the full opacity ladder stays visible on both the light parchment and
-  /// the #161616 dark canvas — a plain `primary.withValues(alpha: 0.15)`
-  /// vanishes on dark because the canvas eats the low-alpha coral.
   static Color _bucketColor(int seconds, Color primary, Color emptyBase) {
-    if (seconds == 0) {
-      return emptyBase;
-    }
+    if (seconds == 0) return emptyBase;
     final int minutes = seconds ~/ 60;
     if (minutes <= 15) {
       return Color.alphaBlend(primary.withValues(alpha: 0.22), emptyBase);
@@ -172,16 +150,15 @@ class JanDeeGrid extends StatelessWidget {
   }
 }
 
-/// Month labels + day labels + cell matrix, composed vertically. Extracted
-/// from [JanDeeGrid.build] so the scroll / no-scroll branches share the same
-/// inner tree.
 class _GridBody extends StatelessWidget {
   const _GridBody({
     required this.cellSize,
     required this.cellGap,
     required this.today,
-    required this.currentWeekSunday,
+    required this.year,
+    required this.thisYear,
     required this.startColumnDate,
+    required this.columns,
     required this.byDate,
     required this.keyFmt,
     required this.primaryColor,
@@ -192,8 +169,10 @@ class _GridBody extends StatelessWidget {
   final double cellSize;
   final double cellGap;
   final DateTime today;
-  final DateTime currentWeekSunday;
+  final int year;
+  final int thisYear;
   final DateTime startColumnDate;
+  final int columns;
   final Map<String, HeatmapDay> byDate;
   final DateFormat keyFmt;
   final Color primaryColor;
@@ -209,7 +188,7 @@ class _GridBody extends StatelessWidget {
           startColumnDate: startColumnDate,
           cellSize: cellSize,
           cellGap: cellGap,
-          columns: JanDeeGrid._columns,
+          columns: columns,
           leftPadding: JanDeeGrid._dayLabelWidth,
         ),
         Row(
@@ -220,7 +199,7 @@ class _GridBody extends StatelessWidget {
               cellGap: cellGap,
               width: JanDeeGrid._dayLabelWidth,
             ),
-            for (int col = 0; col < JanDeeGrid._columns; col++) ...<Widget>[
+            for (int col = 0; col < columns; col++) ...<Widget>[
               Column(
                 children: <Widget>[
                   for (int row = 0; row < JanDeeGrid._rows; row++) ...<Widget>[
@@ -229,7 +208,7 @@ class _GridBody extends StatelessWidget {
                   ],
                 ],
               ),
-              if (col < JanDeeGrid._columns - 1) SizedBox(width: cellGap),
+              if (col < columns - 1) SizedBox(width: cellGap),
             ],
           ],
         ),
@@ -238,14 +217,11 @@ class _GridBody extends StatelessWidget {
   }
 
   Widget _buildCell({required int col, required int row}) {
-    // Column index increases oldest → newest (left → right). Current week
-    // sits at col == _columns - 1.
-    final int weeksAgo = (JanDeeGrid._columns - 1) - col;
-    final DateTime weekStart =
-        currentWeekSunday.subtract(Duration(days: weeksAgo * 7));
-    final DateTime cellDate = weekStart.add(Duration(days: row));
+    final DateTime cellDate =
+        startColumnDate.add(Duration(days: col * 7 + row));
 
-    if (cellDate.isAfter(today)) {
+    // Hide future cells in the current year.
+    if (year == thisYear && cellDate.isAfter(today)) {
       return SizedBox(width: cellSize, height: cellSize);
     }
 
@@ -268,8 +244,8 @@ class _GridBody extends StatelessWidget {
   }
 }
 
-/// Renders month abbreviations across the top of the grid, aligned to the
-/// week-column where the 1st of that month falls.
+/// Month abbreviations in Korean (e.g. "1월", "3월") aligned to the column
+/// where each month's 1st falls.
 class _MonthLabelsRow extends StatelessWidget {
   const _MonthLabelsRow({
     required this.startColumnDate,
@@ -288,11 +264,9 @@ class _MonthLabelsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final DateFormat fmt = DateFormat.MMM();
+    // "M월" produces "1월", "2월", …, "12월" — consistent Korean month labels.
+    final DateFormat fmt = DateFormat('M월');
 
-    // Determine which column each month "starts" on (= column that contains
-    // the 1st of the month). Render the Korean-localised month abbreviation
-    // at that x offset, flush with the aligned week column.
     final List<Widget> stack = <Widget>[];
     int? lastMonth;
     for (int col = 0; col < columns; col++) {
@@ -322,7 +296,7 @@ class _MonthLabelsRow extends StatelessWidget {
   }
 }
 
-/// Left-hand day-of-week labels (월 · 수 · 금 — odd rows to avoid crowding).
+/// Left-hand day-of-week labels (월 · 수 · 금 — odd rows only to avoid crowding).
 class _DayLabelsColumn extends StatelessWidget {
   const _DayLabelsColumn({
     required this.cellSize,

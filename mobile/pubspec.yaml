@@ -26,9 +26,9 @@ dependencies:
 
   # HTTP
   dio: ^5.7.0
-  # Pinned below 4.5 — retrofit 4.5+ introduced `Parser.DartMappable`, which
-  # retrofit_generator 9.7.x does not handle exhaustively. Bump both together
-  # when we upgrade.
+  # Pinned below 4.5 — retrofit 4.5+ + retrofit_generator 10.x require
+  # build ^4.0.0 which conflicts with freezed ^2.x (needs build ^2.3.1).
+  # Full upgrade path: freezed 2→3 (breaking) then retrofit + generator + custom_lint together.
   retrofit: '>=4.4.1 <4.5.0'
 
   # Secure storage (JWT)
@@ -94,15 +94,28 @@ dev_dependencies:
   riverpod_generator: ^2.6.3
 
   # Lint plugins (Riverpod-aware)
+  # custom_lint 0.8+ / riverpod_lint 3.x / retrofit_generator 10.x all
+  # require freezed 3.x (build ^4.0.0 conflicts with freezed ^2.x build ^2.3.1).
+  # Upgrade all four together after the freezed 2→3 migration (Phase 2 task).
   custom_lint: ^0.7.0
   riverpod_lint: ^2.6.3
 
-# Dependency override — analyzer_plugin 0.12.0 (transitive via custom_lint
-# / riverpod_lint) references APIs that conflict with analyzer 7.6. 0.13.0
-# fixes the Element2 split-namespace issue. Revisit once custom_lint 0.8+ is
-# compatible with freezed 2.x (pubspec block shows 0.8+ forces freezed 3.x).
+# analyzer_plugin 0.13.x fixes the Element2 namespace split that 0.12.0
+# exposed against analyzer 7.6. Remove once custom_lint/riverpod_lint include
+# a compatible version as a direct constraint (blocked on freezed 3.x migration).
 dependency_overrides:
   analyzer_plugin: ^0.13.0
 
 flutter:
   uses-material-design: true
+
+  fonts:
+    # Noto Sans KR variable font — bundled as an asset so all weights (w100–w900)
+    # are available on Flutter Web without a network round-trip to fonts.gstatic.com.
+    # Variable fonts use the 'wght' axis, so any fontWeight value maps correctly.
+    - family: NotoSansKR
+      fonts:
+        - asset: assets/fonts/NotoSansKR-VF.ttf
+
+  assets:
+    - assets/fonts/

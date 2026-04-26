@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Notification status-bar icon for the reading foreground service.
+     White vector on transparent background (Android notification icon rules). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <!-- Open book silhouette -->
+  <path
+      android:fillColor="#FFFFFFFF"
+      android:pathData="M12,2C11.45,2 10.88,2.12 10.35,2.37L3,5.5V19.5L10.35,16.37C10.88,16.12 11.45,16 12,16C12.55,16 13.12,16.12 13.65,16.37L21,19.5V5.5L13.65,2.37C13.12,2.12 12.55,2 12,2ZM11,14.18L5,16.68V7.18L11,4.68V14.18ZM13,14.18V4.68L19,7.18V16.68L13,14.18Z"/>
+</vector>
