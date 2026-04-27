@@ -13,18 +13,27 @@ import '../../domain/reaction_type.dart';
 ///
 /// Idle chip uses `surfaceContainerHigh` background + onSurface icon. Active
 /// chip (in `myReactions`) uses primary fill + onPrimary icon so the toggle
-/// state reads at-a-glance. Tapping fires
-/// `feedRepository.toggleReaction` and reconciles the cached post with the
-/// server-canonical counts via [BookFeedNotifier.applyReactionResult].
+/// state reads at-a-glance.
+///
+/// If [onApplied] is provided (community feeds) the caller is responsible for
+/// reconciling its own post list; otherwise the bar falls back to updating the
+/// per-book [BookFeedNotifier] directly.
 class ReactionBar extends ConsumerStatefulWidget {
   const ReactionBar({
     super.key,
     required this.bookId,
     required this.post,
+    this.onApplied,
   });
 
   final String bookId;
   final Post post;
+  final void Function(
+    String postId,
+    ReactionType type,
+    ReactionToggleState toggleState,
+    Map<ReactionType, int> counts,
+  )? onApplied;
 
   @override
   ConsumerState<ReactionBar> createState() => _ReactionBarState();
@@ -60,14 +69,18 @@ class _ReactionBarState extends ConsumerState<ReactionBar> {
       final result = await ref
           .read(feedRepositoryProvider)
           .toggleReaction(postId: widget.post.id, reactionType: type);
-      ref
-          .read(bookFeedNotifierProvider(widget.bookId).notifier)
-          .applyReactionResult(
-            postId: widget.post.id,
-            reactionType: type,
-            toggleState: result.state,
-            counts: result.counts,
-          );
+      if (widget.onApplied != null) {
+        widget.onApplied!(widget.post.id, type, result.state, result.counts);
+      } else {
+        ref
+            .read(bookFeedNotifierProvider(widget.bookId).notifier)
+            .applyReactionResult(
+              postId: widget.post.id,
+              reactionType: type,
+              toggleState: result.state,
+              counts: result.counts,
+            );
+      }
       if (result.state == ReactionToggleState.added) {
         HapticFeedback.lightImpact();
       }

@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../feed/domain/post.dart';
+import '../../feed/domain/reaction_type.dart';
 import '../../feed/presentation/comments_sheet.dart';
 import '../../feed/presentation/widgets/post_card.dart';
 import '../../social/application/social_providers.dart';
@@ -74,15 +75,15 @@ class _FollowingFeedTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(followingFeedProvider);
+    final feedState = ref.watch(followingFeedProvider);
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
 
-    if (state.isLoading && state.posts.isEmpty) {
+    if (feedState.isLoading && feedState.posts.isEmpty) {
       return const Center(child: CircularProgressIndicator(strokeWidth: 2));
     }
 
-    if (state.error != null && state.posts.isEmpty) {
+    if (feedState.error != null && feedState.posts.isEmpty) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -99,7 +100,7 @@ class _FollowingFeedTab extends ConsumerWidget {
       );
     }
 
-    if (state.posts.isEmpty) {
+    if (feedState.posts.isEmpty) {
       return _EmptyFollowingState(
         onExploreTap: onExploreTap,
         spacing: spacing,
@@ -109,11 +110,19 @@ class _FollowingFeedTab extends ConsumerWidget {
     return RefreshIndicator(
       onRefresh: () => ref.read(followingFeedProvider.notifier).fetchFirst(),
       child: _PostFeedList(
-        posts: state.posts,
-        hasMore: state.hasMore,
-        isLoading: state.isLoading,
+        posts: feedState.posts,
+        hasMore: feedState.hasMore,
+        isLoading: feedState.isLoading,
         onLoadMore: () =>
             ref.read(followingFeedProvider.notifier).fetchMore(),
+        onReactionApplied: (postId, type, toggleState, counts) => ref
+            .read(followingFeedProvider.notifier)
+            .applyReactionResult(
+              postId: postId,
+              reactionType: type,
+              toggleState: toggleState,
+              counts: counts,
+            ),
       ),
     );
   }
@@ -169,7 +178,7 @@ class _EmptyFollowingState extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// 탐색 탭 — 포스트 피드 + 닉네임 검색
+// 탐색 탭 — SegmentedButton 정렬 + 닉네임 검색
 // ---------------------------------------------------------------------------
 
 class _ExploreTab extends ConsumerStatefulWidget {
@@ -179,23 +188,13 @@ class _ExploreTab extends ConsumerStatefulWidget {
   ConsumerState<_ExploreTab> createState() => _ExploreTabState();
 }
 
-class _ExploreTabState extends ConsumerState<_ExploreTab>
-    with SingleTickerProviderStateMixin {
-  late final TabController _sortController;
+class _ExploreTabState extends ConsumerState<_ExploreTab> {
   final TextEditingController _searchController = TextEditingController();
   String _query = '';
-
-  static const List<String> _sortOptions = <String>['latest', 'popular'];
-
-  @override
-  void initState() {
-    super.initState();
-    _sortController = TabController(length: _sortOptions.length, vsync: this);
-  }
+  String _sort = 'latest';
 
   @override
   void dispose() {
-    _sortController.dispose();
     _searchController.dispose();
     super.dispose();
   }
@@ -235,23 +234,24 @@ class _ExploreTabState extends ConsumerState<_ExploreTab>
         if (_query.isNotEmpty)
           Expanded(child: _SearchResults(query: _query))
         else ...<Widget>[
-          TabBar(
-            controller: _sortController,
-            isScrollable: false,
-            labelColor: theme.colorScheme.primary,
-            tabs: const <Tab>[
-              Tab(text: '최신'),
-              Tab(text: '인기'),
-            ],
-          ),
-          Expanded(
-            child: TabBarView(
-              controller: _sortController,
-              children: _sortOptions
-                  .map((sort) => _SortedFeedView(sort: sort))
-                  .toList(),
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: spacing.md,
+              vertical: spacing.xs,
+            ),
+            child: SegmentedButton<String>(
+              segments: const <ButtonSegment<String>>[
+                ButtonSegment(value: 'latest', label: Text('최신')),
+                ButtonSegment(value: 'popular', label: Text('인기')),
+              ],
+              selected: <String>{_sort},
+              onSelectionChanged: (s) => setState(() => _sort = s.first),
+              style: SegmentedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+              ),
             ),
           ),
+          Expanded(child: _SortedFeedView(sort: _sort)),
         ],
       ],
     );
@@ -265,15 +265,15 @@ class _SortedFeedView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(exploreFeedProvider(sort));
+    final feedState = ref.watch(exploreFeedProvider(sort));
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
 
-    if (state.isLoading && state.posts.isEmpty) {
+    if (feedState.isLoading && feedState.posts.isEmpty) {
       return const Center(child: CircularProgressIndicator(strokeWidth: 2));
     }
 
-    if (state.error != null && state.posts.isEmpty) {
+    if (feedState.error != null && feedState.posts.isEmpty) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -290,7 +290,7 @@ class _SortedFeedView extends ConsumerWidget {
       );
     }
 
-    if (state.posts.isEmpty) {
+    if (feedState.posts.isEmpty) {
       return Center(
         child: Text(
           '아직 게시물이 없어요',
@@ -305,11 +305,19 @@ class _SortedFeedView extends ConsumerWidget {
       onRefresh: () =>
           ref.read(exploreFeedProvider(sort).notifier).fetchFirst(),
       child: _PostFeedList(
-        posts: state.posts,
-        hasMore: state.hasMore,
-        isLoading: state.isLoading,
+        posts: feedState.posts,
+        hasMore: feedState.hasMore,
+        isLoading: feedState.isLoading,
         onLoadMore: () =>
             ref.read(exploreFeedProvider(sort).notifier).fetchMore(),
+        onReactionApplied: (postId, type, toggleState, counts) => ref
+            .read(exploreFeedProvider(sort).notifier)
+            .applyReactionResult(
+              postId: postId,
+              reactionType: type,
+              toggleState: toggleState,
+              counts: counts,
+            ),
       ),
     );
   }
@@ -325,12 +333,19 @@ class _PostFeedList extends StatelessWidget {
     required this.hasMore,
     required this.isLoading,
     required this.onLoadMore,
+    required this.onReactionApplied,
   });
 
   final List<Post> posts;
   final bool hasMore;
   final bool isLoading;
   final VoidCallback onLoadMore;
+  final void Function(
+    String postId,
+    ReactionType type,
+    ReactionToggleState toggleState,
+    Map<ReactionType, int> counts,
+  ) onReactionApplied;
 
   @override
   Widget build(BuildContext context) {
@@ -363,12 +378,14 @@ class _PostFeedList extends StatelessWidget {
           return PostCard(
             bookId: post.bookId,
             post: post,
+            onTapAuthor: (userId) => context.push(AppRoutes.userProfile(userId)),
             onTapComments: () => CommentsSheet.show(
               context,
               bookId: post.bookId,
               postId: post.id,
               initialCommentCount: post.commentCount,
             ),
+            onReactionApplied: onReactionApplied,
           );
         },
       ),
@@ -442,6 +459,8 @@ class _UserSearchTileState extends ConsumerState<_UserSearchTile> {
     try {
       if (next) {
         await repo.follow(widget.user.id);
+        // Refresh the following feed so the new followee's posts appear.
+        ref.read(followingFeedProvider.notifier).fetchFirst();
       } else {
         await repo.unfollow(widget.user.id);
       }

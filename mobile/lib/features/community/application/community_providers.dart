@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/network/dio_provider.dart';
 import '../../feed/domain/post.dart';
+import '../../feed/domain/reaction_type.dart';
 import '../../social/domain/user_summary.dart';
 import '../data/community_api.dart';
 import '../data/community_repository.dart';
@@ -103,6 +104,27 @@ class _FeedNotifier extends StateNotifier<FeedState> {
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e);
     }
+  }
+
+  void applyReactionResult({
+    required String postId,
+    required ReactionType reactionType,
+    required ReactionToggleState toggleState,
+    required Map<ReactionType, int> counts,
+  }) {
+    final List<Post> next = <Post>[
+      for (final Post p in state.posts)
+        if (p.id == postId)
+          p.copyWith(
+            reactions: counts,
+            myReactions: toggleState == ReactionToggleState.added
+                ? <ReactionType>{...p.myReactions, reactionType}
+                : (Set<ReactionType>.of(p.myReactions)..remove(reactionType)),
+          )
+        else
+          p,
+    ];
+    state = state.copyWith(posts: next);
   }
 }
 

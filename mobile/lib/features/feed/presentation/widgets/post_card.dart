@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../domain/post.dart';
+import '../../domain/reaction_type.dart';
 import 'image_grid.dart';
 import 'post_type_pill.dart';
 import 'reaction_bar.dart';
@@ -25,11 +26,23 @@ class PostCard extends StatelessWidget {
     required this.bookId,
     required this.post,
     required this.onTapComments,
+    this.onTapAuthor,
+    this.onReactionApplied,
   });
 
   final String bookId;
   final Post post;
   final VoidCallback onTapComments;
+  /// If provided, tapping the author avatar/nickname navigates to their profile.
+  final void Function(String userId)? onTapAuthor;
+  /// If provided, reaction toggles update the caller's list; otherwise falls
+  /// back to BookFeedNotifier (book feed context).
+  final void Function(
+    String postId,
+    ReactionType type,
+    ReactionToggleState toggleState,
+    Map<ReactionType, int> counts,
+  )? onReactionApplied;
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +66,7 @@ class PostCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          _Header(post: post),
+          _Header(post: post, onTapAuthor: onTapAuthor),
           SizedBox(height: spacing.sm),
           Text(
             post.content,
@@ -67,7 +80,7 @@ class PostCard extends StatelessWidget {
             ImageGrid(urls: post.imageUrls),
           ],
           SizedBox(height: spacing.sm),
-          ReactionBar(bookId: bookId, post: post),
+          ReactionBar(bookId: bookId, post: post, onApplied: onReactionApplied),
           SizedBox(height: spacing.xs),
           Align(
             alignment: Alignment.centerLeft,
@@ -93,15 +106,16 @@ class PostCard extends StatelessWidget {
 }
 
 class _Header extends StatelessWidget {
-  const _Header({required this.post});
+  const _Header({required this.post, this.onTapAuthor});
 
   final Post post;
+  final void Function(String userId)? onTapAuthor;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
-    return Row(
+    final row = Row(
       children: <Widget>[
         _Avatar(url: post.user.profileImageUrl, name: post.user.nickname),
         SizedBox(width: spacing.sm),
@@ -126,6 +140,12 @@ class _Header extends StatelessWidget {
         ),
         PostTypePill(type: post.postType, compact: true),
       ],
+    );
+    if (onTapAuthor == null) return row;
+    return GestureDetector(
+      onTap: () => onTapAuthor!(post.user.id),
+      behavior: HitTestBehavior.opaque,
+      child: row,
     );
   }
 }
