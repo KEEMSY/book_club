@@ -5,13 +5,14 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../feed/domain/post.dart';
+import '../../feed/presentation/comments_sheet.dart';
+import '../../feed/presentation/widgets/post_card.dart';
 import '../../social/application/social_providers.dart';
 import '../../social/domain/user_summary.dart';
+import '../application/community_providers.dart';
 
 /// Community landing screen — "팔로잉" and "탐색" tabs.
-///
-/// 팔로잉: empty state until M8 wires the real timeline.
-/// 탐색: live user search via GET /social/users/explore.
 class CommunityHomeScreen extends ConsumerStatefulWidget {
   const CommunityHomeScreen({super.key});
 
@@ -39,7 +40,6 @@ class _CommunityHomeScreenState extends ConsumerState<CommunityHomeScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final spacing = theme.extension<AppSpacing>()!;
 
     return Scaffold(
       appBar: AppBar(
@@ -48,17 +48,14 @@ class _CommunityHomeScreenState extends ConsumerState<CommunityHomeScreen>
           controller: _tabController,
           tabs: const <Tab>[
             Tab(text: '팔로잉'),
-            Tab(text: '독자 탐색'),
+            Tab(text: '탐색'),
           ],
         ),
       ),
       body: TabBarView(
         controller: _tabController,
         children: <Widget>[
-          _FollowingTab(
-            onExploreTap: () => _tabController.animateTo(1),
-            spacing: spacing,
-          ),
+          _FollowingFeedTab(onExploreTap: () => _tabController.animateTo(1)),
           const _ExploreTab(),
         ],
       ),
@@ -67,11 +64,66 @@ class _CommunityHomeScreenState extends ConsumerState<CommunityHomeScreen>
 }
 
 // ---------------------------------------------------------------------------
-// 팔로잉 탭 — M8에서 피드 연결 예정
+// 팔로잉 피드
 // ---------------------------------------------------------------------------
 
-class _FollowingTab extends StatelessWidget {
-  const _FollowingTab({required this.onExploreTap, required this.spacing});
+class _FollowingFeedTab extends ConsumerWidget {
+  const _FollowingFeedTab({required this.onExploreTap});
+
+  final VoidCallback onExploreTap;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(followingFeedProvider);
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+
+    if (state.isLoading && state.posts.isEmpty) {
+      return const Center(child: CircularProgressIndicator(strokeWidth: 2));
+    }
+
+    if (state.error != null && state.posts.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Text('피드를 불러오지 못했어요', style: theme.textTheme.bodyMedium),
+            SizedBox(height: spacing.sm),
+            FilledButton(
+              onPressed: () =>
+                  ref.read(followingFeedProvider.notifier).fetchFirst(),
+              child: const Text('다시 시도'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (state.posts.isEmpty) {
+      return _EmptyFollowingState(
+        onExploreTap: onExploreTap,
+        spacing: spacing,
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: () => ref.read(followingFeedProvider.notifier).fetchFirst(),
+      child: _PostFeedList(
+        posts: state.posts,
+        hasMore: state.hasMore,
+        isLoading: state.isLoading,
+        onLoadMore: () =>
+            ref.read(followingFeedProvider.notifier).fetchMore(),
+      ),
+    );
+  }
+}
+
+class _EmptyFollowingState extends StatelessWidget {
+  const _EmptyFollowingState({
+    required this.onExploreTap,
+    required this.spacing,
+  });
 
   final VoidCallback onExploreTap;
   final AppSpacing spacing;
@@ -117,7 +169,7 @@ class _FollowingTab extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// 탐색 탭 — 닉네임 검색 + 결과 리스트
+// 탐색 탭 — 포스트 피드 + 닉네임 검색
 // ---------------------------------------------------------------------------
 
 class _ExploreTab extends ConsumerStatefulWidget {
@@ -127,12 +179,23 @@ class _ExploreTab extends ConsumerStatefulWidget {
   ConsumerState<_ExploreTab> createState() => _ExploreTabState();
 }
 
-class _ExploreTabState extends ConsumerState<_ExploreTab> {
+class _ExploreTabState extends ConsumerState<_ExploreTab>
+    with SingleTickerProviderStateMixin {
+  late final TabController _sortController;
   final TextEditingController _searchController = TextEditingController();
   String _query = '';
 
+  static const List<String> _sortOptions = <String>['latest', 'popular'];
+
+  @override
+  void initState() {
+    super.initState();
+    _sortController = TabController(length: _sortOptions.length, vsync: this);
+  }
+
   @override
   void dispose() {
+    _sortController.dispose();
     _searchController.dispose();
     super.dispose();
   }
@@ -146,7 +209,10 @@ class _ExploreTabState extends ConsumerState<_ExploreTab> {
       children: <Widget>[
         Padding(
           padding: EdgeInsets.fromLTRB(
-            spacing.md, spacing.md, spacing.md, spacing.sm,
+            spacing.md,
+            spacing.md,
+            spacing.md,
+            spacing.sm,
           ),
           child: SearchBar(
             controller: _searchController,
@@ -166,45 +232,153 @@ class _ExploreTabState extends ConsumerState<_ExploreTab> {
             onChanged: (v) => setState(() => _query = v.trim()),
           ),
         ),
-        Expanded(
-          child: _query.isEmpty
-              ? _EmptySearchHint(spacing: spacing)
-              : _SearchResults(query: _query),
-        ),
+        if (_query.isNotEmpty)
+          Expanded(child: _SearchResults(query: _query))
+        else ...<Widget>[
+          TabBar(
+            controller: _sortController,
+            isScrollable: false,
+            labelColor: theme.colorScheme.primary,
+            tabs: const <Tab>[
+              Tab(text: '최신'),
+              Tab(text: '인기'),
+            ],
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: _sortController,
+              children: _sortOptions
+                  .map((sort) => _SortedFeedView(sort: sort))
+                  .toList(),
+            ),
+          ),
+        ],
       ],
     );
   }
 }
 
-class _EmptySearchHint extends StatelessWidget {
-  const _EmptySearchHint({required this.spacing});
+class _SortedFeedView extends ConsumerWidget {
+  const _SortedFeedView({required this.sort});
 
-  final AppSpacing spacing;
+  final String sort;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(exploreFeedProvider(sort));
     final theme = Theme.of(context);
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Icon(
-            CupertinoIcons.person_2,
-            size: 56,
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.25),
-          ),
-          SizedBox(height: spacing.md),
-          Text(
-            '닉네임으로 다른 독자를 찾아보세요',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+    final spacing = theme.extension<AppSpacing>()!;
+
+    if (state.isLoading && state.posts.isEmpty) {
+      return const Center(child: CircularProgressIndicator(strokeWidth: 2));
+    }
+
+    if (state.error != null && state.posts.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Text('피드를 불러오지 못했어요', style: theme.textTheme.bodyMedium),
+            SizedBox(height: spacing.sm),
+            FilledButton(
+              onPressed: () =>
+                  ref.read(exploreFeedProvider(sort).notifier).fetchFirst(),
+              child: const Text('다시 시도'),
             ),
+          ],
+        ),
+      );
+    }
+
+    if (state.posts.isEmpty) {
+      return Center(
+        child: Text(
+          '아직 게시물이 없어요',
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
           ),
-        ],
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: () =>
+          ref.read(exploreFeedProvider(sort).notifier).fetchFirst(),
+      child: _PostFeedList(
+        posts: state.posts,
+        hasMore: state.hasMore,
+        isLoading: state.isLoading,
+        onLoadMore: () =>
+            ref.read(exploreFeedProvider(sort).notifier).fetchMore(),
       ),
     );
   }
 }
+
+// ---------------------------------------------------------------------------
+// Shared post list with infinite scroll
+// ---------------------------------------------------------------------------
+
+class _PostFeedList extends StatelessWidget {
+  const _PostFeedList({
+    required this.posts,
+    required this.hasMore,
+    required this.isLoading,
+    required this.onLoadMore,
+  });
+
+  final List<Post> posts;
+  final bool hasMore;
+  final bool isLoading;
+  final VoidCallback onLoadMore;
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = Theme.of(context).extension<AppSpacing>()!;
+
+    return NotificationListener<ScrollNotification>(
+      onNotification: (n) {
+        if (n is ScrollEndNotification &&
+            n.metrics.extentAfter < 200 &&
+            hasMore &&
+            !isLoading) {
+          onLoadMore();
+        }
+        return false;
+      },
+      child: ListView.separated(
+        padding: EdgeInsets.all(spacing.md),
+        itemCount: posts.length + (isLoading ? 1 : 0),
+        separatorBuilder: (_, __) => SizedBox(height: spacing.md),
+        itemBuilder: (context, index) {
+          if (index == posts.length) {
+            return const Center(
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            );
+          }
+          final post = posts[index];
+          return PostCard(
+            bookId: post.bookId,
+            post: post,
+            onTapComments: () => CommentsSheet.show(
+              context,
+              bookId: post.bookId,
+              postId: post.id,
+              initialCommentCount: post.commentCount,
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 닉네임 검색 결과
+// ---------------------------------------------------------------------------
 
 class _SearchResults extends ConsumerWidget {
   const _SearchResults({required this.query});
@@ -235,10 +409,8 @@ class _SearchResults extends ConsumerWidget {
         }
         return ListView.builder(
           itemCount: page.items.length,
-          itemBuilder: (context, index) {
-            final UserSummary user = page.items[index];
-            return _UserSearchTile(user: user);
-          },
+          itemBuilder: (context, index) =>
+              _UserSearchTile(user: page.items[index]),
         );
       },
     );

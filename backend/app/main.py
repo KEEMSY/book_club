@@ -14,6 +14,7 @@ from app.core.config import get_settings
 from app.core.exceptions import register_exception_handlers
 from app.domains.auth.router import router as auth_router
 from app.domains.book.router import router as book_router
+from app.domains.community.router import router as community_router
 from app.domains.feed.events import CommentAdded, ReactionAdded
 from app.domains.feed.router import router as feed_router
 from app.domains.notification.providers import create_scheduler, get_notification_service
@@ -60,9 +61,13 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
 
+    # In dev, allow all localhost ports so `flutter run -d chrome` works
+    # regardless of which ephemeral port the dev server picks.
+    origin_regex = r"http://localhost(:\d+)?" if settings.env == "dev" else None
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_allow_origins,
+        allow_origin_regex=origin_regex,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -76,6 +81,7 @@ def create_app() -> FastAPI:
     app.include_router(feed_router)
     app.include_router(notification_router)
     app.include_router(social_router)
+    app.include_router(community_router)
 
     return app
 
