@@ -86,6 +86,23 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
     }
   }
 
+  VoidCallback? _buildNavigate(BuildContext context, NotificationDto dto) {
+    switch (dto.ntype) {
+      case 'follow_received':
+        final followerId = dto.data['follower_id'];
+        if (followerId != null) {
+          return () => context.push(AppRoutes.userProfile(followerId));
+        }
+      case 'badge_earned':
+        return () => context.push(AppRoutes.badges);
+      case 'grade_up':
+        return () => context.push(AppRoutes.grade);
+      case 'weekly_report':
+        return () => context.push(AppRoutes.weeklyReport);
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -160,6 +177,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                       onTap: () => ref
                           .read(notificationNotifierProvider.notifier)
                           .markRead(item.id),
+                      onNavigate: _buildNavigate(context, item),
                     );
                   },
                   childCount: state.items.length,
@@ -217,10 +235,11 @@ class _EmptyOrError extends StatelessWidget {
 /// Unread items use `primaryContainer` tinted surface so they stand out
 /// without shouting — Airbnb's "subtle highlight on a light canvas" principle.
 class _NotificationCard extends StatelessWidget {
-  const _NotificationCard({required this.dto, required this.onTap});
+  const _NotificationCard({required this.dto, required this.onTap, required this.onNavigate});
 
   final NotificationDto dto;
   final VoidCallback onTap;
+  final VoidCallback? onNavigate;
 
   @override
   Widget build(BuildContext context) {
@@ -229,7 +248,10 @@ class _NotificationCard extends StatelessWidget {
     final bool unread = dto.readAt == null;
 
     return InkWell(
-      onTap: onTap,
+      onTap: () {
+        onTap();
+        onNavigate?.call();
+      },
       child: Container(
         color: unread
             ? theme.colorScheme.primary.withValues(alpha: 0.06)
@@ -314,6 +336,8 @@ class _NtypeIcon extends StatelessWidget {
       'comment' => ('💬', const Color(0xFFE3F2FD)),
       'grade_up' => ('🌱', const Color(0xFFE8F5E9)),
       'weekly_report' => ('📊', const Color(0xFFF3E5F5)),
+      'follow_received' => ('👥', const Color(0xFFE3F2FD)),
+      'badge_earned' => ('🏅', const Color(0xFFFFF8E1)),
       _ => ('🔔', theme.colorScheme.surfaceContainer),
     };
 

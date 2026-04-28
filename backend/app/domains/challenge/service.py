@@ -19,11 +19,13 @@ from __future__ import annotations
 
 import contextlib
 import os
-from dataclasses import dataclass
+from collections.abc import Callable
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from uuid import UUID
 
 from app.core.exceptions import NotFoundError
+from app.domains.challenge.events import BadgeEarned
 from app.domains.challenge.models import ChallengeParticipant
 from app.domains.challenge.repository import ChallengeRepository
 from app.domains.challenge.schemas import (
@@ -65,6 +67,7 @@ class ChallengeService:
     """Orchestrates challenge lifecycle, progress tracking, and badge awards."""
 
     repo: ChallengeRepository
+    stage_event: Callable[[object], None] | None = field(default=None)
 
     async def list_challenges(
         self,
@@ -180,14 +183,10 @@ class ChallengeService:
         """
         existing = await self.repo.get_participant(challenge_id, user_id)
         if existing is None:
-            raise NotFoundError(
-                "not participating in this challenge", code="NOT_PARTICIPANT"
-            )
+            raise NotFoundError("not participating in this challenge", code="NOT_PARTICIPANT")
         await self.repo.leave(challenge_id, user_id)
 
-    async def leaderboard(
-        self, challenge_id: UUID, limit: int
-    ) -> list[LeaderboardEntry]:
+    async def leaderboard(self, challenge_id: UUID, limit: int) -> list[LeaderboardEntry]:
         """Return ranked participant list for a challenge."""
         ch = await self.repo.get_challenge(challenge_id)
         if ch is None:
@@ -258,6 +257,27 @@ class ChallengeService:
             )
             for b, ub in rows
         ]
+
+    async def award_badge(self, user_id: UUID, badge_id: UUID) -> None:
+        """Award a badge to the user if they do not already own it.
+
+        Stages a BadgeEarned event so the notification service can push a
+        congratulatory message after the transaction commits.
+        Raises:
+            NotFoundError: badge does not exist.
+        """
+        badges = await self.repo.list_badges(None)
+        badge = next((b for b in badges if b.id == badge_id), None)
+        if badge is None:
+            raise NotFoundError("badge not found", code="BADGE_NOT_FOUND")
+
+        if await self.repo.has_badge(user_id, badge_id):
+            return
+
+        await self.repo.award_badge(user_id, badge_id)
+
+        if self.stage_event is not None:
+            self.stage_event(BadgeEarned(user_id=user_id, badge_id=badge_id, badge_name=badge.name))
 
     async def evaluate_progress(self, user_id: UUID, event_type: str) -> None:
         """Placeholder — will be connected to reading events in a future milestone."""

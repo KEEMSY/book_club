@@ -40,6 +40,7 @@ class NotificationType(enum.StrEnum):
     GRADE_UP = "grade_up"
     WEEKLY_REPORT = "weekly_report"
     FOLLOW_RECEIVED = "follow_received"
+    BADGE_EARNED = "badge_earned"
 
 
 class Notification(Base):

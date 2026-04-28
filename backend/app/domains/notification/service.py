@@ -176,6 +176,33 @@ class NotificationService:
                 {"follower_id": str(event.follower_id)},
             )
 
+    async def on_badge_earned(self, event: object) -> None:
+        """Create an in-app notification when a user earns a badge."""
+        from app.domains.challenge.events import BadgeEarned
+
+        if not isinstance(event, BadgeEarned):
+            return
+
+        async with self.sessionmaker() as session:
+            notif = await self._save_notification(
+                session,
+                user_id=event.user_id,
+                ntype=NotificationType.BADGE_EARNED,
+                title="새 배지를 획득했어요!",
+                body=f"'{event.badge_name}' 배지를 획득했습니다. 축하해요!",
+                data={"badge_id": str(event.badge_id), "badge_name": event.badge_name},
+            )
+            tokens = await self.device_tokens.get_active_tokens(event.user_id)
+            await session.commit()
+
+        if tokens:
+            await self.push.send_to_tokens(
+                tokens,
+                notif.title,
+                notif.body,
+                {"badge_id": str(event.badge_id)},
+            )
+
     async def on_grade_up(self, event: object) -> None:
         """Push a grade-up notification when the user crosses a grade or tier boundary.
 

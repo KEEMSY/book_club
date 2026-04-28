@@ -13,6 +13,7 @@ from uuid import UUID, uuid4
 
 import pytest
 from app.core.exceptions import NotFoundError
+from app.domains.challenge.events import BadgeEarned
 from app.domains.challenge.service import (
     AlreadyJoinedError,
     ChallengeEndedError,
@@ -205,8 +206,13 @@ class FakeChallengeRepository:
 # ---------------------------------------------------------------------------
 
 
-def _svc(repo: FakeChallengeRepository) -> ChallengeService:
-    return ChallengeService(repo=repo)
+def _svc(
+    repo: FakeChallengeRepository,
+    staged: list[object] | None = None,
+) -> ChallengeService:
+    if staged is None:
+        return ChallengeService(repo=repo)
+    return ChallengeService(repo=repo, stage_event=staged.append)
 
 
 # ---------------------------------------------------------------------------
@@ -352,3 +358,50 @@ async def test_leaderboard_ordering() -> None:
 
     for i, entry in enumerate(entries):
         assert entry.rank == i + 1
+
+
+@pytest.mark.asyncio
+async def test_award_badge_stages_event() -> None:
+    """award_badge inserts a UserBadge row and stages a BadgeEarned event."""
+    repo = FakeChallengeRepository()
+    badge = _FakeBadge(name="독서 마스터")
+    repo.add_badge(badge)
+    staged: list[object] = []
+    svc = _svc(repo, staged=staged)
+
+    user_id = uuid4()
+    await svc.award_badge(user_id, badge.id)
+
+    assert await repo.has_badge(user_id, badge.id)
+    assert len(staged) == 1
+    event = staged[0]
+    assert isinstance(event, BadgeEarned)
+    assert event.user_id == user_id
+    assert event.badge_id == badge.id
+    assert event.badge_name == "독서 마스터"
+
+
+@pytest.mark.asyncio
+async def test_award_badge_idempotent() -> None:
+    """award_badge is a no-op (and does not stage events) when already earned."""
+    repo = FakeChallengeRepository()
+    badge = _FakeBadge()
+    repo.add_badge(badge)
+    staged: list[object] = []
+    svc = _svc(repo, staged=staged)
+
+    user_id = uuid4()
+    await svc.award_badge(user_id, badge.id)
+    await svc.award_badge(user_id, badge.id)
+
+    assert len(staged) == 1  # only one event despite two calls
+
+
+@pytest.mark.asyncio
+async def test_award_badge_unknown_badge_raises() -> None:
+    """award_badge raises NotFoundError for a non-existent badge id."""
+    repo = FakeChallengeRepository()
+    svc = _svc(repo)
+
+    with pytest.raises(NotFoundError):
+        await svc.award_badge(uuid4(), uuid4())

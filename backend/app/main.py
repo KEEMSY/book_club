@@ -14,6 +14,7 @@ from app.core.config import get_settings
 from app.core.exceptions import register_exception_handlers
 from app.domains.auth.router import router as auth_router
 from app.domains.book.router import router as book_router
+from app.domains.challenge.events import BadgeEarned
 from app.domains.challenge.router import router as challenge_router
 from app.domains.community.router import router as community_router
 from app.domains.feed.events import CommentAdded, ReactionAdded
@@ -37,6 +38,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     bus.subscribe(CommentAdded, notification_svc.on_comment_added)
     bus.subscribe(UserGradeRecomputed, notification_svc.on_grade_up)
     bus.subscribe(FollowReceived, notification_svc.on_follow_received)
+    bus.subscribe(BadgeEarned, notification_svc.on_badge_earned)
 
     scheduler = create_scheduler(notification_svc)
     scheduler.start()
