@@ -12,6 +12,7 @@ part 'community_api.g.dart';
 ///   * `GET /community/feed?cursor=&limit=`              → following timeline
 ///   * `GET /community/explore?sort=&cursor=&limit=`     → discover feed
 ///   * `GET /community/users/{userId}/profile`           → full user profile
+///   * `GET /community/users/{userId}/posts?cursor=&limit=` → user's posts
 @RestApi()
 abstract class CommunityApi {
   factory CommunityApi(Dio dio, {String baseUrl}) = _CommunityApi;
@@ -31,4 +32,11 @@ abstract class CommunityApi {
 
   @GET('/community/users/{userId}/profile')
   Future<UserProfile> getUserProfile(@Path('userId') String userId);
+
+  @GET('/community/users/{userId}/posts')
+  Future<PostPageDto> getUserPosts(
+    @Path('userId') String userId, {
+    @Query('cursor') String? cursor,
+    @Query('limit') int limit = 20,
+  });
 }

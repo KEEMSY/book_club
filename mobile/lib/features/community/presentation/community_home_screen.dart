@@ -153,13 +153,13 @@ class _EmptyFollowingState extends StatelessWidget {
             ),
             SizedBox(height: spacing.md),
             Text(
-              '아직 팔로우한 독자가 없어요',
+              '아직 게시물이 없어요',
               style: theme.textTheme.titleMedium,
               textAlign: TextAlign.center,
             ),
             SizedBox(height: spacing.sm),
             Text(
-              '관심 있는 독자를 팔로우하면\n이곳에서 피드를 볼 수 있어요',
+              '관심 있는 독자를 팔로우하거나\n팔로우한 독자가 글을 올리면 여기에 나타나요',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               ),

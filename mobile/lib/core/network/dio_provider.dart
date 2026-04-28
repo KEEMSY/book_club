@@ -22,12 +22,14 @@ String resolveApiBaseUrl() {
     return fromDefine;
   }
   if (kIsWeb) {
+    // Browser treats localhost and 127.0.0.1 as different origins; use
+    // localhost so the backend CORS regex (http://localhost(:\d+)?) matches.
     return 'http://localhost:8000';
   }
   if (Platform.isAndroid) {
     return 'http://10.0.2.2:8000';
   }
-  return 'http://localhost:8000';
+  return 'http://127.0.0.1:8000';
 }
 
 /// Short human-readable label of the current API target. Handy for debug UI.

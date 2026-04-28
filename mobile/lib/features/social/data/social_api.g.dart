@@ -230,9 +230,9 @@ class _SocialApi implements SocialApi {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
       r'q': q,
+      r'cursor': cursor,
       r'limit': limit,
     };
-    if (cursor != null) queryParameters[r'cursor'] = cursor;
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;

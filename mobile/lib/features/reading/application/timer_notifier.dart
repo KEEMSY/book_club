@@ -126,6 +126,30 @@ class TimerNotifier extends StateNotifier<TimerState> {
     }
   }
 
+  /// Fetches the active session from the server and restores the timer state.
+  ///
+  /// Called by the "이어서 보기" SnackBar action when local secure storage has
+  /// no snapshot (e.g. app reinstall or cross-device session). Falls back
+  /// gracefully: if no server session exists it resets to idle.
+  Future<void> restoreFromServer() async {
+    try {
+      final session = await _repository.getActiveSession();
+      if (session == null) {
+        state = const TimerState.idle();
+        return;
+      }
+      state = TimerState.running(
+        sessionId: session.id,
+        userBookId: session.userBookId,
+        startedAt: session.startedAt,
+        pausedMs: 0,
+      );
+      await _persist();
+    } catch (_) {
+      state = const TimerState.idle();
+    }
+  }
+
   /// Kicks off a new timer session. Surfaces repository errors via
   /// [TimerFailure] so the screen can route `ACTIVE_SESSION_EXISTS` to a
   /// recovery action.

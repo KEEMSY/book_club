@@ -17,6 +17,7 @@ import '../application/grade_state.dart';
 import '../application/heatmap_notifier.dart';
 import '../application/heatmap_state.dart';
 import '../application/reading_providers.dart';
+import '../application/timer_notifier.dart';
 import '../domain/dashboard_prefs.dart';
 import '../domain/goal_period.dart';
 import '../domain/grade_summary.dart';
@@ -55,11 +56,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       ref.read(gradeNotifierProvider.notifier).load();
       ref.read(heatmapNotifierProvider(DateTime.now().year).notifier).load();
       ref.read(goalNotifierProvider.notifier).load();
-      // Warm the "읽는 중" library tab so the start-reading CTA has a book
-      // context to jump straight into.
-      ref
-          .read(libraryNotifierProvider.notifier)
-          .ensureLoaded(BookStatus.reading);
+      ref.read(libraryNotifierProvider.notifier).ensureLoaded(BookStatus.reading);
+      // Restore any active session that survived an app restart.
+      ref.read(timerNotifierProvider.notifier).restore();
     });
   }
 

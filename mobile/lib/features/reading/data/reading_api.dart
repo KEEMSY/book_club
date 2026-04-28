@@ -50,4 +50,7 @@ abstract class ReadingApi {
 
   @GET('/reading/goals/current')
   Future<List<GoalProgressDto>> getCurrentGoals();
+
+  @GET('/reading/sessions/active')
+  Future<ReadingSessionDto?> getActiveSession();
 }

@@ -130,6 +130,9 @@ class ReadingService:
             device=device,
         )
 
+    async def get_active_session(self, user_id: UUID) -> ReadingSession | None:
+        return await self.sessions.get_active_session(user_id)
+
     async def end_session(
         self,
         *,

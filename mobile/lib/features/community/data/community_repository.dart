@@ -60,6 +60,19 @@ class CommunityRepository {
   Future<UserProfile> getUserProfile(String userId) =>
       _call(() => _api.getUserProfile(userId));
 
+  Future<PostPage> getUserPosts(
+    String userId, {
+    String? cursor,
+    int limit = 20,
+  }) =>
+      _call(() async {
+        final dto = await _api.getUserPosts(userId, cursor: cursor, limit: limit);
+        return PostPage(
+          items: dto.items.map((d) => d.toDomain()).toList(),
+          nextCursor: dto.nextCursor,
+        );
+      });
+
   Future<T> _call<T>(Future<T> Function() fn) async {
     try {
       return await fn();

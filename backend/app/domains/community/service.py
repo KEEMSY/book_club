@@ -22,7 +22,7 @@ from app.domains.feed.service import FeedPage
 
 _FEED_PAGE_MAX = 50
 _FEED_PAGE_MIN = 1
-_POPULAR_DAYS = 7
+_POPULAR_DAYS = 30
 
 
 def _parse_cursor(cursor: str | None) -> datetime | None:
@@ -85,6 +85,20 @@ class CommunityService:
             posts = await self.community_repo.get_explore_feed_latest(
                 viewer_id, cursor=_parse_cursor(cursor), limit=clamped
             )
+        return await self._build_page(posts, viewer_id=viewer_id, limit=clamped)
+
+    async def get_user_posts(
+        self,
+        *,
+        user_id: UUID,
+        viewer_id: UUID,
+        cursor: str | None,
+        limit: int,
+    ) -> FeedPage:
+        clamped = max(_FEED_PAGE_MIN, min(limit, _FEED_PAGE_MAX))
+        posts = await self.community_repo.get_user_posts(
+            user_id, cursor=_parse_cursor(cursor), limit=clamped
+        )
         return await self._build_page(posts, viewer_id=viewer_id, limit=clamped)
 
     async def get_user_profile(

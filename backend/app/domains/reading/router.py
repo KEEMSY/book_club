@@ -52,6 +52,15 @@ async def start_session(
     return ReadingSessionPublic.from_row(row)
 
 
+@router.get("/sessions/active", response_model=ReadingSessionPublic | None)
+async def get_active_session(
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ReadingService, Depends(get_reading_service)],
+) -> ReadingSessionPublic | None:
+    row = await service.get_active_session(UUID(user_id))
+    return ReadingSessionPublic.from_row(row) if row else None
+
+
 @router.post("/sessions/{session_id}/end", response_model=SessionCompletionResponse)
 async def end_session(
     session_id: UUID,

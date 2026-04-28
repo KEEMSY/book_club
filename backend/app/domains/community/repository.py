@@ -112,6 +112,29 @@ class CommunityRepository:
         result = await self._session.execute(stmt)
         return [row.Post for row in result.all()]
 
+    async def get_user_posts(
+        self,
+        user_id: UUID,
+        *,
+        cursor: datetime | None,
+        limit: int,
+    ) -> list[Post]:
+        """Posts authored by `user_id`, newest-first."""
+        conditions: list[ColumnElement[bool]] = [
+            Post.user_id == user_id,
+            Post.deleted_at.is_(None),
+        ]
+        if cursor is not None:
+            conditions.append(Post.created_at < cursor)
+        stmt = (
+            select(Post)
+            .where(and_(*conditions))
+            .order_by(Post.created_at.desc(), Post.id.desc())
+            .limit(limit)
+        )
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())
+
     async def follow_counts(self, user_id: UUID) -> tuple[int, int]:
         """Returns (follower_count, following_count) for `user_id`."""
         follower_stmt = select(func.count(Follow.id)).where(Follow.followee_id == user_id)

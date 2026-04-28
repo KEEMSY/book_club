@@ -49,6 +49,10 @@ class FakeReadingRepository implements ReadingRepository {
   Object? gradeError;
   int gradeCalls = 0;
 
+  // -- active session --
+  ReadingSession? activeSessionResult;
+  Object? activeSessionError;
+
   // -- goals --
   List<GoalProgress> goalsResult = <GoalProgress>[];
   ReadingGoal? createGoalResult;
@@ -133,6 +137,12 @@ class FakeReadingRepository implements ReadingRepository {
     currentGoalsCalls++;
     if (goalError != null) throw goalError!;
     return goalsResult;
+  }
+
+  @override
+  Future<ReadingSession?> getActiveSession() async {
+    if (activeSessionError != null) throw activeSessionError!;
+    return activeSessionResult;
   }
 }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../application/grade_notifier.dart';
 import '../application/grade_state.dart';
@@ -138,23 +139,34 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
   void _showFailure(TimerFailure fail) {
     final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
     messenger.clearSnackBars();
+    // Tracks whether the user tapped "이어서 보기" so the auto-clear below
+    // does not clobber the in-flight restoreFromServer() call.
+    var restoreTriggered = false;
     messenger.showSnackBar(
       SnackBar(
         content: Text(_friendlyFailure(fail)),
         action: fail.code == 'ACTIVE_SESSION_EXISTS'
             ? SnackBarAction(
                 label: '이어서 보기',
-                onPressed: () {
-                  ref.read(timerNotifierProvider.notifier).clearFailure();
+                onPressed: () async {
+                  restoreTriggered = true;
+                  await ref
+                      .read(timerNotifierProvider.notifier)
+                      .restoreFromServer();
+                  if (!mounted) return;
+                  final timerState = ref.read(timerNotifierProvider);
+                  if (timerState is TimerRunning) {
+                    context.pushReplacement(
+                        AppRoutes.timer(timerState.userBookId),);
+                  }
                 },
               )
             : null,
         duration: const Duration(seconds: 4),
       ),
     );
-    // Clear the failure after showing so the UI returns to Idle state.
     Future<void>.delayed(const Duration(milliseconds: 400)).then((_) {
-      if (!mounted) return;
+      if (!mounted || restoreTriggered) return;
       ref.read(timerNotifierProvider.notifier).clearFailure();
     });
   }

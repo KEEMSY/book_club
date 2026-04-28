@@ -4,56 +4,121 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/reading/application/reading_providers.dart';
+import 'app_mode_provider.dart';
 
-/// Bottom-nav shell for the four M7 destinations (홈 · 검색 · 서재 · 커뮤니티).
+/// Root shell that renders the two-mode bottom chrome.
 ///
-/// Selected-state tint follows `gradePrimaryProvider` so grade-up events
-/// shift the active-tab icon/label in lockstep with the rest of the
-/// reading surfaces (timer ring, jan-dee, grade badge).
-class AppShell extends ConsumerWidget {
-  const AppShell({
-    super.key,
-    required this.navigationShell,
-  });
+/// 개인 모드:
+///   • NavigationBar-style 3-tab row  (홈 · 검색 · 서재)
+///   • Full-width SegmentedButton mode toggle
+///
+/// 커뮤니티 모드:
+///   • 3-tab row is gone — community screen's own TabBar drives sub-nav
+///   • Full-width SegmentedButton mode toggle (still pinned at the bottom)
+///
+/// The complete replacement of the bottom chrome is what gives the "theme
+/// switching" feel the user asked for.
+class AppShell extends ConsumerStatefulWidget {
+  const AppShell({super.key, required this.navigationShell});
 
   final StatefulNavigationShell navigationShell;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AppShell> createState() => _AppShellState();
+}
+
+class _AppShellState extends ConsumerState<AppShell> {
+  int _lastPersonalIndex = 0;
+
+  void _switchToCommunity() {
+    _lastPersonalIndex = widget.navigationShell.currentIndex.clamp(0, 2);
+    ref.read(appModeProvider.notifier).state = AppMode.community;
+    widget.navigationShell.goBranch(3, initialLocation: false);
+  }
+
+  void _switchToPersonal() {
+    ref.read(appModeProvider.notifier).state = AppMode.personal;
+    widget.navigationShell.goBranch(_lastPersonalIndex, initialLocation: false);
+  }
+
+  void _onTabSelected(int index) {
+    widget.navigationShell.goBranch(
+      index,
+      initialLocation: index == widget.navigationShell.currentIndex,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final Color accent = ref.watch(gradePrimaryProvider);
+    final AppMode mode = ref.watch(appModeProvider);
+    final int tabIndex = widget.navigationShell.currentIndex.clamp(0, 2);
+
     return Scaffold(
-      body: navigationShell,
-      bottomNavigationBar: NavigationBar(
-        backgroundColor: theme.colorScheme.surface,
-        surfaceTintColor: Colors.transparent,
-        indicatorColor: accent.withValues(alpha: 0.12),
-        selectedIndex: navigationShell.currentIndex,
-        onDestinationSelected: (int index) => navigationShell.goBranch(
-          index,
-          initialLocation: index == navigationShell.currentIndex,
-        ),
-        destinations: <NavigationDestination>[
-          NavigationDestination(
-            icon: const Icon(CupertinoIcons.house),
-            selectedIcon: Icon(CupertinoIcons.house_fill, color: accent),
-            label: '홈',
+      body: widget.navigationShell,
+      bottomNavigationBar: _AppBottomBar(
+        mode: mode,
+        tabIndex: tabIndex,
+        accent: accent,
+        theme: theme,
+        onTabSelected: _onTabSelected,
+        onModeSwitch: (m) =>
+            m == AppMode.community ? _switchToCommunity() : _switchToPersonal(),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Bottom bar container
+// ---------------------------------------------------------------------------
+
+class _AppBottomBar extends StatelessWidget {
+  const _AppBottomBar({
+    required this.mode,
+    required this.tabIndex,
+    required this.accent,
+    required this.theme,
+    required this.onTabSelected,
+    required this.onModeSwitch,
+  });
+
+  final AppMode mode;
+  final int tabIndex;
+  final Color accent;
+  final ThemeData theme;
+  final void Function(int) onTabSelected;
+  final void Function(AppMode) onModeSwitch;
+
+  @override
+  Widget build(BuildContext context) {
+    final double bottomPad = MediaQuery.of(context).padding.bottom;
+
+    return Material(
+      color: theme.colorScheme.surface,
+      elevation: 0,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Divider(
+            height: 1,
+            thickness: 0.5,
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
           ),
-          NavigationDestination(
-            icon: const Icon(CupertinoIcons.search),
-            selectedIcon: Icon(CupertinoIcons.search, color: accent),
-            label: '검색',
-          ),
-          NavigationDestination(
-            icon: const Icon(CupertinoIcons.book),
-            selectedIcon: Icon(CupertinoIcons.book_fill, color: accent),
-            label: '서재',
-          ),
-          NavigationDestination(
-            icon: const Icon(CupertinoIcons.person_2),
-            selectedIcon:
-                Icon(CupertinoIcons.person_2_fill, color: accent),
-            label: '커뮤니티',
+          if (mode == AppMode.personal)
+            _PersonalNavRow(
+              tabIndex: tabIndex,
+              accent: accent,
+              theme: theme,
+              onTabSelected: onTabSelected,
+            ),
+          _ModeToggle(
+            mode: mode,
+            accent: accent,
+            theme: theme,
+            bottomPad: bottomPad,
+            onModeSwitch: onModeSwitch,
           ),
         ],
       ),
@@ -61,14 +126,181 @@ class AppShell extends ConsumerWidget {
   }
 }
 
-/// Exposed for tests that need to simulate the bottom-nav host without
-/// spinning up the full go_router graph.
+// ---------------------------------------------------------------------------
+// Personal mode: 3-tab row
+// ---------------------------------------------------------------------------
+
+class _PersonalNavRow extends StatelessWidget {
+  const _PersonalNavRow({
+    required this.tabIndex,
+    required this.accent,
+    required this.theme,
+    required this.onTabSelected,
+  });
+
+  final int tabIndex;
+  final Color accent;
+  final ThemeData theme;
+  final void Function(int) onTabSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: <Widget>[
+        _NavItem(
+          icon: CupertinoIcons.house,
+          selectedIcon: CupertinoIcons.house_fill,
+          label: '홈',
+          selected: tabIndex == 0,
+          accent: accent,
+          theme: theme,
+          onTap: () => onTabSelected(0),
+        ),
+        _NavItem(
+          icon: CupertinoIcons.search,
+          selectedIcon: CupertinoIcons.search,
+          label: '검색',
+          selected: tabIndex == 1,
+          accent: accent,
+          theme: theme,
+          onTap: () => onTabSelected(1),
+        ),
+        _NavItem(
+          icon: CupertinoIcons.book,
+          selectedIcon: CupertinoIcons.book_fill,
+          label: '서재',
+          selected: tabIndex == 2,
+          accent: accent,
+          theme: theme,
+          onTap: () => onTabSelected(2),
+        ),
+      ],
+    );
+  }
+}
+
+class _NavItem extends StatelessWidget {
+  const _NavItem({
+    required this.icon,
+    required this.selectedIcon,
+    required this.label,
+    required this.selected,
+    required this.accent,
+    required this.theme,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final IconData selectedIcon;
+  final String label;
+  final bool selected;
+  final Color accent;
+  final ThemeData theme;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color fg = selected
+        ? accent
+        : theme.colorScheme.onSurface.withValues(alpha: 0.6);
+
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: 64,
+                height: 32,
+                decoration: selected
+                    ? BoxDecoration(
+                        color: accent.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(16),
+                      )
+                    : null,
+                child: Icon(selected ? selectedIcon : icon, color: fg, size: 22),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                label,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: fg,
+                  fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Mode toggle — full-width SegmentedButton, always visible
+// ---------------------------------------------------------------------------
+
+class _ModeToggle extends StatelessWidget {
+  const _ModeToggle({
+    required this.mode,
+    required this.accent,
+    required this.theme,
+    required this.bottomPad,
+    required this.onModeSwitch,
+  });
+
+  final AppMode mode;
+  final Color accent;
+  final ThemeData theme;
+  final double bottomPad;
+  final void Function(AppMode) onModeSwitch;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(12, 8, 12, 10 + bottomPad),
+      child: SegmentedButton<AppMode>(
+        expandedInsets: EdgeInsets.zero,
+        showSelectedIcon: false,
+        selected: {mode},
+        onSelectionChanged: (Set<AppMode> s) => onModeSwitch(s.first),
+        style: SegmentedButton.styleFrom(
+          backgroundColor: theme.colorScheme.surfaceContainerHighest,
+          foregroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.55),
+          selectedBackgroundColor: accent.withValues(alpha: 0.15),
+          selectedForegroundColor: accent,
+          side: BorderSide.none,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          textStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+        ),
+        segments: const <ButtonSegment<AppMode>>[
+          ButtonSegment<AppMode>(
+            value: AppMode.personal,
+            icon: Icon(CupertinoIcons.person, size: 15),
+            label: Text('개인'),
+          ),
+          ButtonSegment<AppMode>(
+            value: AppMode.community,
+            icon: Icon(CupertinoIcons.person_2, size: 15),
+            label: Text('커뮤니티'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Exposed for tests.
 @visibleForTesting
 class AppShellForTesting extends StatelessWidget {
   const AppShellForTesting({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
-  }
+  Widget build(BuildContext context) => const Placeholder();
 }

@@ -3,9 +3,10 @@
 Prefix: /community. All endpoints require a valid access token.
 
 Endpoints:
-  GET /community/feed               — following timeline (cursor-paged)
-  GET /community/explore            — discover feed (sort=latest|popular)
-  GET /community/users/{id}/profile — full user profile with follow counts
+  GET /community/feed                    — following timeline (cursor-paged)
+  GET /community/explore                 — discover feed (sort=latest|popular)
+  GET /community/users/{id}/profile      — full user profile with follow counts
+  GET /community/users/{id}/posts        — posts authored by a user (cursor-paged)
 """
 
 from __future__ import annotations
@@ -70,6 +71,30 @@ async def get_explore_feed(
 ) -> FeedResponse:
     page = await service.get_explore_feed(
         viewer_id=UUID(user_id), sort=sort, cursor=cursor, limit=limit
+    )
+    author_ids = [item.post.user_id for item in page.items]
+    authors = await user_query.get_authors(author_ids) if author_ids else {}
+    items = [
+        PostPublic.from_feed_item(
+            item,
+            author=_author_from_view(authors.get(item.post.user_id), item.post.user_id),
+        )
+        for item in page.items
+    ]
+    return FeedResponse(items=items, next_cursor=page.next_cursor)
+
+
+@router.get("/users/{user_id}/posts", response_model=FeedResponse)
+async def get_user_posts(
+    user_id: UUID,
+    viewer_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[CommunityService, Depends(get_community_service)],
+    user_query: Annotated[FeedUserQueryPort, Depends(get_feed_user_query)],
+    cursor: Annotated[str | None, Query()] = None,
+    limit: Annotated[int, Query(ge=1, le=50)] = 20,
+) -> FeedResponse:
+    page = await service.get_user_posts(
+        user_id=user_id, viewer_id=UUID(viewer_id), cursor=cursor, limit=limit
     )
     author_ids = [item.post.user_id for item in page.items]
     authors = await user_query.get_authors(author_ids) if author_ids else {}

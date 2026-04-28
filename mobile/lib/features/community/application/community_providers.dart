@@ -136,6 +136,17 @@ final followingFeedProvider =
   );
 });
 
+/// User posts feed — key is the target user's ID string.
+final userPostsFeedProvider =
+    StateNotifierProvider.autoDispose.family<_FeedNotifier, FeedState, String>(
+  (ref, userId) {
+    final repo = ref.watch(communityRepositoryProvider);
+    return _FeedNotifier(
+      ({String? cursor}) => repo.getUserPosts(userId, cursor: cursor),
+    );
+  },
+);
+
 /// Explore feed — key is sort string ("latest" | "popular").
 final exploreFeedProvider =
     StateNotifierProvider.autoDispose.family<_FeedNotifier, FeedState, String>(

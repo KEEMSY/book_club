@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../feed/presentation/comments_sheet.dart';
+import '../../feed/presentation/widgets/post_card.dart';
 import '../../social/application/social_providers.dart';
 import '../../social/data/social_repository.dart';
 import '../../social/domain/user_summary.dart';
@@ -135,10 +137,7 @@ class _ProfileContent extends ConsumerWidget {
               color: theme.colorScheme.outlineVariant,
             ),
           ),
-          // Posts section — M8 will replace this placeholder.
-          SliverFillRemaining(
-            child: _PostsPlaceholder(isBlocked: false, spacing: spacing),
-          ),
+          _UserPostsSliver(userId: userId),
         ],
       ),
     );
@@ -375,57 +374,120 @@ class _ThreeDotMenu extends ConsumerWidget {
 
 enum _MenuAction { report, block }
 
-class _PostsPlaceholder extends StatelessWidget {
-  const _PostsPlaceholder({
-    required this.isBlocked,
-    required this.spacing,
-  });
+class _UserPostsSliver extends ConsumerStatefulWidget {
+  const _UserPostsSliver({required this.userId});
 
-  final bool isBlocked;
-  final AppSpacing spacing;
+  final String userId;
 
   @override
+  ConsumerState<_UserPostsSliver> createState() => _UserPostsSliverState();
+}
+
+class _UserPostsSliverState extends ConsumerState<_UserPostsSliver> {
+  @override
   Widget build(BuildContext context) {
+    final feedState = ref.watch(userPostsFeedProvider(widget.userId));
     final theme = Theme.of(context);
-    if (isBlocked) {
-      return Center(
-        child: Padding(
-          padding: EdgeInsets.all(spacing.lg),
-          child: Text(
-            '이 사용자의 콘텐츠를 볼 수 없습니다',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-            ),
-            textAlign: TextAlign.center,
+    final spacing = theme.extension<AppSpacing>()!;
+
+    if (feedState.isLoading && feedState.posts.isEmpty) {
+      return const SliverFillRemaining(
+        child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+      );
+    }
+
+    if (feedState.error != null && feedState.posts.isEmpty) {
+      return SliverFillRemaining(
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('게시글을 불러오지 못했어요', style: theme.textTheme.bodyMedium),
+              SizedBox(height: spacing.sm),
+              FilledButton(
+                onPressed: () => ref
+                    .read(userPostsFeedProvider(widget.userId).notifier)
+                    .fetchFirst(),
+                child: const Text('다시 시도'),
+              ),
+            ],
           ),
         ),
       );
     }
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.all(spacing.lg),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              CupertinoIcons.book,
-              size: 48,
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+
+    if (feedState.posts.isEmpty) {
+      return SliverFillRemaining(
+        child: Center(
+          child: Padding(
+            padding: EdgeInsets.all(spacing.lg),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  CupertinoIcons.book,
+                  size: 48,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+                ),
+                SizedBox(height: spacing.md),
+                Text(
+                  '아직 게시글이 없어요',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: spacing.md),
-            Text(
-              '게시글',
-              style: theme.textTheme.titleMedium,
-            ),
-            SizedBox(height: spacing.sm),
-            Text(
-              'M8에서 게시글 목록이 표시됩니다',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+        ),
+      );
+    }
+
+    return SliverPadding(
+      padding: EdgeInsets.all(spacing.md),
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            if (index == feedState.posts.length) {
+              if (feedState.isLoading) {
+                return const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                );
+              }
+              return null;
+            }
+            if (index == feedState.posts.length - 1 &&
+                feedState.hasMore &&
+                !feedState.isLoading) {
+              ref
+                  .read(userPostsFeedProvider(widget.userId).notifier)
+                  .fetchMore();
+            }
+            final post = feedState.posts[index];
+            return Padding(
+              padding: EdgeInsets.only(bottom: spacing.md),
+              child: PostCard(
+                bookId: post.bookId,
+                post: post,
+                onTapComments: () => CommentsSheet.show(
+                  context,
+                  bookId: post.bookId,
+                  postId: post.id,
+                  initialCommentCount: post.commentCount,
+                ),
+                onReactionApplied: (postId, type, toggleState, counts) => ref
+                    .read(userPostsFeedProvider(widget.userId).notifier)
+                    .applyReactionResult(
+                      postId: postId,
+                      reactionType: type,
+                      toggleState: toggleState,
+                      counts: counts,
+                    ),
               ),
-              textAlign: TextAlign.center,
-            ),
-          ],
+            );
+          },
+          childCount: feedState.posts.length + (feedState.hasMore ? 1 : 0),
         ),
       ),
     );

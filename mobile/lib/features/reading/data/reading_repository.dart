@@ -62,6 +62,11 @@ class ReadingRepository {
     return dto.toDomain();
   }
 
+  Future<ReadingSession?> getActiveSession() async {
+    final ReadingSessionDto? dto = await _call(() => _api.getActiveSession());
+    return dto?.toDomain();
+  }
+
   Future<SessionCompletion> endSession({
     required String sessionId,
     required DateTime endedAt,
