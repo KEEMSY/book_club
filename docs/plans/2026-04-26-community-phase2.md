@@ -595,3 +595,4 @@ Phase 2 완료 태그: `v0.0.2`
 ## Changelog
 
 - **0.1.0** (2026-04-26) — Phase 2 커뮤니티 화면 계획 초안 작성. 화면 구조·소셜 그래프·챌린지 시스템·데이터 모델·마일스톤·백로그 분류 포함.
+- **0.2.0** (2026-04-27) — M10 완료: `badge_earned` 알림 타입 추가, `BadgeEarned` 도메인 이벤트, `ChallengeService.award_badge` 구현, `follow_received`·`badge_earned` 모바일 알림 아이콘 + 탭 네비게이션 연결. 태그 `v0.0.2-m10`.
