@@ -45,6 +45,18 @@ class _CommunityHomeScreenState extends ConsumerState<CommunityHomeScreen>
     return Scaffold(
       appBar: AppBar(
         title: Text('커뮤니티', style: theme.textTheme.titleLarge),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.emoji_events_outlined),
+            tooltip: '챌린지',
+            onPressed: () => context.push(AppRoutes.challenges),
+          ),
+          IconButton(
+            icon: const Icon(Icons.workspace_premium_outlined),
+            tooltip: '배지',
+            onPressed: () => context.push(AppRoutes.badges),
+          ),
+        ],
         bottom: TabBar(
           controller: _tabController,
           tabs: const <Tab>[

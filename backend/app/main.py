@@ -14,6 +14,7 @@ from app.core.config import get_settings
 from app.core.exceptions import register_exception_handlers
 from app.domains.auth.router import router as auth_router
 from app.domains.book.router import router as book_router
+from app.domains.challenge.router import router as challenge_router
 from app.domains.community.router import router as community_router
 from app.domains.feed.events import CommentAdded, ReactionAdded
 from app.domains.feed.router import router as feed_router
@@ -82,6 +83,7 @@ def create_app() -> FastAPI:
     app.include_router(notification_router)
     app.include_router(social_router)
     app.include_router(community_router)
+    app.include_router(challenge_router)
 
     return app
 

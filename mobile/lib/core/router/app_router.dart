@@ -8,6 +8,9 @@ import '../../features/auth/presentation/login_screen.dart';
 import '../../features/book/presentation/book_detail_screen.dart';
 import '../../features/book/presentation/library_screen.dart';
 import '../../features/book/presentation/search_screen.dart';
+import '../../features/challenge/presentation/badge_collection_screen.dart';
+import '../../features/challenge/presentation/challenge_detail_screen.dart';
+import '../../features/challenge/presentation/challenge_list_screen.dart';
 import '../../features/community/presentation/community_home_screen.dart';
 import '../../features/community/presentation/follower_list_screen.dart';
 import '../../features/community/presentation/following_list_screen.dart';
@@ -49,6 +52,11 @@ class AppRoutes {
   static String userProfile(String userId) => '/users/$userId/profile';
   static String userFollowers(String userId) => '/users/$userId/followers';
   static String userFollowing(String userId) => '/users/$userId/following';
+
+  // M9 destinations — challenge & badge.
+  static const challenges = '/community/challenges';
+  static String challengeDetail(String id) => '/community/challenges/$id';
+  static const badges = '/community/badges';
 }
 
 /// Adapter that bridges a Riverpod [ValueNotifier]-free state stream into a
@@ -233,6 +241,25 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: AppRoutes.community,
                 builder: (context, state) => const CommunityHomeScreen(),
+                routes: <RouteBase>[
+                  GoRoute(
+                    path: 'challenges',
+                    builder: (context, state) => const ChallengeListScreen(),
+                    routes: <RouteBase>[
+                      GoRoute(
+                        path: ':id',
+                        builder: (context, state) => ChallengeDetailScreen(
+                          challengeId: state.pathParameters['id']!,
+                        ),
+                      ),
+                    ],
+                  ),
+                  GoRoute(
+                    path: 'badges',
+                    builder: (context, state) =>
+                        const BadgeCollectionScreen(),
+                  ),
+                ],
               ),
             ],
           ),
