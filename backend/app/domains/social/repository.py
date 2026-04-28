@@ -290,8 +290,10 @@ class SocialRepository:
         """ILIKE nickname search, excludes actor and users who blocked actor."""
         from sqlalchemy import not_
 
+        from sqlalchemy import ColumnElement
+
         blocked_subq = select(Block.blocker_id).where(Block.blocked_id == actor_id)
-        conditions: list[object] = [
+        conditions: list[ColumnElement[bool]] = [
             User.id != actor_id,
             User.deleted_at.is_(None),
             User.nickname.ilike(f"%{q}%"),
@@ -302,12 +304,7 @@ class SocialRepository:
             if cursor_dt is not None:
                 conditions.append(User.created_at < cursor_dt)
 
-        stmt = (
-            select(User)
-            .where(and_(*conditions))
-            .order_by(User.created_at.desc())
-            .limit(limit)
-        )
+        stmt = select(User).where(and_(*conditions)).order_by(User.created_at.desc()).limit(limit)
         result = await self._session.execute(stmt)
         users = list(result.scalars().all())
 

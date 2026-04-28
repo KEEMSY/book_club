@@ -162,6 +162,27 @@ class FakeChallengeRepository:
     async def participant_count(self, challenge_id: UUID) -> int:
         return sum(1 for p in self._participants.values() if p.challenge_id == challenge_id)
 
+    async def batch_get_participants(
+        self,
+        challenge_ids: list[UUID],
+        user_id: UUID,
+    ) -> dict[UUID, Any]:
+        return {
+            cid: self._participants.get((cid, user_id))
+            for cid in challenge_ids
+        }
+
+    async def batch_participant_counts(
+        self,
+        challenge_ids: list[UUID],
+    ) -> dict[UUID, int]:
+        return {
+            cid: sum(
+                1 for p in self._participants.values() if p.challenge_id == cid
+            )
+            for cid in challenge_ids
+        }
+
     async def update_progress(
         self,
         challenge_id: UUID,

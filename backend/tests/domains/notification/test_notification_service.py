@@ -12,10 +12,12 @@ from typing import Any
 from uuid import UUID, uuid4
 
 import pytest
+from app.domains.challenge.events import BadgeEarned
 from app.domains.feed.events import CommentAdded, ReactionAdded
 from app.domains.notification.models import Notification, NotificationType, WeeklyReport
 from app.domains.notification.service import NotificationService
 from app.domains.reading.events import UserGradeRecomputed
+from app.domains.social.events import FollowReceived
 
 
 # ---------------------------------------------------------------------------
@@ -197,6 +199,42 @@ class _TestableNotificationService(NotificationService):
                     notif.body,
                     {"comment_id": str(event.comment_id)},
                 )
+
+    async def on_follow_received(self, event: object) -> None:
+        from app.domains.social.events import FollowReceived as _FR
+
+        if not isinstance(event, _FR):
+            return
+        notif = self._make_notification(
+            user_id=event.followee_id,
+            ntype=NotificationType.FOLLOW_RECEIVED,
+            title="새 팔로워가 생겼어요",
+            body="회원님을 팔로우한 사람이 있습니다.",
+            data={"follower_id": str(event.follower_id)},
+        )
+        tokens = await self.device_tokens.get_active_tokens(event.followee_id)
+        if tokens:
+            await self.push.send_to_tokens(
+                tokens, notif.title, notif.body, {"follower_id": str(event.follower_id)}
+            )
+
+    async def on_badge_earned(self, event: object) -> None:
+        from app.domains.challenge.events import BadgeEarned as _BE
+
+        if not isinstance(event, _BE):
+            return
+        notif = self._make_notification(
+            user_id=event.user_id,
+            ntype=NotificationType.BADGE_EARNED,
+            title="새 배지를 획득했어요!",
+            body=f"'{event.badge_name}' 배지를 획득했습니다. 축하해요!",
+            data={"badge_id": str(event.badge_id), "badge_name": event.badge_name},
+        )
+        tokens = await self.device_tokens.get_active_tokens(event.user_id)
+        if tokens:
+            await self.push.send_to_tokens(
+                tokens, notif.title, notif.body, {"badge_id": str(event.badge_id)}
+            )
 
     async def on_grade_up(self, event: object) -> None:
         from app.domains.notification.service import _GRADE_NAMES, _TIER_ROMAN
@@ -428,4 +466,79 @@ async def test_on_grade_up_skips_regression() -> None:
     await svc.on_grade_up(event)
 
     assert len(svc._notifications) == 0
+    assert len(push.calls) == 0
+
+
+@pytest.mark.asyncio
+async def test_on_follow_received_creates_notification_and_push() -> None:
+    """FollowReceived event creates a follow_received notification and sends push."""
+    push = FakePushAdapter()
+    followee = uuid4()
+    follower = uuid4()
+
+    svc = _TestableNotificationService(push, {followee: ["tok-followee"]})
+
+    event = FollowReceived(follower_id=follower, followee_id=followee)
+    await svc.on_follow_received(event)
+
+    assert len(svc._notifications) == 1
+    notif = svc._notifications[0]
+    assert notif.user_id == followee
+    assert notif.ntype == NotificationType.FOLLOW_RECEIVED.value
+    assert notif.data["follower_id"] == str(follower)
+    assert len(push.calls) == 1
+    assert push.calls[0]["tokens"] == ["tok-followee"]
+
+
+@pytest.mark.asyncio
+async def test_on_follow_received_no_push_when_no_tokens() -> None:
+    """FollowReceived still creates a notification even when user has no FCM tokens."""
+    push = FakePushAdapter()
+    followee = uuid4()
+    follower = uuid4()
+
+    svc = _TestableNotificationService(push, {})  # no tokens registered
+
+    await svc.on_follow_received(FollowReceived(follower_id=follower, followee_id=followee))
+
+    assert len(svc._notifications) == 1
+    assert len(push.calls) == 0  # no push without device tokens
+
+
+@pytest.mark.asyncio
+async def test_on_badge_earned_creates_notification_and_push() -> None:
+    """BadgeEarned event creates a badge_earned notification and sends push."""
+    push = FakePushAdapter()
+    user_id = uuid4()
+    badge_id = uuid4()
+    badge_name = "독서 마스터"
+
+    svc = _TestableNotificationService(push, {user_id: ["tok-user"]})
+
+    event = BadgeEarned(user_id=user_id, badge_id=badge_id, badge_name=badge_name)
+    await svc.on_badge_earned(event)
+
+    assert len(svc._notifications) == 1
+    notif = svc._notifications[0]
+    assert notif.user_id == user_id
+    assert notif.ntype == NotificationType.BADGE_EARNED.value
+    assert badge_name in notif.body
+    assert notif.data["badge_id"] == str(badge_id)
+    assert len(push.calls) == 1
+    assert push.calls[0]["tokens"] == ["tok-user"]
+
+
+@pytest.mark.asyncio
+async def test_on_badge_earned_no_push_when_no_tokens() -> None:
+    """BadgeEarned still creates a notification even when user has no FCM tokens."""
+    push = FakePushAdapter()
+    user_id = uuid4()
+
+    svc = _TestableNotificationService(push, {})
+
+    await svc.on_badge_earned(
+        BadgeEarned(user_id=user_id, badge_id=uuid4(), badge_name="첫 독서")
+    )
+
+    assert len(svc._notifications) == 1
     assert len(push.calls) == 0

@@ -85,10 +85,14 @@ class ChallengeService:
         clamped = max(1, min(limit, 50))
         challenges = await self.repo.list_challenges(status, clamped, cursor_dt)
 
+        # Batch-fetch participant rows and counts — 2 queries for any page size.
+        challenge_ids = [ch.id for ch in challenges]
+        participants = await self.repo.batch_get_participants(challenge_ids, viewer_id)
+        counts = await self.repo.batch_participant_counts(challenge_ids)
+
         items: list[ChallengePublic] = []
         for ch in challenges:
-            participant = await self.repo.get_participant(ch.id, viewer_id)
-            count = await self.repo.participant_count(ch.id)
+            p = participants.get(ch.id)
             items.append(
                 ChallengePublic(
                     id=ch.id,
@@ -99,10 +103,10 @@ class ChallengeService:
                     genre_filter=ch.genre_filter,
                     starts_at=ch.starts_at,
                     ends_at=ch.ends_at,
-                    participant_count=count,
-                    is_joined=participant is not None,
-                    my_progress=participant.current_value if participant else None,
-                    achieved_at=participant.achieved_at if participant else None,
+                    participant_count=counts.get(ch.id, 0),
+                    is_joined=p is not None,
+                    my_progress=p.current_value if p else None,
+                    achieved_at=p.achieved_at if p else None,
                     badge=None,  # badge detail omitted in list view for performance
                 )
             )

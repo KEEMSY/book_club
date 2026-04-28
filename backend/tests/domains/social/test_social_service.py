@@ -301,3 +301,82 @@ async def test_report_duplicate_raises_conflict() -> None:
     with pytest.raises(ConflictError) as exc_info:
         await svc.report(reporter, "post", post_id, "spam again")
     assert exc_info.value.code == "REPORT_DUPLICATE"
+
+
+@pytest.mark.asyncio
+async def test_report_success() -> None:
+    """First report on a target succeeds and is persisted."""
+    repo = FakeSocialRepository()
+    svc = _make_service(repo)
+
+    reporter = uuid4()
+    post_id = uuid4()
+
+    await svc.report(reporter, "post", post_id, "inappropriate")
+
+    assert await repo.has_reported(reporter, "post", post_id)
+
+
+@pytest.mark.asyncio
+async def test_follow_removes_reverse_block() -> None:
+    """Following a user the actor had previously blocked removes that block first."""
+    repo = FakeSocialRepository()
+    svc = _make_service(repo)
+
+    actor = uuid4()
+    target = uuid4()
+
+    # actor has previously blocked target
+    await repo.block(actor, target)
+    assert await repo.is_blocked(actor, target)
+
+    # actor now wants to follow target — block should be lifted
+    await svc.follow(actor, target)
+
+    assert await repo.is_following(actor, target)
+    assert not await repo.is_blocked(actor, target)
+
+
+@pytest.mark.asyncio
+async def test_block_self_raises() -> None:
+    """Blocking oneself raises ConflictError with code BLOCK_SELF."""
+    repo = FakeSocialRepository()
+    svc = _make_service(repo)
+
+    user = uuid4()
+    with pytest.raises(ConflictError) as exc_info:
+        await svc.block(user, user)
+    assert exc_info.value.code == "BLOCK_SELF"
+
+
+@pytest.mark.asyncio
+async def test_unblock_idempotent() -> None:
+    """Unblocking a user that is not blocked does not raise."""
+    repo = FakeSocialRepository()
+    svc = _make_service(repo)
+
+    actor = uuid4()
+    target = uuid4()
+    # Both calls should succeed silently.
+    await svc.unblock(actor, target)
+    await svc.unblock(actor, target)
+
+    assert not await repo.is_blocked(actor, target)
+
+
+@pytest.mark.asyncio
+async def test_block_prevents_follow_by_blocked_user() -> None:
+    """A user who was blocked cannot follow back (target→actor direction)."""
+    repo = FakeSocialRepository()
+    svc = _make_service(repo)
+
+    actor = uuid4()
+    target = uuid4()
+
+    # actor blocks target
+    await svc.block(actor, target)
+
+    # target tries to follow actor — actor has blocked target, so FOLLOW_BLOCKED
+    with pytest.raises(ConflictError) as exc_info:
+        await svc.follow(target, actor)
+    assert exc_info.value.code == "FOLLOW_BLOCKED"

@@ -8,6 +8,9 @@ Design choices:
   the DB time zone is authoritative, not the application host.
 - ``leaderboard`` JOINs to the users table and returns (participant, user)
   tuples so the service layer can build ranked entries in a single round-trip.
+- ``batch_get_participants`` / ``batch_participant_counts`` enable the service
+  layer to load viewer participation data for a whole page of challenges in 2
+  queries instead of 2N (avoids N+1 in list_challenges).
 - ``update_progress`` uses a plain UPDATE; the caller decides the new value
   so the method stays generic (usable by both manual admin edits and event
   handlers).
@@ -154,11 +157,48 @@ class ChallengeRepository:
         """Return the number of participants in a challenge."""
         from sqlalchemy import func as sqlfunc
 
-        stmt = select(sqlfunc.count()).select_from(ChallengeParticipant).where(
-            ChallengeParticipant.challenge_id == challenge_id
+        stmt = (
+            select(sqlfunc.count())
+            .select_from(ChallengeParticipant)
+            .where(ChallengeParticipant.challenge_id == challenge_id)
         )
         result = await self._session.execute(stmt)
         return result.scalar_one()
+
+    async def batch_get_participants(
+        self,
+        challenge_ids: list[UUID],
+        user_id: UUID,
+    ) -> dict[UUID, ChallengeParticipant | None]:
+        """Fetch viewer's participant rows for multiple challenges in one query."""
+        if not challenge_ids:
+            return {}
+        stmt = select(ChallengeParticipant).where(
+            ChallengeParticipant.challenge_id.in_(challenge_ids),
+            ChallengeParticipant.user_id == user_id,
+        )
+        result = await self._session.execute(stmt)
+        by_challenge = {row.challenge_id: row for row in result.scalars().all()}
+        return {cid: by_challenge.get(cid) for cid in challenge_ids}
+
+    async def batch_participant_counts(
+        self,
+        challenge_ids: list[UUID],
+    ) -> dict[UUID, int]:
+        """Count participants for multiple challenges in one query."""
+        if not challenge_ids:
+            return {}
+        stmt = (
+            select(
+                ChallengeParticipant.challenge_id,
+                func.count().label("cnt"),
+            )
+            .where(ChallengeParticipant.challenge_id.in_(challenge_ids))
+            .group_by(ChallengeParticipant.challenge_id)
+        )
+        result = await self._session.execute(stmt)
+        counts = {row.challenge_id: row.cnt for row in result}
+        return {cid: counts.get(cid, 0) for cid in challenge_ids}
 
     async def update_progress(
         self,
@@ -224,8 +264,6 @@ class ChallengeRepository:
         """Return the number of users who have earned a badge."""
         from sqlalchemy import func as sqlfunc
 
-        stmt = select(sqlfunc.count()).select_from(UserBadge).where(
-            UserBadge.badge_id == badge_id
-        )
+        stmt = select(sqlfunc.count()).select_from(UserBadge).where(UserBadge.badge_id == badge_id)
         result = await self._session.execute(stmt)
         return result.scalar_one()
