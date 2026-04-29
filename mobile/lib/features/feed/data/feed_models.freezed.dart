@@ -2282,3 +2282,599 @@ abstract class _CreateCommentRequest implements CreateCommentRequest {
   _$$CreateCommentRequestImplCopyWith<_$CreateCommentRequestImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
+
+HighlightDto _$HighlightDtoFromJson(Map<String, dynamic> json) {
+  return _HighlightDto.fromJson(json);
+}
+
+/// @nodoc
+mixin _$HighlightDto {
+  String get id => throw _privateConstructorUsedError;
+  String get userBookId => throw _privateConstructorUsedError;
+  String get quoteText => throw _privateConstructorUsedError;
+  int? get pageNumber => throw _privateConstructorUsedError;
+  DateTime get createdAt => throw _privateConstructorUsedError;
+
+  /// Serializes this HighlightDto to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of HighlightDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $HighlightDtoCopyWith<HighlightDto> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $HighlightDtoCopyWith<$Res> {
+  factory $HighlightDtoCopyWith(
+          HighlightDto value, $Res Function(HighlightDto) then) =
+      _$HighlightDtoCopyWithImpl<$Res, HighlightDto>;
+  @useResult
+  $Res call(
+      {String id,
+      String userBookId,
+      String quoteText,
+      int? pageNumber,
+      DateTime createdAt});
+}
+
+/// @nodoc
+class _$HighlightDtoCopyWithImpl<$Res, $Val extends HighlightDto>
+    implements $HighlightDtoCopyWith<$Res> {
+  _$HighlightDtoCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of HighlightDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? userBookId = null,
+    Object? quoteText = null,
+    Object? pageNumber = freezed,
+    Object? createdAt = null,
+  }) {
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      userBookId: null == userBookId
+          ? _value.userBookId
+          : userBookId // ignore: cast_nullable_to_non_nullable
+              as String,
+      quoteText: null == quoteText
+          ? _value.quoteText
+          : quoteText // ignore: cast_nullable_to_non_nullable
+              as String,
+      pageNumber: freezed == pageNumber
+          ? _value.pageNumber
+          : pageNumber // ignore: cast_nullable_to_non_nullable
+              as int?,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$HighlightDtoImplCopyWith<$Res>
+    implements $HighlightDtoCopyWith<$Res> {
+  factory _$$HighlightDtoImplCopyWith(
+          _$HighlightDtoImpl value, $Res Function(_$HighlightDtoImpl) then) =
+      __$$HighlightDtoImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      String userBookId,
+      String quoteText,
+      int? pageNumber,
+      DateTime createdAt});
+}
+
+/// @nodoc
+class __$$HighlightDtoImplCopyWithImpl<$Res>
+    extends _$HighlightDtoCopyWithImpl<$Res, _$HighlightDtoImpl>
+    implements _$$HighlightDtoImplCopyWith<$Res> {
+  __$$HighlightDtoImplCopyWithImpl(
+      _$HighlightDtoImpl _value, $Res Function(_$HighlightDtoImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of HighlightDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? userBookId = null,
+    Object? quoteText = null,
+    Object? pageNumber = freezed,
+    Object? createdAt = null,
+  }) {
+    return _then(_$HighlightDtoImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      userBookId: null == userBookId
+          ? _value.userBookId
+          : userBookId // ignore: cast_nullable_to_non_nullable
+              as String,
+      quoteText: null == quoteText
+          ? _value.quoteText
+          : quoteText // ignore: cast_nullable_to_non_nullable
+              as String,
+      pageNumber: freezed == pageNumber
+          ? _value.pageNumber
+          : pageNumber // ignore: cast_nullable_to_non_nullable
+              as int?,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$HighlightDtoImpl extends _HighlightDto {
+  const _$HighlightDtoImpl(
+      {required this.id,
+      required this.userBookId,
+      required this.quoteText,
+      this.pageNumber,
+      required this.createdAt})
+      : super._();
+
+  factory _$HighlightDtoImpl.fromJson(Map<String, dynamic> json) =>
+      _$$HighlightDtoImplFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final String userBookId;
+  @override
+  final String quoteText;
+  @override
+  final int? pageNumber;
+  @override
+  final DateTime createdAt;
+
+  @override
+  String toString() {
+    return 'HighlightDto(id: $id, userBookId: $userBookId, quoteText: $quoteText, pageNumber: $pageNumber, createdAt: $createdAt)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$HighlightDtoImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.userBookId, userBookId) ||
+                other.userBookId == userBookId) &&
+            (identical(other.quoteText, quoteText) ||
+                other.quoteText == quoteText) &&
+            (identical(other.pageNumber, pageNumber) ||
+                other.pageNumber == pageNumber) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, id, userBookId, quoteText, pageNumber, createdAt);
+
+  /// Create a copy of HighlightDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$HighlightDtoImplCopyWith<_$HighlightDtoImpl> get copyWith =>
+      __$$HighlightDtoImplCopyWithImpl<_$HighlightDtoImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$HighlightDtoImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _HighlightDto extends HighlightDto {
+  const factory _HighlightDto(
+      {required final String id,
+      required final String userBookId,
+      required final String quoteText,
+      final int? pageNumber,
+      required final DateTime createdAt}) = _$HighlightDtoImpl;
+  const _HighlightDto._() : super._();
+
+  factory _HighlightDto.fromJson(Map<String, dynamic> json) =
+      _$HighlightDtoImpl.fromJson;
+
+  @override
+  String get id;
+  @override
+  String get userBookId;
+  @override
+  String get quoteText;
+  @override
+  int? get pageNumber;
+  @override
+  DateTime get createdAt;
+
+  /// Create a copy of HighlightDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$HighlightDtoImplCopyWith<_$HighlightDtoImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+HighlightPageDto _$HighlightPageDtoFromJson(Map<String, dynamic> json) {
+  return _HighlightPageDto.fromJson(json);
+}
+
+/// @nodoc
+mixin _$HighlightPageDto {
+  List<HighlightDto> get items => throw _privateConstructorUsedError;
+  String? get nextCursor => throw _privateConstructorUsedError;
+
+  /// Serializes this HighlightPageDto to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of HighlightPageDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $HighlightPageDtoCopyWith<HighlightPageDto> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $HighlightPageDtoCopyWith<$Res> {
+  factory $HighlightPageDtoCopyWith(
+          HighlightPageDto value, $Res Function(HighlightPageDto) then) =
+      _$HighlightPageDtoCopyWithImpl<$Res, HighlightPageDto>;
+  @useResult
+  $Res call({List<HighlightDto> items, String? nextCursor});
+}
+
+/// @nodoc
+class _$HighlightPageDtoCopyWithImpl<$Res, $Val extends HighlightPageDto>
+    implements $HighlightPageDtoCopyWith<$Res> {
+  _$HighlightPageDtoCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of HighlightPageDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? items = null,
+    Object? nextCursor = freezed,
+  }) {
+    return _then(_value.copyWith(
+      items: null == items
+          ? _value.items
+          : items // ignore: cast_nullable_to_non_nullable
+              as List<HighlightDto>,
+      nextCursor: freezed == nextCursor
+          ? _value.nextCursor
+          : nextCursor // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$HighlightPageDtoImplCopyWith<$Res>
+    implements $HighlightPageDtoCopyWith<$Res> {
+  factory _$$HighlightPageDtoImplCopyWith(_$HighlightPageDtoImpl value,
+          $Res Function(_$HighlightPageDtoImpl) then) =
+      __$$HighlightPageDtoImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({List<HighlightDto> items, String? nextCursor});
+}
+
+/// @nodoc
+class __$$HighlightPageDtoImplCopyWithImpl<$Res>
+    extends _$HighlightPageDtoCopyWithImpl<$Res, _$HighlightPageDtoImpl>
+    implements _$$HighlightPageDtoImplCopyWith<$Res> {
+  __$$HighlightPageDtoImplCopyWithImpl(_$HighlightPageDtoImpl _value,
+      $Res Function(_$HighlightPageDtoImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of HighlightPageDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? items = null,
+    Object? nextCursor = freezed,
+  }) {
+    return _then(_$HighlightPageDtoImpl(
+      items: null == items
+          ? _value._items
+          : items // ignore: cast_nullable_to_non_nullable
+              as List<HighlightDto>,
+      nextCursor: freezed == nextCursor
+          ? _value.nextCursor
+          : nextCursor // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$HighlightPageDtoImpl extends _HighlightPageDto {
+  const _$HighlightPageDtoImpl(
+      {required final List<HighlightDto> items, this.nextCursor})
+      : _items = items,
+        super._();
+
+  factory _$HighlightPageDtoImpl.fromJson(Map<String, dynamic> json) =>
+      _$$HighlightPageDtoImplFromJson(json);
+
+  final List<HighlightDto> _items;
+  @override
+  List<HighlightDto> get items {
+    if (_items is EqualUnmodifiableListView) return _items;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_items);
+  }
+
+  @override
+  final String? nextCursor;
+
+  @override
+  String toString() {
+    return 'HighlightPageDto(items: $items, nextCursor: $nextCursor)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$HighlightPageDtoImpl &&
+            const DeepCollectionEquality().equals(other._items, _items) &&
+            (identical(other.nextCursor, nextCursor) ||
+                other.nextCursor == nextCursor));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, const DeepCollectionEquality().hash(_items), nextCursor);
+
+  /// Create a copy of HighlightPageDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$HighlightPageDtoImplCopyWith<_$HighlightPageDtoImpl> get copyWith =>
+      __$$HighlightPageDtoImplCopyWithImpl<_$HighlightPageDtoImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$HighlightPageDtoImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _HighlightPageDto extends HighlightPageDto {
+  const factory _HighlightPageDto(
+      {required final List<HighlightDto> items,
+      final String? nextCursor}) = _$HighlightPageDtoImpl;
+  const _HighlightPageDto._() : super._();
+
+  factory _HighlightPageDto.fromJson(Map<String, dynamic> json) =
+      _$HighlightPageDtoImpl.fromJson;
+
+  @override
+  List<HighlightDto> get items;
+  @override
+  String? get nextCursor;
+
+  /// Create a copy of HighlightPageDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$HighlightPageDtoImplCopyWith<_$HighlightPageDtoImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+CreateHighlightRequest _$CreateHighlightRequestFromJson(
+    Map<String, dynamic> json) {
+  return _CreateHighlightRequest.fromJson(json);
+}
+
+/// @nodoc
+mixin _$CreateHighlightRequest {
+  String get quoteText => throw _privateConstructorUsedError;
+  int? get pageNumber => throw _privateConstructorUsedError;
+
+  /// Serializes this CreateHighlightRequest to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of CreateHighlightRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $CreateHighlightRequestCopyWith<CreateHighlightRequest> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $CreateHighlightRequestCopyWith<$Res> {
+  factory $CreateHighlightRequestCopyWith(CreateHighlightRequest value,
+          $Res Function(CreateHighlightRequest) then) =
+      _$CreateHighlightRequestCopyWithImpl<$Res, CreateHighlightRequest>;
+  @useResult
+  $Res call({String quoteText, int? pageNumber});
+}
+
+/// @nodoc
+class _$CreateHighlightRequestCopyWithImpl<$Res,
+        $Val extends CreateHighlightRequest>
+    implements $CreateHighlightRequestCopyWith<$Res> {
+  _$CreateHighlightRequestCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of CreateHighlightRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? quoteText = null,
+    Object? pageNumber = freezed,
+  }) {
+    return _then(_value.copyWith(
+      quoteText: null == quoteText
+          ? _value.quoteText
+          : quoteText // ignore: cast_nullable_to_non_nullable
+              as String,
+      pageNumber: freezed == pageNumber
+          ? _value.pageNumber
+          : pageNumber // ignore: cast_nullable_to_non_nullable
+              as int?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$CreateHighlightRequestImplCopyWith<$Res>
+    implements $CreateHighlightRequestCopyWith<$Res> {
+  factory _$$CreateHighlightRequestImplCopyWith(
+          _$CreateHighlightRequestImpl value,
+          $Res Function(_$CreateHighlightRequestImpl) then) =
+      __$$CreateHighlightRequestImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String quoteText, int? pageNumber});
+}
+
+/// @nodoc
+class __$$CreateHighlightRequestImplCopyWithImpl<$Res>
+    extends _$CreateHighlightRequestCopyWithImpl<$Res,
+        _$CreateHighlightRequestImpl>
+    implements _$$CreateHighlightRequestImplCopyWith<$Res> {
+  __$$CreateHighlightRequestImplCopyWithImpl(
+      _$CreateHighlightRequestImpl _value,
+      $Res Function(_$CreateHighlightRequestImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of CreateHighlightRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? quoteText = null,
+    Object? pageNumber = freezed,
+  }) {
+    return _then(_$CreateHighlightRequestImpl(
+      quoteText: null == quoteText
+          ? _value.quoteText
+          : quoteText // ignore: cast_nullable_to_non_nullable
+              as String,
+      pageNumber: freezed == pageNumber
+          ? _value.pageNumber
+          : pageNumber // ignore: cast_nullable_to_non_nullable
+              as int?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$CreateHighlightRequestImpl implements _CreateHighlightRequest {
+  const _$CreateHighlightRequestImpl(
+      {required this.quoteText, this.pageNumber});
+
+  factory _$CreateHighlightRequestImpl.fromJson(Map<String, dynamic> json) =>
+      _$$CreateHighlightRequestImplFromJson(json);
+
+  @override
+  final String quoteText;
+  @override
+  final int? pageNumber;
+
+  @override
+  String toString() {
+    return 'CreateHighlightRequest(quoteText: $quoteText, pageNumber: $pageNumber)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$CreateHighlightRequestImpl &&
+            (identical(other.quoteText, quoteText) ||
+                other.quoteText == quoteText) &&
+            (identical(other.pageNumber, pageNumber) ||
+                other.pageNumber == pageNumber));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, quoteText, pageNumber);
+
+  /// Create a copy of CreateHighlightRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$CreateHighlightRequestImplCopyWith<_$CreateHighlightRequestImpl>
+      get copyWith => __$$CreateHighlightRequestImplCopyWithImpl<
+          _$CreateHighlightRequestImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$CreateHighlightRequestImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _CreateHighlightRequest implements CreateHighlightRequest {
+  const factory _CreateHighlightRequest(
+      {required final String quoteText,
+      final int? pageNumber}) = _$CreateHighlightRequestImpl;
+
+  factory _CreateHighlightRequest.fromJson(Map<String, dynamic> json) =
+      _$CreateHighlightRequestImpl.fromJson;
+
+  @override
+  String get quoteText;
+  @override
+  int? get pageNumber;
+
+  /// Create a copy of CreateHighlightRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$CreateHighlightRequestImplCopyWith<_$CreateHighlightRequestImpl>
+      get copyWith => throw _privateConstructorUsedError;
+}

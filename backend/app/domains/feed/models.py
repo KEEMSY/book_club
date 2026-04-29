@@ -31,6 +31,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Index,
+    Integer,
     Text,
     UniqueConstraint,
     func,
@@ -194,3 +195,39 @@ class Comment(Base):
         onupdate=func.now(),
     )
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class PostHighlight(Base):
+    """A private quote saved by the user from a book they're reading.
+
+    Stored separately from :class:`Post` so highlights stay private by
+    default — the user explicitly shares them to the feed by creating a
+    Post with ``post_type=highlight`` and the quote as ``content``.
+    """
+
+    __tablename__ = "post_highlights"
+    __table_args__ = (
+        Index("ix_highlights_user_book_created", "user_book_id", "created_at"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    user_book_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("user_books.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    quote_text: Mapped[str] = mapped_column(Text, nullable=False)
+    page_number: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )

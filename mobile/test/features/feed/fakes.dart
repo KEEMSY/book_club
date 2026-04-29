@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:book_club/features/feed/data/feed_repository.dart';
 import 'package:book_club/features/feed/data/image_uploader.dart';
 import 'package:book_club/features/feed/domain/comment.dart';
+import 'package:book_club/features/feed/domain/highlight.dart';
 import 'package:book_club/features/feed/domain/post.dart';
 import 'package:book_club/features/feed/domain/post_author.dart';
 import 'package:book_club/features/feed/domain/post_type.dart';
@@ -64,6 +65,11 @@ class FakeFeedRepository implements FeedRepository {
   // -- deletePost --
   Object? deletePostError;
   final List<String> deletePostCalls = <String>[];
+
+  // -- highlight --
+  Highlight? createHighlightResult;
+  HighlightPage defaultHighlightPage =
+      const HighlightPage(items: <Highlight>[], nextCursor: null);
 
   // -- uploadImage --
   final List<String> uploadKeyQueue = <String>[];
@@ -147,6 +153,37 @@ class FakeFeedRepository implements FeedRepository {
     deleteCommentCalls.add(commentId);
     if (deleteCommentError != null) throw deleteCommentError!;
   }
+
+  @override
+  Future<Highlight> createHighlight({
+    required String userBookId,
+    required String quoteText,
+    int? pageNumber,
+  }) async {
+    return createHighlightResult ??
+        Highlight(
+          id: 'highlight-1',
+          userBookId: userBookId,
+          quoteText: quoteText,
+          pageNumber: pageNumber,
+          createdAt: DateTime.utc(2026, 4, 30, 12),
+        );
+  }
+
+  @override
+  Future<HighlightPage> listHighlights({
+    required String userBookId,
+    String? cursor,
+    int limit = 20,
+  }) async {
+    return defaultHighlightPage;
+  }
+
+  @override
+  Future<void> deleteHighlight({
+    required String userBookId,
+    required String highlightId,
+  }) async {}
 
   @override
   Future<String> uploadImage(PickedImage image) async {

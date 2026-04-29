@@ -121,13 +121,34 @@ class CommentResponse(BaseModel):
     next_cursor: str | None
 
 
+class CreateHighlightRequest(BaseModel):
+    quote_text: str = Field(min_length=1, max_length=500)
+    page_number: int | None = Field(default=None, ge=1)
+
+
+class HighlightPublic(BaseModel):
+    id: UUID
+    user_book_id: UUID
+    quote_text: str
+    page_number: int | None
+    created_at: datetime
+
+
+class HighlightResponse(BaseModel):
+    items: list[HighlightPublic]
+    next_cursor: str | None
+
+
 __all__ = [
     "AuthorPublic",
     "CommentPublic",
     "CommentResponse",
     "CreateCommentRequest",
+    "CreateHighlightRequest",
     "CreatePostRequest",
     "FeedResponse",
+    "HighlightPublic",
+    "HighlightResponse",
     "PostPublic",
     "PresignedUploadResponse",
     "ReactionType",

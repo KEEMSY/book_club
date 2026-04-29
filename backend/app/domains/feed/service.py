@@ -38,10 +38,11 @@ from uuid import UUID
 
 from app.core.exceptions import ConflictError, NotFoundError
 from app.domains.feed.events import CommentAdded, PostCreated, ReactionAdded
-from app.domains.feed.models import Comment, Post, PostType, ReactionType
+from app.domains.feed.models import Comment, Post, PostHighlight, PostType, ReactionType
 from app.domains.feed.ports import (
     CommentRepositoryPort,
     FeedBookQueryPort,
+    HighlightRepositoryPort,
     ImageStoragePort,
     PostFeedItem,
     PostRepositoryPort,
@@ -57,6 +58,8 @@ _FEED_PAGE_MAX = 50
 _FEED_PAGE_MIN = 1
 _COMMENTS_PAGE_MAX = 100
 _COMMENTS_PAGE_MIN = 1
+_QUOTE_MAX = 500
+_HIGHLIGHTS_PAGE_MAX = 50
 
 _ALLOWED_CONTENT_TYPES: dict[str, str] = {
     "image/jpeg": "jpg",
@@ -78,6 +81,12 @@ class CommentPage:
 
 
 @dataclass(frozen=True, slots=True)
+class HighlightPage:
+    items: list[PostHighlight]
+    next_cursor: str | None
+
+
+@dataclass(frozen=True, slots=True)
 class ReactionToggleResult:
     """Outcome of a toggle — mobile uses ``state`` to flip the icon and
     ``counts`` to update the bar without a re-fetch."""
@@ -88,13 +97,14 @@ class ReactionToggleResult:
 
 @dataclass(slots=True)
 class FeedService:
-    """Orchestrates feed posts, reactions, comments, and image uploads."""
+    """Orchestrates feed posts, reactions, comments, image uploads, and highlights."""
 
     posts: PostRepositoryPort
     reactions: ReactionRepositoryPort
     comments: CommentRepositoryPort
     image_storage: ImageStoragePort
     book_query: FeedBookQueryPort
+    highlights: HighlightRepositoryPort
     # Optional fields keep backward compatibility with existing tests that do
     # not wire an event bus (the notification domain depends on these events).
     bus: EventBus | None = field(default=None)
@@ -300,6 +310,52 @@ class FeedService:
             raise NotFoundError("comment not found", code="COMMENT_NOT_FOUND")
         await self.comments.soft_delete(comment_id, datetime.now(tz=UTC))
 
+    async def create_highlight(
+        self,
+        *,
+        user_id: UUID,
+        user_book_id: UUID,
+        quote_text: str,
+        page_number: int | None,
+    ) -> PostHighlight:
+        if not quote_text:
+            raise ConflictError("quote text empty", code="QUOTE_EMPTY")
+        if len(quote_text) > _QUOTE_MAX:
+            raise ConflictError("quote text too long", code="QUOTE_TOO_LONG")
+        return await self.highlights.create(
+            user_id=user_id,
+            user_book_id=user_book_id,
+            quote_text=quote_text,
+            page_number=page_number,
+        )
+
+    async def list_highlights(
+        self,
+        *,
+        user_id: UUID,
+        user_book_id: UUID,
+        cursor: str | None,
+        limit: int,
+    ) -> HighlightPage:
+        clamped = max(1, min(limit, _HIGHLIGHTS_PAGE_MAX))
+        cursor_dt = _parse_iso_cursor(cursor)
+        rows = await self.highlights.list_by_user_book(
+            user_book_id,
+            user_id=user_id,
+            cursor=cursor_dt,
+            limit=clamped,
+        )
+        next_cursor: str | None = None
+        if len(rows) == clamped:
+            next_cursor = rows[-1].created_at.isoformat()
+        return HighlightPage(items=rows, next_cursor=next_cursor)
+
+    async def delete_highlight(self, *, user_id: UUID, highlight_id: UUID) -> None:
+        row = await self.highlights.get_by_id(highlight_id)
+        if row is None or row.user_id != user_id:
+            raise NotFoundError("highlight not found", code="HIGHLIGHT_NOT_FOUND")
+        await self.highlights.delete(highlight_id)
+
 
 def _parse_iso_cursor(cursor: str | None) -> datetime | None:
     if cursor is None or cursor == "":
@@ -319,6 +375,7 @@ __all__ = [
     "CommentPage",
     "FeedPage",
     "FeedService",
+    "HighlightPage",
     "PostCreated",
     "PostFeedItem",
     "PostType",

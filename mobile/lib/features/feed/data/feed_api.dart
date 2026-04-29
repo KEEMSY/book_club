@@ -21,6 +21,9 @@ part 'feed_api.g.dart';
 ///   * `GET  /posts/{id}/comments?cursor=&limit=`
 ///   * `POST /posts/{id}/comments`
 ///   * `DELETE /comments/{id}`
+///   * `POST /me/library/{user_book_id}/highlights`
+///   * `GET  /me/library/{user_book_id}/highlights?cursor=&limit=`
+///   * `DELETE /me/library/{user_book_id}/highlights/{highlight_id}`
 @RestApi()
 abstract class FeedApi {
   factory FeedApi(Dio dio, {String baseUrl}) = _FeedApi;
@@ -67,4 +70,23 @@ abstract class FeedApi {
 
   @DELETE('/comments/{id}')
   Future<void> deleteComment(@Path('id') String commentId);
+
+  @POST('/me/library/{user_book_id}/highlights')
+  Future<HighlightDto> createHighlight(
+    @Path('user_book_id') String userBookId,
+    @Body() Map<String, dynamic> body,
+  );
+
+  @GET('/me/library/{user_book_id}/highlights')
+  Future<HighlightPageDto> listHighlights(
+    @Path('user_book_id') String userBookId, {
+    @Query('cursor') String? cursor,
+    @Query('limit') int limit = 20,
+  });
+
+  @DELETE('/me/library/{user_book_id}/highlights/{highlight_id}')
+  Future<void> deleteHighlight(
+    @Path('user_book_id') String userBookId,
+    @Path('highlight_id') String highlightId,
+  );
 }

@@ -30,7 +30,7 @@ from uuid import UUID, uuid4
 
 import pytest
 from app.core.exceptions import ConflictError, NotFoundError
-from app.domains.feed.models import Comment, Post, PostType, Reaction, ReactionType
+from app.domains.feed.models import Comment, Post, PostHighlight, PostType, Reaction, ReactionType
 from app.domains.feed.ports import PresignedUpload
 from app.domains.feed.service import FeedService
 
@@ -224,6 +224,54 @@ class FakeBookQuery:
         return book_id in self.existing
 
 
+class FakeHighlightRepo:
+    def __init__(self) -> None:
+        self.by_id: dict[UUID, PostHighlight] = {}
+
+    async def create(
+        self,
+        *,
+        user_id: UUID,
+        user_book_id: UUID,
+        quote_text: str,
+        page_number: int | None,
+    ) -> PostHighlight:
+        h = PostHighlight(
+            id=uuid4(),
+            user_id=user_id,
+            user_book_id=user_book_id,
+            quote_text=quote_text,
+            page_number=page_number,
+            created_at=datetime.now(tz=UTC),
+        )
+        self.by_id[h.id] = h
+        return h
+
+    async def get_by_id(self, highlight_id: UUID) -> PostHighlight | None:
+        return self.by_id.get(highlight_id)
+
+    async def list_by_user_book(
+        self,
+        user_book_id: UUID,
+        *,
+        user_id: UUID,
+        cursor: datetime | None,
+        limit: int,
+    ) -> list[PostHighlight]:
+        rows = [
+            h
+            for h in self.by_id.values()
+            if h.user_book_id == user_book_id
+            and h.user_id == user_id
+            and (cursor is None or h.created_at < cursor)
+        ]
+        rows.sort(key=lambda h: h.created_at, reverse=True)
+        return rows[:limit]
+
+    async def delete(self, highlight_id: UUID) -> None:
+        self.by_id.pop(highlight_id, None)
+
+
 def _build_service(
     *,
     books: Iterable[UUID] = (),
@@ -257,6 +305,7 @@ def _build_service(
         comments=comments,
         image_storage=storage,
         book_query=book_query,
+        highlights=FakeHighlightRepo(),
     )
     return service, posts, reactions, comments, storage, book_query
 
@@ -653,3 +702,87 @@ async def test_delete_comment_owner_only() -> None:
 
     await service.delete_comment(user_id=owner, comment_id=c.id)
     assert comments.by_id[c.id].deleted_at is not None
+
+
+# ---------------------------------------------------------------------------
+# Highlight tests
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_create_highlight_saves_and_returns() -> None:
+    service, *_ = _build_service()
+    user_id = uuid4()
+    user_book_id = uuid4()
+    h = await service.create_highlight(
+        user_id=user_id,
+        user_book_id=user_book_id,
+        quote_text="인간은 갈대다",
+        page_number=42,
+    )
+    assert h.quote_text == "인간은 갈대다"
+    assert h.page_number == 42
+    assert h.user_id == user_id
+    assert h.user_book_id == user_book_id
+
+
+@pytest.mark.asyncio
+async def test_create_highlight_rejects_empty_quote() -> None:
+    service, *_ = _build_service()
+    with pytest.raises(ConflictError) as exc_info:
+        await service.create_highlight(
+            user_id=uuid4(),
+            user_book_id=uuid4(),
+            quote_text="",
+            page_number=None,
+        )
+    assert exc_info.value.code == "QUOTE_EMPTY"
+
+
+@pytest.mark.asyncio
+async def test_create_highlight_rejects_overlong_quote() -> None:
+    service, *_ = _build_service()
+    with pytest.raises(ConflictError) as exc_info:
+        await service.create_highlight(
+            user_id=uuid4(),
+            user_book_id=uuid4(),
+            quote_text="x" * 501,
+            page_number=None,
+        )
+    assert exc_info.value.code == "QUOTE_TOO_LONG"
+
+
+@pytest.mark.asyncio
+async def test_list_highlights_returns_own_only() -> None:
+    service, *_ = _build_service()
+    user_a = uuid4()
+    user_b = uuid4()
+    ub = uuid4()
+    await service.create_highlight(
+        user_id=user_a, user_book_id=ub, quote_text="A의 메모", page_number=None
+    )
+    await service.create_highlight(
+        user_id=user_b, user_book_id=ub, quote_text="B의 메모", page_number=None
+    )
+    page = await service.list_highlights(
+        user_id=user_a, user_book_id=ub, cursor=None, limit=20
+    )
+    assert len(page.items) == 1
+    assert page.items[0].quote_text == "A의 메모"
+
+
+@pytest.mark.asyncio
+async def test_delete_highlight_owner_only() -> None:
+    service, *_ = _build_service()
+    owner = uuid4()
+    attacker = uuid4()
+    h = await service.create_highlight(
+        user_id=owner, user_book_id=uuid4(), quote_text="소유자 메모", page_number=None
+    )
+    with pytest.raises(NotFoundError):
+        await service.delete_highlight(user_id=attacker, highlight_id=h.id)
+    await service.delete_highlight(user_id=owner, highlight_id=h.id)
+    page = await service.list_highlights(
+        user_id=owner, user_book_id=h.user_book_id, cursor=None, limit=20
+    )
+    assert page.items == []

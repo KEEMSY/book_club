@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
 import '../domain/comment.dart';
+import '../domain/highlight.dart';
 import '../domain/post.dart';
 import '../domain/post_type.dart';
 import '../domain/reaction_type.dart';
@@ -133,6 +134,41 @@ class FeedRepository {
 
   Future<void> deleteComment(String commentId) async {
     await _call(() => _api.deleteComment(commentId));
+  }
+
+  Future<Highlight> createHighlight({
+    required String userBookId,
+    required String quoteText,
+    int? pageNumber,
+  }) async {
+    final HighlightDto dto = await _call(
+      () => _api.createHighlight(
+        userBookId,
+        <String, dynamic>{
+          'quote_text': quoteText,
+          if (pageNumber != null) 'page_number': pageNumber,
+        },
+      ),
+    );
+    return dto.toDomain();
+  }
+
+  Future<HighlightPage> listHighlights({
+    required String userBookId,
+    String? cursor,
+    int limit = 20,
+  }) async {
+    final HighlightPageDto dto = await _call(
+      () => _api.listHighlights(userBookId, cursor: cursor, limit: limit),
+    );
+    return dto.toDomain();
+  }
+
+  Future<void> deleteHighlight({
+    required String userBookId,
+    required String highlightId,
+  }) async {
+    await _call(() => _api.deleteHighlight(userBookId, highlightId));
   }
 
   /// Orchestrates presign → PUT → key. Surfaced through the repository so

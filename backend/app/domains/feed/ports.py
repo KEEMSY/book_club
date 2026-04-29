@@ -21,6 +21,7 @@ from uuid import UUID
 from app.domains.feed.models import (
     Comment,
     Post,
+    PostHighlight,
     PostType,
     Reaction,
     ReactionType,
@@ -183,3 +184,27 @@ class FeedUserQueryPort(Protocol):
     """
 
     async def get_authors(self, user_ids: list[UUID]) -> dict[UUID, AuthorView]: ...
+
+
+class HighlightRepositoryPort(Protocol):
+    async def create(
+        self,
+        *,
+        user_id: UUID,
+        user_book_id: UUID,
+        quote_text: str,
+        page_number: int | None,
+    ) -> PostHighlight: ...
+
+    async def list_by_user_book(
+        self,
+        user_book_id: UUID,
+        *,
+        user_id: UUID,
+        cursor: datetime | None,
+        limit: int,
+    ) -> list[PostHighlight]: ...
+
+    async def get_by_id(self, highlight_id: UUID) -> PostHighlight | None: ...
+
+    async def delete(self, highlight_id: UUID) -> None: ...

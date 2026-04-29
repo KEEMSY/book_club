@@ -32,7 +32,7 @@ from sqlalchemy import and_, delete, func, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domains.feed.models import Comment, Post, Reaction, ReactionType
+from app.domains.feed.models import Comment, Post, PostHighlight, Reaction, ReactionType
 
 
 class PostRepository:
@@ -279,4 +279,63 @@ class CommentRepository:
         if row is None:
             return
         row.deleted_at = at
+        await self._session.flush()
+
+
+class HighlightRepository:
+    """Persistence adapter for :class:`PostHighlight`. Implements ``HighlightRepositoryPort``."""
+
+    def __init__(self, session: AsyncSession) -> None:
+        self._session = session
+
+    async def create(
+        self,
+        *,
+        user_id: UUID,
+        user_book_id: UUID,
+        quote_text: str,
+        page_number: int | None,
+    ) -> PostHighlight:
+        row = PostHighlight(
+            user_id=user_id,
+            user_book_id=user_book_id,
+            quote_text=quote_text,
+            page_number=page_number,
+        )
+        self._session.add(row)
+        await self._session.flush()
+        await self._session.refresh(row)
+        return row
+
+    async def get_by_id(self, highlight_id: UUID) -> PostHighlight | None:
+        return await self._session.get(PostHighlight, highlight_id)
+
+    async def list_by_user_book(
+        self,
+        user_book_id: UUID,
+        *,
+        user_id: UUID,
+        cursor: datetime | None,
+        limit: int,
+    ) -> list[PostHighlight]:
+        conditions = [
+            PostHighlight.user_book_id == user_book_id,
+            PostHighlight.user_id == user_id,
+        ]
+        if cursor is not None:
+            conditions.append(PostHighlight.created_at < cursor)
+        stmt = (
+            select(PostHighlight)
+            .where(and_(*conditions))
+            .order_by(PostHighlight.created_at.desc(), PostHighlight.id.desc())
+            .limit(limit)
+        )
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def delete(self, highlight_id: UUID) -> None:
+        row = await self._session.get(PostHighlight, highlight_id)
+        if row is None:
+            return
+        await self._session.delete(row)
         await self._session.flush()

@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../feed/application/highlight_notifier.dart';
+import '../../feed/application/highlight_state.dart';
+import '../../feed/domain/highlight.dart';
 import '../../feed/presentation/book_feed_section.dart';
 import '../application/book_detail_notifier.dart';
 import '../application/book_detail_state.dart';
@@ -57,6 +60,12 @@ class BookDetailScreen extends ConsumerWidget {
             book: book,
             libraryState: libraryState,
             spacing: spacing,
+            userBookId: switch (libraryState) {
+              LibraryCtaAdded(:final userBook) => userBook.id,
+              LibraryCtaDuplicate(:final duplicateUserBookId) =>
+                duplicateUserBookId,
+              _ => null,
+            },
             onAdd: () async {
               final messenger = ScaffoldMessenger.of(context);
               final userBook = await ref
@@ -111,6 +120,7 @@ class _Content extends StatefulWidget {
     required this.onAdd,
     required this.onAddWishlist,
     required this.onGoToLibrary,
+    this.userBookId,
   });
 
   final Book book;
@@ -119,6 +129,7 @@ class _Content extends StatefulWidget {
   final VoidCallback onAdd;
   final VoidCallback onAddWishlist;
   final VoidCallback onGoToLibrary;
+  final String? userBookId;
 
   @override
   State<_Content> createState() => _ContentState();
@@ -201,6 +212,13 @@ class _ContentState extends State<_Content> {
               onAddWishlist: widget.onAddWishlist,
               onGoToLibrary: widget.onGoToLibrary,
             ),
+            if (widget.userBookId != null) ...<Widget>[
+              SizedBox(height: spacing.xl),
+              _HighlightSection(
+                userBookId: widget.userBookId!,
+                bookId: book.id,
+              ),
+            ],
             SizedBox(height: spacing.xl),
             BookFeedSection(
               bookId: book.id,
@@ -408,5 +426,244 @@ class _ErrorView extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Highlight section
+// ---------------------------------------------------------------------------
+
+class _HighlightSection extends ConsumerWidget {
+  const _HighlightSection({required this.userBookId, required this.bookId});
+
+  final String userBookId;
+  final String bookId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+    final HighlightState state = ref.watch(highlightNotifierProvider(userBookId));
+
+    // Load on first build.
+    ref.listen<HighlightState>(highlightNotifierProvider(userBookId), (_, __) {});
+    if (state is HighlightInitial) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(highlightNotifierProvider(userBookId).notifier).load();
+      });
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Row(
+          children: <Widget>[
+            Expanded(
+              child: Text('내 하이라이트', style: theme.textTheme.titleMedium),
+            ),
+            TextButton.icon(
+              onPressed: () => _showAddModal(context, ref),
+              icon: const Icon(Icons.add, size: 18),
+              label: const Text('추가'),
+            ),
+          ],
+        ),
+        if (state is HighlightLoading)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            child: Center(child: CircularProgressIndicator()),
+          )
+        else if (state is HighlightLoaded && state.items.isEmpty)
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: spacing.md),
+            child: Text(
+              '기억하고 싶은 문장을 저장해보세요.',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          )
+        else if (state is HighlightLoaded)
+          ...state.items
+              .map((Highlight h) => _HighlightCard(highlight: h, userBookId: userBookId)),
+      ],
+    );
+  }
+
+  Future<void> _showAddModal(BuildContext context, WidgetRef ref) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) => _AddHighlightSheet(userBookId: userBookId),
+    );
+  }
+}
+
+class _HighlightCard extends ConsumerWidget {
+  const _HighlightCard({required this.highlight, required this.userBookId});
+
+  final Highlight highlight;
+  final String userBookId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final radii = theme.extension<AppRadius>()!;
+    final spacing = theme.extension<AppSpacing>()!;
+    return Container(
+      margin: EdgeInsets.only(bottom: spacing.sm),
+      padding: EdgeInsets.all(spacing.md),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerLowest,
+        border: Border(
+          left: BorderSide(
+            color: theme.colorScheme.primary,
+            width: 3,
+          ),
+        ),
+        borderRadius: BorderRadius.all(Radius.circular(radii.sm)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  '"${highlight.quoteText}"',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontStyle: FontStyle.italic,
+                    height: 1.6,
+                  ),
+                ),
+                if (highlight.pageNumber != null) ...<Widget>[
+                  const SizedBox(height: 4),
+                  Text(
+                    'p.${highlight.pageNumber}',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete_outline, size: 18),
+            onPressed: () => ref
+                .read(highlightNotifierProvider(userBookId).notifier)
+                .delete(highlight.id),
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AddHighlightSheet extends ConsumerStatefulWidget {
+  const _AddHighlightSheet({required this.userBookId});
+
+  final String userBookId;
+
+  @override
+  ConsumerState<_AddHighlightSheet> createState() => _AddHighlightSheetState();
+}
+
+class _AddHighlightSheetState extends ConsumerState<_AddHighlightSheet> {
+  final TextEditingController _quoteController = TextEditingController();
+  final TextEditingController _pageController = TextEditingController();
+  bool _saving = false;
+
+  @override
+  void dispose() {
+    _quoteController.dispose();
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        spacing.lg,
+        spacing.sm,
+        spacing.lg,
+        spacing.lg + MediaQuery.viewInsetsOf(context).bottom,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Text('하이라이트 추가', style: theme.textTheme.headlineMedium),
+          SizedBox(height: spacing.md),
+          TextField(
+            controller: _quoteController,
+            maxLength: 500,
+            maxLines: 5,
+            minLines: 3,
+            decoration: const InputDecoration(
+              hintText: '기억하고 싶은 문장을 입력하세요',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          SizedBox(height: spacing.sm),
+          TextField(
+            controller: _pageController,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(
+              hintText: '페이지 번호 (선택)',
+              border: OutlineInputBorder(),
+              prefixText: 'p.',
+            ),
+          ),
+          SizedBox(height: spacing.lg),
+          FilledButton(
+            onPressed: _saving ? null : _save,
+            child: _saving
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                : const Text('저장'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _save() async {
+    final String quote = _quoteController.text.trim();
+    if (quote.isEmpty) return;
+    final int? page = int.tryParse(_pageController.text.trim());
+    setState(() => _saving = true);
+    final Highlight? h = await ref
+        .read(highlightNotifierProvider(widget.userBookId).notifier)
+        .add(quoteText: quote, pageNumber: page);
+    if (!mounted) return;
+    setState(() => _saving = false);
+    if (h != null) {
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('하이라이트가 저장됐어요')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('저장에 실패했어요. 다시 시도해주세요.')),
+      );
+    }
   }
 }

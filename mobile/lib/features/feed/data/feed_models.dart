@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../domain/comment.dart';
+import '../domain/highlight.dart';
 import '../domain/post.dart';
 import '../domain/post_author.dart';
 import '../domain/post_type.dart';
@@ -217,4 +218,60 @@ class CreateCommentRequest with _$CreateCommentRequest {
 
   factory CreateCommentRequest.fromJson(Map<String, dynamic> json) =>
       _$CreateCommentRequestFromJson(json);
+}
+
+/// Mirror of `HighlightPublic` from the backend.
+@freezed
+class HighlightDto with _$HighlightDto {
+  const HighlightDto._();
+
+  const factory HighlightDto({
+    required String id,
+    required String userBookId,
+    required String quoteText,
+    int? pageNumber,
+    required DateTime createdAt,
+  }) = _HighlightDto;
+
+  factory HighlightDto.fromJson(Map<String, dynamic> json) =>
+      _$HighlightDtoFromJson(json);
+
+  Highlight toDomain() => Highlight(
+        id: id,
+        userBookId: userBookId,
+        quoteText: quoteText,
+        pageNumber: pageNumber,
+        createdAt: createdAt,
+      );
+}
+
+/// Paginated list response for highlights.
+@freezed
+class HighlightPageDto with _$HighlightPageDto {
+  const HighlightPageDto._();
+
+  const factory HighlightPageDto({
+    required List<HighlightDto> items,
+    String? nextCursor,
+  }) = _HighlightPageDto;
+
+  factory HighlightPageDto.fromJson(Map<String, dynamic> json) =>
+      _$HighlightPageDtoFromJson(json);
+
+  HighlightPage toDomain() => HighlightPage(
+        items: items.map((HighlightDto h) => h.toDomain()).toList(),
+        nextCursor: nextCursor,
+      );
+}
+
+/// Body for `POST /me/library/{user_book_id}/highlights`.
+@freezed
+class CreateHighlightRequest with _$CreateHighlightRequest {
+  const factory CreateHighlightRequest({
+    required String quoteText,
+    int? pageNumber,
+  }) = _CreateHighlightRequest;
+
+  factory CreateHighlightRequest.fromJson(Map<String, dynamic> json) =>
+      _$CreateHighlightRequestFromJson(json);
 }

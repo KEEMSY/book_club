@@ -30,8 +30,11 @@ from app.domains.feed.schemas import (
     CommentPublic,
     CommentResponse,
     CreateCommentRequest,
+    CreateHighlightRequest,
     CreatePostRequest,
     FeedResponse,
+    HighlightPublic,
+    HighlightResponse,
     PostPublic,
     PresignedUploadResponse,
     RequestUploadRequest,
@@ -223,4 +226,73 @@ async def delete_comment(
     service: Annotated[FeedService, Depends(get_feed_service)],
 ) -> Response:
     await service.delete_comment(user_id=UUID(user_id), comment_id=comment_id)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.post(
+    "/me/library/{user_book_id}/highlights",
+    response_model=HighlightPublic,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_highlight(
+    user_book_id: UUID,
+    body: CreateHighlightRequest,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[FeedService, Depends(get_feed_service)],
+) -> HighlightPublic:
+    highlight = await service.create_highlight(
+        user_id=UUID(user_id),
+        user_book_id=user_book_id,
+        quote_text=body.quote_text,
+        page_number=body.page_number,
+    )
+    return HighlightPublic(
+        id=highlight.id,
+        user_book_id=highlight.user_book_id,
+        quote_text=highlight.quote_text,
+        page_number=highlight.page_number,
+        created_at=highlight.created_at,
+    )
+
+
+@router.get("/me/library/{user_book_id}/highlights", response_model=HighlightResponse)
+async def list_highlights(
+    user_book_id: UUID,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[FeedService, Depends(get_feed_service)],
+    cursor: Annotated[str | None, Query()] = None,
+    limit: Annotated[int, Query(ge=1, le=50)] = 20,
+) -> HighlightResponse:
+    page = await service.list_highlights(
+        user_id=UUID(user_id),
+        user_book_id=user_book_id,
+        cursor=cursor,
+        limit=limit,
+    )
+    return HighlightResponse(
+        items=[
+            HighlightPublic(
+                id=h.id,
+                user_book_id=h.user_book_id,
+                quote_text=h.quote_text,
+                page_number=h.page_number,
+                created_at=h.created_at,
+            )
+            for h in page.items
+        ],
+        next_cursor=page.next_cursor,
+    )
+
+
+@router.delete(
+    "/me/library/{user_book_id}/highlights/{highlight_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def delete_highlight(
+    user_book_id: UUID,  # path param kept for RESTful consistency; unused in handler
+    highlight_id: UUID,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[FeedService, Depends(get_feed_service)],
+) -> Response:
+    await service.delete_highlight(user_id=UUID(user_id), highlight_id=highlight_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

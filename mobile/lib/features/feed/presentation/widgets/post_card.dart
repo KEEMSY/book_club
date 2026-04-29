@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../domain/post.dart';
+import '../../domain/post_type.dart';
 import '../../domain/reaction_type.dart';
 import 'image_grid.dart';
 import 'post_type_pill.dart';
@@ -68,13 +69,16 @@ class PostCard extends StatelessWidget {
         children: <Widget>[
           _Header(post: post, onTapAuthor: onTapAuthor),
           SizedBox(height: spacing.sm),
-          Text(
-            post.content,
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: theme.colorScheme.onSurface,
-              height: 1.5,
+          if (post.postType == PostType.highlight)
+            _HighlightBody(content: post.content)
+          else
+            Text(
+              post.content,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.onSurface,
+                height: 1.5,
+              ),
             ),
-          ),
           if (post.imageUrls.isNotEmpty) ...<Widget>[
             SizedBox(height: spacing.sm),
             ImageGrid(urls: post.imageUrls),
@@ -188,6 +192,39 @@ class _Avatar extends StatelessWidget {
         style: theme.textTheme.titleSmall?.copyWith(
           color: theme.colorScheme.onSurface,
           fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+}
+
+class _HighlightBody extends StatelessWidget {
+  const _HighlightBody({required this.content});
+
+  final String content;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final radii = theme.extension<AppRadius>()!;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerLowest,
+        border: Border(
+          left: BorderSide(color: theme.colorScheme.primary, width: 3),
+        ),
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(radii.sm),
+          bottomRight: Radius.circular(radii.sm),
+        ),
+      ),
+      child: Text(
+        '"$content"',
+        style: theme.textTheme.bodyLarge?.copyWith(
+          fontStyle: FontStyle.italic,
+          color: theme.colorScheme.onSurface,
+          height: 1.6,
         ),
       ),
     );

@@ -188,3 +188,51 @@ Map<String, dynamic> _$$CreateCommentRequestImplToJson(
       'parent_id': instance.parentId,
       'content': instance.content,
     };
+
+_$HighlightDtoImpl _$$HighlightDtoImplFromJson(Map<String, dynamic> json) =>
+    _$HighlightDtoImpl(
+      id: json['id'] as String,
+      userBookId: json['user_book_id'] as String,
+      quoteText: json['quote_text'] as String,
+      pageNumber: (json['page_number'] as num?)?.toInt(),
+      createdAt: DateTime.parse(json['created_at'] as String),
+    );
+
+Map<String, dynamic> _$$HighlightDtoImplToJson(_$HighlightDtoImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'user_book_id': instance.userBookId,
+      'quote_text': instance.quoteText,
+      'page_number': instance.pageNumber,
+      'created_at': instance.createdAt.toIso8601String(),
+    };
+
+_$HighlightPageDtoImpl _$$HighlightPageDtoImplFromJson(
+        Map<String, dynamic> json) =>
+    _$HighlightPageDtoImpl(
+      items: (json['items'] as List<dynamic>)
+          .map((e) => HighlightDto.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      nextCursor: json['next_cursor'] as String?,
+    );
+
+Map<String, dynamic> _$$HighlightPageDtoImplToJson(
+        _$HighlightPageDtoImpl instance) =>
+    <String, dynamic>{
+      'items': instance.items.map((e) => e.toJson()).toList(),
+      'next_cursor': instance.nextCursor,
+    };
+
+_$CreateHighlightRequestImpl _$$CreateHighlightRequestImplFromJson(
+        Map<String, dynamic> json) =>
+    _$CreateHighlightRequestImpl(
+      quoteText: json['quote_text'] as String,
+      pageNumber: (json['page_number'] as num?)?.toInt(),
+    );
+
+Map<String, dynamic> _$$CreateHighlightRequestImplToJson(
+        _$CreateHighlightRequestImpl instance) =>
+    <String, dynamic>{
+      'quote_text': instance.quoteText,
+      'page_number': instance.pageNumber,
+    };
