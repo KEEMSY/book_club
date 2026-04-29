@@ -105,6 +105,7 @@ class LibraryPageDto with _$LibraryPageDto {
 class AddToLibraryRequest with _$AddToLibraryRequest {
   const factory AddToLibraryRequest({
     required String bookId,
+    @Default('reading') String status,
   }) = _AddToLibraryRequest;
 
   factory AddToLibraryRequest.fromJson(Map<String, dynamic> json) =>

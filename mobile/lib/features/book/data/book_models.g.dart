@@ -91,12 +91,14 @@ _$AddToLibraryRequestImpl _$$AddToLibraryRequestImplFromJson(
         Map<String, dynamic> json) =>
     _$AddToLibraryRequestImpl(
       bookId: json['book_id'] as String,
+      status: json['status'] as String? ?? 'reading',
     );
 
 Map<String, dynamic> _$$AddToLibraryRequestImplToJson(
         _$AddToLibraryRequestImpl instance) =>
     <String, dynamic>{
       'book_id': instance.bookId,
+      'status': instance.status,
     };
 
 _$UpdateStatusRequestImpl _$$UpdateStatusRequestImplFromJson(

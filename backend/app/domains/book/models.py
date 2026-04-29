@@ -57,6 +57,7 @@ class UserBookStatus(enum.StrEnum):
     COMPLETED = "completed"
     PAUSED = "paused"
     DROPPED = "dropped"
+    WISHLIST = "wishlist"
 
 
 class Book(Base):

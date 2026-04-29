@@ -235,6 +235,9 @@ class _StatusPill extends StatelessWidget {
       case BookStatus.dropped:
         background = theme.colorScheme.surfaceContainerHighest;
         foreground = theme.colorScheme.onSurface;
+      case BookStatus.wishlist:
+        background = theme.colorScheme.secondaryContainer;
+        foreground = theme.colorScheme.onSecondaryContainer;
     }
 
     return Container(

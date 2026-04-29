@@ -44,12 +44,16 @@ class SearchBooksResponse(BaseModel):
     has_more: bool
 
 
+_LibraryStatus = Literal["reading", "completed", "paused", "dropped", "wishlist"]
+
+
 class AddToLibraryRequest(BaseModel):
     book_id: UUID
+    status: _LibraryStatus = "reading"
 
 
 class UpdateStatusRequest(BaseModel):
-    status: Literal["reading", "completed", "paused", "dropped"]
+    status: _LibraryStatus
 
 
 class SubmitReviewRequest(BaseModel):
@@ -62,7 +66,7 @@ class UserBookPublic(BaseModel):
 
     id: UUID
     book: BookPublic
-    status: Literal["reading", "completed", "paused", "dropped"]
+    status: _LibraryStatus
     started_at: datetime | None
     finished_at: datetime | None
     rating: int | None

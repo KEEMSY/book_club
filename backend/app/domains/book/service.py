@@ -104,13 +104,17 @@ class BookService:
             raise NotFoundError("book not found", code="BOOK_NOT_FOUND")
         return book
 
-    async def add_to_library(self, *, user_id: UUID, book_id: UUID) -> UserBook:
+    async def add_to_library(
+        self,
+        *,
+        user_id: UUID,
+        book_id: UUID,
+        status: UserBookStatus = UserBookStatus.READING,
+    ) -> UserBook:
         book = await self.books.get_by_id(book_id)
         if book is None:
             raise NotFoundError("book not found", code="BOOK_NOT_FOUND")
-        return await self.user_books.create(
-            user_id=user_id, book_id=book_id, status=UserBookStatus.READING
-        )
+        return await self.user_books.create(user_id=user_id, book_id=book_id, status=status)
 
     async def add_external_to_library(
         self,
@@ -118,6 +122,7 @@ class BookService:
         user_id: UUID,
         external_isbn13: str,
         query_hint: str | None = None,
+        status: UserBookStatus = UserBookStatus.READING,
     ) -> UserBook:
         """Fetch-if-missing then add — the UX flow where the mobile app has
         an ``ExternalBook`` in hand but no catalog row yet.
@@ -133,9 +138,7 @@ class BookService:
                 code="BOOK_NOT_FOUND",
             )
         _ = query_hint  # Reserved for future provider re-fetch path.
-        return await self.user_books.create(
-            user_id=user_id, book_id=book.id, status=UserBookStatus.READING
-        )
+        return await self.user_books.create(user_id=user_id, book_id=book.id, status=status)
 
     async def update_status(
         self,

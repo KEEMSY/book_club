@@ -67,12 +67,20 @@ class BookRepository {
     return dto.toDomain();
   }
 
-  Future<UserBook> addToLibrary(String bookId) async {
+  Future<UserBook> addToLibrary(
+    String bookId, {
+    BookStatus status = BookStatus.reading,
+  }) async {
     final UserBookDto dto = await _call(
-      () => _api.addToLibrary(AddToLibraryRequest(bookId: bookId).toJson()),
+      () => _api.addToLibrary(
+        AddToLibraryRequest(bookId: bookId, status: status.wire).toJson(),
+      ),
     );
     return dto.toDomain();
   }
+
+  Future<UserBook> addToWishlist(String bookId) =>
+      addToLibrary(bookId, status: BookStatus.wishlist);
 
   Future<UserBook> updateStatus({
     required String userBookId,

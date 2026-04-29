@@ -982,6 +982,7 @@ AddToLibraryRequest _$AddToLibraryRequestFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$AddToLibraryRequest {
   String get bookId => throw _privateConstructorUsedError;
+  String get status => throw _privateConstructorUsedError;
 
   /// Serializes this AddToLibraryRequest to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -999,7 +1000,7 @@ abstract class $AddToLibraryRequestCopyWith<$Res> {
           AddToLibraryRequest value, $Res Function(AddToLibraryRequest) then) =
       _$AddToLibraryRequestCopyWithImpl<$Res, AddToLibraryRequest>;
   @useResult
-  $Res call({String bookId});
+  $Res call({String bookId, String status});
 }
 
 /// @nodoc
@@ -1018,11 +1019,16 @@ class _$AddToLibraryRequestCopyWithImpl<$Res, $Val extends AddToLibraryRequest>
   @override
   $Res call({
     Object? bookId = null,
+    Object? status = null,
   }) {
     return _then(_value.copyWith(
       bookId: null == bookId
           ? _value.bookId
           : bookId // ignore: cast_nullable_to_non_nullable
+              as String,
+      status: null == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
               as String,
     ) as $Val);
   }
@@ -1036,7 +1042,7 @@ abstract class _$$AddToLibraryRequestImplCopyWith<$Res>
       __$$AddToLibraryRequestImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String bookId});
+  $Res call({String bookId, String status});
 }
 
 /// @nodoc
@@ -1053,11 +1059,16 @@ class __$$AddToLibraryRequestImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? bookId = null,
+    Object? status = null,
   }) {
     return _then(_$AddToLibraryRequestImpl(
       bookId: null == bookId
           ? _value.bookId
           : bookId // ignore: cast_nullable_to_non_nullable
+              as String,
+      status: null == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
               as String,
     ));
   }
@@ -1066,17 +1077,21 @@ class __$$AddToLibraryRequestImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$AddToLibraryRequestImpl implements _AddToLibraryRequest {
-  const _$AddToLibraryRequestImpl({required this.bookId});
+  const _$AddToLibraryRequestImpl(
+      {required this.bookId, this.status = 'reading'});
 
   factory _$AddToLibraryRequestImpl.fromJson(Map<String, dynamic> json) =>
       _$$AddToLibraryRequestImplFromJson(json);
 
   @override
   final String bookId;
+  @override
+  @JsonKey()
+  final String status;
 
   @override
   String toString() {
-    return 'AddToLibraryRequest(bookId: $bookId)';
+    return 'AddToLibraryRequest(bookId: $bookId, status: $status)';
   }
 
   @override
@@ -1084,12 +1099,13 @@ class _$AddToLibraryRequestImpl implements _AddToLibraryRequest {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$AddToLibraryRequestImpl &&
-            (identical(other.bookId, bookId) || other.bookId == bookId));
+            (identical(other.bookId, bookId) || other.bookId == bookId) &&
+            (identical(other.status, status) || other.status == status));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, bookId);
+  int get hashCode => Object.hash(runtimeType, bookId, status);
 
   /// Create a copy of AddToLibraryRequest
   /// with the given fields replaced by the non-null parameter values.
@@ -1109,14 +1125,17 @@ class _$AddToLibraryRequestImpl implements _AddToLibraryRequest {
 }
 
 abstract class _AddToLibraryRequest implements AddToLibraryRequest {
-  const factory _AddToLibraryRequest({required final String bookId}) =
-      _$AddToLibraryRequestImpl;
+  const factory _AddToLibraryRequest(
+      {required final String bookId,
+      final String status}) = _$AddToLibraryRequestImpl;
 
   factory _AddToLibraryRequest.fromJson(Map<String, dynamic> json) =
       _$AddToLibraryRequestImpl.fromJson;
 
   @override
   String get bookId;
+  @override
+  String get status;
 
   /// Create a copy of AddToLibraryRequest
   /// with the given fields replaced by the non-null parameter values.

@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/book_repository.dart';
 import '../domain/book.dart';
+import '../domain/book_status.dart';
 import '../domain/user_book.dart';
 import 'book_detail_state.dart';
 import 'book_providers.dart';
@@ -30,7 +31,11 @@ class BookDetailNotifier extends StateNotifier<BookDetailState> {
     }
   }
 
-  Future<UserBook?> addToLibrary() async {
+  Future<UserBook?> addToLibrary() => _addWithStatus(BookStatus.reading);
+
+  Future<UserBook?> addToWishlist() => _addWithStatus(BookStatus.wishlist);
+
+  Future<UserBook?> _addWithStatus(BookStatus status) async {
     final BookDetailState snapshot = state;
     if (snapshot is! BookDetailLoaded) {
       return null;
@@ -40,7 +45,8 @@ class BookDetailNotifier extends StateNotifier<BookDetailState> {
     }
     state = snapshot.copyWith(libraryState: const LibraryCtaState.adding());
     try {
-      final UserBook added = await _repository.addToLibrary(bookId);
+      final UserBook added =
+          await _repository.addToLibrary(bookId, status: status);
       state = snapshot.copyWith(
         libraryState: LibraryCtaState.added(userBook: added),
       );

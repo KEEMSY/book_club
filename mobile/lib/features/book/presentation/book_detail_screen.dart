@@ -61,11 +61,21 @@ class BookDetailScreen extends ConsumerWidget {
                   .read(bookDetailNotifierProvider(bookId).notifier)
                   .addToLibrary();
               if (userBook != null) {
-                ref
-                    .read(libraryNotifierProvider.notifier)
-                    .upsert(userBook);
+                ref.read(libraryNotifierProvider.notifier).upsert(userBook);
                 messenger.showSnackBar(
                   const SnackBar(content: Text('서재에 담겼어요')),
+                );
+              }
+            },
+            onAddWishlist: () async {
+              final messenger = ScaffoldMessenger.of(context);
+              final userBook = await ref
+                  .read(bookDetailNotifierProvider(bookId).notifier)
+                  .addToWishlist();
+              if (userBook != null) {
+                ref.read(libraryNotifierProvider.notifier).upsert(userBook);
+                messenger.showSnackBar(
+                  const SnackBar(content: Text('읽고 싶어요 목록에 추가됐어요')),
                 );
               }
             },
@@ -94,6 +104,7 @@ class _Content extends StatefulWidget {
     required this.libraryState,
     required this.spacing,
     required this.onAdd,
+    required this.onAddWishlist,
     required this.onGoToLibrary,
   });
 
@@ -101,6 +112,7 @@ class _Content extends StatefulWidget {
   final LibraryCtaState libraryState;
   final AppSpacing spacing;
   final VoidCallback onAdd;
+  final VoidCallback onAddWishlist;
   final VoidCallback onGoToLibrary;
 
   @override
@@ -181,6 +193,7 @@ class _ContentState extends State<_Content> {
             _LibraryCta(
               state: widget.libraryState,
               onAdd: widget.onAdd,
+              onAddWishlist: widget.onAddWishlist,
               onGoToLibrary: widget.onGoToLibrary,
             ),
             SizedBox(height: spacing.xl),
@@ -261,11 +274,13 @@ class _LibraryCta extends StatelessWidget {
   const _LibraryCta({
     required this.state,
     required this.onAdd,
+    required this.onAddWishlist,
     required this.onGoToLibrary,
   });
 
   final LibraryCtaState state;
   final VoidCallback onAdd;
+  final VoidCallback onAddWishlist;
   final VoidCallback onGoToLibrary;
 
   @override
@@ -273,97 +288,86 @@ class _LibraryCta extends StatelessWidget {
     final theme = Theme.of(context);
     final radii = theme.extension<AppRadius>()!;
 
-    return SizedBox(
-      width: double.infinity,
-      child: switch (state) {
-        LibraryCtaIdle() => FilledButton(
-            style: FilledButton.styleFrom(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(radii.pill)),
-              ),
-              minimumSize: const Size.fromHeight(52),
-            ),
-            onPressed: onAdd,
-            child: const Text('내 서재에 담기'),
-          ),
-        LibraryCtaAdding() => FilledButton(
-            style: FilledButton.styleFrom(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(radii.pill)),
-              ),
-              minimumSize: const Size.fromHeight(52),
-            ),
-            onPressed: null,
-            child: const SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
-            ),
-          ),
-        LibraryCtaAdded() => FilledButton(
-            style: FilledButton.styleFrom(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(radii.pill)),
-              ),
-              minimumSize: const Size.fromHeight(52),
-            ),
-            onPressed: onGoToLibrary,
-            child: const Text('서재에서 보기'),
-          ),
-        // Duplicate: backend returned 409 but we do not know the user_book_id
-        // yet — per the spec, disable the CTA and show a chip.
-        LibraryCtaDuplicate(:final String? duplicateUserBookId) =>
-          duplicateUserBookId == null
-              ? OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.all(Radius.circular(radii.pill)),
-                    ),
-                    minimumSize: const Size.fromHeight(52),
-                  ),
-                  onPressed: null,
-                  child: const Text('이미 서재에 있어요'),
-                )
-              : FilledButton(
-                  style: FilledButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.all(Radius.circular(radii.pill)),
-                    ),
-                    minimumSize: const Size.fromHeight(52),
-                  ),
-                  onPressed: onGoToLibrary,
-                  child: const Text('서재에서 보기'),
-                ),
-        LibraryCtaError(:final String message) => Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Text(
-                message,
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.error,
-                ),
-              ),
-              const SizedBox(height: 8),
-              FilledButton(
-                style: FilledButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(radii.pill)),
-                  ),
-                  minimumSize: const Size.fromHeight(52),
-                ),
-                onPressed: onAdd,
-                child: const Text('다시 시도'),
-              ),
-            ],
-          ),
-      },
+    final ButtonStyle _pillStyle = FilledButton.styleFrom(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(radii.pill)),
+      ),
+      minimumSize: const Size.fromHeight(52),
     );
+    final ButtonStyle _outlinePillStyle = OutlinedButton.styleFrom(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(radii.pill)),
+      ),
+      minimumSize: const Size.fromHeight(52),
+    );
+
+    return switch (state) {
+      LibraryCtaIdle() => Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            FilledButton(
+              style: _pillStyle,
+              onPressed: onAdd,
+              child: const Text('내 서재에 담기'),
+            ),
+            const SizedBox(height: 8),
+            OutlinedButton(
+              style: _outlinePillStyle,
+              onPressed: onAddWishlist,
+              child: const Text('읽고 싶어요'),
+            ),
+          ],
+        ),
+      LibraryCtaAdding() => FilledButton(
+          style: _pillStyle,
+          onPressed: null,
+          child: const SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            ),
+          ),
+        ),
+      LibraryCtaAdded() => FilledButton(
+          style: _pillStyle,
+          onPressed: onGoToLibrary,
+          child: const Text('서재에서 보기'),
+        ),
+      // Duplicate: backend returned 409 but we do not know the user_book_id
+      // yet — per the spec, disable the CTA and show a chip.
+      LibraryCtaDuplicate(:final String? duplicateUserBookId) =>
+        duplicateUserBookId == null
+            ? OutlinedButton(
+                style: _outlinePillStyle,
+                onPressed: null,
+                child: const Text('이미 서재에 있어요'),
+              )
+            : FilledButton(
+                style: _pillStyle,
+                onPressed: onGoToLibrary,
+                child: const Text('서재에서 보기'),
+              ),
+      LibraryCtaError(:final String message) => Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.error,
+              ),
+            ),
+            const SizedBox(height: 8),
+            FilledButton(
+              style: _pillStyle,
+              onPressed: onAdd,
+              child: const Text('다시 시도'),
+            ),
+          ],
+        ),
+    };
   }
 }
 

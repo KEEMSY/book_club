@@ -81,7 +81,9 @@ class FakeBookService:
             raise NotFoundError("book not found", code="BOOK_NOT_FOUND")
         return self.book
 
-    async def add_to_library(self, *, user_id: UUID, book_id: UUID) -> UserBook:
+    async def add_to_library(
+        self, *, user_id: UUID, book_id: UUID, status: UserBookStatus = UserBookStatus.READING
+    ) -> UserBook:
         self.calls.append(("add_to_library", {"user_id": user_id, "book_id": book_id}))
         if self.add_conflict:
             raise ConflictError("already", code="BOOK_ALREADY_IN_LIBRARY")

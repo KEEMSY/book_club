@@ -129,7 +129,11 @@ async def add_to_library(
     user_id: Annotated[str, Depends(get_current_user_id)],
     service: Annotated[BookService, Depends(get_book_service)],
 ) -> UserBookPublic:
-    ub = await service.add_to_library(user_id=UUID(user_id), book_id=body.book_id)
+    ub = await service.add_to_library(
+        user_id=UUID(user_id),
+        book_id=body.book_id,
+        status=UserBookStatus(body.status),
+    )
     return UserBookPublic.from_user_book(ub)
 
 
@@ -169,7 +173,7 @@ async def list_library(
     user_id: Annotated[str, Depends(get_current_user_id)],
     service: Annotated[BookService, Depends(get_book_service)],
     status_filter: Annotated[
-        Literal["reading", "completed", "paused", "dropped"] | None,
+        Literal["reading", "completed", "paused", "dropped", "wishlist"] | None,
         Query(alias="status"),
     ] = None,
     cursor: Annotated[str | None, Query()] = None,

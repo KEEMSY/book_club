@@ -7,7 +7,8 @@ enum BookStatus {
   reading,
   completed,
   paused,
-  dropped;
+  dropped,
+  wishlist;
 
   /// Parses a backend wire value. Unknown strings default to [reading] so
   /// a future server-side status added ahead of client release does not
@@ -22,6 +23,8 @@ enum BookStatus {
         return BookStatus.paused;
       case 'dropped':
         return BookStatus.dropped;
+      case 'wishlist':
+        return BookStatus.wishlist;
       default:
         return BookStatus.reading;
     }
@@ -37,6 +40,8 @@ enum BookStatus {
         return 'paused';
       case BookStatus.dropped:
         return 'dropped';
+      case BookStatus.wishlist:
+        return 'wishlist';
     }
   }
 
@@ -51,6 +56,8 @@ enum BookStatus {
         return '잠시 멈춤';
       case BookStatus.dropped:
         return '포기';
+      case BookStatus.wishlist:
+        return '읽고 싶어요';
     }
   }
 
@@ -65,6 +72,8 @@ enum BookStatus {
         return '잠시 멈춘 책이 없어요';
       case BookStatus.dropped:
         return '포기한 책이 없어요';
+      case BookStatus.wishlist:
+        return '읽고 싶은 책이 없어요';
     }
   }
 }
