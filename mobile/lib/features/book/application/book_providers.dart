@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/network/dio_provider.dart';
 import '../data/book_api.dart';
 import '../data/book_repository.dart';
+import '../domain/book_status.dart';
 
 /// retrofit client for `/books/*` and `/me/library` — built once per Dio.
 final bookApiProvider = Provider<BookApi>((ref) {
@@ -15,3 +16,7 @@ final bookApiProvider = Provider<BookApi>((ref) {
 final bookRepositoryProvider = Provider<BookRepository>((ref) {
   return BookRepository(ref.watch(bookApiProvider));
 });
+
+/// One-shot "jump to this tab" signal consumed by LibraryScreen.
+/// Set before navigating to /library; the screen clears it after reading.
+final libraryPendingTabProvider = StateProvider<BookStatus?>((ref) => null);

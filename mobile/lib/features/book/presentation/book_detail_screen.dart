@@ -6,8 +6,10 @@ import '../../../core/theme/app_theme.dart';
 import '../../feed/presentation/book_feed_section.dart';
 import '../application/book_detail_notifier.dart';
 import '../application/book_detail_state.dart';
+import '../application/book_providers.dart';
 import '../application/library_notifier.dart';
 import '../domain/book.dart';
+import '../domain/book_status.dart';
 import 'widgets/book_cover.dart';
 
 /// Two-pane Airbnb-toned book detail:
@@ -80,19 +82,20 @@ class BookDetailScreen extends ConsumerWidget {
               }
             },
             onGoToLibrary: () {
-              final (String? id, String? status) = switch (libraryState) {
+              final (String? id, String? pendingTab) = switch (libraryState) {
                 LibraryCtaAdded(:final userBook) =>
                   (userBook.id, userBook.status.wire),
                 LibraryCtaDuplicate(:final duplicateUserBookId) =>
                   (duplicateUserBookId, null),
                 _ => (null, null),
               };
-              final StringBuffer uri = StringBuffer('/library');
-              final List<String> params = <String>[];
-              if (id != null) params.add('highlight=$id');
-              if (status != null) params.add('status=$status');
-              if (params.isNotEmpty) uri.write('?${params.join('&')}');
-              context.go(uri.toString());
+              if (pendingTab != null) {
+                ref.read(libraryPendingTabProvider.notifier).state =
+                    BookStatus.fromWire(pendingTab);
+              }
+              final String uri =
+                  id != null ? '/library?highlight=$id' : '/library';
+              context.go(uri);
             },
           ),
       },

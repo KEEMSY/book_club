@@ -230,11 +230,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 builder: (context, state) {
                   final String? highlight =
                       state.uri.queryParameters['highlight'];
-                  final String? status = state.uri.queryParameters['status'];
-                  return LibraryScreen(
-                    highlightUserBookId: highlight,
-                    initialStatusWire: status,
-                  );
+                  return LibraryScreen(highlightUserBookId: highlight);
                 },
               ),
             ],

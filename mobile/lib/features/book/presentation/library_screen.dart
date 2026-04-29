@@ -14,28 +14,22 @@ import 'widgets/empty_states.dart';
 import 'widgets/review_modal.dart';
 import 'widgets/status_segment.dart';
 
-BookStatus _statusFromWire(String? wire) {
-  if (wire == null) return BookStatus.reading;
-  return BookStatus.fromWire(wire);
-}
-
 /// "내 서재" — Airbnb magazine-style library.
 ///
 /// Top: Playfair displaySmall "내 서재" header. Status segments sit below
 /// (읽는 중 · 완독 · 잠시 멈춤 · 포기) and drive the grid. Pagination is
 /// cursor-based via LibraryNotifier.loadMore.
 class LibraryScreen extends ConsumerStatefulWidget {
-  const LibraryScreen({super.key, this.highlightUserBookId, this.initialStatusWire});
+  const LibraryScreen({super.key, this.highlightUserBookId});
 
   final String? highlightUserBookId;
-  final String? initialStatusWire;
 
   @override
   ConsumerState<LibraryScreen> createState() => _LibraryScreenState();
 }
 
 class _LibraryScreenState extends ConsumerState<LibraryScreen> {
-  late BookStatus _selected = _statusFromWire(widget.initialStatusWire);
+  BookStatus _selected = BookStatus.reading;
   final Map<BookStatus, ScrollController> _controllers =
       <BookStatus, ScrollController>{};
 
@@ -50,24 +44,6 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(libraryNotifierProvider.notifier).ensureLoaded(_selected);
     });
-  }
-
-  @override
-  void didUpdateWidget(LibraryScreen oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // StatefulShellRoute keeps this screen alive, so initState won't re-run
-    // when navigating to /library?status=wishlist from book detail. Handle
-    // the tab switch here instead.
-    if (widget.initialStatusWire != null &&
-        widget.initialStatusWire != oldWidget.initialStatusWire) {
-      final BookStatus target = _statusFromWire(widget.initialStatusWire);
-      if (target != _selected) {
-        setState(() => _selected = target);
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          ref.read(libraryNotifierProvider.notifier).ensureLoaded(target);
-        });
-      }
-    }
   }
 
   @override
@@ -94,6 +70,14 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // One-shot signal from book detail — switches to the tab of the just-added
+    // book (e.g. wishlist) and clears itself so the next open is unaffected.
+    ref.listen<BookStatus?>(libraryPendingTabProvider, (_, next) {
+      if (next == null) return;
+      ref.read(libraryPendingTabProvider.notifier).state = null;
+      _selectStatus(next);
+    });
+
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
     final Map<BookStatus, LibraryListState> map =
