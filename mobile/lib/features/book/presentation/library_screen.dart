@@ -53,6 +53,24 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
   }
 
   @override
+  void didUpdateWidget(LibraryScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // StatefulShellRoute keeps this screen alive, so initState won't re-run
+    // when navigating to /library?status=wishlist from book detail. Handle
+    // the tab switch here instead.
+    if (widget.initialStatusWire != null &&
+        widget.initialStatusWire != oldWidget.initialStatusWire) {
+      final BookStatus target = _statusFromWire(widget.initialStatusWire);
+      if (target != _selected) {
+        setState(() => _selected = target);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          ref.read(libraryNotifierProvider.notifier).ensureLoaded(target);
+        });
+      }
+    }
+  }
+
+  @override
   void dispose() {
     for (final ScrollController controller in _controllers.values) {
       controller.dispose();

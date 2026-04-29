@@ -337,20 +337,24 @@ class _LibraryCta extends StatelessWidget {
           onPressed: onGoToLibrary,
           child: const Text('서재에서 보기'),
         ),
-      // Duplicate: backend returned 409 but we do not know the user_book_id
-      // yet — per the spec, disable the CTA and show a chip.
-      LibraryCtaDuplicate(:final String? duplicateUserBookId) =>
-        duplicateUserBookId == null
-            ? OutlinedButton(
-                style: outlinePillStyle,
-                onPressed: null,
-                child: const Text('이미 서재에 있어요'),
-              )
-            : FilledButton(
-                style: pillStyle,
-                onPressed: onGoToLibrary,
-                child: const Text('서재에서 보기'),
+      LibraryCtaDuplicate() => Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Text(
+              '이미 서재에 있는 책이에요',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
               ),
+            ),
+            const SizedBox(height: 8),
+            FilledButton(
+              style: pillStyle,
+              onPressed: onGoToLibrary,
+              child: const Text('서재에서 보기'),
+            ),
+          ],
+        ),
       LibraryCtaError(:final String message) => Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
