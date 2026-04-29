@@ -45,9 +45,7 @@ async def get_following_feed(
     cursor: Annotated[str | None, Query()] = None,
     limit: Annotated[int, Query(ge=1, le=50)] = 20,
 ) -> FeedResponse:
-    page = await service.get_following_feed(
-        user_id=UUID(user_id), cursor=cursor, limit=limit
-    )
+    page = await service.get_following_feed(user_id=UUID(user_id), cursor=cursor, limit=limit)
     author_ids = [item.post.user_id for item in page.items]
     authors = await user_query.get_authors(author_ids) if author_ids else {}
     items = [
@@ -114,9 +112,7 @@ async def get_user_profile(
     viewer_id: Annotated[str, Depends(get_current_user_id)],
     service: Annotated[CommunityService, Depends(get_community_service)],
 ) -> UserProfileResponse:
-    profile = await service.get_user_profile(
-        user_id=user_id, viewer_id=UUID(viewer_id)
-    )
+    profile = await service.get_user_profile(user_id=user_id, viewer_id=UUID(viewer_id))
     return UserProfileResponse(
         id=profile.user_id,
         nickname=profile.nickname,

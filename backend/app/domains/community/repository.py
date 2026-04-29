@@ -31,9 +31,7 @@ class CommunityRepository:
     ) -> list[Post]:
         """Posts from users that `user_id` follows, newest-first."""
         followees_subq = (
-            select(Follow.followee_id)
-            .where(Follow.follower_id == user_id)
-            .scalar_subquery()
+            select(Follow.followee_id).where(Follow.follower_id == user_id).scalar_subquery()
         )
         conditions: list[ColumnElement[bool]] = [
             Post.user_id.in_(followees_subq),
@@ -59,9 +57,7 @@ class CommunityRepository:
     ) -> list[Post]:
         """All non-deleted posts excluding blocked users' content, newest-first."""
         blocked_subq = (
-            select(Block.blocked_id)
-            .where(Block.blocker_id == viewer_id)
-            .scalar_subquery()
+            select(Block.blocked_id).where(Block.blocker_id == viewer_id).scalar_subquery()
         )
         conditions: list[ColumnElement[bool]] = [
             Post.deleted_at.is_(None),
@@ -91,9 +87,7 @@ class CommunityRepository:
         that have zero reactions and those that have many.
         """
         blocked_subq = (
-            select(Block.blocked_id)
-            .where(Block.blocker_id == viewer_id)
-            .scalar_subquery()
+            select(Block.blocked_id).where(Block.blocker_id == viewer_id).scalar_subquery()
         )
         rc = func.count(Reaction.id).label("rc")
         j = outerjoin(Post, Reaction, Reaction.post_id == Post.id)

@@ -200,6 +200,36 @@ class ChallengeRepository:
         counts = {row.challenge_id: row.cnt for row in result}
         return {cid: counts.get(cid, 0) for cid in challenge_ids}
 
+    async def list_user_active_challenges(
+        self,
+        user_id: UUID,
+        challenge_type: str,
+    ) -> list[tuple[Challenge, ChallengeParticipant]]:
+        """Return active, not-yet-achieved challenges of a given type that the user has joined."""
+        now = func.now()
+        stmt = (
+            select(Challenge, ChallengeParticipant)
+            .join(
+                ChallengeParticipant,
+                ChallengeParticipant.challenge_id == Challenge.id,
+            )
+            .where(
+                ChallengeParticipant.user_id == user_id,
+                Challenge.challenge_type == challenge_type,
+                Challenge.starts_at <= now,
+                Challenge.ends_at >= now,
+                ChallengeParticipant.achieved_at.is_(None),
+            )
+        )
+        result = await self._session.execute(stmt)
+        return [(row.Challenge, row.ChallengeParticipant) for row in result]
+
+    async def get_badge(self, badge_id: UUID) -> Badge | None:
+        """Return a badge by id, or None."""
+        stmt = select(Badge).where(Badge.id == badge_id)
+        result = await self._session.execute(stmt)
+        return result.scalar_one_or_none()
+
     async def update_progress(
         self,
         challenge_id: UUID,
@@ -267,3 +297,59 @@ class ChallengeRepository:
         stmt = select(sqlfunc.count()).select_from(UserBadge).where(UserBadge.badge_id == badge_id)
         result = await self._session.execute(stmt)
         return result.scalar_one()
+
+    # ------------------------------------------------------------------
+    # Admin creation
+    # ------------------------------------------------------------------
+
+    async def create_badge(
+        self,
+        *,
+        name: str,
+        description: str,
+        category: str,
+        icon_key: str,
+    ) -> Badge:
+        """Insert a new badge and return it."""
+        from app.domains.challenge.models import BadgeCategory
+
+        row = Badge(
+            name=name,
+            description=description,
+            category=BadgeCategory(category),
+            icon_key=icon_key,
+        )
+        self._session.add(row)
+        await self._session.flush()
+        await self._session.refresh(row)
+        return row
+
+    async def create_challenge(
+        self,
+        *,
+        title: str,
+        description: str | None,
+        challenge_type: str,
+        target_value: int,
+        genre_filter: str | None,
+        starts_at: datetime,
+        ends_at: datetime,
+        badge_id: UUID | None,
+    ) -> Challenge:
+        """Insert a new challenge and return it."""
+        from app.domains.challenge.models import ChallengeType
+
+        row = Challenge(
+            title=title,
+            description=description,
+            challenge_type=ChallengeType(challenge_type),
+            target_value=target_value,
+            genre_filter=genre_filter,
+            starts_at=starts_at,
+            ends_at=ends_at,
+            badge_id=badge_id,
+        )
+        self._session.add(row)
+        await self._session.flush()
+        await self._session.refresh(row)
+        return row

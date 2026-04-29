@@ -105,9 +105,7 @@ class Report(Base):
     )
     # 'post' | 'comment' | 'user' — plain VARCHAR avoids ALTER TYPE on value addition.
     target_type: Mapped[str] = mapped_column(String(16), nullable=False)
-    target_id: Mapped[uuid.UUID] = mapped_column(
-        PGUUID(as_uuid=True), nullable=False
-    )
+    target_id: Mapped[uuid.UUID] = mapped_column(PGUUID(as_uuid=True), nullable=False)
     reason: Mapped[str] = mapped_column(String(500), nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()

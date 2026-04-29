@@ -10,18 +10,21 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app import __version__
 from app.api import health
+from app.api.admin import router as admin_router
 from app.core.config import get_settings
 from app.core.exceptions import register_exception_handlers
 from app.domains.auth.router import router as auth_router
+from app.domains.book.events import UserBookCompleted
 from app.domains.book.router import router as book_router
 from app.domains.challenge.events import BadgeEarned
+from app.domains.challenge.providers import get_challenge_service_singleton
 from app.domains.challenge.router import router as challenge_router
 from app.domains.community.router import router as community_router
 from app.domains.feed.events import CommentAdded, ReactionAdded
 from app.domains.feed.router import router as feed_router
 from app.domains.notification.providers import create_scheduler, get_notification_service
 from app.domains.notification.router import router as notification_router
-from app.domains.reading.events import UserGradeRecomputed
+from app.domains.reading.events import ReadingSessionCompleted, UserGradeRecomputed
 from app.domains.reading.providers import get_event_bus
 from app.domains.reading.router import router as reading_router
 from app.domains.social.events import FollowReceived
@@ -32,6 +35,7 @@ from app.domains.social.router import router as social_router
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """Wire event bus subscribers and start the APScheduler on startup."""
     notification_svc = get_notification_service()
+    challenge_svc = get_challenge_service_singleton()
     bus = get_event_bus()
 
     bus.subscribe(ReactionAdded, notification_svc.on_reaction_added)
@@ -39,6 +43,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     bus.subscribe(UserGradeRecomputed, notification_svc.on_grade_up)
     bus.subscribe(FollowReceived, notification_svc.on_follow_received)
     bus.subscribe(BadgeEarned, notification_svc.on_badge_earned)
+    bus.subscribe(ReadingSessionCompleted, challenge_svc.on_reading_session_completed)
+    bus.subscribe(UserBookCompleted, challenge_svc.on_user_book_completed)
+    bus.subscribe(UserGradeRecomputed, challenge_svc.on_grade_recomputed)
 
     scheduler = create_scheduler(notification_svc)
     scheduler.start()
@@ -86,6 +93,7 @@ def create_app() -> FastAPI:
     app.include_router(social_router)
     app.include_router(community_router)
     app.include_router(challenge_router)
+    app.include_router(admin_router)
 
     return app
 

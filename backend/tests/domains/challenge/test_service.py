@@ -221,6 +221,31 @@ class FakeChallengeRepository:
     async def badge_earner_count(self, badge_id: UUID) -> int:
         return sum(1 for (_, bid) in self._user_badges if bid == badge_id)
 
+    async def get_badge(self, badge_id: UUID) -> _FakeBadge | None:
+        return self._badges.get(badge_id)
+
+    async def list_user_active_challenges(
+        self,
+        user_id: UUID,
+        challenge_type: str,
+    ) -> list[Any]:
+        now = datetime.now(tz=UTC)
+        results = []
+        for (cid, uid), p in self._participants.items():
+            if uid != user_id:
+                continue
+            if p.achieved_at is not None:
+                continue
+            ch = self._challenges.get(cid)
+            if ch is None:
+                continue
+            if ch.challenge_type != challenge_type:
+                continue
+            if not (ch.starts_at <= now <= ch.ends_at):
+                continue
+            results.append((ch, p))
+        return results
+
 
 # ---------------------------------------------------------------------------
 # Helper
@@ -426,3 +451,141 @@ async def test_award_badge_unknown_badge_raises() -> None:
 
     with pytest.raises(NotFoundError):
         await svc.award_badge(uuid4(), uuid4())
+
+
+# ---------------------------------------------------------------------------
+# _advance_challenges — event handler progress logic
+# ---------------------------------------------------------------------------
+
+
+async def _advance(
+    repo: FakeChallengeRepository,
+    *,
+    user_id: UUID,
+    challenge_type: str,
+    delta: int,
+    mode: str,
+) -> list[object]:
+    """Helper: call _advance_challenges with fake repo, return staged events."""
+    staged: list[object] = []
+    await ChallengeService._advance_challenges(
+        repo=repo,
+        stage=staged.append,
+        user_id=user_id,
+        challenge_type=challenge_type,
+        delta=delta,
+        mode=mode,
+    )
+    return staged
+
+
+@pytest.mark.asyncio
+async def test_advance_books_count_increments_progress() -> None:
+    """books_count challenge progress increments by 1 per completed book."""
+    repo = FakeChallengeRepository()
+    user_id = uuid4()
+    ch = _FakeChallenge(challenge_type="books_count", target_value=5)
+    repo.add_challenge(ch)
+    await repo.join(ch.id, user_id)
+
+    staged = await _advance(repo, user_id=user_id, challenge_type="books_count", delta=1, mode="add")
+
+    p = await repo.get_participant(ch.id, user_id)
+    assert p is not None
+    assert p.current_value == 1
+    assert p.achieved_at is None
+    assert staged == []
+
+
+@pytest.mark.asyncio
+async def test_advance_books_count_awards_badge_on_target() -> None:
+    """books_count challenge reaches target → badge awarded + BadgeEarned staged."""
+    repo = FakeChallengeRepository()
+    user_id = uuid4()
+    badge = _FakeBadge(name="다독가")
+    repo.add_badge(badge)
+    ch = _FakeChallenge(challenge_type="books_count", target_value=2, badge_id=badge.id)
+    repo.add_challenge(ch)
+    await repo.join(ch.id, user_id)
+    await repo.update_progress(ch.id, user_id, 1, None)
+
+    staged = await _advance(repo, user_id=user_id, challenge_type="books_count", delta=1, mode="add")
+
+    p = await repo.get_participant(ch.id, user_id)
+    assert p is not None
+    assert p.current_value == 2
+    assert p.achieved_at is not None
+    assert await repo.has_badge(user_id, badge.id)
+    assert len(staged) == 1
+    ev = staged[0]
+    assert isinstance(ev, BadgeEarned)
+    assert ev.user_id == user_id
+    assert ev.badge_name == "다독가"
+
+
+@pytest.mark.asyncio
+async def test_advance_already_achieved_skipped() -> None:
+    """Challenges already achieved (achieved_at set) are not re-processed."""
+    repo = FakeChallengeRepository()
+    user_id = uuid4()
+    ch = _FakeChallenge(challenge_type="books_count", target_value=1)
+    repo.add_challenge(ch)
+    await repo.join(ch.id, user_id)
+    # Manually mark as achieved
+    await repo.update_progress(ch.id, user_id, 1, datetime.now(tz=UTC))
+
+    staged = await _advance(repo, user_id=user_id, challenge_type="books_count", delta=1, mode="add")
+
+    assert staged == []
+    p = await repo.get_participant(ch.id, user_id)
+    assert p is not None
+    assert p.current_value == 1  # not incremented again
+
+
+@pytest.mark.asyncio
+async def test_advance_reading_time_accumulates() -> None:
+    """reading_time progress accumulates (mode=add) across multiple events."""
+    repo = FakeChallengeRepository()
+    user_id = uuid4()
+    ch = _FakeChallenge(challenge_type="reading_time", target_value=3600)
+    repo.add_challenge(ch)
+    await repo.join(ch.id, user_id)
+
+    await _advance(repo, user_id=user_id, challenge_type="reading_time", delta=1800, mode="add")
+    await _advance(repo, user_id=user_id, challenge_type="reading_time", delta=1200, mode="add")
+
+    p = await repo.get_participant(ch.id, user_id)
+    assert p is not None
+    assert p.current_value == 3000
+
+
+@pytest.mark.asyncio
+async def test_advance_streak_uses_max() -> None:
+    """streak progress uses max(current, delta) — smaller updates don't regress."""
+    repo = FakeChallengeRepository()
+    user_id = uuid4()
+    ch = _FakeChallenge(challenge_type="streak", target_value=30)
+    repo.add_challenge(ch)
+    await repo.join(ch.id, user_id)
+    await repo.update_progress(ch.id, user_id, 15, None)
+
+    # A streak regression (10 < 15) should not decrease the stored value.
+    await _advance(repo, user_id=user_id, challenge_type="streak", delta=10, mode="max")
+
+    p = await repo.get_participant(ch.id, user_id)
+    assert p is not None
+    assert p.current_value == 15
+
+
+@pytest.mark.asyncio
+async def test_advance_no_badge_when_challenge_has_none() -> None:
+    """Reaching target on a challenge without a badge_id stages no BadgeEarned."""
+    repo = FakeChallengeRepository()
+    user_id = uuid4()
+    ch = _FakeChallenge(challenge_type="books_count", target_value=1, badge_id=None)
+    repo.add_challenge(ch)
+    await repo.join(ch.id, user_id)
+
+    staged = await _advance(repo, user_id=user_id, challenge_type="books_count", delta=1, mode="add")
+
+    assert staged == []

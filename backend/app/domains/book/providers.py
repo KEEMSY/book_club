@@ -20,6 +20,8 @@ from app.domains.book.adapters.kakao_book_adapter import KakaoBookAdapter
 from app.domains.book.adapters.naver_book_adapter import NaverBookAdapter
 from app.domains.book.repository import BookRepository, UserBookRepository
 from app.domains.book.service import BookService
+from app.domains.reading.providers import get_event_bus
+from app.shared.event_bus import commit_and_publish, stage_event
 
 
 def get_book_service(
@@ -28,6 +30,13 @@ def get_book_service(
     """Construct a BookService wired with live repositories + the composite
     search adapter (Naver primary, Kakao fallback).
     """
+    bus = get_event_bus()
+
+    def _stage(event: object) -> None:
+        stage_event(session, event)
+
+    commit_and_publish(session, bus)
+
     search = CompositeBookSearchAdapter(
         primary=NaverBookAdapter(),
         fallback=KakaoBookAdapter(),
@@ -36,4 +45,5 @@ def get_book_service(
         books=BookRepository(session),
         user_books=UserBookRepository(session),
         search_provider=search,
+        stage_event=_stage,
     )

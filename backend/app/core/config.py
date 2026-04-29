@@ -66,6 +66,9 @@ class Settings(BaseSettings):
     firebase_credentials_json: str = Field(default="")
     firebase_project_id: str = Field(default="")
 
+    # Admin key for privileged management endpoints. Unset → endpoints return 404.
+    admin_key: str = Field(default="")
+
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:

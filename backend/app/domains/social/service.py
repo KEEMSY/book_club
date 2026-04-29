@@ -120,9 +120,7 @@ class SocialService:
     ) -> UserSummaryPage:
         """Return paginated followers of user_id with is_following from actor's view."""
         clamped = max(_PAGE_MIN, min(limit, _PAGE_MAX))
-        users, next_cursor = await self.repo.list_followers(
-            user_id, actor_id, cursor, clamped
-        )
+        users, next_cursor = await self.repo.list_followers(user_id, actor_id, cursor, clamped)
         items = []
         for u in users:
             is_following = await self.repo.is_following(actor_id, u.id)
@@ -146,9 +144,7 @@ class SocialService:
     ) -> UserSummaryPage:
         """Return paginated following list of user_id with is_following from actor's view."""
         clamped = max(_PAGE_MIN, min(limit, _PAGE_MAX))
-        users, next_cursor = await self.repo.list_following(
-            user_id, actor_id, cursor, clamped
-        )
+        users, next_cursor = await self.repo.list_following(user_id, actor_id, cursor, clamped)
         items = []
         for u in users:
             is_following = await self.repo.is_following(actor_id, u.id)

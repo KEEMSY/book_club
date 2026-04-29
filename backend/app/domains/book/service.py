@@ -28,11 +28,13 @@ Business rules captured here (the spec the service is responsible for):
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from collections.abc import Callable
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from uuid import UUID
 
 from app.core.exceptions import ConflictError, NotFoundError
+from app.domains.book.events import UserBookCompleted
 from app.domains.book.models import Book, BookSource, UserBook, UserBookStatus
 from app.domains.book.ports import (
     BookRepositoryPort,
@@ -73,6 +75,7 @@ class BookService:
     books: BookRepositoryPort
     user_books: UserBookRepositoryPort
     search_provider: BookSearchPort
+    stage_event: Callable[[object], None] | None = field(default=None)
 
     async def search_books(self, query: str, *, page: int = 1, size: int = 20) -> SearchBooksResult:
         external = await self.search_provider.search(query, page=page, size=size)
@@ -146,7 +149,16 @@ class BookService:
         # leak the existence of another user's row to an attacker.
         if ub is None or ub.user_id != user_id:
             raise NotFoundError("user_book not found", code="USER_BOOK_NOT_FOUND")
-        return await self.user_books.update_status(user_book_id, status)
+        updated = await self.user_books.update_status(user_book_id, status)
+        if status is UserBookStatus.COMPLETED and self.stage_event is not None:
+            self.stage_event(
+                UserBookCompleted(
+                    user_id=user_id,
+                    user_book_id=user_book_id,
+                    book_id=ub.book_id,
+                )
+            )
+        return updated
 
     async def submit_review(
         self,
@@ -178,13 +190,22 @@ class BookService:
         elif ub.finished_at is None:
             next_finished = now
 
-        return await self.user_books.set_rating_review(
+        result = await self.user_books.set_rating_review(
             user_book_id,
             rating=rating,
             one_line_review=one_line_review,
             finished_at=next_finished,
             status=next_status,
         )
+        if next_status is UserBookStatus.COMPLETED and self.stage_event is not None:
+            self.stage_event(
+                UserBookCompleted(
+                    user_id=user_id,
+                    user_book_id=user_book_id,
+                    book_id=ub.book_id,
+                )
+            )
+        return result
 
     async def list_library(
         self,

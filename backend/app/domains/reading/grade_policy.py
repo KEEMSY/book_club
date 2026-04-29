@@ -14,18 +14,18 @@ from __future__ import annotations
 
 # (grade, tier, books_required, seconds_required)
 TIER_THRESHOLDS: list[tuple[int, int, int, int]] = [
-    (1, 1, 0,   0),
-    (1, 2, 1,   2 * 3600),
-    (1, 3, 2,   6 * 3600),
-    (2, 1, 3,   10 * 3600),
-    (2, 2, 5,   20 * 3600),
-    (2, 3, 7,   35 * 3600),
-    (3, 1, 10,  50 * 3600),
-    (3, 2, 17,  83 * 3600),
-    (3, 3, 23,  117 * 3600),
-    (4, 1, 30,  150 * 3600),
-    (4, 2, 53,  250 * 3600),
-    (4, 3, 77,  375 * 3600),
+    (1, 1, 0, 0),
+    (1, 2, 1, 2 * 3600),
+    (1, 3, 2, 6 * 3600),
+    (2, 1, 3, 10 * 3600),
+    (2, 2, 5, 20 * 3600),
+    (2, 3, 7, 35 * 3600),
+    (3, 1, 10, 50 * 3600),
+    (3, 2, 17, 83 * 3600),
+    (3, 3, 23, 117 * 3600),
+    (4, 1, 30, 150 * 3600),
+    (4, 2, 53, 250 * 3600),
+    (4, 3, 77, 375 * 3600),
     (5, 1, 100, 500 * 3600),
 ]
 """(grade, tier, books_required, seconds_required) — design doc §5.2."""
@@ -56,9 +56,7 @@ def calculate_grade(*, total_books: int, total_seconds: int) -> int:
     return grade
 
 
-def next_tier_threshold(
-    current_grade: int, current_tier: int
-) -> tuple[int, int] | None:
+def next_tier_threshold(current_grade: int, current_tier: int) -> tuple[int, int] | None:
     """Books and seconds needed to advance to the next tier.
 
     Scans ``TIER_THRESHOLDS`` for the matching (grade, tier) row and returns

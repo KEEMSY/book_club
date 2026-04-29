@@ -24,6 +24,8 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from uuid import UUID
 
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+
 from app.core.exceptions import NotFoundError
 from app.domains.challenge.events import BadgeEarned
 from app.domains.challenge.models import ChallengeParticipant
@@ -38,6 +40,8 @@ from app.domains.challenge.schemas import (
     MyBadgeItem,
     MyChallengeItem,
 )
+from app.shared.event_bus import EventBus, commit_and_publish
+from app.shared.event_bus import stage_event as _stage_to_session
 
 
 class AlreadyJoinedError(Exception):
@@ -64,10 +68,26 @@ def _icon_url(icon_key: str) -> str:
 
 @dataclass(slots=True)
 class ChallengeService:
-    """Orchestrates challenge lifecycle, progress tracking, and badge awards."""
+    """Orchestrates challenge lifecycle, progress tracking, and badge awards.
 
-    repo: ChallengeRepository
+    Two operating modes:
+    - **Request-scoped** (router path): ``repo`` holds the request session;
+      ``stage_event`` is a closure over that session. ``sessionmaker`` / ``bus``
+      are None.
+    - **Event-handler** (bus subscriber): ``sessionmaker`` and ``bus`` are set;
+      each handler opens a fresh session, wires ``commit_and_publish``, and
+      commits independently. ``repo`` and ``stage_event`` may be placeholders.
+    """
+
+    repo: ChallengeRepository | None
     stage_event: Callable[[object], None] | None = field(default=None)
+    sessionmaker: async_sessionmaker[AsyncSession] | None = field(default=None)
+    bus: EventBus | None = field(default=None)
+
+    def _get_repo(self) -> ChallengeRepository:
+        """Return the request-scoped repo, asserting it is set."""
+        assert self.repo is not None, "repo required in request-scoped mode"
+        return self.repo
 
     async def list_challenges(
         self,
@@ -83,12 +103,12 @@ class ChallengeService:
                 cursor_dt = datetime.fromisoformat(cursor)
 
         clamped = max(1, min(limit, 50))
-        challenges = await self.repo.list_challenges(status, clamped, cursor_dt)
+        challenges = await self._get_repo().list_challenges(status, clamped, cursor_dt)
 
         # Batch-fetch participant rows and counts — 2 queries for any page size.
         challenge_ids = [ch.id for ch in challenges]
-        participants = await self.repo.batch_get_participants(challenge_ids, viewer_id)
-        counts = await self.repo.batch_participant_counts(challenge_ids)
+        participants = await self._get_repo().batch_get_participants(challenge_ids, viewer_id)
+        counts = await self._get_repo().batch_participant_counts(challenge_ids)
 
         items: list[ChallengePublic] = []
         for ch in challenges:
@@ -121,16 +141,16 @@ class ChallengeService:
         self, challenge_id: UUID, viewer_id: UUID
     ) -> ChallengeDetailView:
         """Return full challenge detail including viewer participation info."""
-        ch = await self.repo.get_challenge(challenge_id)
+        ch = await self._get_repo().get_challenge(challenge_id)
         if ch is None:
             raise NotFoundError("challenge not found", code="CHALLENGE_NOT_FOUND")
 
-        participant = await self.repo.get_participant(challenge_id, viewer_id)
-        count = await self.repo.participant_count(challenge_id)
+        participant = await self._get_repo().get_participant(challenge_id, viewer_id)
+        count = await self._get_repo().participant_count(challenge_id)
 
         badge_view: BadgeView | None = None
         if ch.badge_id is not None:
-            badges = await self.repo.list_badges(None)
+            badges = await self._get_repo().list_badges(None)
             badge_orm = next((b for b in badges if b.id == ch.badge_id), None)
             if badge_orm is not None:
                 badge_view = BadgeView(
@@ -165,7 +185,7 @@ class ChallengeService:
             ChallengeEndedError: ends_at is in the past.
             AlreadyJoinedError: user is already a participant.
         """
-        ch = await self.repo.get_challenge(challenge_id)
+        ch = await self._get_repo().get_challenge(challenge_id)
         if ch is None:
             raise NotFoundError("challenge not found", code="CHALLENGE_NOT_FOUND")
 
@@ -173,11 +193,11 @@ class ChallengeService:
         if ch.ends_at.replace(tzinfo=UTC) < now:
             raise ChallengeEndedError("challenge has already ended")
 
-        existing = await self.repo.get_participant(challenge_id, user_id)
+        existing = await self._get_repo().get_participant(challenge_id, user_id)
         if existing is not None:
             raise AlreadyJoinedError("already participating in this challenge")
 
-        return await self.repo.join(challenge_id, user_id)
+        return await self._get_repo().join(challenge_id, user_id)
 
     async def leave(self, challenge_id: UUID, user_id: UUID) -> None:
         """Remove the user from the challenge.
@@ -185,19 +205,19 @@ class ChallengeService:
         Raises:
             NotFoundError: user is not a participant.
         """
-        existing = await self.repo.get_participant(challenge_id, user_id)
+        existing = await self._get_repo().get_participant(challenge_id, user_id)
         if existing is None:
             raise NotFoundError("not participating in this challenge", code="NOT_PARTICIPANT")
-        await self.repo.leave(challenge_id, user_id)
+        await self._get_repo().leave(challenge_id, user_id)
 
     async def leaderboard(self, challenge_id: UUID, limit: int) -> list[LeaderboardEntry]:
         """Return ranked participant list for a challenge."""
-        ch = await self.repo.get_challenge(challenge_id)
+        ch = await self._get_repo().get_challenge(challenge_id)
         if ch is None:
             raise NotFoundError("challenge not found", code="CHALLENGE_NOT_FOUND")
 
         clamped = max(1, min(limit, 100))
-        rows = await self.repo.leaderboard(challenge_id, clamped)
+        rows = await self._get_repo().leaderboard(challenge_id, clamped)
 
         entries: list[LeaderboardEntry] = []
         for rank, (participant, user) in enumerate(rows, start=1):
@@ -215,7 +235,7 @@ class ChallengeService:
 
     async def my_challenges(self, user_id: UUID) -> list[MyChallengeItem]:
         """Return challenges the user has joined."""
-        rows = await self.repo.my_challenges(user_id)
+        rows = await self._get_repo().my_challenges(user_id)
         return [
             MyChallengeItem(
                 id=ch.id,
@@ -233,7 +253,7 @@ class ChallengeService:
 
     async def list_badges(self, category: str | None) -> list[BadgeView]:
         """Return all badges, optionally filtered by category."""
-        badges = await self.repo.list_badges(category)
+        badges = await self._get_repo().list_badges(category)
         return [
             BadgeView(
                 id=b.id,
@@ -247,7 +267,7 @@ class ChallengeService:
 
     async def my_badges(self, user_id: UUID) -> list[MyBadgeItem]:
         """Return badges earned by the user."""
-        rows = await self.repo.my_badges(user_id)
+        rows = await self._get_repo().my_badges(user_id)
         return [
             MyBadgeItem(
                 badge=BadgeWithEarnedAt(
@@ -270,21 +290,121 @@ class ChallengeService:
         Raises:
             NotFoundError: badge does not exist.
         """
-        badges = await self.repo.list_badges(None)
+        badges = await self._get_repo().list_badges(None)
         badge = next((b for b in badges if b.id == badge_id), None)
         if badge is None:
             raise NotFoundError("badge not found", code="BADGE_NOT_FOUND")
 
-        if await self.repo.has_badge(user_id, badge_id):
+        if await self._get_repo().has_badge(user_id, badge_id):
             return
 
-        await self.repo.award_badge(user_id, badge_id)
+        await self._get_repo().award_badge(user_id, badge_id)
 
         if self.stage_event is not None:
             self.stage_event(BadgeEarned(user_id=user_id, badge_id=badge_id, badge_name=badge.name))
 
-    async def evaluate_progress(self, user_id: UUID, event_type: str) -> None:
-        """Placeholder — will be connected to reading events in a future milestone."""
-        # TODO(sy, M10): wire to ReadingSessionCompleted events and
-        # update challenge progress automatically.
-        pass
+    async def on_reading_session_completed(self, event: object) -> None:
+        """Accumulate reading_time challenge progress when a timer session ends."""
+        from app.domains.reading.events import ReadingSessionCompleted
+
+        if not isinstance(event, ReadingSessionCompleted):
+            return
+        await self._handle_progress_event(
+            user_id=event.user_id,
+            challenge_type="reading_time",
+            delta=event.duration_sec,
+            mode="add",
+        )
+
+    async def on_user_book_completed(self, event: object) -> None:
+        """Increment books_count challenge progress when a book is completed."""
+        from app.domains.book.events import UserBookCompleted
+
+        if not isinstance(event, UserBookCompleted):
+            return
+        await self._handle_progress_event(
+            user_id=event.user_id,
+            challenge_type="books_count",
+            delta=1,
+            mode="add",
+        )
+
+    async def on_grade_recomputed(self, event: object) -> None:
+        """Update streak challenge progress to the max of current and new streak_days."""
+        from app.domains.reading.events import UserGradeRecomputed
+
+        if not isinstance(event, UserGradeRecomputed):
+            return
+        await self._handle_progress_event(
+            user_id=event.user_id,
+            challenge_type="streak",
+            delta=event.streak_days,
+            mode="max",
+        )
+
+    async def _handle_progress_event(
+        self,
+        *,
+        user_id: UUID,
+        challenge_type: str,
+        delta: int,
+        mode: str,
+    ) -> None:
+        """Open a fresh session and advance challenges for this event.
+
+        Each event gets its own transaction so a failure in one user's
+        challenge update doesn't roll back unrelated work. BadgeEarned events
+        are staged on the fresh session so they publish only if this commit
+        succeeds.
+        """
+        if self.sessionmaker is None or self.bus is None:
+            return
+
+        async with self.sessionmaker() as session:
+            repo = ChallengeRepository(session)
+
+            def _stage(ev: object) -> None:
+                _stage_to_session(session, ev)
+
+            commit_and_publish(session, self.bus)
+            await self._advance_challenges(
+                repo=repo,
+                stage=_stage,
+                user_id=user_id,
+                challenge_type=challenge_type,
+                delta=delta,
+                mode=mode,
+            )
+            await session.commit()
+
+    @staticmethod
+    async def _advance_challenges(
+        *,
+        repo: ChallengeRepository,
+        stage: Callable[[object], None],
+        user_id: UUID,
+        challenge_type: str,
+        delta: int,
+        mode: str,
+    ) -> None:
+        """Advance all active, unachieved challenges of a given type for a user.
+
+        mode="add": new_value = current + delta
+        mode="max": new_value = max(current, delta)
+        Award badge + stage BadgeEarned when the target is first crossed.
+        """
+        rows = await repo.list_user_active_challenges(user_id, challenge_type)
+        now = datetime.now(tz=UTC)
+        for ch, p in rows:
+            new_value = p.current_value + delta if mode == "add" else max(p.current_value, delta)
+
+            achieved_at: datetime | None = None
+            if new_value >= ch.target_value:
+                achieved_at = now
+            await repo.update_progress(ch.id, user_id, new_value, achieved_at)
+
+            if achieved_at is not None and ch.badge_id is not None:
+                badge = await repo.get_badge(ch.badge_id)
+                if badge is not None and not await repo.has_badge(user_id, ch.badge_id):
+                    await repo.award_badge(user_id, ch.badge_id)
+                    stage(BadgeEarned(user_id=user_id, badge_id=ch.badge_id, badge_name=badge.name))

@@ -288,9 +288,7 @@ class SocialRepository:
         limit: int,
     ) -> tuple[list[User], str | None]:
         """ILIKE nickname search, excludes actor and users who blocked actor."""
-        from sqlalchemy import not_
-
-        from sqlalchemy import ColumnElement
+        from sqlalchemy import ColumnElement, not_
 
         blocked_subq = select(Block.blocker_id).where(Block.blocked_id == actor_id)
         conditions: list[ColumnElement[bool]] = [
