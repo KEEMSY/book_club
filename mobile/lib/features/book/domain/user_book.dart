@@ -13,7 +13,7 @@ class UserBook with _$UserBook {
     required String id,
     required Book book,
     required BookStatus status,
-    required DateTime startedAt,
+    DateTime? startedAt,
     DateTime? finishedAt,
     int? rating,
     String? oneLineReview,

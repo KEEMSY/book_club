@@ -14,22 +14,28 @@ import 'widgets/empty_states.dart';
 import 'widgets/review_modal.dart';
 import 'widgets/status_segment.dart';
 
+BookStatus _statusFromWire(String? wire) {
+  if (wire == null) return BookStatus.reading;
+  return BookStatus.fromWire(wire);
+}
+
 /// "내 서재" — Airbnb magazine-style library.
 ///
 /// Top: Playfair displaySmall "내 서재" header. Status segments sit below
 /// (읽는 중 · 완독 · 잠시 멈춤 · 포기) and drive the grid. Pagination is
 /// cursor-based via LibraryNotifier.loadMore.
 class LibraryScreen extends ConsumerStatefulWidget {
-  const LibraryScreen({super.key, this.highlightUserBookId});
+  const LibraryScreen({super.key, this.highlightUserBookId, this.initialStatusWire});
 
   final String? highlightUserBookId;
+  final String? initialStatusWire;
 
   @override
   ConsumerState<LibraryScreen> createState() => _LibraryScreenState();
 }
 
 class _LibraryScreenState extends ConsumerState<LibraryScreen> {
-  BookStatus _selected = BookStatus.reading;
+  late BookStatus _selected = _statusFromWire(widget.initialStatusWire);
   final Map<BookStatus, ScrollController> _controllers =
       <BookStatus, ScrollController>{};
 

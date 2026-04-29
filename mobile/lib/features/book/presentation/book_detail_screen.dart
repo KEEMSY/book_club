@@ -80,17 +80,19 @@ class BookDetailScreen extends ConsumerWidget {
               }
             },
             onGoToLibrary: () {
-              final String? userBookId = switch (libraryState) {
-                LibraryCtaAdded(:final userBook) => userBook.id,
+              final (String? id, String? status) = switch (libraryState) {
+                LibraryCtaAdded(:final userBook) =>
+                  (userBook.id, userBook.status.wire),
                 LibraryCtaDuplicate(:final duplicateUserBookId) =>
-                  duplicateUserBookId,
-                _ => null,
+                  (duplicateUserBookId, null),
+                _ => (null, null),
               };
-              if (userBookId == null) {
-                context.go('/library');
-              } else {
-                context.go('/library?highlight=$userBookId');
-              }
+              final StringBuffer uri = StringBuffer('/library');
+              final List<String> params = <String>[];
+              if (id != null) params.add('highlight=$id');
+              if (status != null) params.add('status=$status');
+              if (params.isNotEmpty) uri.write('?${params.join('&')}');
+              context.go(uri.toString());
             },
           ),
       },
@@ -288,13 +290,13 @@ class _LibraryCta extends StatelessWidget {
     final theme = Theme.of(context);
     final radii = theme.extension<AppRadius>()!;
 
-    final ButtonStyle _pillStyle = FilledButton.styleFrom(
+    final ButtonStyle pillStyle = FilledButton.styleFrom(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(radii.pill)),
       ),
       minimumSize: const Size.fromHeight(52),
     );
-    final ButtonStyle _outlinePillStyle = OutlinedButton.styleFrom(
+    final ButtonStyle outlinePillStyle = OutlinedButton.styleFrom(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(radii.pill)),
       ),
@@ -306,20 +308,20 @@ class _LibraryCta extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             FilledButton(
-              style: _pillStyle,
+              style: pillStyle,
               onPressed: onAdd,
               child: const Text('내 서재에 담기'),
             ),
             const SizedBox(height: 8),
             OutlinedButton(
-              style: _outlinePillStyle,
+              style: outlinePillStyle,
               onPressed: onAddWishlist,
               child: const Text('읽고 싶어요'),
             ),
           ],
         ),
       LibraryCtaAdding() => FilledButton(
-          style: _pillStyle,
+          style: pillStyle,
           onPressed: null,
           child: const SizedBox(
             width: 20,
@@ -331,7 +333,7 @@ class _LibraryCta extends StatelessWidget {
           ),
         ),
       LibraryCtaAdded() => FilledButton(
-          style: _pillStyle,
+          style: pillStyle,
           onPressed: onGoToLibrary,
           child: const Text('서재에서 보기'),
         ),
@@ -340,12 +342,12 @@ class _LibraryCta extends StatelessWidget {
       LibraryCtaDuplicate(:final String? duplicateUserBookId) =>
         duplicateUserBookId == null
             ? OutlinedButton(
-                style: _outlinePillStyle,
+                style: outlinePillStyle,
                 onPressed: null,
                 child: const Text('이미 서재에 있어요'),
               )
             : FilledButton(
-                style: _pillStyle,
+                style: pillStyle,
                 onPressed: onGoToLibrary,
                 child: const Text('서재에서 보기'),
               ),
@@ -361,7 +363,7 @@ class _LibraryCta extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             FilledButton(
-              style: _pillStyle,
+              style: pillStyle,
               onPressed: onAdd,
               child: const Text('다시 시도'),
             ),

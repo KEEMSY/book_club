@@ -19,7 +19,7 @@ mixin _$UserBook {
   String get id => throw _privateConstructorUsedError;
   Book get book => throw _privateConstructorUsedError;
   BookStatus get status => throw _privateConstructorUsedError;
-  DateTime get startedAt => throw _privateConstructorUsedError;
+  DateTime? get startedAt => throw _privateConstructorUsedError;
   DateTime? get finishedAt => throw _privateConstructorUsedError;
   int? get rating => throw _privateConstructorUsedError;
   String? get oneLineReview => throw _privateConstructorUsedError;
@@ -40,7 +40,7 @@ abstract class $UserBookCopyWith<$Res> {
       {String id,
       Book book,
       BookStatus status,
-      DateTime startedAt,
+      DateTime? startedAt,
       DateTime? finishedAt,
       int? rating,
       String? oneLineReview});
@@ -66,7 +66,7 @@ class _$UserBookCopyWithImpl<$Res, $Val extends UserBook>
     Object? id = null,
     Object? book = null,
     Object? status = null,
-    Object? startedAt = null,
+    Object? startedAt = freezed,
     Object? finishedAt = freezed,
     Object? rating = freezed,
     Object? oneLineReview = freezed,
@@ -84,10 +84,10 @@ class _$UserBookCopyWithImpl<$Res, $Val extends UserBook>
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
               as BookStatus,
-      startedAt: null == startedAt
+      startedAt: freezed == startedAt
           ? _value.startedAt
           : startedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+              as DateTime?,
       finishedAt: freezed == finishedAt
           ? _value.finishedAt
           : finishedAt // ignore: cast_nullable_to_non_nullable
@@ -126,7 +126,7 @@ abstract class _$$UserBookImplCopyWith<$Res>
       {String id,
       Book book,
       BookStatus status,
-      DateTime startedAt,
+      DateTime? startedAt,
       DateTime? finishedAt,
       int? rating,
       String? oneLineReview});
@@ -151,7 +151,7 @@ class __$$UserBookImplCopyWithImpl<$Res>
     Object? id = null,
     Object? book = null,
     Object? status = null,
-    Object? startedAt = null,
+    Object? startedAt = freezed,
     Object? finishedAt = freezed,
     Object? rating = freezed,
     Object? oneLineReview = freezed,
@@ -169,10 +169,10 @@ class __$$UserBookImplCopyWithImpl<$Res>
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
               as BookStatus,
-      startedAt: null == startedAt
+      startedAt: freezed == startedAt
           ? _value.startedAt
           : startedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+              as DateTime?,
       finishedAt: freezed == finishedAt
           ? _value.finishedAt
           : finishedAt // ignore: cast_nullable_to_non_nullable
@@ -196,7 +196,7 @@ class _$UserBookImpl implements _UserBook {
       {required this.id,
       required this.book,
       required this.status,
-      required this.startedAt,
+      this.startedAt,
       this.finishedAt,
       this.rating,
       this.oneLineReview});
@@ -208,7 +208,7 @@ class _$UserBookImpl implements _UserBook {
   @override
   final BookStatus status;
   @override
-  final DateTime startedAt;
+  final DateTime? startedAt;
   @override
   final DateTime? finishedAt;
   @override
@@ -256,7 +256,7 @@ abstract class _UserBook implements UserBook {
       {required final String id,
       required final Book book,
       required final BookStatus status,
-      required final DateTime startedAt,
+      final DateTime? startedAt,
       final DateTime? finishedAt,
       final int? rating,
       final String? oneLineReview}) = _$UserBookImpl;
@@ -268,7 +268,7 @@ abstract class _UserBook implements UserBook {
   @override
   BookStatus get status;
   @override
-  DateTime get startedAt;
+  DateTime? get startedAt;
   @override
   DateTime? get finishedAt;
   @override

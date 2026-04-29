@@ -49,17 +49,29 @@ class DashboardScreen extends ConsumerStatefulWidget {
 }
 
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
+  bool _loadsStarted = false;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(gradeNotifierProvider.notifier).load();
-      ref.read(heatmapNotifierProvider(DateTime.now().year).notifier).load();
-      ref.read(goalNotifierProvider.notifier).load();
-      ref.read(libraryNotifierProvider.notifier).ensureLoaded(BookStatus.reading);
-      // Restore any active session that survived an app restart.
-      ref.read(timerNotifierProvider.notifier).restore();
+      // If auth is already settled (e.g. token rehydrated before first frame),
+      // fire immediately; otherwise the ref.listen in build() will pick it up.
+      _tryStartLoads();
     });
+  }
+
+  void _tryStartLoads() {
+    if (_loadsStarted) return;
+    final auth = ref.read(authNotifierProvider);
+    if (auth is! Authenticated) return;
+    _loadsStarted = true;
+    ref.read(gradeNotifierProvider.notifier).load();
+    ref.read(heatmapNotifierProvider(DateTime.now().year).notifier).load();
+    ref.read(goalNotifierProvider.notifier).load();
+    ref.read(libraryNotifierProvider.notifier).ensureLoaded(BookStatus.reading);
+    // Restore any active session that survived an app restart.
+    ref.read(timerNotifierProvider.notifier).restore();
   }
 
   @override
@@ -72,6 +84,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         ref.watch(heatmapNotifierProvider(DateTime.now().year));
     final GoalState goalState = ref.watch(goalNotifierProvider);
     final AuthState authState = ref.watch(authNotifierProvider);
+    // Bootstrap completes asynchronously — fire loads once auth settles.
+    ref.listen<AuthState>(authNotifierProvider, (_, next) {
+      if (next is Authenticated) _tryStartLoads();
+    });
     final DashboardPrefs prefs = ref.watch(dashboardPrefsProvider);
     final String? nickname =
         authState is Authenticated ? authState.user.nickname : null;

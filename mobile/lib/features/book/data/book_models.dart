@@ -51,7 +51,7 @@ class UserBookDto with _$UserBookDto {
     required String id,
     required BookDto book,
     required String status,
-    required DateTime startedAt,
+    DateTime? startedAt,
     DateTime? finishedAt,
     int? rating,
     String? oneLineReview,

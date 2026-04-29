@@ -33,7 +33,9 @@ _$UserBookDtoImpl _$$UserBookDtoImplFromJson(Map<String, dynamic> json) =>
       id: json['id'] as String,
       book: BookDto.fromJson(json['book'] as Map<String, dynamic>),
       status: json['status'] as String,
-      startedAt: DateTime.parse(json['started_at'] as String),
+      startedAt: json['started_at'] == null
+          ? null
+          : DateTime.parse(json['started_at'] as String),
       finishedAt: json['finished_at'] == null
           ? null
           : DateTime.parse(json['finished_at'] as String),
@@ -46,7 +48,7 @@ Map<String, dynamic> _$$UserBookDtoImplToJson(_$UserBookDtoImpl instance) =>
       'id': instance.id,
       'book': instance.book.toJson(),
       'status': instance.status,
-      'started_at': instance.startedAt.toIso8601String(),
+      'started_at': instance.startedAt?.toIso8601String(),
       'finished_at': instance.finishedAt?.toIso8601String(),
       'rating': instance.rating,
       'one_line_review': instance.oneLineReview,

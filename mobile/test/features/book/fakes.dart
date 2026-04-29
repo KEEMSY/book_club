@@ -85,7 +85,10 @@ class FakeBookRepository implements BookRepository {
   }
 
   @override
-  Future<UserBook> addToLibrary(String bookId) async {
+  Future<UserBook> addToLibrary(
+    String bookId, {
+    BookStatus status = BookStatus.reading,
+  }) async {
     addToLibraryCalls.add(bookId);
     if (addToLibraryError != null) {
       throw addToLibraryError!;
@@ -98,6 +101,9 @@ class FakeBookRepository implements BookRepository {
     }
     return addToLibraryResult!;
   }
+
+  @override
+  Future<UserBook> addToWishlist(String bookId) => addToLibrary(bookId, status: BookStatus.wishlist);
 
   @override
   Future<UserBook> updateStatus({
