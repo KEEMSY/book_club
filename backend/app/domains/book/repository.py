@@ -119,6 +119,14 @@ class UserBookRepository:
             await self._session.flush()
         except IntegrityError as exc:
             await self._session.rollback()
+            pgcode = getattr(getattr(exc, "orig", None), "pgcode", None)
+            if pgcode == "23514":
+                # CHECK constraint violation — most likely 'wishlist' rejected
+                # because migration 0010 hasn't been applied yet.
+                raise ConflictError(
+                    "invalid status value; run `alembic upgrade head`",
+                    code="INVALID_STATUS",
+                ) from exc
             raise ConflictError(
                 "book already in library",
                 code="BOOK_ALREADY_IN_LIBRARY",
