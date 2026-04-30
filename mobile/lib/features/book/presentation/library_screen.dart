@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../auth/application/auth_providers.dart';
+import '../../feed/presentation/widgets/add_highlight_sheet.dart';
 import '../application/book_providers.dart';
 import '../application/library_notifier.dart';
 import '../application/library_state.dart';
@@ -345,6 +346,14 @@ class _LibraryActionsSheet extends ConsumerWidget {
               },
             ),
             ListTile(
+              leading: const Icon(Icons.format_quote_rounded),
+              title: const Text('하이라이트 추가'),
+              onTap: () async {
+                Navigator.of(context).pop();
+                await _showHighlightSheet(context);
+              },
+            ),
+            ListTile(
               leading: const Icon(Icons.delete_outline_rounded),
               title: const Text('서재에서 삭제'),
               trailing: Container(
@@ -363,6 +372,19 @@ class _LibraryActionsSheet extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> _showHighlightSheet(BuildContext context) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) => AddHighlightSheet(userBookId: userBook.id),
     );
   }
 
