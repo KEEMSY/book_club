@@ -202,23 +202,42 @@ class _TimerReadout extends ConsumerWidget {
     final notifier = ref.read(timerNotifierProvider.notifier);
     final Duration elapsed = notifier.elapsedAt(now);
 
-    // Progress is visually symbolic: 0..1 wraps once per hour so short
-    // sessions still fill the ring. (Progress is not tied to a goal.)
-    final double progress = (elapsed.inSeconds % 3600) / 3600.0;
+    // Goal-proportional progress: ring fills to 1.0 when the user reaches their
+    // daily target, then stays full. Falls back to 30-min default when no preset
+    // has been saved yet.
+    final int goalSeconds =
+        ref.watch(dailyGoalSecondsProvider).valueOrNull ?? 1800;
+    final double progress =
+        (elapsed.inSeconds / goalSeconds).clamp(0.0, 1.0);
+    final bool goalReached = elapsed.inSeconds >= goalSeconds;
 
     final bool indeterminate = state is TimerEnding;
 
-    return TimerRing(
-      color: accent,
-      progress: progress,
-      indeterminate: indeterminate,
-      child: Text(
-        formatElapsed(elapsed),
-        style: theme.textTheme.displayLarge?.copyWith(
-          color: theme.colorScheme.onSurface,
-          fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        TimerRing(
+          color: accent,
+          progress: progress,
+          indeterminate: indeterminate,
+          child: Text(
+            formatElapsed(elapsed),
+            style: theme.textTheme.displayLarge?.copyWith(
+              color: theme.colorScheme.onSurface,
+              fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
+            ),
+          ),
         ),
-      ),
+        if (goalReached) ...<Widget>[
+          const SizedBox(height: 12),
+          Chip(
+            avatar: Icon(Icons.check_circle_rounded, size: 16, color: accent),
+            label: const Text('오늘 목표 달성!'),
+            labelStyle: theme.textTheme.labelMedium,
+            backgroundColor: theme.colorScheme.surfaceContainerHigh,
+          ),
+        ],
+      ],
     );
   }
 }

@@ -7,6 +7,7 @@ import '../data/reading_api.dart';
 import '../data/reading_repository.dart';
 import 'grade_notifier.dart';
 import 'grade_state.dart';
+import 'reading_journey_inputs.dart';
 
 /// retrofit client for `/reading/*` — built once per Dio instance.
 final readingApiProvider = Provider<ReadingApi>((ref) {
@@ -19,6 +20,17 @@ final readingApiProvider = Provider<ReadingApi>((ref) {
 /// data layer.
 final readingRepositoryProvider = Provider<ReadingRepository>((ref) {
   return ReadingRepository(ref.watch(readingApiProvider));
+});
+
+/// User's daily reading goal in seconds, read from the persisted journey preset.
+/// Falls back to 30 min (1800 s) when no preset exists. Consumed by TimerRing
+/// so the arc fills proportionally to today's target instead of wrapping hourly.
+final dailyGoalSecondsProvider = FutureProvider<int>((ref) async {
+  final store = ref.watch(journeyPresetStoreProvider);
+  final inputs = await store.read();
+  final dailyMinutes =
+      inputs?.dailyMinutes ?? ReadingJourneyInputs.defaults.dailyMinutes;
+  return dailyMinutes * 60;
 });
 
 /// Single-source-of-truth for the grade accent color. TimerRing, GradeBadge,
