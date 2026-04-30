@@ -33,6 +33,7 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domains.feed.models import Comment, Post, PostHighlight, Reaction, ReactionType
+from app.domains.feed.ports import HighlightWithBookId
 
 
 class PostRepository:
@@ -339,3 +340,25 @@ class HighlightRepository:
             return
         await self._session.delete(row)
         await self._session.flush()
+
+    async def list_all_for_user(self, user_id: UUID) -> list[HighlightWithBookId]:
+        """Return every highlight for a user, joined to ``user_books`` for ``book_id``.
+
+        Ordered by ``(book_id, created_at DESC)`` so the service can group by
+        ``user_book_id`` while preserving recency order within each group.
+        Cross-domain import of ``UserBook`` is intentional per CLAUDE.md §3.3 —
+        this is a same-DB JOIN, not a service-layer cross-domain call.
+        """
+        from app.domains.book.models import UserBook
+
+        stmt = (
+            select(PostHighlight, UserBook.book_id)
+            .join(UserBook, UserBook.id == PostHighlight.user_book_id)
+            .where(PostHighlight.user_id == user_id)
+            .order_by(UserBook.book_id, PostHighlight.created_at.desc())
+        )
+        result = await self._session.execute(stmt)
+        return [
+            HighlightWithBookId(highlight=row.PostHighlight, book_id=row.book_id)
+            for row in result.all()
+        ]

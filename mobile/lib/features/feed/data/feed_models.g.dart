@@ -240,3 +240,39 @@ Map<String, dynamic> _$$CreateHighlightRequestImplToJson(
       'quote_text': instance.quoteText,
       'page_number': instance.pageNumber,
     };
+
+_$BookHighlightGroupDtoImpl _$$BookHighlightGroupDtoImplFromJson(
+        Map<String, dynamic> json) =>
+    _$BookHighlightGroupDtoImpl(
+      userBookId: json['user_book_id'] as String,
+      bookId: json['book_id'] as String,
+      bookTitle: json['book_title'] as String?,
+      bookCoverUrl: json['book_cover_url'] as String?,
+      highlights: (json['highlights'] as List<dynamic>)
+          .map((e) => HighlightDto.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
+Map<String, dynamic> _$$BookHighlightGroupDtoImplToJson(
+        _$BookHighlightGroupDtoImpl instance) =>
+    <String, dynamic>{
+      'user_book_id': instance.userBookId,
+      'book_id': instance.bookId,
+      'book_title': instance.bookTitle,
+      'book_cover_url': instance.bookCoverUrl,
+      'highlights': instance.highlights.map((e) => e.toJson()).toList(),
+    };
+
+_$AllHighlightsResponseDtoImpl _$$AllHighlightsResponseDtoImplFromJson(
+        Map<String, dynamic> json) =>
+    _$AllHighlightsResponseDtoImpl(
+      groups: (json['groups'] as List<dynamic>)
+          .map((e) => BookHighlightGroupDto.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
+Map<String, dynamic> _$$AllHighlightsResponseDtoImplToJson(
+        _$AllHighlightsResponseDtoImpl instance) =>
+    <String, dynamic>{
+      'groups': instance.groups.map((e) => e.toJson()).toList(),
+    };

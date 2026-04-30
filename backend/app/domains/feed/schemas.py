@@ -157,8 +157,22 @@ class HighlightResponse(BaseModel):
     next_cursor: str | None
 
 
+class BookHighlightGroupPublic(BaseModel):
+    user_book_id: UUID
+    book_id: UUID
+    book_title: str | None = None
+    book_cover_url: str | None = None
+    highlights: list[HighlightPublic]
+
+
+class AllHighlightsResponse(BaseModel):
+    groups: list[BookHighlightGroupPublic]
+
+
 __all__ = [
+    "AllHighlightsResponse",
     "AuthorPublic",
+    "BookHighlightGroupPublic",
     "CommentPublic",
     "CommentResponse",
     "CreateCommentRequest",

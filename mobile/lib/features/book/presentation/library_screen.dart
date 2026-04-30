@@ -5,6 +5,9 @@ import 'package:go_router/go_router.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../auth/application/auth_providers.dart';
+import '../../feed/application/feed_providers.dart';
+import '../../feed/domain/book_highlight_group.dart';
+import '../../feed/domain/highlight.dart';
 import '../../feed/presentation/widgets/add_highlight_sheet.dart';
 import '../application/book_providers.dart';
 import '../application/library_notifier.dart';
@@ -12,6 +15,7 @@ import '../application/library_state.dart';
 import '../domain/book_status.dart';
 import '../domain/user_book.dart';
 import 'widgets/book_card.dart';
+import 'widgets/book_cover.dart';
 import 'widgets/empty_states.dart';
 import 'widgets/review_modal.dart';
 import 'widgets/status_segment.dart';
@@ -32,6 +36,7 @@ class LibraryScreen extends ConsumerStatefulWidget {
 
 class _LibraryScreenState extends ConsumerState<LibraryScreen> {
   BookStatus _selected = BookStatus.reading;
+  bool _showHighlights = false;
   final Map<BookStatus, ScrollController> _controllers =
       <BookStatus, ScrollController>{};
 
@@ -105,6 +110,17 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
                     child: Text('내 서재', style: theme.textTheme.displaySmall),
                   ),
                   IconButton(
+                    tooltip: _showHighlights ? '서재 보기' : '하이라이트 보기',
+                    onPressed: () =>
+                        setState(() => _showHighlights = !_showHighlights),
+                    icon: Icon(
+                      Icons.format_quote_rounded,
+                      color: _showHighlights
+                          ? theme.colorScheme.primary
+                          : null,
+                    ),
+                  ),
+                  IconButton(
                     tooltip: '로그아웃',
                     onPressed: () =>
                         ref.read(authNotifierProvider.notifier).logout(),
@@ -113,24 +129,27 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
                 ],
               ),
             ),
-            Padding(
-              padding: EdgeInsets.only(bottom: spacing.md),
-              child: StatusSegment(
-                selected: _selected,
-                onChanged: _selectStatus,
+            if (!_showHighlights)
+              Padding(
+                padding: EdgeInsets.only(bottom: spacing.md),
+                child: StatusSegment(
+                  selected: _selected,
+                  onChanged: _selectStatus,
+                ),
               ),
-            ),
             Expanded(
-              child: _TabBody(
-                status: _selected,
-                state: current,
-                controller: _controllers[_selected]!,
-                highlightUserBookId: widget.highlightUserBookId,
-                onBrowse: () => context.go('/search'),
-                onRefresh: () => ref
-                    .read(libraryNotifierProvider.notifier)
-                    .refresh(_selected),
-              ),
+              child: _showHighlights
+                  ? const _AllHighlightsView()
+                  : _TabBody(
+                      status: _selected,
+                      state: current,
+                      controller: _controllers[_selected]!,
+                      highlightUserBookId: widget.highlightUserBookId,
+                      onBrowse: () => context.go('/search'),
+                      onRefresh: () => ref
+                          .read(libraryNotifierProvider.notifier)
+                          .refresh(_selected),
+                    ),
             ),
           ],
         ),
@@ -283,7 +302,10 @@ class _LibraryCard extends ConsumerWidget {
       child: BookCard.grid(
         book: userBook.book,
         status: userBook.status,
-        onTap: () => context.push(AppRoutes.bookDetail(userBook.book.id)),
+        onTap: () => context.push(
+              AppRoutes.bookDetail(userBook.book.id),
+              extra: userBook.id,
+            ),
         onLongPress: () => _showActions(context, ref, userBook),
       ),
     );
@@ -560,6 +582,196 @@ class _ErrorView extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Highlights view — shows all user highlights grouped by book
+// ---------------------------------------------------------------------------
+
+class _AllHighlightsView extends ConsumerWidget {
+  const _AllHighlightsView();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+    final AsyncValue<List<BookHighlightGroup>> asyncGroups =
+        ref.watch(allHighlightsProvider);
+
+    return asyncGroups.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (Object e, _) => Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: spacing.xl),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              const Icon(Icons.cloud_off_rounded, size: 40),
+              SizedBox(height: spacing.md),
+              Text(
+                '하이라이트를 불러오지 못했어요.',
+                style: theme.textTheme.titleMedium,
+              ),
+              SizedBox(height: spacing.lg),
+              FilledButton(
+                onPressed: () => ref.invalidate(allHighlightsProvider),
+                child: const Text('다시 시도'),
+              ),
+            ],
+          ),
+        ),
+      ),
+      data: (List<BookHighlightGroup> groups) {
+        if (groups.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: spacing.xl),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Icon(
+                    Icons.format_quote_rounded,
+                    size: 48,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  SizedBox(height: spacing.md),
+                  Text(
+                    '아직 저장된 하이라이트가 없어요.',
+                    style: theme.textTheme.titleMedium,
+                  ),
+                  SizedBox(height: spacing.sm),
+                  Text(
+                    '책 상세 화면에서 인상 깊은 문장을 저장해보세요.',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+        return ListView.builder(
+          padding: EdgeInsets.fromLTRB(
+            spacing.md,
+            spacing.sm,
+            spacing.md,
+            spacing.xl,
+          ),
+          itemCount: groups.length,
+          itemBuilder: (BuildContext context, int index) =>
+              _BookHighlightGroupSection(group: groups[index]),
+        );
+      },
+    );
+  }
+}
+
+class _BookHighlightGroupSection extends StatelessWidget {
+  const _BookHighlightGroupSection({required this.group});
+
+  final BookHighlightGroup group;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+    final radii = theme.extension<AppRadius>()!;
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: spacing.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          // Book header — tap to navigate to the detail screen.
+          InkWell(
+            onTap: () => context.push(
+              AppRoutes.bookDetail(group.bookId),
+              extra: group.userBookId,
+            ),
+            borderRadius: BorderRadius.all(Radius.circular(radii.sm)),
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: spacing.xs),
+              child: Row(
+                children: <Widget>[
+                  BookCover(
+                    coverUrl: group.bookCoverUrl,
+                    width: 48,
+                    height: 68,
+                    borderRadius: BorderRadius.all(Radius.circular(radii.sm)),
+                  ),
+                  SizedBox(width: spacing.md),
+                  Expanded(
+                    child: Text(
+                      group.bookTitle ?? '알 수 없는 책',
+                      style: theme.textTheme.titleSmall,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const Icon(Icons.chevron_right_rounded, size: 20),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(height: spacing.sm),
+          // Highlight cards for this book.
+          ...group.highlights.map(
+            (Highlight h) => _HighlightCard(highlight: h),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HighlightCard extends StatelessWidget {
+  const _HighlightCard({required this.highlight});
+
+  final Highlight highlight;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final radii = theme.extension<AppRadius>()!;
+    final spacing = theme.extension<AppSpacing>()!;
+    return Container(
+      margin: EdgeInsets.only(bottom: spacing.sm),
+      padding: EdgeInsets.all(spacing.md),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerLowest,
+        border: Border(
+          left: BorderSide(
+            color: theme.colorScheme.primary,
+            width: 3,
+          ),
+        ),
+        borderRadius: BorderRadius.all(Radius.circular(radii.sm)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            '"${highlight.quoteText}"',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontStyle: FontStyle.italic,
+              height: 1.6,
+            ),
+          ),
+          if (highlight.pageNumber != null) ...<Widget>[
+            const SizedBox(height: 4),
+            Text(
+              'p.${highlight.pageNumber}',
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }

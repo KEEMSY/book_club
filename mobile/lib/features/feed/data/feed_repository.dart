@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import '../domain/book_highlight_group.dart';
 import '../domain/comment.dart';
 import '../domain/highlight.dart';
 import '../domain/post.dart';
@@ -169,6 +170,26 @@ class FeedRepository {
     required String highlightId,
   }) async {
     await _call(() => _api.deleteHighlight(userBookId, highlightId));
+  }
+
+  Future<List<BookHighlightGroup>> listAllHighlights() async {
+    try {
+      final AllHighlightsResponseDto dto = await _api.listAllHighlights();
+      return dto.groups
+          .map(
+            (BookHighlightGroupDto g) => BookHighlightGroup(
+              userBookId: g.userBookId,
+              bookId: g.bookId,
+              bookTitle: g.bookTitle,
+              bookCoverUrl: g.bookCoverUrl,
+              highlights:
+                  g.highlights.map((HighlightDto h) => h.toDomain()).toList(),
+            ),
+          )
+          .toList();
+    } on DioException catch (e) {
+      throw _fromDio(e);
+    }
   }
 
   /// Orchestrates presign → PUT → key. Surfaced through the repository so

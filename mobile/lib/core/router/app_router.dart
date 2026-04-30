@@ -122,7 +122,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootKey,
         builder: (context, state) {
           final String id = state.pathParameters['id']!;
-          return BookDetailScreen(bookId: id);
+          final String? userBookId = state.extra as String?;
+          return BookDetailScreen(bookId: id, userBookId: userBookId);
         },
         routes: <RouteBase>[
           // Compose surface stacked above the detail screen — full-screen

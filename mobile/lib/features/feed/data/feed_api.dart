@@ -89,4 +89,7 @@ abstract class FeedApi {
     @Path('user_book_id') String userBookId,
     @Path('highlight_id') String highlightId,
   );
+
+  @GET('/me/highlights')
+  Future<AllHighlightsResponseDto> listAllHighlights();
 }

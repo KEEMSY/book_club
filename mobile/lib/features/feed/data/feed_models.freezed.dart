@@ -2922,3 +2922,420 @@ abstract class _CreateHighlightRequest implements CreateHighlightRequest {
   _$$CreateHighlightRequestImplCopyWith<_$CreateHighlightRequestImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
+
+BookHighlightGroupDto _$BookHighlightGroupDtoFromJson(
+    Map<String, dynamic> json) {
+  return _BookHighlightGroupDto.fromJson(json);
+}
+
+/// @nodoc
+mixin _$BookHighlightGroupDto {
+  String get userBookId => throw _privateConstructorUsedError;
+  String get bookId => throw _privateConstructorUsedError;
+  String? get bookTitle => throw _privateConstructorUsedError;
+  String? get bookCoverUrl => throw _privateConstructorUsedError;
+  List<HighlightDto> get highlights => throw _privateConstructorUsedError;
+
+  /// Serializes this BookHighlightGroupDto to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of BookHighlightGroupDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $BookHighlightGroupDtoCopyWith<BookHighlightGroupDto> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $BookHighlightGroupDtoCopyWith<$Res> {
+  factory $BookHighlightGroupDtoCopyWith(BookHighlightGroupDto value,
+          $Res Function(BookHighlightGroupDto) then) =
+      _$BookHighlightGroupDtoCopyWithImpl<$Res, BookHighlightGroupDto>;
+  @useResult
+  $Res call(
+      {String userBookId,
+      String bookId,
+      String? bookTitle,
+      String? bookCoverUrl,
+      List<HighlightDto> highlights});
+}
+
+/// @nodoc
+class _$BookHighlightGroupDtoCopyWithImpl<$Res,
+        $Val extends BookHighlightGroupDto>
+    implements $BookHighlightGroupDtoCopyWith<$Res> {
+  _$BookHighlightGroupDtoCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of BookHighlightGroupDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? userBookId = null,
+    Object? bookId = null,
+    Object? bookTitle = freezed,
+    Object? bookCoverUrl = freezed,
+    Object? highlights = null,
+  }) {
+    return _then(_value.copyWith(
+      userBookId: null == userBookId
+          ? _value.userBookId
+          : userBookId // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookId: null == bookId
+          ? _value.bookId
+          : bookId // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookTitle: freezed == bookTitle
+          ? _value.bookTitle
+          : bookTitle // ignore: cast_nullable_to_non_nullable
+              as String?,
+      bookCoverUrl: freezed == bookCoverUrl
+          ? _value.bookCoverUrl
+          : bookCoverUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      highlights: null == highlights
+          ? _value.highlights
+          : highlights // ignore: cast_nullable_to_non_nullable
+              as List<HighlightDto>,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$BookHighlightGroupDtoImplCopyWith<$Res>
+    implements $BookHighlightGroupDtoCopyWith<$Res> {
+  factory _$$BookHighlightGroupDtoImplCopyWith(
+          _$BookHighlightGroupDtoImpl value,
+          $Res Function(_$BookHighlightGroupDtoImpl) then) =
+      __$$BookHighlightGroupDtoImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String userBookId,
+      String bookId,
+      String? bookTitle,
+      String? bookCoverUrl,
+      List<HighlightDto> highlights});
+}
+
+/// @nodoc
+class __$$BookHighlightGroupDtoImplCopyWithImpl<$Res>
+    extends _$BookHighlightGroupDtoCopyWithImpl<$Res,
+        _$BookHighlightGroupDtoImpl>
+    implements _$$BookHighlightGroupDtoImplCopyWith<$Res> {
+  __$$BookHighlightGroupDtoImplCopyWithImpl(_$BookHighlightGroupDtoImpl _value,
+      $Res Function(_$BookHighlightGroupDtoImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of BookHighlightGroupDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? userBookId = null,
+    Object? bookId = null,
+    Object? bookTitle = freezed,
+    Object? bookCoverUrl = freezed,
+    Object? highlights = null,
+  }) {
+    return _then(_$BookHighlightGroupDtoImpl(
+      userBookId: null == userBookId
+          ? _value.userBookId
+          : userBookId // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookId: null == bookId
+          ? _value.bookId
+          : bookId // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookTitle: freezed == bookTitle
+          ? _value.bookTitle
+          : bookTitle // ignore: cast_nullable_to_non_nullable
+              as String?,
+      bookCoverUrl: freezed == bookCoverUrl
+          ? _value.bookCoverUrl
+          : bookCoverUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      highlights: null == highlights
+          ? _value._highlights
+          : highlights // ignore: cast_nullable_to_non_nullable
+              as List<HighlightDto>,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$BookHighlightGroupDtoImpl extends _BookHighlightGroupDto {
+  const _$BookHighlightGroupDtoImpl(
+      {required this.userBookId,
+      required this.bookId,
+      this.bookTitle,
+      this.bookCoverUrl,
+      required final List<HighlightDto> highlights})
+      : _highlights = highlights,
+        super._();
+
+  factory _$BookHighlightGroupDtoImpl.fromJson(Map<String, dynamic> json) =>
+      _$$BookHighlightGroupDtoImplFromJson(json);
+
+  @override
+  final String userBookId;
+  @override
+  final String bookId;
+  @override
+  final String? bookTitle;
+  @override
+  final String? bookCoverUrl;
+  final List<HighlightDto> _highlights;
+  @override
+  List<HighlightDto> get highlights {
+    if (_highlights is EqualUnmodifiableListView) return _highlights;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_highlights);
+  }
+
+  @override
+  String toString() {
+    return 'BookHighlightGroupDto(userBookId: $userBookId, bookId: $bookId, bookTitle: $bookTitle, bookCoverUrl: $bookCoverUrl, highlights: $highlights)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$BookHighlightGroupDtoImpl &&
+            (identical(other.userBookId, userBookId) ||
+                other.userBookId == userBookId) &&
+            (identical(other.bookId, bookId) || other.bookId == bookId) &&
+            (identical(other.bookTitle, bookTitle) ||
+                other.bookTitle == bookTitle) &&
+            (identical(other.bookCoverUrl, bookCoverUrl) ||
+                other.bookCoverUrl == bookCoverUrl) &&
+            const DeepCollectionEquality()
+                .equals(other._highlights, _highlights));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, userBookId, bookId, bookTitle,
+      bookCoverUrl, const DeepCollectionEquality().hash(_highlights));
+
+  /// Create a copy of BookHighlightGroupDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$BookHighlightGroupDtoImplCopyWith<_$BookHighlightGroupDtoImpl>
+      get copyWith => __$$BookHighlightGroupDtoImplCopyWithImpl<
+          _$BookHighlightGroupDtoImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$BookHighlightGroupDtoImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _BookHighlightGroupDto extends BookHighlightGroupDto {
+  const factory _BookHighlightGroupDto(
+          {required final String userBookId,
+          required final String bookId,
+          final String? bookTitle,
+          final String? bookCoverUrl,
+          required final List<HighlightDto> highlights}) =
+      _$BookHighlightGroupDtoImpl;
+  const _BookHighlightGroupDto._() : super._();
+
+  factory _BookHighlightGroupDto.fromJson(Map<String, dynamic> json) =
+      _$BookHighlightGroupDtoImpl.fromJson;
+
+  @override
+  String get userBookId;
+  @override
+  String get bookId;
+  @override
+  String? get bookTitle;
+  @override
+  String? get bookCoverUrl;
+  @override
+  List<HighlightDto> get highlights;
+
+  /// Create a copy of BookHighlightGroupDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$BookHighlightGroupDtoImplCopyWith<_$BookHighlightGroupDtoImpl>
+      get copyWith => throw _privateConstructorUsedError;
+}
+
+AllHighlightsResponseDto _$AllHighlightsResponseDtoFromJson(
+    Map<String, dynamic> json) {
+  return _AllHighlightsResponseDto.fromJson(json);
+}
+
+/// @nodoc
+mixin _$AllHighlightsResponseDto {
+  List<BookHighlightGroupDto> get groups => throw _privateConstructorUsedError;
+
+  /// Serializes this AllHighlightsResponseDto to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of AllHighlightsResponseDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $AllHighlightsResponseDtoCopyWith<AllHighlightsResponseDto> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $AllHighlightsResponseDtoCopyWith<$Res> {
+  factory $AllHighlightsResponseDtoCopyWith(AllHighlightsResponseDto value,
+          $Res Function(AllHighlightsResponseDto) then) =
+      _$AllHighlightsResponseDtoCopyWithImpl<$Res, AllHighlightsResponseDto>;
+  @useResult
+  $Res call({List<BookHighlightGroupDto> groups});
+}
+
+/// @nodoc
+class _$AllHighlightsResponseDtoCopyWithImpl<$Res,
+        $Val extends AllHighlightsResponseDto>
+    implements $AllHighlightsResponseDtoCopyWith<$Res> {
+  _$AllHighlightsResponseDtoCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of AllHighlightsResponseDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? groups = null,
+  }) {
+    return _then(_value.copyWith(
+      groups: null == groups
+          ? _value.groups
+          : groups // ignore: cast_nullable_to_non_nullable
+              as List<BookHighlightGroupDto>,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$AllHighlightsResponseDtoImplCopyWith<$Res>
+    implements $AllHighlightsResponseDtoCopyWith<$Res> {
+  factory _$$AllHighlightsResponseDtoImplCopyWith(
+          _$AllHighlightsResponseDtoImpl value,
+          $Res Function(_$AllHighlightsResponseDtoImpl) then) =
+      __$$AllHighlightsResponseDtoImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({List<BookHighlightGroupDto> groups});
+}
+
+/// @nodoc
+class __$$AllHighlightsResponseDtoImplCopyWithImpl<$Res>
+    extends _$AllHighlightsResponseDtoCopyWithImpl<$Res,
+        _$AllHighlightsResponseDtoImpl>
+    implements _$$AllHighlightsResponseDtoImplCopyWith<$Res> {
+  __$$AllHighlightsResponseDtoImplCopyWithImpl(
+      _$AllHighlightsResponseDtoImpl _value,
+      $Res Function(_$AllHighlightsResponseDtoImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of AllHighlightsResponseDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? groups = null,
+  }) {
+    return _then(_$AllHighlightsResponseDtoImpl(
+      groups: null == groups
+          ? _value._groups
+          : groups // ignore: cast_nullable_to_non_nullable
+              as List<BookHighlightGroupDto>,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$AllHighlightsResponseDtoImpl implements _AllHighlightsResponseDto {
+  const _$AllHighlightsResponseDtoImpl(
+      {required final List<BookHighlightGroupDto> groups})
+      : _groups = groups;
+
+  factory _$AllHighlightsResponseDtoImpl.fromJson(Map<String, dynamic> json) =>
+      _$$AllHighlightsResponseDtoImplFromJson(json);
+
+  final List<BookHighlightGroupDto> _groups;
+  @override
+  List<BookHighlightGroupDto> get groups {
+    if (_groups is EqualUnmodifiableListView) return _groups;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_groups);
+  }
+
+  @override
+  String toString() {
+    return 'AllHighlightsResponseDto(groups: $groups)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$AllHighlightsResponseDtoImpl &&
+            const DeepCollectionEquality().equals(other._groups, _groups));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(_groups));
+
+  /// Create a copy of AllHighlightsResponseDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$AllHighlightsResponseDtoImplCopyWith<_$AllHighlightsResponseDtoImpl>
+      get copyWith => __$$AllHighlightsResponseDtoImplCopyWithImpl<
+          _$AllHighlightsResponseDtoImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$AllHighlightsResponseDtoImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _AllHighlightsResponseDto implements AllHighlightsResponseDto {
+  const factory _AllHighlightsResponseDto(
+          {required final List<BookHighlightGroupDto> groups}) =
+      _$AllHighlightsResponseDtoImpl;
+
+  factory _AllHighlightsResponseDto.fromJson(Map<String, dynamic> json) =
+      _$AllHighlightsResponseDtoImpl.fromJson;
+
+  @override
+  List<BookHighlightGroupDto> get groups;
+
+  /// Create a copy of AllHighlightsResponseDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$AllHighlightsResponseDtoImplCopyWith<_$AllHighlightsResponseDtoImpl>
+      get copyWith => throw _privateConstructorUsedError;
+}

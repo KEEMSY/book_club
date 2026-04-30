@@ -5,6 +5,7 @@ import '../../../core/network/dio_provider.dart';
 import '../data/feed_api.dart';
 import '../data/feed_repository.dart';
 import '../data/image_uploader.dart';
+import '../domain/book_highlight_group.dart';
 
 /// retrofit client for `/books/{id}/posts`, `/posts/*`, `/uploads/*`.
 final feedApiProvider = Provider<FeedApi>((ref) {
@@ -39,4 +40,11 @@ final feedRepositoryProvider = Provider<FeedRepository>((ref) {
     api: ref.watch(feedApiProvider),
     uploader: ref.watch(imageUploaderProvider),
   );
+});
+
+/// All highlights for the current user, grouped by book.
+/// Auto-disposes when the widget tree no longer observes it.
+final allHighlightsProvider =
+    FutureProvider.autoDispose<List<BookHighlightGroup>>((ref) {
+  return ref.watch(feedRepositoryProvider).listAllHighlights();
 });

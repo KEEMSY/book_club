@@ -23,9 +23,15 @@ import 'widgets/book_cover.dart';
 ///   * Primary CTA "내 서재에 담기" — Rausch FilledButton with loading / added
 ///     / duplicate machine bound to BookDetailNotifier.libraryState.
 class BookDetailScreen extends ConsumerWidget {
-  const BookDetailScreen({super.key, required this.bookId});
+  const BookDetailScreen({super.key, required this.bookId, this.userBookId});
 
   final String bookId;
+
+  /// Pre-known userBookId passed from the library grid when the user taps a
+  /// book that is already in the library. Lets the CTA start in "duplicate"
+  /// state before the network call resolves, avoiding the brief flicker where
+  /// the primary "담기" button is shown for an already-added book.
+  final String? userBookId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -60,12 +66,13 @@ class BookDetailScreen extends ConsumerWidget {
           _Content(
             book: book,
             libraryState: libraryState,
+            initialUserBookId: userBookId,
             spacing: spacing,
             userBookId: switch (libraryState) {
               LibraryCtaAdded(:final userBook) => userBook.id,
               LibraryCtaDuplicate(:final duplicateUserBookId) =>
-                duplicateUserBookId,
-              _ => null,
+                duplicateUserBookId ?? userBookId,
+              _ => userBookId,
             },
             onAdd: () async {
               final messenger = ScaffoldMessenger.of(context);
@@ -122,6 +129,7 @@ class _Content extends StatefulWidget {
     required this.onAddWishlist,
     required this.onGoToLibrary,
     this.userBookId,
+    this.initialUserBookId,
   });
 
   final Book book;
@@ -131,6 +139,11 @@ class _Content extends StatefulWidget {
   final VoidCallback onAddWishlist;
   final VoidCallback onGoToLibrary;
   final String? userBookId;
+
+  /// If non-null, this book is already in the library under this ID.
+  /// Used to override the CTA to "duplicate" state before the async check
+  /// resolves so the button never briefly shows "담기" for an owned book.
+  final String? initialUserBookId;
 
   @override
   State<_Content> createState() => _ContentState();
@@ -157,6 +170,18 @@ class _ContentState extends State<_Content> {
     final String? description = book.description;
     final bool hasDescription =
         description != null && description.trim().isNotEmpty;
+
+    // Override CTA to "duplicate" when we already know the book is in the
+    // library (passed via route extra) but the async notifier hasn't resolved
+    // yet. Once the notifier settles to Added/Duplicate the real state takes
+    // over and the override is no longer applied.
+    final LibraryCtaState effectiveLibraryState =
+        (widget.libraryState is LibraryCtaIdle &&
+                widget.initialUserBookId != null)
+            ? LibraryCtaState.duplicate(
+                duplicateUserBookId: widget.initialUserBookId,
+              )
+            : widget.libraryState;
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -208,7 +233,7 @@ class _ContentState extends State<_Content> {
             ],
             SizedBox(height: spacing.xl),
             _LibraryCta(
-              state: widget.libraryState,
+              state: effectiveLibraryState,
               onAdd: widget.onAdd,
               onAddWishlist: widget.onAddWishlist,
               onGoToLibrary: widget.onGoToLibrary,

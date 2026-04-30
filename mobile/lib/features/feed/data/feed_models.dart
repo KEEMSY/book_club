@@ -279,3 +279,31 @@ class CreateHighlightRequest with _$CreateHighlightRequest {
   factory CreateHighlightRequest.fromJson(Map<String, dynamic> json) =>
       _$CreateHighlightRequestFromJson(json);
 }
+
+/// Mirror of `BookHighlightGroupPublic` from `GET /me/highlights`.
+@freezed
+class BookHighlightGroupDto with _$BookHighlightGroupDto {
+  const BookHighlightGroupDto._();
+
+  const factory BookHighlightGroupDto({
+    required String userBookId,
+    required String bookId,
+    String? bookTitle,
+    String? bookCoverUrl,
+    required List<HighlightDto> highlights,
+  }) = _BookHighlightGroupDto;
+
+  factory BookHighlightGroupDto.fromJson(Map<String, dynamic> json) =>
+      _$BookHighlightGroupDtoFromJson(json);
+}
+
+/// Envelope for `GET /me/highlights`.
+@freezed
+class AllHighlightsResponseDto with _$AllHighlightsResponseDto {
+  const factory AllHighlightsResponseDto({
+    required List<BookHighlightGroupDto> groups,
+  }) = _AllHighlightsResponseDto;
+
+  factory AllHighlightsResponseDto.fromJson(Map<String, dynamic> json) =>
+      _$AllHighlightsResponseDtoFromJson(json);
+}

@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:book_club/features/feed/data/feed_repository.dart';
 import 'package:book_club/features/feed/data/image_uploader.dart';
+import 'package:book_club/features/feed/domain/book_highlight_group.dart';
 import 'package:book_club/features/feed/domain/comment.dart';
 import 'package:book_club/features/feed/domain/highlight.dart';
 import 'package:book_club/features/feed/domain/post.dart';
@@ -184,6 +185,11 @@ class FakeFeedRepository implements FeedRepository {
     required String userBookId,
     required String highlightId,
   }) async {}
+
+  @override
+  Future<List<BookHighlightGroup>> listAllHighlights() async {
+    return const <BookHighlightGroup>[];
+  }
 
   @override
   Future<String> uploadImage(PickedImage image) async {

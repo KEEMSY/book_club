@@ -31,7 +31,7 @@ from uuid import UUID, uuid4
 import pytest
 from app.core.exceptions import ConflictError, NotFoundError
 from app.domains.feed.models import Comment, Post, PostHighlight, PostType, Reaction, ReactionType
-from app.domains.feed.ports import PresignedUpload
+from app.domains.feed.ports import BookSnapshot, HighlightWithBookId, PresignedUpload
 from app.domains.feed.service import FeedService
 
 
@@ -219,14 +219,24 @@ class FakeImageStorage:
 class FakeBookQuery:
     def __init__(self, existing: Iterable[UUID] = ()) -> None:
         self.existing = set(existing)
+        # Maps book_id → (title, cover_url) for snapshot lookups.
+        self.snapshots: dict[UUID, tuple[str, str | None]] = {}
 
     async def book_exists(self, book_id: UUID) -> bool:
         return book_id in self.existing
+
+    async def get_book_snapshot(self, book_id: UUID) -> BookSnapshot | None:
+        entry = self.snapshots.get(book_id)
+        if entry is None:
+            return None
+        title, cover_url = entry
+        return BookSnapshot(id=book_id, title=title, cover_url=cover_url)
 
 
 class FakeHighlightRepo:
     def __init__(self) -> None:
         self.by_id: dict[UUID, PostHighlight] = {}
+        self._ub_to_book: dict[UUID, UUID] = {}
 
     async def create(
         self,
@@ -271,6 +281,21 @@ class FakeHighlightRepo:
     async def delete(self, highlight_id: UUID) -> None:
         self.by_id.pop(highlight_id, None)
 
+    async def list_all_for_user(self, user_id: UUID) -> list[HighlightWithBookId]:
+        # ub_id → book_id mapping registered via ``register_user_book``.
+        return [
+            HighlightWithBookId(
+                highlight=h,
+                book_id=self._ub_to_book.get(h.user_book_id, uuid4()),
+            )
+            for h in self.by_id.values()
+            if h.user_id == user_id
+        ]
+
+    def register_user_book(self, user_book_id: UUID, book_id: UUID) -> None:
+        """Test helper — teaches the fake which book_id maps to a user_book_id."""
+        self._ub_to_book[user_book_id] = book_id
+
 
 def _build_service(
     *,
@@ -282,12 +307,14 @@ def _build_service(
     FakeCommentRepo,
     FakeImageStorage,
     FakeBookQuery,
+    FakeHighlightRepo,
 ]:
     posts = FakePostRepo()
     reactions = FakeReactionRepo()
     comments = FakeCommentRepo()
     storage = FakeImageStorage()
     book_query = FakeBookQuery(existing=books)
+    highlights = FakeHighlightRepo()
 
     # Patch FakePostRepo.comment_counts_for to use the shared comments fake
     # so list_posts_by_book sees real counts in tests.
@@ -305,9 +332,9 @@ def _build_service(
         comments=comments,
         image_storage=storage,
         book_query=book_query,
-        highlights=FakeHighlightRepo(),
+        highlights=highlights,
     )
-    return service, posts, reactions, comments, storage, book_query
+    return service, posts, reactions, comments, storage, book_query, highlights
 
 
 # ---------------------------------------------------------------------------
@@ -317,7 +344,7 @@ def _build_service(
 
 @pytest.mark.asyncio
 async def test_request_image_upload_returns_presigned_with_user_prefixed_key() -> None:
-    service, _, _, _, storage, _ = _build_service()
+    service, _, _, _, storage, _, _ = _build_service()
     user_id = uuid4()
 
     presigned = await service.request_image_upload(user_id=user_id, content_type="image/jpeg")
@@ -329,7 +356,7 @@ async def test_request_image_upload_returns_presigned_with_user_prefixed_key() -
 
 @pytest.mark.asyncio
 async def test_request_image_upload_rejects_unsupported_content_type() -> None:
-    service, _, _, _, _, _ = _build_service()
+    service, _, _, _, _, _, _ = _build_service()
     with pytest.raises(ConflictError) as exc_info:
         await service.request_image_upload(user_id=uuid4(), content_type="application/pdf")
     assert exc_info.value.code == "UNSUPPORTED_CONTENT_TYPE"
@@ -343,7 +370,7 @@ async def test_request_image_upload_rejects_unsupported_content_type() -> None:
 @pytest.mark.asyncio
 async def test_create_post_happy_persists_with_image_keys() -> None:
     book_id = uuid4()
-    service, posts, _, _, _, _ = _build_service(books=[book_id])
+    service, posts, _, _, _, _, _ = _build_service(books=[book_id])
     user_id = uuid4()
 
     post = await service.create_post(
@@ -362,7 +389,7 @@ async def test_create_post_happy_persists_with_image_keys() -> None:
 @pytest.mark.asyncio
 async def test_create_post_rejects_oversize_content() -> None:
     book_id = uuid4()
-    service, _, _, _, _, _ = _build_service(books=[book_id])
+    service, _, _, _, _, _, _ = _build_service(books=[book_id])
     with pytest.raises(ConflictError) as exc_info:
         await service.create_post(
             user_id=uuid4(),
@@ -377,7 +404,7 @@ async def test_create_post_rejects_oversize_content() -> None:
 @pytest.mark.asyncio
 async def test_create_post_rejects_too_many_images() -> None:
     book_id = uuid4()
-    service, _, _, _, _, _ = _build_service(books=[book_id])
+    service, _, _, _, _, _, _ = _build_service(books=[book_id])
     user_id = uuid4()
     with pytest.raises(ConflictError) as exc_info:
         await service.create_post(
@@ -393,7 +420,7 @@ async def test_create_post_rejects_too_many_images() -> None:
 @pytest.mark.asyncio
 async def test_create_post_rejects_image_key_outside_user_prefix() -> None:
     book_id = uuid4()
-    service, _, _, _, _, _ = _build_service(books=[book_id])
+    service, _, _, _, _, _, _ = _build_service(books=[book_id])
     user_id = uuid4()
     other_id = uuid4()
     with pytest.raises(ConflictError) as exc_info:
@@ -409,7 +436,7 @@ async def test_create_post_rejects_image_key_outside_user_prefix() -> None:
 
 @pytest.mark.asyncio
 async def test_create_post_rejects_unknown_book() -> None:
-    service, _, _, _, _, _ = _build_service()
+    service, _, _, _, _, _, _ = _build_service()
     with pytest.raises(NotFoundError) as exc_info:
         await service.create_post(
             user_id=uuid4(),
@@ -429,7 +456,7 @@ async def test_create_post_rejects_unknown_book() -> None:
 @pytest.mark.asyncio
 async def test_list_posts_by_book_materialises_feed_items() -> None:
     book_id = uuid4()
-    service, _posts, reactions, comments, _, _ = _build_service(books=[book_id])
+    service, _posts, reactions, comments, _, _, _ = _build_service(books=[book_id])
     author = uuid4()
     viewer = uuid4()
     post = await service.create_post(
@@ -459,7 +486,7 @@ async def test_list_posts_by_book_materialises_feed_items() -> None:
 @pytest.mark.asyncio
 async def test_list_posts_by_book_emits_next_cursor_on_full_page() -> None:
     book_id = uuid4()
-    service, _posts, _, _, _, _ = _build_service(books=[book_id])
+    service, _posts, _, _, _, _, _ = _build_service(books=[book_id])
     user_id = uuid4()
     base = datetime.now(tz=UTC)
     for i in range(3):
@@ -488,7 +515,7 @@ async def test_list_posts_by_book_emits_next_cursor_on_full_page() -> None:
 @pytest.mark.asyncio
 async def test_delete_post_owner_soft_deletes() -> None:
     book_id = uuid4()
-    service, posts, _, _, _, _ = _build_service(books=[book_id])
+    service, posts, _, _, _, _, _ = _build_service(books=[book_id])
     user_id = uuid4()
     post = await service.create_post(
         user_id=user_id,
@@ -504,7 +531,7 @@ async def test_delete_post_owner_soft_deletes() -> None:
 @pytest.mark.asyncio
 async def test_delete_post_returns_404_for_non_owner() -> None:
     book_id = uuid4()
-    service, _, _, _, _, _ = _build_service(books=[book_id])
+    service, _, _, _, _, _, _ = _build_service(books=[book_id])
     owner = uuid4()
     attacker = uuid4()
     post = await service.create_post(
@@ -527,7 +554,7 @@ async def test_delete_post_returns_404_for_non_owner() -> None:
 @pytest.mark.asyncio
 async def test_toggle_reaction_adds_then_removes() -> None:
     book_id = uuid4()
-    service, _, _, _, _, _ = _build_service(books=[book_id])
+    service, _, _, _, _, _, _ = _build_service(books=[book_id])
     user_id = uuid4()
     post = await service.create_post(
         user_id=user_id,
@@ -551,7 +578,7 @@ async def test_toggle_reaction_adds_then_removes() -> None:
 
 @pytest.mark.asyncio
 async def test_toggle_reaction_404_when_post_missing() -> None:
-    service, _, _, _, _, _ = _build_service()
+    service, _, _, _, _, _, _ = _build_service()
     with pytest.raises(NotFoundError):
         await service.toggle_reaction(
             user_id=uuid4(), post_id=uuid4(), reaction_type=ReactionType.HEART
@@ -566,7 +593,7 @@ async def test_toggle_reaction_404_when_post_missing() -> None:
 @pytest.mark.asyncio
 async def test_add_comment_root_then_reply_at_depth_one_succeeds() -> None:
     book_id = uuid4()
-    service, _, _, _, _, _ = _build_service(books=[book_id])
+    service, _, _, _, _, _, _ = _build_service(books=[book_id])
     user_id = uuid4()
     post = await service.create_post(
         user_id=user_id,
@@ -587,7 +614,7 @@ async def test_add_comment_root_then_reply_at_depth_one_succeeds() -> None:
 @pytest.mark.asyncio
 async def test_add_comment_reply_to_reply_raises_depth_exceeded() -> None:
     book_id = uuid4()
-    service, _, _, _, _, _ = _build_service(books=[book_id])
+    service, _, _, _, _, _, _ = _build_service(books=[book_id])
     user_id = uuid4()
     post = await service.create_post(
         user_id=user_id,
@@ -613,7 +640,7 @@ async def test_add_comment_reply_to_reply_raises_depth_exceeded() -> None:
 @pytest.mark.asyncio
 async def test_add_comment_parent_must_belong_to_same_post() -> None:
     book_id = uuid4()
-    service, _, _, _, _, _ = _build_service(books=[book_id])
+    service, _, _, _, _, _, _ = _build_service(books=[book_id])
     user_id = uuid4()
     p1 = await service.create_post(
         user_id=user_id,
@@ -640,7 +667,7 @@ async def test_add_comment_parent_must_belong_to_same_post() -> None:
 @pytest.mark.asyncio
 async def test_add_comment_rejects_oversize() -> None:
     book_id = uuid4()
-    service, _, _, _, _, _ = _build_service(books=[book_id])
+    service, _, _, _, _, _, _ = _build_service(books=[book_id])
     user_id = uuid4()
     post = await service.create_post(
         user_id=user_id,
@@ -662,7 +689,7 @@ async def test_add_comment_rejects_oversize() -> None:
 @pytest.mark.asyncio
 async def test_list_comments_returns_flat_list_ascending() -> None:
     book_id = uuid4()
-    service, _, _, _, _, _ = _build_service(books=[book_id])
+    service, _, _, _, _, _, _ = _build_service(books=[book_id])
     user_id = uuid4()
     post = await service.create_post(
         user_id=user_id,
@@ -686,7 +713,7 @@ async def test_list_comments_returns_flat_list_ascending() -> None:
 @pytest.mark.asyncio
 async def test_delete_comment_owner_only() -> None:
     book_id = uuid4()
-    service, _, _, comments, _, _ = _build_service(books=[book_id])
+    service, _, _, comments, _, _, _ = _build_service(books=[book_id])
     owner = uuid4()
     attacker = uuid4()
     post = await service.create_post(
@@ -764,9 +791,7 @@ async def test_list_highlights_returns_own_only() -> None:
     await service.create_highlight(
         user_id=user_b, user_book_id=ub, quote_text="B의 메모", page_number=None
     )
-    page = await service.list_highlights(
-        user_id=user_a, user_book_id=ub, cursor=None, limit=20
-    )
+    page = await service.list_highlights(user_id=user_a, user_book_id=ub, cursor=None, limit=20)
     assert len(page.items) == 1
     assert page.items[0].quote_text == "A의 메모"
 
@@ -786,3 +811,104 @@ async def test_delete_highlight_owner_only() -> None:
         user_id=owner, user_book_id=h.user_book_id, cursor=None, limit=20
     )
     assert page.items == []
+
+
+# ---------------------------------------------------------------------------
+# list_all_highlights
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_list_all_highlights_groups_by_user_book() -> None:
+    """Two user_book_ids produce two groups each enriched with a book snapshot."""
+    user_id = uuid4()
+    ub1, ub2 = uuid4(), uuid4()
+    book1, book2 = uuid4(), uuid4()
+
+    service, _, _, _, _, book_query, highlights = _build_service()
+    highlights.register_user_book(ub1, book1)
+    highlights.register_user_book(ub2, book2)
+    book_query.snapshots[book1] = ("클린 코드", "https://cover/1.jpg")
+    book_query.snapshots[book2] = ("파이썬 완전정복", None)
+
+    await service.create_highlight(
+        user_id=user_id, user_book_id=ub1, quote_text="첫 번째 인용", page_number=10
+    )
+    await service.create_highlight(
+        user_id=user_id, user_book_id=ub1, quote_text="두 번째 인용", page_number=20
+    )
+    await service.create_highlight(
+        user_id=user_id, user_book_id=ub2, quote_text="다른 책 인용", page_number=None
+    )
+
+    groups = await service.list_all_highlights(user_id=user_id)
+
+    assert len(groups) == 2
+    by_ub = {g.user_book_id: g for g in groups}
+
+    g1 = by_ub[ub1]
+    assert g1.book_id == book1
+    assert g1.book_title == "클린 코드"
+    assert g1.book_cover_url == "https://cover/1.jpg"
+    assert len(g1.highlights) == 2
+
+    g2 = by_ub[ub2]
+    assert g2.book_id == book2
+    assert g2.book_title == "파이썬 완전정복"
+    assert g2.book_cover_url is None
+    assert len(g2.highlights) == 1
+    assert g2.highlights[0].quote_text == "다른 책 인용"
+
+
+@pytest.mark.asyncio
+async def test_list_all_highlights_excludes_other_users() -> None:
+    """Highlights from a different user are not included."""
+    user_a = uuid4()
+    user_b = uuid4()
+    ub = uuid4()
+    book_id = uuid4()
+
+    service, _, _, _, _, _, highlights = _build_service()
+    highlights.register_user_book(ub, book_id)
+
+    await service.create_highlight(
+        user_id=user_a, user_book_id=ub, quote_text="A의 문장", page_number=None
+    )
+    await service.create_highlight(
+        user_id=user_b, user_book_id=ub, quote_text="B의 문장", page_number=None
+    )
+
+    groups = await service.list_all_highlights(user_id=user_a)
+    all_quotes = [h.quote_text for g in groups for h in g.highlights]
+
+    assert "A의 문장" in all_quotes
+    assert "B의 문장" not in all_quotes
+
+
+@pytest.mark.asyncio
+async def test_list_all_highlights_empty_when_no_highlights() -> None:
+    """No highlights → empty list, no error."""
+    service, *_ = _build_service()
+    groups = await service.list_all_highlights(user_id=uuid4())
+    assert groups == []
+
+
+@pytest.mark.asyncio
+async def test_list_all_highlights_book_snapshot_missing_is_tolerated() -> None:
+    """If a book_id has no snapshot the group is still returned with None titles."""
+    user_id = uuid4()
+    ub = uuid4()
+    book_id = uuid4()
+
+    service, _, _, _, _, _, highlights = _build_service()
+    highlights.register_user_book(ub, book_id)
+    # No snapshot registered for book_id — FakeBookQuery returns None.
+
+    await service.create_highlight(
+        user_id=user_id, user_book_id=ub, quote_text="고아 하이라이트", page_number=None
+    )
+
+    groups = await service.list_all_highlights(user_id=user_id)
+    assert len(groups) == 1
+    assert groups[0].book_title is None
+    assert groups[0].book_cover_url is None

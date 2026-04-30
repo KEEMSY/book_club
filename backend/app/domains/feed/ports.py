@@ -197,6 +197,19 @@ class FeedUserQueryPort(Protocol):
     async def get_authors(self, user_ids: list[UUID]) -> dict[UUID, AuthorView]: ...
 
 
+@dataclass(frozen=True, slots=True)
+class HighlightWithBookId:
+    """Pairs a highlight with its parent book_id for the all-highlights endpoint.
+
+    ``book_id`` is not stored on ``PostHighlight`` directly; it comes from the
+    ``user_books`` JOIN. This DTO carries both so the service can group
+    highlights by book without an additional query per row.
+    """
+
+    highlight: PostHighlight
+    book_id: UUID
+
+
 class HighlightRepositoryPort(Protocol):
     async def create(
         self,
@@ -219,3 +232,5 @@ class HighlightRepositoryPort(Protocol):
     async def get_by_id(self, highlight_id: UUID) -> PostHighlight | None: ...
 
     async def delete(self, highlight_id: UUID) -> None: ...
+
+    async def list_all_for_user(self, user_id: UUID) -> list[HighlightWithBookId]: ...

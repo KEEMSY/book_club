@@ -27,7 +27,9 @@ from app.domains.feed.providers import (
     get_feed_user_query,
 )
 from app.domains.feed.schemas import (
+    AllHighlightsResponse,
     AuthorPublic,
+    BookHighlightGroupPublic,
     CommentPublic,
     CommentResponse,
     CreateCommentRequest,
@@ -287,6 +289,35 @@ async def list_highlights(
             for h in page.items
         ],
         next_cursor=page.next_cursor,
+    )
+
+
+@router.get("/me/highlights", response_model=AllHighlightsResponse)
+async def list_all_my_highlights(
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[FeedService, Depends(get_feed_service)],
+) -> AllHighlightsResponse:
+    groups = await service.list_all_highlights(user_id=UUID(user_id))
+    return AllHighlightsResponse(
+        groups=[
+            BookHighlightGroupPublic(
+                user_book_id=g.user_book_id,
+                book_id=g.book_id,
+                book_title=g.book_title,
+                book_cover_url=g.book_cover_url,
+                highlights=[
+                    HighlightPublic(
+                        id=h.id,
+                        user_book_id=h.user_book_id,
+                        quote_text=h.quote_text,
+                        page_number=h.page_number,
+                        created_at=h.created_at,
+                    )
+                    for h in g.highlights
+                ],
+            )
+            for g in groups
+        ]
     )
 
 

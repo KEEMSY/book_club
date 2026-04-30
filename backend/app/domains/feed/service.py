@@ -87,6 +87,21 @@ class HighlightPage:
 
 
 @dataclass(frozen=True, slots=True)
+class BookHighlightGroup:
+    """All highlights for a single user_book, enriched with book metadata.
+
+    ``book_title`` / ``book_cover_url`` may be ``None`` when the catalog row
+    cannot be found (edge case: book deleted after highlight was saved).
+    """
+
+    user_book_id: UUID
+    book_id: UUID
+    book_title: str | None
+    book_cover_url: str | None
+    highlights: list[PostHighlight]
+
+
+@dataclass(frozen=True, slots=True)
 class ReactionToggleResult:
     """Outcome of a toggle — mobile uses ``state`` to flip the icon and
     ``counts`` to update the bar without a re-fetch."""
@@ -356,6 +371,36 @@ class FeedService:
             raise NotFoundError("highlight not found", code="HIGHLIGHT_NOT_FOUND")
         await self.highlights.delete(highlight_id)
 
+    async def list_all_highlights(self, *, user_id: UUID) -> list[BookHighlightGroup]:
+        """Return all user highlights grouped by user_book, enriched with book info.
+
+        Groups are assembled in the order they first appear in the repository
+        result (book_id order). Within each group highlights are newest-first
+        (repository guarantee).
+        """
+        items = await self.highlights.list_all_for_user(user_id)
+        # Preserve insertion order — dict maintains it in Python 3.7+.
+        groups: dict[UUID, list[PostHighlight]] = {}
+        book_ids: dict[UUID, UUID] = {}
+        for item in items:
+            ub_id = item.highlight.user_book_id
+            groups.setdefault(ub_id, []).append(item.highlight)
+            book_ids[ub_id] = item.book_id
+
+        result: list[BookHighlightGroup] = []
+        for ub_id, highlights in groups.items():
+            snap = await self.book_query.get_book_snapshot(book_ids[ub_id])
+            result.append(
+                BookHighlightGroup(
+                    user_book_id=ub_id,
+                    book_id=book_ids[ub_id],
+                    book_title=snap.title if snap else None,
+                    book_cover_url=snap.cover_url if snap else None,
+                    highlights=highlights,
+                )
+            )
+        return result
+
 
 def _parse_iso_cursor(cursor: str | None) -> datetime | None:
     if cursor is None or cursor == "":
@@ -371,6 +416,7 @@ def _parse_iso_cursor(cursor: str | None) -> datetime | None:
 
 
 __all__ = [
+    "BookHighlightGroup",
     "CommentAdded",
     "CommentPage",
     "FeedPage",
