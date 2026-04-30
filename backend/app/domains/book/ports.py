@@ -90,6 +90,8 @@ class UserBookRepositoryPort(Protocol):
         status: UserBookStatus | None = None,
     ) -> UserBook: ...
 
+    async def delete(self, user_book_id: UUID) -> None: ...
+
     async def list_for_user(
         self,
         user_id: UUID,

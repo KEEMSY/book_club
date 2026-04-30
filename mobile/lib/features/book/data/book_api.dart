@@ -51,6 +51,11 @@ abstract class BookApi {
     @Body() Map<String, dynamic> body,
   );
 
+  @DELETE('/me/library/{user_book_id}')
+  Future<void> removeFromLibrary(
+    @Path('user_book_id') String userBookId,
+  );
+
   /// Cursor-paginated library listing. [status] and [cursor] are optional;
   /// retrofit omits null query params from the URL.
   @GET('/me/library')

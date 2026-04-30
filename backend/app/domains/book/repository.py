@@ -183,6 +183,12 @@ class UserBookRepository:
         await self._session.refresh(ub)
         return ub
 
+    async def delete(self, user_book_id: UUID) -> None:
+        ub = await self.get_by_id(user_book_id)
+        if ub is None:
+            raise NotFoundError("user_book not found", code="USER_BOOK_NOT_FOUND")
+        await self._session.delete(ub)
+
     async def list_for_user(
         self,
         user_id: UUID,

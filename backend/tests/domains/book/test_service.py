@@ -127,6 +127,9 @@ class FakeUserBookRepo:
             ub.status = status
         return ub
 
+    async def delete(self, user_book_id: UUID) -> None:
+        self.by_id.pop(user_book_id, None)
+
     async def list_for_user(
         self,
         user_id: UUID,
@@ -409,3 +412,29 @@ async def test_list_library_clamps_limit_and_emits_next_cursor() -> None:
     # Limit clamped to 50 — 999 is silently reduced, no error.
     all_rows = await service.list_library(user_id=user_id, status=None, cursor=None, limit=999)
     assert len(all_rows.items) == 5
+
+
+@pytest.mark.asyncio
+async def test_remove_from_library_deletes_and_rejects_non_owner() -> None:
+    service, books, _, _ = _build_service()
+    owner = uuid4()
+    attacker = uuid4()
+    seeded = await books.upsert_by_isbn(
+        isbn13="9788937460999",
+        title="t",
+        author="a",
+        publisher=None,
+        cover_url=None,
+        description=None,
+        source=BookSource.NAVER,
+    )
+    ub = await service.add_to_library(user_id=owner, book_id=seeded.id)
+
+    # Non-owner gets 404.
+    with pytest.raises(NotFoundError):
+        await service.remove_from_library(user_id=attacker, user_book_id=ub.id)
+
+    # Owner can delete; library becomes empty afterwards.
+    await service.remove_from_library(user_id=owner, user_book_id=ub.id)
+    page = await service.list_library(user_id=owner, status=None, cursor=None, limit=10)
+    assert len(page.items) == 0

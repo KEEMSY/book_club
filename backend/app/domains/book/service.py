@@ -210,6 +210,17 @@ class BookService:
             )
         return result
 
+    async def remove_from_library(
+        self,
+        *,
+        user_id: UUID,
+        user_book_id: UUID,
+    ) -> None:
+        ub = await self.user_books.get_by_id(user_book_id)
+        if ub is None or ub.user_id != user_id:
+            raise NotFoundError("user_book not found", code="USER_BOOK_NOT_FOUND")
+        await self.user_books.delete(user_book_id)
+
     async def list_library(
         self,
         *,

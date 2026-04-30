@@ -112,6 +112,9 @@ class BookRepository {
     return dto.toDomain();
   }
 
+  Future<void> removeFromLibrary(String userBookId) =>
+      _call(() => _api.removeFromLibrary(userBookId));
+
   Future<LibraryPage> listLibrary({
     BookStatus? status,
     String? cursor,

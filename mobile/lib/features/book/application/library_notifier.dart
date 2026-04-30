@@ -106,6 +106,21 @@ class LibraryNotifier extends StateNotifier<Map<BookStatus, LibraryListState>> {
     state = next;
   }
 
+  /// Deletes the UserBook from the server and removes it from every local tab.
+  Future<void> removeFromLibrary(String userBookId) async {
+    await _repository.removeFromLibrary(userBookId);
+    final Map<BookStatus, LibraryListState> next =
+        Map<BookStatus, LibraryListState>.from(state);
+    next.updateAll((_, list) {
+      if (list is! LibraryListLoaded) return list;
+      final items =
+          list.items.where((UserBook b) => b.id != userBookId).toList();
+      if (items.length == list.items.length) return list;
+      return list.copyWith(items: items);
+    });
+    state = next;
+  }
+
   Future<void> _loadFirstPage(BookStatus status) async {
     try {
       final LibraryPage page = await _repository.listLibrary(status: status);

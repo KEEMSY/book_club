@@ -354,20 +354,18 @@ class _LibraryActionsSheet extends ConsumerWidget {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.delete_outline_rounded),
-              title: const Text('서재에서 삭제'),
-              trailing: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 2,
-                ),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerHigh,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text('준비중', style: theme.textTheme.labelMedium),
+              leading: Icon(
+                Icons.delete_outline_rounded,
+                color: theme.colorScheme.error,
               ),
-              enabled: false,
+              title: Text(
+                '서재에서 삭제',
+                style: TextStyle(color: theme.colorScheme.error),
+              ),
+              onTap: () async {
+                Navigator.of(context).pop();
+                await _confirmAndDelete(context, ref);
+              },
             ),
           ],
         ),
@@ -386,6 +384,46 @@ class _LibraryActionsSheet extends ConsumerWidget {
       ),
       builder: (_) => AddHighlightSheet(userBookId: userBook.id),
     );
+  }
+
+  Future<void> _confirmAndDelete(BuildContext context, WidgetRef ref) async {
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('서재에서 삭제'),
+        content: Text('"${userBook.book.title}"를 서재에서 삭제할까요?'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('취소'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(
+              '삭제',
+              style: TextStyle(color: Theme.of(ctx).colorScheme.error),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    try {
+      await ref
+          .read(libraryNotifierProvider.notifier)
+          .removeFromLibrary(userBook.id);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('서재에서 삭제됐어요')),
+        );
+      }
+    } on Exception {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('삭제에 실패했어요. 다시 시도해주세요.')),
+        );
+      }
+    }
   }
 
   Future<void> _showStatusSheet(

@@ -128,6 +128,15 @@ class FakeBookRepository implements BookRepository {
     return submitReviewResult!;
   }
 
+  final List<String> removeFromLibraryCalls = <String>[];
+  Object? removeFromLibraryError;
+
+  @override
+  Future<void> removeFromLibrary(String userBookId) async {
+    removeFromLibraryCalls.add(userBookId);
+    if (removeFromLibraryError != null) throw removeFromLibraryError!;
+  }
+
   @override
   Future<LibraryPage> listLibrary({
     BookStatus? status,

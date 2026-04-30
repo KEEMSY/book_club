@@ -168,6 +168,18 @@ async def submit_review(
     return UserBookPublic.from_user_book(ub)
 
 
+@router.delete("/me/library/{user_book_id}", status_code=204)
+async def remove_from_library(
+    user_book_id: UUID,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[BookService, Depends(get_book_service)],
+) -> None:
+    await service.remove_from_library(
+        user_id=UUID(user_id),
+        user_book_id=user_book_id,
+    )
+
+
 @router.get("/me/library", response_model=LibraryResponse)
 async def list_library(
     user_id: Annotated[str, Depends(get_current_user_id)],
