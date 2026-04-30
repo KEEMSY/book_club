@@ -24,6 +24,8 @@ _$PostDtoImpl _$$PostDtoImplFromJson(Map<String, dynamic> json) =>
     _$PostDtoImpl(
       id: json['id'] as String,
       bookId: json['book_id'] as String,
+      bookTitle: json['book_title'] as String?,
+      bookCoverUrl: json['book_cover_url'] as String?,
       user: PostAuthorDto.fromJson(json['user'] as Map<String, dynamic>),
       postType: json['post_type'] as String,
       content: json['content'] as String,
@@ -42,6 +44,8 @@ Map<String, dynamic> _$$PostDtoImplToJson(_$PostDtoImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
       'book_id': instance.bookId,
+      'book_title': instance.bookTitle,
+      'book_cover_url': instance.bookCoverUrl,
       'user': instance.user.toJson(),
       'post_type': instance.postType,
       'content': instance.content,

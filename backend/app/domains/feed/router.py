@@ -20,8 +20,9 @@ from fastapi import APIRouter, Depends, Query, Response, status
 
 from app.core.deps import get_current_user_id
 from app.domains.feed.models import PostType, ReactionType
-from app.domains.feed.ports import AuthorView, FeedUserQueryPort
+from app.domains.feed.ports import AuthorView, BookSnapshot, FeedBookQueryPort, FeedUserQueryPort
 from app.domains.feed.providers import (
+    get_feed_book_query,
     get_feed_service,
     get_feed_user_query,
 )
@@ -85,6 +86,7 @@ async def list_book_posts(
     user_id: Annotated[str, Depends(get_current_user_id)],
     service: Annotated[FeedService, Depends(get_feed_service)],
     user_query: Annotated[FeedUserQueryPort, Depends(get_feed_user_query)],
+    book_query: Annotated[FeedBookQueryPort, Depends(get_feed_book_query)],
     cursor: Annotated[str | None, Query()] = None,
     limit: Annotated[int, Query(ge=1, le=50)] = 20,
 ) -> FeedResponse:
@@ -96,10 +98,12 @@ async def list_book_posts(
     )
     author_ids = [item.post.user_id for item in page.items]
     authors = await user_query.get_authors(author_ids) if author_ids else {}
+    book_snapshot: BookSnapshot | None = await book_query.get_book_snapshot(book_id)
     items = [
         PostPublic.from_feed_item(
             item,
             author=_author_from_view(authors.get(item.post.user_id), item.post.user_id),
+            book_snapshot=book_snapshot,
         )
         for item in page.items
     ]
@@ -117,6 +121,7 @@ async def create_book_post(
     user_id: Annotated[str, Depends(get_current_user_id)],
     service: Annotated[FeedService, Depends(get_feed_service)],
     user_query: Annotated[FeedUserQueryPort, Depends(get_feed_user_query)],
+    book_query: Annotated[FeedBookQueryPort, Depends(get_feed_book_query)],
 ) -> PostPublic:
     # The body carries book_id too — we trust the path parameter as the
     # canonical source so a mismatched body is silently corrected to the
@@ -131,7 +136,8 @@ async def create_book_post(
     )
     authors = await user_query.get_authors([post.user_id])
     author = _author_from_view(authors.get(post.user_id), post.user_id)
-    return PostPublic.from_post(post, author=author)
+    book_snapshot: BookSnapshot | None = await book_query.get_book_snapshot(book_id)
+    return PostPublic.from_post(post, author=author, book_snapshot=book_snapshot)
 
 
 @router.delete("/posts/{post_id}", status_code=status.HTTP_204_NO_CONTENT)

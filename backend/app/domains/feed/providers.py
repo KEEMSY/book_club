@@ -18,7 +18,7 @@ from app.core.db import get_session
 from app.domains.auth.repository import UserRepository
 from app.domains.book.repository import BookRepository
 from app.domains.feed.adapters.r2_image_storage_adapter import R2ImageStorageAdapter
-from app.domains.feed.ports import AuthorView
+from app.domains.feed.ports import AuthorView, BookSnapshot
 from app.domains.feed.repository import (
     CommentRepository,
     HighlightRepository,
@@ -38,6 +38,12 @@ class _FeedBookQueryAdapter:
 
     async def book_exists(self, book_id: UUID) -> bool:
         return (await self._books.get_by_id(book_id)) is not None
+
+    async def get_book_snapshot(self, book_id: UUID) -> BookSnapshot | None:
+        book = await self._books.get_by_id(book_id)
+        if book is None:
+            return None
+        return BookSnapshot(id=book.id, title=book.title, cover_url=book.cover_url)
 
 
 class _FeedUserQueryAdapter:
@@ -97,3 +103,12 @@ def get_feed_user_query(
     hydrate ``AuthorPublic`` for each post and comment.
     """
     return _FeedUserQueryAdapter(UserRepository(session))
+
+
+def get_feed_book_query(
+    session: Annotated[AsyncSession, Depends(get_session)],
+) -> _FeedBookQueryAdapter:
+    """Returns the cross-domain book lookup the feed/community routers use
+    to hydrate ``book_title`` / ``book_cover_url`` on highlight posts.
+    """
+    return _FeedBookQueryAdapter(BookRepository(session))

@@ -26,8 +26,9 @@ import pytest_asyncio
 from app.core.exceptions import ConflictError, NotFoundError
 from app.core.security import create_access_token
 from app.domains.feed.models import Comment, Post, PostType, ReactionType
-from app.domains.feed.ports import AuthorView, PostFeedItem, PresignedUpload
+from app.domains.feed.ports import AuthorView, BookSnapshot, PostFeedItem, PresignedUpload
 from app.domains.feed.providers import (
+    get_feed_book_query,
     get_feed_service,
     get_feed_user_query,
 )
@@ -234,13 +235,25 @@ class FakeUserQuery:
         }
 
 
+class FakeBookQuery:
+    """Returns None for every book snapshot — sufficient for router contract tests."""
+
+    async def book_exists(self, book_id: UUID) -> bool:
+        return True
+
+    async def get_book_snapshot(self, book_id: UUID) -> BookSnapshot | None:
+        return None
+
+
 @pytest_asyncio.fixture
 async def client_and_fake() -> AsyncIterator[tuple[AsyncClient, FakeFeedService, UUID]]:
     app = create_app()
     fake = FakeFeedService()
     user_query = FakeUserQuery()
+    book_query = FakeBookQuery()
     app.dependency_overrides[get_feed_service] = lambda: fake
     app.dependency_overrides[get_feed_user_query] = lambda: user_query
+    app.dependency_overrides[get_feed_book_query] = lambda: book_query
     transport = ASGITransport(app=app)
     user_id = uuid4()
     async with AsyncClient(transport=transport, base_url="http://testserver") as client:

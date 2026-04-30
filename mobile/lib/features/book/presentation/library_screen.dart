@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../auth/application/auth_providers.dart';
 import '../../feed/presentation/widgets/add_highlight_sheet.dart';
@@ -282,7 +283,8 @@ class _LibraryCard extends ConsumerWidget {
       child: BookCard.grid(
         book: userBook.book,
         status: userBook.status,
-        onTap: () => _showActions(context, ref, userBook),
+        onTap: () => context.push(AppRoutes.bookDetail(userBook.book.id)),
+        onLongPress: () => _showActions(context, ref, userBook),
       ),
     );
   }

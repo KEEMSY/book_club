@@ -18,6 +18,8 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$Post {
   String get id => throw _privateConstructorUsedError;
   String get bookId => throw _privateConstructorUsedError;
+  String? get bookTitle => throw _privateConstructorUsedError;
+  String? get bookCoverUrl => throw _privateConstructorUsedError;
   PostAuthor get user => throw _privateConstructorUsedError;
   PostType get postType => throw _privateConstructorUsedError;
   String get content => throw _privateConstructorUsedError;
@@ -41,6 +43,8 @@ abstract class $PostCopyWith<$Res> {
   $Res call(
       {String id,
       String bookId,
+      String? bookTitle,
+      String? bookCoverUrl,
       PostAuthor user,
       PostType postType,
       String content,
@@ -70,6 +74,8 @@ class _$PostCopyWithImpl<$Res, $Val extends Post>
   $Res call({
     Object? id = null,
     Object? bookId = null,
+    Object? bookTitle = freezed,
+    Object? bookCoverUrl = freezed,
     Object? user = null,
     Object? postType = null,
     Object? content = null,
@@ -88,6 +94,14 @@ class _$PostCopyWithImpl<$Res, $Val extends Post>
           ? _value.bookId
           : bookId // ignore: cast_nullable_to_non_nullable
               as String,
+      bookTitle: freezed == bookTitle
+          ? _value.bookTitle
+          : bookTitle // ignore: cast_nullable_to_non_nullable
+              as String?,
+      bookCoverUrl: freezed == bookCoverUrl
+          ? _value.bookCoverUrl
+          : bookCoverUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
       user: null == user
           ? _value.user
           : user // ignore: cast_nullable_to_non_nullable
@@ -144,6 +158,8 @@ abstract class _$$PostImplCopyWith<$Res> implements $PostCopyWith<$Res> {
   $Res call(
       {String id,
       String bookId,
+      String? bookTitle,
+      String? bookCoverUrl,
       PostAuthor user,
       PostType postType,
       String content,
@@ -171,6 +187,8 @@ class __$$PostImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? bookId = null,
+    Object? bookTitle = freezed,
+    Object? bookCoverUrl = freezed,
     Object? user = null,
     Object? postType = null,
     Object? content = null,
@@ -189,6 +207,14 @@ class __$$PostImplCopyWithImpl<$Res>
           ? _value.bookId
           : bookId // ignore: cast_nullable_to_non_nullable
               as String,
+      bookTitle: freezed == bookTitle
+          ? _value.bookTitle
+          : bookTitle // ignore: cast_nullable_to_non_nullable
+              as String?,
+      bookCoverUrl: freezed == bookCoverUrl
+          ? _value.bookCoverUrl
+          : bookCoverUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
       user: null == user
           ? _value.user
           : user // ignore: cast_nullable_to_non_nullable
@@ -231,6 +257,8 @@ class _$PostImpl implements _Post {
   const _$PostImpl(
       {required this.id,
       required this.bookId,
+      this.bookTitle,
+      this.bookCoverUrl,
       required this.user,
       required this.postType,
       required this.content,
@@ -247,6 +275,10 @@ class _$PostImpl implements _Post {
   final String id;
   @override
   final String bookId;
+  @override
+  final String? bookTitle;
+  @override
+  final String? bookCoverUrl;
   @override
   final PostAuthor user;
   @override
@@ -284,7 +316,7 @@ class _$PostImpl implements _Post {
 
   @override
   String toString() {
-    return 'Post(id: $id, bookId: $bookId, user: $user, postType: $postType, content: $content, imageUrls: $imageUrls, reactions: $reactions, myReactions: $myReactions, commentCount: $commentCount, createdAt: $createdAt)';
+    return 'Post(id: $id, bookId: $bookId, bookTitle: $bookTitle, bookCoverUrl: $bookCoverUrl, user: $user, postType: $postType, content: $content, imageUrls: $imageUrls, reactions: $reactions, myReactions: $myReactions, commentCount: $commentCount, createdAt: $createdAt)';
   }
 
   @override
@@ -294,6 +326,10 @@ class _$PostImpl implements _Post {
             other is _$PostImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.bookId, bookId) || other.bookId == bookId) &&
+            (identical(other.bookTitle, bookTitle) ||
+                other.bookTitle == bookTitle) &&
+            (identical(other.bookCoverUrl, bookCoverUrl) ||
+                other.bookCoverUrl == bookCoverUrl) &&
             (identical(other.user, user) || other.user == user) &&
             (identical(other.postType, postType) ||
                 other.postType == postType) &&
@@ -315,6 +351,8 @@ class _$PostImpl implements _Post {
       runtimeType,
       id,
       bookId,
+      bookTitle,
+      bookCoverUrl,
       user,
       postType,
       content,
@@ -337,6 +375,8 @@ abstract class _Post implements Post {
   const factory _Post(
       {required final String id,
       required final String bookId,
+      final String? bookTitle,
+      final String? bookCoverUrl,
       required final PostAuthor user,
       required final PostType postType,
       required final String content,
@@ -350,6 +390,10 @@ abstract class _Post implements Post {
   String get id;
   @override
   String get bookId;
+  @override
+  String? get bookTitle;
+  @override
+  String? get bookCoverUrl;
   @override
   PostAuthor get user;
   @override

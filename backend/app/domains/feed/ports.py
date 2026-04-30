@@ -156,6 +156,15 @@ class ImageStoragePort(Protocol):
     async def public_url(self, key: str) -> str: ...
 
 
+@dataclass(frozen=True, slots=True)
+class BookSnapshot:
+    """Minimal book info for enriching feed posts at the router layer."""
+
+    id: UUID
+    title: str
+    cover_url: str | None
+
+
 class FeedBookQueryPort(Protocol):
     """Cross-domain read of the book catalog.
 
@@ -166,6 +175,8 @@ class FeedBookQueryPort(Protocol):
     """
 
     async def book_exists(self, book_id: UUID) -> bool: ...
+
+    async def get_book_snapshot(self, book_id: UUID) -> BookSnapshot | None: ...
 
 
 @dataclass(frozen=True, slots=True)

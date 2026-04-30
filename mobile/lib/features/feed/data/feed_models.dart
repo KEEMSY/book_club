@@ -43,6 +43,8 @@ class PostDto with _$PostDto {
   const factory PostDto({
     required String id,
     required String bookId,
+    String? bookTitle,
+    String? bookCoverUrl,
     required PostAuthorDto user,
     required String postType,
     required String content,
@@ -66,6 +68,8 @@ class PostDto with _$PostDto {
     return Post(
       id: id,
       bookId: bookId,
+      bookTitle: bookTitle,
+      bookCoverUrl: bookCoverUrl,
       user: user.toDomain(),
       postType: PostType.fromWire(postType),
       content: content,

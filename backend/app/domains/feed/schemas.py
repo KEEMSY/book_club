@@ -13,7 +13,7 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.domains.feed.models import Post, ReactionType
-from app.domains.feed.ports import PostFeedItem
+from app.domains.feed.ports import BookSnapshot, PostFeedItem
 
 PostTypeStr = Literal["highlight", "thought", "question", "discussion"]
 ReactionTypeStr = Literal["idea", "fire", "think", "clap", "heart"]
@@ -49,6 +49,8 @@ class CreatePostRequest(BaseModel):
 class PostPublic(BaseModel):
     id: UUID
     book_id: UUID
+    book_title: str | None = None
+    book_cover_url: str | None = None
     user: AuthorPublic
     post_type: PostTypeStr
     content: str
@@ -59,10 +61,18 @@ class PostPublic(BaseModel):
     created_at: datetime
 
     @classmethod
-    def from_feed_item(cls, item: PostFeedItem, *, author: AuthorPublic) -> PostPublic:
+    def from_feed_item(
+        cls,
+        item: PostFeedItem,
+        *,
+        author: AuthorPublic,
+        book_snapshot: BookSnapshot | None = None,
+    ) -> PostPublic:
         return cls(
             id=item.post.id,
             book_id=item.post.book_id,
+            book_title=book_snapshot.title if book_snapshot else None,
+            book_cover_url=book_snapshot.cover_url if book_snapshot else None,
             user=author,
             post_type=item.post.post_type.value,
             content=item.post.content,
@@ -74,10 +84,18 @@ class PostPublic(BaseModel):
         )
 
     @classmethod
-    def from_post(cls, post: Post, *, author: AuthorPublic) -> PostPublic:
+    def from_post(
+        cls,
+        post: Post,
+        *,
+        author: AuthorPublic,
+        book_snapshot: BookSnapshot | None = None,
+    ) -> PostPublic:
         return cls(
             id=post.id,
             book_id=post.book_id,
+            book_title=book_snapshot.title if book_snapshot else None,
+            book_cover_url=book_snapshot.cover_url if book_snapshot else None,
             user=author,
             post_type=post.post_type.value,
             content=post.content,

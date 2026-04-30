@@ -1,5 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../core/router/app_router.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../domain/post.dart';
@@ -70,7 +73,12 @@ class PostCard extends StatelessWidget {
           _Header(post: post, onTapAuthor: onTapAuthor),
           SizedBox(height: spacing.sm),
           if (post.postType == PostType.highlight)
-            _HighlightBody(content: post.content)
+            _HighlightBody(
+              content: post.content,
+              bookId: post.bookId,
+              bookTitle: post.bookTitle,
+              bookCoverUrl: post.bookCoverUrl,
+            )
           else
             Text(
               post.content,
@@ -199,16 +207,25 @@ class _Avatar extends StatelessWidget {
 }
 
 class _HighlightBody extends StatelessWidget {
-  const _HighlightBody({required this.content});
+  const _HighlightBody({
+    required this.content,
+    required this.bookId,
+    this.bookTitle,
+    this.bookCoverUrl,
+  });
 
   final String content;
+  final String bookId;
+  final String? bookTitle;
+  final String? bookCoverUrl;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final radii = theme.extension<AppRadius>()!;
+    final spacing = theme.extension<AppSpacing>()!;
+
     return Container(
-      padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerLowest,
         border: Border(
@@ -219,13 +236,75 @@ class _HighlightBody extends StatelessWidget {
           bottomRight: Radius.circular(radii.sm),
         ),
       ),
-      child: Text(
-        '"$content"',
-        style: theme.textTheme.bodyLarge?.copyWith(
-          fontStyle: FontStyle.italic,
-          color: theme.colorScheme.onSurface,
-          height: 1.6,
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          if (bookTitle != null)
+            InkWell(
+              onTap: () => context.push(AppRoutes.bookDetail(bookId)),
+              borderRadius: BorderRadius.only(
+                topRight: Radius.circular(radii.sm),
+              ),
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(12, spacing.sm, 12, spacing.xs),
+                child: Row(
+                  children: <Widget>[
+                    if (bookCoverUrl != null && bookCoverUrl!.isNotEmpty)
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(2),
+                        child: CachedNetworkImage(
+                          imageUrl: bookCoverUrl!,
+                          width: 28,
+                          height: 40,
+                          fit: BoxFit.cover,
+                          errorWidget: (_, __, ___) => const SizedBox(
+                            width: 28,
+                            height: 40,
+                          ),
+                        ),
+                      ),
+                    if (bookCoverUrl != null && bookCoverUrl!.isNotEmpty)
+                      SizedBox(width: spacing.sm),
+                    Expanded(
+                      child: Text(
+                        bookTitle!,
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Icon(
+                      Icons.chevron_right,
+                      size: 16,
+                      color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          if (bookTitle != null)
+            Divider(
+              height: 1,
+              thickness: 1,
+              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
+              indent: 12,
+              endIndent: 12,
+            ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+            child: Text(
+              '"$content"',
+              style: theme.textTheme.bodyLarge?.copyWith(
+                fontStyle: FontStyle.italic,
+                color: theme.colorScheme.onSurface,
+                height: 1.6,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

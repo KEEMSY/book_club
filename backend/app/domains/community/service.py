@@ -15,7 +15,7 @@ from uuid import UUID
 from app.core.exceptions import NotFoundError
 from app.domains.auth.repository import UserRepository
 from app.domains.community.repository import CommunityRepository
-from app.domains.feed.models import Post
+from app.domains.feed.models import Post, PostType
 from app.domains.feed.ports import ImageStoragePort, PostFeedItem, ReactionRepositoryPort
 from app.domains.feed.repository import PostRepository
 from app.domains.feed.service import FeedPage
@@ -72,18 +72,28 @@ class CommunityService:
         *,
         viewer_id: UUID,
         sort: str,
+        post_type: str | None,
         cursor: str | None,
         limit: int,
     ) -> FeedPage:
         clamped = max(_FEED_PAGE_MIN, min(limit, _FEED_PAGE_MAX))
+        parsed_post_type: PostType | None = None
+        if post_type is not None:
+            try:
+                parsed_post_type = PostType(post_type)
+            except ValueError:
+                parsed_post_type = None
         if sort == "popular":
             since = datetime.now(tz=UTC) - timedelta(days=_POPULAR_DAYS)
             posts = await self.community_repo.get_explore_feed_popular(
-                viewer_id, since=since, limit=clamped
+                viewer_id, since=since, post_type=parsed_post_type, limit=clamped
             )
         else:
             posts = await self.community_repo.get_explore_feed_latest(
-                viewer_id, cursor=_parse_cursor(cursor), limit=clamped
+                viewer_id,
+                cursor=_parse_cursor(cursor),
+                post_type=parsed_post_type,
+                limit=clamped,
             )
         return await self._build_page(posts, viewer_id=viewer_id, limit=clamped)
 

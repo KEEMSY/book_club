@@ -26,6 +26,7 @@ abstract class CommunityApi {
   @GET('/community/explore')
   Future<PostPageDto> getExploreFeed({
     @Query('sort') String sort = 'latest',
+    @Query('post_type') String? postType,
     @Query('cursor') String? cursor,
     @Query('limit') int limit = 20,
   });

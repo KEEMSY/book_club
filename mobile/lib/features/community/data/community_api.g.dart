@@ -51,12 +51,14 @@ class _CommunityApi implements CommunityApi {
   @override
   Future<PostPageDto> getExploreFeed({
     String sort = 'latest',
+    String? postType,
     String? cursor,
     int limit = 20,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
       r'sort': sort,
+      r'post_type': postType,
       r'cursor': cursor,
       r'limit': limit,
     };

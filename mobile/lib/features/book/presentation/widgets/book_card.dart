@@ -17,6 +17,7 @@ class BookCard extends StatelessWidget {
     required this.book,
     this.status,
     this.onTap,
+    this.onLongPress,
   }) : _layout = _BookCardLayout.list;
 
   const BookCard.grid({
@@ -24,11 +25,13 @@ class BookCard extends StatelessWidget {
     required this.book,
     this.status,
     this.onTap,
+    this.onLongPress,
   }) : _layout = _BookCardLayout.grid;
 
   final Book book;
   final BookStatus? status;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
   final _BookCardLayout _layout;
 
   @override
@@ -52,6 +55,7 @@ class BookCard extends StatelessWidget {
           spacing: spacing,
           theme: theme,
           onTap: onTap,
+          onLongPress: onLongPress,
         );
     }
   }
@@ -153,6 +157,7 @@ class _GridLayout extends StatelessWidget {
     required this.spacing,
     required this.theme,
     required this.onTap,
+    this.onLongPress,
   });
 
   final Book book;
@@ -160,12 +165,14 @@ class _GridLayout extends StatelessWidget {
   final AppSpacing spacing;
   final ThemeData theme;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
 
   @override
   Widget build(BuildContext context) {
     final radii = theme.extension<AppRadius>()!;
     return InkWell(
       onTap: onTap,
+      onLongPress: onLongPress,
       borderRadius: BorderRadius.circular(radii.md),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

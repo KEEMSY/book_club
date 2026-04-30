@@ -157,3 +157,13 @@ final exploreFeedProvider =
     );
   },
 );
+
+/// Highlight-only feed (community "인용" tab).
+final highlightFeedProvider =
+    StateNotifierProvider.autoDispose<_FeedNotifier, FeedState>((ref) {
+  final repo = ref.watch(communityRepositoryProvider);
+  return _FeedNotifier(
+    ({String? cursor}) =>
+        repo.getExploreFeed(sort: 'latest', postType: 'highlight', cursor: cursor),
+  );
+});

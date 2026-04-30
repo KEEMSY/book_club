@@ -19,6 +19,8 @@ class Post with _$Post {
   const factory Post({
     required String id,
     required String bookId,
+    String? bookTitle,
+    String? bookCoverUrl,
     required PostAuthor user,
     required PostType postType,
     required String content,

@@ -14,7 +14,7 @@ from uuid import UUID
 from sqlalchemy import ColumnElement, and_, desc, func, outerjoin, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domains.feed.models import Post, Reaction
+from app.domains.feed.models import Post, PostType, Reaction
 from app.domains.social.models import Block, Follow
 
 
@@ -53,6 +53,7 @@ class CommunityRepository:
         viewer_id: UUID,
         *,
         cursor: datetime | None,
+        post_type: PostType | None = None,
         limit: int,
     ) -> list[Post]:
         """All non-deleted posts excluding blocked users' content, newest-first."""
@@ -65,6 +66,8 @@ class CommunityRepository:
         ]
         if cursor is not None:
             conditions.append(Post.created_at < cursor)
+        if post_type is not None:
+            conditions.append(Post.post_type == post_type)
         stmt = (
             select(Post)
             .where(and_(*conditions))
@@ -79,6 +82,7 @@ class CommunityRepository:
         viewer_id: UUID,
         *,
         since: datetime,
+        post_type: PostType | None = None,
         limit: int,
     ) -> list[Post]:
         """Posts from the last N days ordered by reaction count, excluding blocked.
@@ -91,14 +95,17 @@ class CommunityRepository:
         )
         rc = func.count(Reaction.id).label("rc")
         j = outerjoin(Post, Reaction, Reaction.post_id == Post.id)
+        conditions = [
+            Post.deleted_at.is_(None),
+            Post.user_id.notin_(blocked_subq),
+            Post.created_at >= since,
+        ]
+        if post_type is not None:
+            conditions.append(Post.post_type == post_type)
         stmt = (
             select(Post, rc)
             .select_from(j)
-            .where(
-                Post.deleted_at.is_(None),
-                Post.user_id.notin_(blocked_subq),
-                Post.created_at >= since,
-            )
+            .where(*conditions)
             .group_by(Post.id)
             .order_by(desc("rc"), Post.id.desc())
             .limit(limit)

@@ -29,7 +29,7 @@ class _CommunityHomeScreenState extends ConsumerState<CommunityHomeScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -62,6 +62,7 @@ class _CommunityHomeScreenState extends ConsumerState<CommunityHomeScreen>
           tabs: const <Tab>[
             Tab(text: '팔로잉'),
             Tab(text: '탐색'),
+            Tab(text: '인용'),
           ],
         ),
       ),
@@ -70,6 +71,7 @@ class _CommunityHomeScreenState extends ConsumerState<CommunityHomeScreen>
         children: <Widget>[
           _FollowingFeedTab(onExploreTap: () => _tabController.animateTo(1)),
           const _ExploreTab(),
+          const _HighlightFeedTab(),
         ],
       ),
     );
@@ -532,6 +534,93 @@ class _UserSearchTileState extends ConsumerState<_UserSearchTile> {
               ),
               child: const Text('팔로우'),
             ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 인용 피드 탭 — highlight-type posts only
+// ---------------------------------------------------------------------------
+
+class _HighlightFeedTab extends ConsumerWidget {
+  const _HighlightFeedTab();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final feedState = ref.watch(highlightFeedProvider);
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+
+    if (feedState.isLoading && feedState.posts.isEmpty) {
+      return const Center(child: CircularProgressIndicator(strokeWidth: 2));
+    }
+
+    if (feedState.error != null && feedState.posts.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Text('피드를 불러오지 못했어요', style: theme.textTheme.bodyMedium),
+            SizedBox(height: spacing.sm),
+            FilledButton(
+              onPressed: () =>
+                  ref.read(highlightFeedProvider.notifier).fetchFirst(),
+              child: const Text('다시 시도'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (feedState.posts.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: EdgeInsets.all(spacing.lg),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Icon(
+                Icons.format_quote_rounded,
+                size: 64,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+              ),
+              SizedBox(height: spacing.md),
+              Text(
+                '아직 공유된 인용이 없어요',
+                style: theme.textTheme.titleMedium,
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: spacing.sm),
+              Text(
+                '책을 읽으며 기억하고 싶은 문장을\n피드에 공유해보세요',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: () => ref.read(highlightFeedProvider.notifier).fetchFirst(),
+      child: _PostFeedList(
+        posts: feedState.posts,
+        hasMore: feedState.hasMore,
+        isLoading: feedState.isLoading,
+        onLoadMore: () =>
+            ref.read(highlightFeedProvider.notifier).fetchMore(),
+        onReactionApplied: (postId, type, toggleState, counts) => ref
+            .read(highlightFeedProvider.notifier)
+            .applyReactionResult(
+              postId: postId,
+              reactionType: type,
+              toggleState: toggleState,
+              counts: counts,
+            ),
+      ),
     );
   }
 }

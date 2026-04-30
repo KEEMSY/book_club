@@ -42,12 +42,14 @@ class CommunityRepository {
 
   Future<PostPage> getExploreFeed({
     String sort = 'latest',
+    String? postType,
     String? cursor,
     int limit = 20,
   }) =>
       _call(() async {
         final dto = await _api.getExploreFeed(
           sort: sort,
+          postType: postType,
           cursor: cursor,
           limit: limit,
         );

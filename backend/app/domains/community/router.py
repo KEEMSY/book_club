@@ -20,8 +20,15 @@ from app.core.deps import get_current_user_id
 from app.domains.community.providers import get_community_service
 from app.domains.community.schemas import UserProfileResponse
 from app.domains.community.service import CommunityService
-from app.domains.feed.ports import AuthorView, FeedUserQueryPort
-from app.domains.feed.providers import get_feed_user_query
+from app.domains.feed.models import PostType
+from app.domains.feed.ports import (
+    AuthorView,
+    BookSnapshot,
+    FeedBookQueryPort,
+    FeedUserQueryPort,
+    PostFeedItem,
+)
+from app.domains.feed.providers import get_feed_book_query, get_feed_user_query
 from app.domains.feed.schemas import AuthorPublic, FeedResponse, PostPublic
 
 router = APIRouter(prefix="/community", tags=["community"])
@@ -37,21 +44,40 @@ def _author_from_view(view: AuthorView | None, fallback_id: UUID) -> AuthorPubli
     )
 
 
+async def _book_snapshots_for_highlights(
+    items: list[PostFeedItem],
+    book_query: FeedBookQueryPort,
+) -> dict[UUID, BookSnapshot]:
+    """Batch-fetch book snapshots for highlight posts (one query per unique book_id)."""
+    highlight_book_ids = {
+        item.post.book_id for item in items if item.post.post_type == PostType.HIGHLIGHT
+    }
+    snapshots: dict[UUID, BookSnapshot] = {}
+    for book_id in highlight_book_ids:
+        snap = await book_query.get_book_snapshot(book_id)
+        if snap is not None:
+            snapshots[book_id] = snap
+    return snapshots
+
+
 @router.get("/feed", response_model=FeedResponse)
 async def get_following_feed(
     user_id: Annotated[str, Depends(get_current_user_id)],
     service: Annotated[CommunityService, Depends(get_community_service)],
     user_query: Annotated[FeedUserQueryPort, Depends(get_feed_user_query)],
+    book_query: Annotated[FeedBookQueryPort, Depends(get_feed_book_query)],
     cursor: Annotated[str | None, Query()] = None,
     limit: Annotated[int, Query(ge=1, le=50)] = 20,
 ) -> FeedResponse:
     page = await service.get_following_feed(user_id=UUID(user_id), cursor=cursor, limit=limit)
     author_ids = [item.post.user_id for item in page.items]
     authors = await user_query.get_authors(author_ids) if author_ids else {}
+    book_snaps = await _book_snapshots_for_highlights(page.items, book_query)
     items = [
         PostPublic.from_feed_item(
             item,
             author=_author_from_view(authors.get(item.post.user_id), item.post.user_id),
+            book_snapshot=book_snaps.get(item.post.book_id),
         )
         for item in page.items
     ]
@@ -63,19 +89,23 @@ async def get_explore_feed(
     user_id: Annotated[str, Depends(get_current_user_id)],
     service: Annotated[CommunityService, Depends(get_community_service)],
     user_query: Annotated[FeedUserQueryPort, Depends(get_feed_user_query)],
+    book_query: Annotated[FeedBookQueryPort, Depends(get_feed_book_query)],
     sort: Annotated[Literal["latest", "popular"], Query()] = "latest",
+    post_type: Annotated[str | None, Query()] = None,
     cursor: Annotated[str | None, Query()] = None,
     limit: Annotated[int, Query(ge=1, le=50)] = 20,
 ) -> FeedResponse:
     page = await service.get_explore_feed(
-        viewer_id=UUID(user_id), sort=sort, cursor=cursor, limit=limit
+        viewer_id=UUID(user_id), sort=sort, post_type=post_type, cursor=cursor, limit=limit
     )
     author_ids = [item.post.user_id for item in page.items]
     authors = await user_query.get_authors(author_ids) if author_ids else {}
+    book_snaps = await _book_snapshots_for_highlights(page.items, book_query)
     items = [
         PostPublic.from_feed_item(
             item,
             author=_author_from_view(authors.get(item.post.user_id), item.post.user_id),
+            book_snapshot=book_snaps.get(item.post.book_id),
         )
         for item in page.items
     ]
@@ -88,6 +118,7 @@ async def get_user_posts(
     viewer_id: Annotated[str, Depends(get_current_user_id)],
     service: Annotated[CommunityService, Depends(get_community_service)],
     user_query: Annotated[FeedUserQueryPort, Depends(get_feed_user_query)],
+    book_query: Annotated[FeedBookQueryPort, Depends(get_feed_book_query)],
     cursor: Annotated[str | None, Query()] = None,
     limit: Annotated[int, Query(ge=1, le=50)] = 20,
 ) -> FeedResponse:
@@ -96,10 +127,12 @@ async def get_user_posts(
     )
     author_ids = [item.post.user_id for item in page.items]
     authors = await user_query.get_authors(author_ids) if author_ids else {}
+    book_snaps = await _book_snapshots_for_highlights(page.items, book_query)
     items = [
         PostPublic.from_feed_item(
             item,
             author=_author_from_view(authors.get(item.post.user_id), item.post.user_id),
+            book_snapshot=book_snaps.get(item.post.book_id),
         )
         for item in page.items
     ]
