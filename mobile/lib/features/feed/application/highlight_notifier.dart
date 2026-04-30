@@ -34,11 +34,16 @@ class HighlightNotifier extends StateNotifier<HighlightState> {
         quoteText: quoteText,
         pageNumber: pageNumber,
       );
-      if (state case HighlightLoaded(:final List<Highlight> items, :final nextCursor)) {
-        state = HighlightState.loaded(
-          items: <Highlight>[h, ...items],
-          nextCursor: nextCursor,
-        );
+      // Guard against autoDispose: the provider may have been collected while
+      // the HTTP call was in flight (e.g. opened from library sheet with no
+      // watcher). Skip the optimistic state update rather than throwing.
+      if (mounted) {
+        if (state case HighlightLoaded(:final List<Highlight> items, :final nextCursor)) {
+          state = HighlightState.loaded(
+            items: <Highlight>[h, ...items],
+            nextCursor: nextCursor,
+          );
+        }
       }
       return h;
     } on FeedRepositoryException {

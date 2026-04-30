@@ -92,17 +92,25 @@ class _AddHighlightSheetState extends ConsumerState<AddHighlightSheet> {
     if (quote.isEmpty) return;
     final int? page = int.tryParse(_pageController.text.trim());
     setState(() => _saving = true);
-    final Highlight? h = await ref
-        .read(highlightNotifierProvider(widget.userBookId).notifier)
-        .add(quoteText: quote, pageNumber: page);
-    if (!mounted) return;
-    setState(() => _saving = false);
-    if (h != null) {
-      Navigator.of(context).pop();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('하이라이트가 저장됐어요')),
-      );
-    } else {
+    try {
+      final Highlight? h = await ref
+          .read(highlightNotifierProvider(widget.userBookId).notifier)
+          .add(quoteText: quote, pageNumber: page);
+      if (!mounted) return;
+      setState(() => _saving = false);
+      if (h != null) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('하이라이트가 저장됐어요')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('저장에 실패했어요. 다시 시도해주세요.')),
+        );
+      }
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _saving = false);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('저장에 실패했어요. 다시 시도해주세요.')),
       );
