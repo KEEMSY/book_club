@@ -153,6 +153,9 @@ class FakeAuthApi implements AuthApi {
   Future<void> deleteMe() async {
     deleteMeCalls++;
   }
+
+  @override
+  Future<void> updateProfile(Map<String, dynamic> body) async {}
 }
 
 /// Helper that builds a canonical [AuthUserDto] for test fixtures.

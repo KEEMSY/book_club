@@ -51,6 +51,10 @@ abstract class AuthApi {
   @GET('/me')
   Future<AuthUserDto> getMe();
 
+  /// Updates the current user's profile (nickname / bio). Backend returns 204.
+  @PATCH('/me')
+  Future<void> updateProfile(@Body() Map<String, dynamic> body);
+
   /// Soft-deletes the current user (backend returns 204).
   @DELETE('/me')
   Future<void> deleteMe();

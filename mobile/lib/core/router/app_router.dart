@@ -14,7 +14,9 @@ import '../../features/challenge/presentation/challenge_list_screen.dart';
 import '../../features/community/presentation/community_home_screen.dart';
 import '../../features/community/presentation/follower_list_screen.dart';
 import '../../features/community/presentation/following_list_screen.dart';
+import '../../features/community/presentation/profile_edit_screen.dart';
 import '../../features/community/presentation/user_profile_screen.dart';
+import '../../features/social/domain/user_summary.dart';
 import '../../features/feed/presentation/post_compose_screen.dart';
 import '../../features/notification/presentation/notification_screen.dart';
 import '../../features/notification/presentation/weekly_report_screen.dart';
@@ -57,6 +59,9 @@ class AppRoutes {
   static const challenges = '/community/challenges';
   static String challengeDetail(String id) => '/community/challenges/$id';
   static const badges = '/community/badges';
+
+  // Profile edit — own profile only.
+  static const profileEdit = '/profile/edit';
 }
 
 /// Adapter that bridges a Riverpod [ValueNotifier]-free state stream into a
@@ -172,6 +177,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final String? week = state.uri.queryParameters['week'];
           return WeeklyReportScreen(weekStart: week);
+        },
+      ),
+      // Profile edit — own profile only, pushed above the shell.
+      GoRoute(
+        path: AppRoutes.profileEdit,
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) {
+          final UserProfile profile = state.extra! as UserProfile;
+          return ProfileEditScreen(profile: profile);
         },
       ),
       // User profile — pushed above the shell so the nav bar disappears and

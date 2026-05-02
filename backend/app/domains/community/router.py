@@ -18,7 +18,12 @@ from fastapi import APIRouter, Depends, Query
 
 from app.core.deps import get_current_user_id
 from app.domains.community.providers import get_community_service
-from app.domains.community.schemas import UserProfileResponse
+from app.domains.community.schemas import (
+    BadgeSummaryPublic,
+    GradeStatsPublic,
+    HighlightSummaryPublic,
+    UserProfileResponse,
+)
 from app.domains.community.service import CommunityService
 from app.domains.feed.models import PostType
 from app.domains.feed.ports import (
@@ -155,4 +160,32 @@ async def get_user_profile(
         following_count=profile.following_count,
         is_following=profile.is_following,
         is_me=profile.is_me,
+        grade_stats=GradeStatsPublic(
+            grade=profile.grade_stats.grade,
+            tier=profile.grade_stats.tier,
+            total_books=profile.grade_stats.total_books,
+            total_seconds=profile.grade_stats.total_seconds,
+            streak_days=profile.grade_stats.streak_days,
+        )
+        if profile.grade_stats
+        else None,
+        badges=[
+            BadgeSummaryPublic(
+                id=b.id,
+                name=b.name,
+                icon_url=b.icon_url,
+                category=b.category,
+                earned_at=b.earned_at,
+            )
+            for b in profile.badges
+        ],
+        recent_highlights=[
+            HighlightSummaryPublic(
+                id=h.id,
+                quote_text=h.quote_text,
+                book_title=h.book_title,
+                created_at=h.created_at,
+            )
+            for h in profile.recent_highlights
+        ],
     )

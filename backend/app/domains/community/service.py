@@ -8,12 +8,21 @@ repository adapters the feed service uses, avoiding duplicated SQL.
 
 from __future__ import annotations
 
+import asyncio
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
 from app.core.exceptions import NotFoundError
 from app.domains.auth.repository import UserRepository
+from app.domains.community.ports import (
+    BadgeSummary,
+    GradeStats,
+    HighlightSummary,
+    ProfileChallengeQueryPort,
+    ProfileHighlightQueryPort,
+    ProfileReadingQueryPort,
+)
 from app.domains.community.repository import CommunityRepository
 from app.domains.feed.models import Post, PostType
 from app.domains.feed.ports import ImageStoragePort, PostFeedItem, ReactionRepositoryPort
@@ -44,6 +53,9 @@ class UserProfileView:
     following_count: int
     is_following: bool
     is_me: bool
+    grade_stats: GradeStats | None
+    badges: list[BadgeSummary]
+    recent_highlights: list[HighlightSummary]
 
 
 @dataclass(slots=True)
@@ -53,6 +65,9 @@ class CommunityService:
     reactions: ReactionRepositoryPort
     image_storage: ImageStoragePort
     user_repo: UserRepository
+    reading_query: ProfileReadingQueryPort
+    challenge_query: ProfileChallengeQueryPort
+    highlight_query: ProfileHighlightQueryPort
 
     async def get_following_feed(
         self,
@@ -126,6 +141,11 @@ class CommunityService:
             if viewer_id != user_id
             else False
         )
+        grade_stats, badges, highlights = await asyncio.gather(
+            self.reading_query.get_grade_stats(user_id),
+            self.challenge_query.get_user_badges(user_id, limit=6),
+            self.highlight_query.get_recent_highlights(user_id, limit=3),
+        )
         return UserProfileView(
             user_id=user.id,
             nickname=user.nickname,
@@ -135,6 +155,9 @@ class CommunityService:
             following_count=following_count,
             is_following=is_following,
             is_me=viewer_id == user_id,
+            grade_stats=grade_stats,
+            badges=badges,
+            recent_highlights=highlights,
         )
 
     async def _build_page(

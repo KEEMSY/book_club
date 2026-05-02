@@ -6,8 +6,10 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/grade_theme.dart';
 import '../../feed/presentation/comments_sheet.dart';
 import '../../feed/presentation/widgets/post_card.dart';
+import '../../reading/presentation/widgets/grade_badge.dart';
 import '../../social/application/social_providers.dart';
 import '../../social/data/social_repository.dart';
 import '../../social/domain/user_summary.dart';
@@ -16,12 +18,12 @@ import '../application/community_providers.dart';
 /// Full-page user profile screen.
 ///
 /// Renders different actions depending on [UserProfile.isMe]:
-///   * own profile  → "프로필 편집" button
+///   * own profile  → "프로필 편집" button (navigates to [ProfileEditScreen])
 ///   * other user   → "팔로우" / "팔로잉" toggle + 3-dot menu
 ///
-/// The profile header, counts, and action button are placed inside a
-/// [CustomScrollView] so the "게시글" section (M8) can be added as an
-/// additional sliver without restructuring this widget.
+/// The profile header, stats, grade, badges, highlights, follow counts, and
+/// action button are placed inside a [CustomScrollView] so the "게시글" section
+/// can be added as an additional sliver without restructuring this widget.
 class UserProfileScreen extends ConsumerWidget {
   const UserProfileScreen({super.key, required this.userId});
 
@@ -77,53 +79,58 @@ class _ProfileContent extends ConsumerWidget {
         slivers: [
           SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsets.all(spacing.lg),
+              padding: EdgeInsets.fromLTRB(
+                spacing.lg,
+                spacing.lg,
+                spacing.lg,
+                spacing.md,
+              ),
+              child: _ProfileHeader(profile: profile),
+            ),
+          ),
+          if (profile.gradeStats != null) ...[
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: spacing.lg,
+                  vertical: spacing.sm,
+                ),
+                child: _StatsRow(stats: profile.gradeStats!),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: spacing.md),
+                child: _GradeSection(stats: profile.gradeStats!),
+              ),
+            ),
+          ],
+          if (profile.badges.isNotEmpty)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  top: spacing.sm,
+                  bottom: spacing.md,
+                ),
+                child: _BadgeShowcase(badges: profile.badges),
+              ),
+            ),
+          if (profile.recentHighlights.isNotEmpty)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: spacing.lg),
+                child:
+                    _RecentHighlightsSection(highlights: profile.recentHighlights),
+              ),
+            ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: spacing.lg,
+                vertical: spacing.lg,
+              ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  _ProfileAvatar(
-                    profileImageUrl: profile.profileImageUrl,
-                    nickname: profile.nickname,
-                  ),
-                  SizedBox(height: spacing.md),
-                  Text(
-                    profile.nickname,
-                    style: theme.textTheme.headlineMedium,
-                    textAlign: TextAlign.center,
-                  ),
-                  if (profile.bio != null && profile.bio!.isNotEmpty) ...[
-                    SizedBox(height: spacing.sm),
-                    Text(
-                      profile.bio!,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurface
-                            .withValues(alpha: 0.6),
-                      ),
-                      textAlign: TextAlign.center,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                  SizedBox(height: spacing.sm),
-                  // Grade badge placeholder — M8 will wire real grade data
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: spacing.sm,
-                      vertical: spacing.xs,
-                    ),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      '독서 등급 —',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onSurface
-                            .withValues(alpha: 0.5),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: spacing.lg),
                   _FollowCounts(profile: profile, userId: userId),
                   SizedBox(height: spacing.lg),
                   _ActionButton(profile: profile, userId: userId),
@@ -143,6 +150,362 @@ class _ProfileContent extends ConsumerWidget {
     );
   }
 }
+
+// ---------------------------------------------------------------------------
+// Profile header — avatar + nickname + bio (grade placeholder removed)
+// ---------------------------------------------------------------------------
+
+class _ProfileHeader extends StatelessWidget {
+  const _ProfileHeader({required this.profile});
+
+  final UserProfile profile;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        _ProfileAvatar(
+          profileImageUrl: profile.profileImageUrl,
+          nickname: profile.nickname,
+        ),
+        SizedBox(height: spacing.md),
+        Text(
+          profile.nickname,
+          style: theme.textTheme.headlineMedium,
+          textAlign: TextAlign.center,
+        ),
+        if (profile.bio != null && profile.bio!.isNotEmpty) ...[
+          SizedBox(height: spacing.sm),
+          Text(
+            profile.bio!,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Stats row — 완독 N권 | 총 Xh Ym | N일 스트릭
+// ---------------------------------------------------------------------------
+
+class _StatsRow extends StatelessWidget {
+  const _StatsRow({required this.stats});
+
+  final GradeStats stats;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _StatTile(label: '완독', value: '${stats.totalBooks}권'),
+        _StatDivider(),
+        _StatTile(label: '총 독서', value: _formatSeconds(stats.totalSeconds)),
+        _StatDivider(),
+        _StatTile(label: '스트릭', value: '${stats.streakDays}일'),
+      ],
+    );
+  }
+
+  /// Formats a raw second count into a compact human-readable string.
+  ///
+  /// Returns "Xh Ym" when an hour or more, "Ym" otherwise.
+  static String _formatSeconds(int totalSeconds) {
+    final hours = totalSeconds ~/ 3600;
+    final minutes = (totalSeconds % 3600) ~/ 60;
+    if (hours > 0) {
+      return '${hours}h ${minutes}m';
+    }
+    return '${minutes}m';
+  }
+}
+
+class _StatTile extends StatelessWidget {
+  const _StatTile({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      children: [
+        Text(
+          value,
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          label,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _StatDivider extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: SizedBox(
+        height: 32,
+        child: VerticalDivider(
+          color: Theme.of(context).colorScheme.outlineVariant,
+          width: 1,
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Grade section — real GradeBadge with grade name
+// ---------------------------------------------------------------------------
+
+class _GradeSection extends StatelessWidget {
+  const _GradeSection({required this.stats});
+
+  final GradeStats stats;
+
+  /// Maps the raw grade integer (1–5) to the Flutter [ReaderGrade] enum.
+  static ReaderGrade _toReaderGrade(int grade) {
+    switch (grade) {
+      case 2:
+        return ReaderGrade.explorer;
+      case 3:
+        return ReaderGrade.devoted;
+      case 4:
+        return ReaderGrade.passionate;
+      case 5:
+        return ReaderGrade.master;
+      case 1:
+      default:
+        return ReaderGrade.sprout;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final readerGrade = _toReaderGrade(stats.grade);
+    return Center(
+      child: GradeBadge(
+        grade: readerGrade,
+        tier: stats.tier,
+        size: 96,
+        showLabel: true,
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Badge showcase — horizontal scroll list
+// ---------------------------------------------------------------------------
+
+class _BadgeShowcase extends StatelessWidget {
+  const _BadgeShowcase({required this.badges});
+
+  final List<BadgeSummary> badges;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: spacing.lg),
+          child: Text('획득한 배지', style: theme.textTheme.titleSmall),
+        ),
+        SizedBox(height: spacing.sm),
+        SizedBox(
+          height: 96,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: spacing.lg),
+            itemCount: badges.length,
+            itemBuilder: (context, index) {
+              final badge = badges[index];
+              return Padding(
+                padding: EdgeInsets.only(right: spacing.md),
+                child: _BadgeTile(badge: badge),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _BadgeTile extends StatelessWidget {
+  const _BadgeTile({required this.badge});
+
+  final BadgeSummary badge;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        badge.iconUrl.isNotEmpty
+            ? ClipOval(
+                child: CachedNetworkImage(
+                  imageUrl: badge.iconUrl,
+                  width: 56,
+                  height: 56,
+                  fit: BoxFit.cover,
+                  placeholder: (_, __) => Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surfaceContainerHighest,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.star_rounded,
+                      size: 28,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  errorWidget: (_, __, ___) => _BadgeFallbackIcon(),
+                ),
+              )
+            : _BadgeFallbackIcon(),
+        const SizedBox(height: 4),
+        Text(
+          badge.name,
+          style: theme.textTheme.labelSmall,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
+    );
+  }
+}
+
+class _BadgeFallbackIcon extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      width: 56,
+      height: 56,
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest,
+        shape: BoxShape.circle,
+      ),
+      child: Icon(
+        Icons.star_rounded,
+        size: 28,
+        color: theme.colorScheme.onSurfaceVariant,
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Recent highlights section
+// ---------------------------------------------------------------------------
+
+class _RecentHighlightsSection extends StatelessWidget {
+  const _RecentHighlightsSection({required this.highlights});
+
+  final List<HighlightSummary> highlights;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('최근 하이라이트', style: theme.textTheme.titleSmall),
+        SizedBox(height: spacing.sm),
+        ...highlights.map((h) => _HighlightCard(highlight: h)),
+        SizedBox(height: spacing.md),
+      ],
+    );
+  }
+}
+
+class _HighlightCard extends StatelessWidget {
+  const _HighlightCard({required this.highlight});
+
+  final HighlightSummary highlight;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+    return Padding(
+      padding: EdgeInsets.only(bottom: spacing.sm),
+      child: Container(
+        padding: EdgeInsets.all(spacing.md),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              CupertinoIcons.quote_bubble,
+              size: 16,
+              color: theme.colorScheme.primary,
+            ),
+            SizedBox(width: spacing.sm),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    highlight.quoteText,
+                    style: theme.textTheme.bodySmall,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (highlight.bookTitle != null) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      highlight.bookTitle!,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Existing widgets (preserved from original implementation)
+// ---------------------------------------------------------------------------
 
 class _ProfileAvatar extends StatelessWidget {
   const _ProfileAvatar({
@@ -250,12 +613,8 @@ class _ActionButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     if (profile.isMe) {
       return OutlinedButton(
-        onPressed: () {
-          // Profile edit navigation — routed through auth/me PATCH in M8.
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('프로필 편집은 M8에서 오픈 예정이에요')),
-          );
-        },
+        onPressed: () =>
+            context.push(AppRoutes.profileEdit, extra: profile),
         child: const Text('프로필 편집'),
       );
     }
@@ -294,7 +653,12 @@ class _ActionButton extends ConsumerWidget {
     final state = ref.read(followNotifierProvider);
     if (state is AsyncError) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text((state.error as SocialRepositoryException?)?.message ?? '팔로우에 실패했습니다.')),
+        SnackBar(
+          content: Text(
+            (state.error as SocialRepositoryException?)?.message ??
+                '팔로우에 실패했습니다.',
+          ),
+        ),
       );
     } else {
       ref.invalidate(userProfileProvider(userId));
@@ -307,7 +671,12 @@ class _ActionButton extends ConsumerWidget {
     final state = ref.read(followNotifierProvider);
     if (state is AsyncError) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text((state.error as SocialRepositoryException?)?.message ?? '언팔로우에 실패했습니다.')),
+        SnackBar(
+          content: Text(
+            (state.error as SocialRepositoryException?)?.message ??
+                '언팔로우에 실패했습니다.',
+          ),
+        ),
       );
     } else {
       ref.invalidate(userProfileProvider(userId));

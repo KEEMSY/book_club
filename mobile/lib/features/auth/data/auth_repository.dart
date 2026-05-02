@@ -139,6 +139,18 @@ class AuthRepository {
 
   Future<void> logout() => _storage.clearTokens();
 
+  /// Updates the authenticated user's profile fields.
+  ///
+  /// Null values are omitted from the request body so the backend applies
+  /// a partial update — only the supplied fields are changed.
+  Future<void> updateProfile({String? nickname, String? bio}) =>
+      _call(
+        () => _api.updateProfile({
+          if (nickname != null) 'nickname': nickname,
+          if (bio != null) 'bio': bio,
+        }),
+      );
+
   /// Registers the device's push token. Swallows all errors because push
   /// registration is best-effort at login time; M5 will introduce a proper
   /// retry queue.

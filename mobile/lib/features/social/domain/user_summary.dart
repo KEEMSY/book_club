@@ -3,6 +3,50 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'user_summary.freezed.dart';
 part 'user_summary.g.dart';
 
+/// Reading statistics and grade info bundled with a user profile.
+@freezed
+class GradeStats with _$GradeStats {
+  const factory GradeStats({
+    required int grade,
+    required int tier,
+    required int totalBooks,
+    required int totalSeconds,
+    required int streakDays,
+  }) = _GradeStats;
+
+  factory GradeStats.fromJson(Map<String, dynamic> json) =>
+      _$GradeStatsFromJson(json);
+}
+
+/// Minimal badge entry for profile showcase.
+@freezed
+class BadgeSummary with _$BadgeSummary {
+  const factory BadgeSummary({
+    required String id,
+    required String name,
+    required String iconUrl,
+    required String category,
+    required DateTime earnedAt,
+  }) = _BadgeSummary;
+
+  factory BadgeSummary.fromJson(Map<String, dynamic> json) =>
+      _$BadgeSummaryFromJson(json);
+}
+
+/// Single highlight shown on a user's profile (recent highlights section).
+@freezed
+class HighlightSummary with _$HighlightSummary {
+  const factory HighlightSummary({
+    required String id,
+    required String quoteText,
+    String? bookTitle,
+    required DateTime createdAt,
+  }) = _HighlightSummary;
+
+  factory HighlightSummary.fromJson(Map<String, dynamic> json) =>
+      _$HighlightSummaryFromJson(json);
+}
+
 /// A lightweight user representation returned by social list endpoints.
 ///
 /// Used in follower/following lists so the UI can render avatar + follow chip
@@ -48,6 +92,9 @@ class UserProfile with _$UserProfile {
     required int followingCount,
     required bool isFollowing,
     required bool isMe,
+    GradeStats? gradeStats,
+    @Default([]) List<BadgeSummary> badges,
+    @Default([]) List<HighlightSummary> recentHighlights,
   }) = _UserProfile;
 
   factory UserProfile.fromJson(Map<String, dynamic> json) =>
