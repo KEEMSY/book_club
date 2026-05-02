@@ -136,6 +136,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   nickname: nickname,
                   userId: userId,
                   profileImageUrl: profileImageUrl,
+                  onManual: _onManualLog,
                 ),
                 SizedBox(height: spacing.lg),
                 DailyTotalCard(
@@ -182,14 +183,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           ),
         ],
       ),
-      floatingActionButton: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          const NotificationBell(),
-          _TopActions(onManual: _onManualLog),
-        ],
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
     );
   }
 
@@ -258,11 +251,13 @@ class _Header extends StatelessWidget {
     required this.nickname,
     required this.userId,
     required this.profileImageUrl,
+    required this.onManual,
   });
 
   final String? nickname;
   final String? userId;
   final String? profileImageUrl;
+  final VoidCallback onManual;
 
   @override
   Widget build(BuildContext context) {
@@ -300,7 +295,10 @@ class _Header extends StatelessWidget {
             ],
           ),
         ),
-        if (userId != null)
+        const NotificationBell(),
+        _TopActions(onManual: onManual),
+        if (userId != null) ...<Widget>[
+          const SizedBox(width: 4),
           GestureDetector(
             onTap: () => context.push(AppRoutes.userProfile(userId!)),
             child: _ProfileAvatar(
@@ -308,6 +306,7 @@ class _Header extends StatelessWidget {
               nickname: nickname,
             ),
           ),
+        ],
       ],
     );
   }
