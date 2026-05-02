@@ -119,7 +119,7 @@ async def get_me(
     return UserPublic.model_validate(user)
 
 
-@router.patch("/auth/me", response_model=UserPublic)
+@router.patch("/me", response_model=UserPublic)
 async def update_me(
     body: UpdateProfileRequest,
     user_id: Annotated[str, Depends(get_current_user_id)],
