@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../club/presentation/clubs_tab.dart';
 import '../../feed/domain/post.dart';
 import '../../feed/domain/reaction_type.dart';
 import '../../feed/presentation/comments_sheet.dart';
@@ -29,7 +30,7 @@ class _CommunityHomeScreenState extends ConsumerState<CommunityHomeScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override
@@ -63,6 +64,7 @@ class _CommunityHomeScreenState extends ConsumerState<CommunityHomeScreen>
             Tab(text: '팔로잉'),
             Tab(text: '탐색'),
             Tab(text: '인용'),
+            Tab(text: '그룹'),
           ],
         ),
       ),
@@ -72,6 +74,7 @@ class _CommunityHomeScreenState extends ConsumerState<CommunityHomeScreen>
           _FollowingFeedTab(onExploreTap: () => _tabController.animateTo(1)),
           const _ExploreTab(),
           const _HighlightFeedTab(),
+          const ClubsTab(),
         ],
       ),
     );

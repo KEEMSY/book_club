@@ -157,9 +157,9 @@ class _PersonalNavRow extends StatelessWidget {
           onTap: () => onTabSelected(0),
         ),
         _NavItem(
-          icon: CupertinoIcons.search,
-          selectedIcon: CupertinoIcons.search,
-          label: '검색',
+          icon: Icons.explore_outlined,
+          selectedIcon: Icons.explore_rounded,
+          label: '탐색',
           selected: tabIndex == 1,
           accent: accent,
           theme: theme,

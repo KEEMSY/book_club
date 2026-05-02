@@ -8,6 +8,7 @@ import '../../features/auth/presentation/login_screen.dart';
 import '../../features/book/presentation/book_detail_screen.dart';
 import '../../features/book/presentation/library_screen.dart';
 import '../../features/book/presentation/search_screen.dart';
+import '../../features/discovery/presentation/discovery_screen.dart';
 import '../../features/challenge/presentation/badge_collection_screen.dart';
 import '../../features/challenge/presentation/challenge_detail_screen.dart';
 import '../../features/challenge/presentation/challenge_list_screen.dart';
@@ -39,6 +40,9 @@ class AppRoutes {
   static const goals = '/goals';
   static String timer(String userBookId) =>
       '/reading/timer?user_book_id=$userBookId';
+
+  // M16 destinations — discovery tab (replaces plain search shell branch).
+  static const discovery = '/discovery';
 
   // M2 destinations (still reachable through the shell).
   static const search = '/search';
@@ -119,6 +123,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.login,
         builder: (context, state) => const LoginScreen(),
+      ),
+      // Search is pushed from DiscoveryScreen — lives on the root navigator
+      // so it slides on top of the discovery tab without disrupting the shell.
+      GoRoute(
+        path: AppRoutes.search,
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) => const SearchScreen(),
       ),
       // Book detail is pushed on top of whichever shell branch the user is on
       // (home vs search vs library), so it lives on the root navigator.
@@ -232,8 +243,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             navigatorKey: _shellSearchKey,
             routes: <RouteBase>[
               GoRoute(
-                path: AppRoutes.search,
-                builder: (context, state) => const SearchScreen(),
+                path: AppRoutes.discovery,
+                builder: (context, state) => const DiscoveryScreen(),
               ),
             ],
           ),

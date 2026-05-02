@@ -43,6 +43,13 @@ class ConflictError(DomainError):
     code = "CONFLICT"
 
 
+class PermissionDeniedError(DomainError):
+    """Caller lacks permission to perform the action."""
+
+    status_code = 403
+    code = "FORBIDDEN"
+
+
 class AuthError(DomainError):
     """Authentication or authorization failure."""
 
