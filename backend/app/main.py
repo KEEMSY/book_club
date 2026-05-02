@@ -14,12 +14,12 @@ from app.api.admin import router as admin_router
 from app.core.config import get_settings
 from app.core.exceptions import register_exception_handlers
 from app.domains.auth.router import router as auth_router
-from app.domains.club.router import router as club_router
 from app.domains.book.events import UserBookCompleted
 from app.domains.book.router import router as book_router
 from app.domains.challenge.events import BadgeEarned
 from app.domains.challenge.providers import get_challenge_service_singleton
 from app.domains.challenge.router import router as challenge_router
+from app.domains.club.router import router as club_router
 from app.domains.community.router import router as community_router
 from app.domains.discovery.router import router as discovery_router
 from app.domains.feed.events import CommentAdded, ReactionAdded
