@@ -1,7 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../auth/application/auth_providers.dart';
 import '../../auth/domain/auth_state.dart';
@@ -91,6 +93,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final DashboardPrefs prefs = ref.watch(dashboardPrefsProvider);
     final String? nickname =
         authState is Authenticated ? authState.user.nickname : null;
+    final String? userId =
+        authState is Authenticated ? authState.user.id : null;
+    final String? profileImageUrl =
+        authState is Authenticated ? authState.user.profileImageUrl : null;
 
     final int? weeklyGoalSeconds =
         goalState is GoalLoaded ? _weeklyGoal(goalState) : null;
@@ -126,7 +132,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 56 + 16 + bottomInset + spacing.lg,
               ),
               children: <Widget>[
-                _Header(nickname: nickname),
+                _Header(
+                  nickname: nickname,
+                  userId: userId,
+                  profileImageUrl: profileImageUrl,
+                ),
                 SizedBox(height: spacing.lg),
                 DailyTotalCard(
                   todaySeconds: todaySeconds,
@@ -244,9 +254,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 }
 
 class _Header extends StatelessWidget {
-  const _Header({required this.nickname});
+  const _Header({
+    required this.nickname,
+    required this.userId,
+    required this.profileImageUrl,
+  });
 
   final String? nickname;
+  final String? userId;
+  final String? profileImageUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -261,27 +277,66 @@ class _Header extends StatelessWidget {
       greeting = '오늘의 독서, 편안한 저녁';
     }
     final String name = nickname ?? '독자';
-    // Greeting sits as the landing headline in Playfair `displaySmall` (22/600)
-    // with nearBlack ink, so it reads as the editorial entry point rather than
-    // a muted line. Nickname follows in `titleMedium` (16/500) sans — a clear
-    // supporting sub-line per §3 hierarchy.
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        Text(
-          greeting,
-          style: theme.textTheme.displaySmall?.copyWith(
-            color: theme.colorScheme.onSurface,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                greeting,
+                style: theme.textTheme.displaySmall?.copyWith(
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '$name님',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.72),
+                ),
+              ),
+            ],
           ),
         ),
-        const SizedBox(height: 4),
-        Text(
-          '$name님',
-          style: theme.textTheme.titleMedium?.copyWith(
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.72),
+        if (userId != null)
+          GestureDetector(
+            onTap: () => context.push(AppRoutes.userProfile(userId!)),
+            child: _ProfileAvatar(
+              profileImageUrl: profileImageUrl,
+              nickname: nickname,
+            ),
           ),
-        ),
       ],
+    );
+  }
+}
+
+class _ProfileAvatar extends StatelessWidget {
+  const _ProfileAvatar({required this.profileImageUrl, required this.nickname});
+
+  final String? profileImageUrl;
+  final String? nickname;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final String initial =
+        (nickname != null && nickname!.isNotEmpty) ? nickname![0] : '?';
+    return CircleAvatar(
+      radius: 20,
+      backgroundColor: theme.colorScheme.primaryContainer,
+      foregroundImage: profileImageUrl != null
+          ? CachedNetworkImageProvider(profileImageUrl!)
+          : null,
+      child: Text(
+        initial,
+        style: theme.textTheme.titleMedium?.copyWith(
+          color: theme.colorScheme.onPrimaryContainer,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
     );
   }
 }
