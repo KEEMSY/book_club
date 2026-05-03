@@ -17,6 +17,8 @@ from app.core.deps import get_current_user_id
 from app.domains.reading.models import GoalPeriod
 from app.domains.reading.providers import get_reading_service
 from app.domains.reading.schemas import (
+    BookmarkPublic,
+    CreateBookmarkRequest,
     CreateGoalRequest,
     EndSessionRequest,
     GoalProgressPublic,
@@ -157,3 +159,41 @@ async def list_current_goals(
     today = datetime.now(tz=UTC).date()
     rows = await service.get_current_goals(user_id=UUID(user_id), on_date=today)
     return [GoalProgressPublic.from_progress(r) for r in rows]
+
+
+@router.post(
+    "/bookmarks/{user_book_id}",
+    response_model=BookmarkPublic,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_bookmark(
+    user_book_id: str,
+    body: CreateBookmarkRequest,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ReadingService, Depends(get_reading_service)],
+) -> BookmarkPublic:
+    bookmark = await service.add_bookmark(
+        user_id=UUID(user_id),
+        user_book_id=UUID(user_book_id),
+        page=body.page,
+        note=body.note,
+    )
+    return BookmarkPublic.model_validate(bookmark)
+
+
+@router.get(
+    "/bookmarks/{user_book_id}/latest",
+    response_model=BookmarkPublic | None,
+)
+async def get_latest_bookmark(
+    user_book_id: str,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ReadingService, Depends(get_reading_service)],
+) -> BookmarkPublic | None:
+    bookmark = await service.get_latest_bookmark(
+        user_id=UUID(user_id),
+        user_book_id=UUID(user_book_id),
+    )
+    if bookmark is None:
+        return None
+    return BookmarkPublic.model_validate(bookmark)

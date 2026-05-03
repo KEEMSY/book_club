@@ -66,7 +66,7 @@ from app.domains.reading.events import (
     UserGradeRecomputed,
 )
 from app.domains.reading.grade_policy import calculate_grade_tier, next_threshold
-from app.domains.reading.models import Goal, GoalPeriod, ReadingSession
+from app.domains.reading.models import Bookmark, Goal, GoalPeriod, ReadingSession
 from app.domains.reading.ports import (
     DailyStatRepositoryPort,
     GoalProgress,
@@ -79,6 +79,7 @@ from app.domains.reading.ports import (
     SessionCompletion,
     UserGradeRepositoryPort,
 )
+from app.domains.reading.repository import BookmarkRepository
 from app.domains.reading.streak_policy import update_streak
 from app.shared.event_bus import EventBus
 
@@ -101,6 +102,7 @@ class ReadingService:
     book_query: ReadingBookQueryPort
     bus: EventBus
     stage_event: StageEventFn
+    bookmark_repo: BookmarkRepository
 
     async def start_session(
         self,
@@ -325,6 +327,39 @@ class ReadingService:
                 )
             )
         return out
+
+    async def add_bookmark(
+        self,
+        *,
+        user_id: UUID,
+        user_book_id: UUID,
+        page: int,
+        note: str | None,
+    ) -> Bookmark:
+        owned = await self.book_query.user_book_belongs_to_user(
+            user_book_id=user_book_id, user_id=user_id
+        )
+        if not owned:
+            raise NotFoundError("user_book not found", code="USER_BOOK_NOT_FOUND")
+        return await self.bookmark_repo.create(
+            user_id=user_id,
+            user_book_id=user_book_id,
+            page=page,
+            note=note,
+        )
+
+    async def get_latest_bookmark(
+        self,
+        *,
+        user_id: UUID,
+        user_book_id: UUID,
+    ) -> Bookmark | None:
+        owned = await self.book_query.user_book_belongs_to_user(
+            user_book_id=user_book_id, user_id=user_id
+        )
+        if not owned:
+            raise NotFoundError("user_book not found", code="USER_BOOK_NOT_FOUND")
+        return await self.bookmark_repo.get_latest(user_book_id=user_book_id)
 
     # ------------------------------------------------------------------
     # Internal helpers

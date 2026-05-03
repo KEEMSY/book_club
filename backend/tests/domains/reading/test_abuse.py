@@ -25,6 +25,7 @@ from app.domains.reading.service import ReadingService
 from app.shared.event_bus import LocalEventBus
 
 from tests.domains.reading.test_service import (
+    FakeBookmarkRepo,
     FakeBookQuery,
     FakeDailyStatRepo,
     FakeGoalRepo,
@@ -51,6 +52,7 @@ def _build() -> tuple[
         book_query=bq,
         bus=bus,
         stage_event=staged.append,
+        bookmark_repo=FakeBookmarkRepo(),
     )
     return service, staged, bq, daily, grades
 

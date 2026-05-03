@@ -25,6 +25,7 @@ import pytest
 from app.core.exceptions import ConflictError, NotFoundError
 from app.domains.reading.events import ReadingSessionCompleted, UserGradeRecomputed
 from app.domains.reading.models import (
+    Bookmark,
     DailyReadingStat,
     Goal,
     GoalPeriod,
@@ -253,6 +254,31 @@ class FakeBookQuery:
         return self.completed_in_window.get((user_id, from_date, to_date), 0)  # type: ignore[arg-type]
 
 
+class FakeBookmarkRepo:
+    def __init__(self) -> None:
+        self.rows: list[Bookmark] = []
+
+    async def create(
+        self,
+        *,
+        user_id: UUID,
+        user_book_id: UUID,
+        page: int,
+        note: str | None,
+    ) -> Bookmark:
+        row = Bookmark(user_id=user_id, user_book_id=user_book_id, page=page, note=note)
+        row.id = uuid4()
+        row.created_at = datetime.now(tz=UTC)
+        self.rows.append(row)
+        return row
+
+    async def get_latest(self, *, user_book_id: UUID) -> Bookmark | None:
+        matches = [r for r in self.rows if r.user_book_id == user_book_id]
+        if not matches:
+            return None
+        return max(matches, key=lambda r: r.created_at)
+
+
 def _build_service() -> tuple[ReadingService, LocalEventBus, list[object], FakeBookQuery]:
     sessions = FakeReadingSessionRepo()
     daily = FakeDailyStatRepo()
@@ -269,6 +295,7 @@ def _build_service() -> tuple[ReadingService, LocalEventBus, list[object], FakeB
         book_query=book_query,
         bus=bus,
         stage_event=staged.append,
+        bookmark_repo=FakeBookmarkRepo(),
     )
     return service, bus, staged, book_query
 

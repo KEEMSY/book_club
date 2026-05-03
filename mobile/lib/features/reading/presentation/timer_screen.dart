@@ -68,17 +68,28 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     final state = ref.watch(timerNotifierProvider);
     final Color accent = ref.watch(gradePrimaryProvider);
 
-    ref.listen<TimerState>(timerNotifierProvider, (prev, next) {
+    ref.listen<TimerState>(timerNotifierProvider, (prev, next) async {
       if (next is TimerCompleted) {
         final gradeNotifier = ref.read(gradeNotifierProvider.notifier);
         gradeNotifier.applySessionCompletion(next.completion);
         ref
             .read(heatmapNotifierProvider(DateTime.now().year).notifier)
             .invalidate();
-        // Push the summary screen, then pop back to the dashboard once the
-        // user acknowledges.
+
         final NavigatorState nav = Navigator.of(context);
         final GoRouter router = GoRouter.of(context);
+
+        // Prompt the user to save a bookmark before showing the summary.
+        final String userBookId = widget.userBookId;
+        if (userBookId.isNotEmpty && mounted) {
+          await _BookmarkSaveModal.show(
+            context,
+            ref: ref,
+            userBookId: userBookId,
+          );
+        }
+
+        if (!mounted) return;
         nav
             .push(
           MaterialPageRoute<void>(
@@ -260,5 +271,128 @@ class _StreakBadge extends ConsumerWidget {
       labelStyle: theme.textTheme.labelMedium,
       backgroundColor: theme.colorScheme.surfaceContainerHigh,
     );
+  }
+}
+
+/// Bottom sheet shown after a reading session ends. Lets the user record the
+/// page they reached so the next session can resume from the right spot.
+class _BookmarkSaveModal extends ConsumerStatefulWidget {
+  const _BookmarkSaveModal({required this.userBookId});
+  final String userBookId;
+
+  static Future<void> show(
+    BuildContext context, {
+    required WidgetRef ref,
+    required String userBookId,
+  }) {
+    final container = ProviderScope.containerOf(context);
+    return showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (_) => UncontrolledProviderScope(
+        container: container,
+        child: _BookmarkSaveModal(userBookId: userBookId),
+      ),
+    );
+  }
+
+  @override
+  ConsumerState<_BookmarkSaveModal> createState() => _BookmarkSaveModalState();
+}
+
+class _BookmarkSaveModalState extends ConsumerState<_BookmarkSaveModal> {
+  final _pageCtrl = TextEditingController();
+  bool _saving = false;
+
+  @override
+  void dispose() {
+    _pageCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+    final double bottom = MediaQuery.viewInsetsOf(context).bottom;
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        spacing.lg,
+        spacing.lg,
+        spacing.lg,
+        spacing.xl + bottom,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text('책갈피 저장', style: theme.textTheme.titleLarge),
+          SizedBox(height: spacing.xs),
+          Text(
+            '몇 페이지까지 읽었나요?',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+            ),
+          ),
+          SizedBox(height: spacing.md),
+          TextField(
+            controller: _pageCtrl,
+            keyboardType: TextInputType.number,
+            autofocus: true,
+            decoration: const InputDecoration(
+              hintText: '페이지 번호',
+              suffixText: '페이지',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          SizedBox(height: spacing.md),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('건너뛰기'),
+                ),
+              ),
+              SizedBox(width: spacing.md),
+              Expanded(
+                child: FilledButton(
+                  onPressed: _saving ? null : _save,
+                  child: _saving
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('저장'),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _save() async {
+    final int? page = int.tryParse(_pageCtrl.text.trim());
+    if (page == null || page < 1) return;
+    setState(() => _saving = true);
+    try {
+      await ref.read(readingRepositoryProvider).createBookmark(
+            userBookId: widget.userBookId,
+            page: page,
+          );
+      if (mounted) Navigator.of(context).pop();
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('저장에 실패했습니다')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
   }
 }

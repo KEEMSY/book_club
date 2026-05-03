@@ -31,6 +31,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import ConflictError, NotFoundError
 from app.domains.reading.models import (
+    Bookmark,
     DailyReadingStat,
     Goal,
     GoalPeriod,
@@ -327,3 +328,33 @@ class GoalRepository:
             seen.add(row.period)
             unique.append(row)
         return unique
+
+
+class BookmarkRepository:
+    """Persistence adapter for :class:`Bookmark`."""
+
+    def __init__(self, session: AsyncSession) -> None:
+        self._session = session
+
+    async def create(
+        self,
+        *,
+        user_id: UUID,
+        user_book_id: UUID,
+        page: int,
+        note: str | None,
+    ) -> Bookmark:
+        row = Bookmark(user_id=user_id, user_book_id=user_book_id, page=page, note=note)
+        self._session.add(row)
+        await self._session.flush()
+        return row
+
+    async def get_latest(self, *, user_book_id: UUID) -> Bookmark | None:
+        stmt = (
+            select(Bookmark)
+            .where(Bookmark.user_book_id == user_book_id)
+            .order_by(Bookmark.created_at.desc())
+            .limit(1)
+        )
+        result = await self._session.execute(stmt)
+        return result.scalar_one_or_none()

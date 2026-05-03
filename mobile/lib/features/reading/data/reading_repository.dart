@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 
+import '../domain/bookmark.dart';
 import '../domain/goal_period.dart';
 import '../domain/grade_summary.dart';
 import '../domain/heatmap_day.dart';
@@ -140,6 +141,28 @@ class ReadingRepository {
     final List<GoalProgressDto> resp =
         await _call(() => _api.getCurrentGoals());
     return resp.map((d) => d.toDomain()).toList(growable: false);
+  }
+
+  Future<Bookmark> createBookmark({
+    required String userBookId,
+    required int page,
+    String? note,
+  }) async {
+    return _call(() async {
+      final json = await _api.createBookmark(userBookId, {
+        'page': page,
+        if (note != null) 'note': note,
+      });
+      return Bookmark.fromJson(json);
+    });
+  }
+
+  Future<Bookmark?> getLatestBookmark({required String userBookId}) async {
+    return _call(() async {
+      final json = await _api.getLatestBookmark(userBookId);
+      if (json == null) return null;
+      return Bookmark.fromJson(json);
+    });
   }
 
   Future<T> _call<T>(Future<T> Function() fn) async {

@@ -15,6 +15,8 @@ part 'reading_api.g.dart';
 ///   * `GET  /reading/grade`
 ///   * `POST /reading/goals`
 ///   * `GET  /reading/goals/current`
+///   * `POST /reading/bookmarks/{userBookId}`
+///   * `GET  /reading/bookmarks/{userBookId}/latest`
 ///
 /// All endpoints require `Authorization: Bearer` which is attached globally
 /// by [AuthInterceptor]. Bodies stay as `Map<String, dynamic>` for the same
@@ -53,4 +55,15 @@ abstract class ReadingApi {
 
   @GET('/reading/sessions/active')
   Future<ReadingSessionDto?> getActiveSession();
+
+  @POST('/reading/bookmarks/{userBookId}')
+  Future<Map<String, dynamic>> createBookmark(
+    @Path('userBookId') String userBookId,
+    @Body() Map<String, dynamic> body,
+  );
+
+  @GET('/reading/bookmarks/{userBookId}/latest')
+  Future<Map<String, dynamic>?> getLatestBookmark(
+    @Path('userBookId') String userBookId,
+  );
 }

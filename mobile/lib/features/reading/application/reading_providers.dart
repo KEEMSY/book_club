@@ -5,6 +5,7 @@ import '../../../core/network/dio_provider.dart';
 import '../../../core/theme/grade_theme.dart';
 import '../data/reading_api.dart';
 import '../data/reading_repository.dart';
+import '../domain/bookmark.dart';
 import 'grade_notifier.dart';
 import 'grade_state.dart';
 import 'reading_journey_inputs.dart';
@@ -31,6 +32,14 @@ final dailyGoalSecondsProvider = FutureProvider<int>((ref) async {
   final dailyMinutes =
       inputs?.dailyMinutes ?? ReadingJourneyInputs.defaults.dailyMinutes;
   return dailyMinutes * 60;
+});
+
+/// Fetches the most recent bookmark for a given userBookId. Used in the
+/// "start reading" sheet to show where the user left off per book.
+final latestBookmarkProvider = FutureProvider.autoDispose
+    .family<Bookmark?, String>((ref, userBookId) async {
+  final repo = ref.read(readingRepositoryProvider);
+  return repo.getLatestBookmark(userBookId: userBookId);
 });
 
 /// Single-source-of-truth for the grade accent color. TimerRing, GradeBadge,

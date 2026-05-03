@@ -216,3 +216,30 @@ class Goal(Base):
         server_default=func.now(),
         onupdate=func.now(),
     )
+
+
+class Bookmark(Base):
+    """A reading position bookmark — one row per save event."""
+
+    __tablename__ = "bookmarks"
+    __table_args__ = (
+        Index("ix_bookmarks_user_book_id_created_at", "user_book_id", "created_at"),
+        Index("ix_bookmarks_user_id", "user_id"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_book_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("user_books.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    page: Mapped[int] = mapped_column(Integer, nullable=False)
+    note: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )

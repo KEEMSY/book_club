@@ -26,6 +26,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.db import get_session
 from app.domains.book.models import UserBook, UserBookStatus
 from app.domains.reading.repository import (
+    BookmarkRepository,
     DailyStatRepository,
     GoalRepository,
     ReadingSessionRepository,
@@ -127,4 +128,5 @@ def get_reading_service(
         book_query=BookQueryAdapter(session),
         bus=bus,
         stage_event=_stage,
+        bookmark_repo=BookmarkRepository(session),
     )

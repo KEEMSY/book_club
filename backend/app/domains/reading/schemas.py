@@ -180,3 +180,18 @@ class GoalProgressPublic(BaseModel):
             seconds_done=p.seconds_done,
             percent=p.percent,
         )
+
+
+class CreateBookmarkRequest(BaseModel):
+    page: int = Field(..., ge=1)
+    note: str | None = Field(None, max_length=200)
+
+
+class BookmarkPublic(BaseModel):
+    id: UUID
+    user_book_id: UUID
+    page: int
+    note: str | None
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)

@@ -186,18 +186,26 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  void _startReading(BuildContext context) {
+  Future<void> _startReading(BuildContext context) async {
     final readingMap = ref.read(libraryNotifierProvider);
     final readingState = readingMap[BookStatus.reading];
     final List<UserBook> reading =
         readingState is LibraryListLoaded ? readingState.items : <UserBook>[];
-    if (reading.isNotEmpty) {
-      final UserBook first = reading.first;
-      context.push('/reading/timer?user_book_id=${first.id}');
+    if (reading.isEmpty) {
+      context.go('/library');
       return;
     }
-    // No reading book yet — send the user to the library / search.
-    context.go('/library');
+    if (!mounted) return;
+    // Capture the router before the async gap to avoid BuildContext warnings.
+    final GoRouter router = GoRouter.of(context);
+    final String? targetId = await _StartReadingSheet.show(
+      context,
+      ref: ref,
+      books: reading,
+    );
+    if (targetId == null) return;
+    if (!mounted) return;
+    router.push('/reading/timer?user_book_id=$targetId');
   }
 
   Future<void> _onManualLog() async {
@@ -688,6 +696,87 @@ class _StartReadingButton extends StatelessWidget {
           elevation: 4,
           shadowColor: accent.withValues(alpha: 0.4),
         ),
+      ),
+    );
+  }
+}
+
+/// Bottom sheet shown when the user taps "지금 읽기 시작" with multiple books
+/// in progress. Displays each book's latest bookmark so the user can pick up
+/// exactly where they left off.
+class _StartReadingSheet extends ConsumerWidget {
+  const _StartReadingSheet({required this.books});
+
+  final List<UserBook> books;
+
+  static Future<String?> show(
+    BuildContext context, {
+    required WidgetRef ref,
+    required List<UserBook> books,
+  }) {
+    final container = ProviderScope.containerOf(context);
+    return showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (_) => UncontrolledProviderScope(
+        container: container,
+        child: _StartReadingSheet(books: books),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        spacing.lg,
+        spacing.lg,
+        spacing.lg,
+        spacing.xl,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text('어떤 책을 읽을까요?', style: theme.textTheme.titleLarge),
+          SizedBox(height: spacing.md),
+          ...books.map((book) => _BookTile(book: book)),
+        ],
+      ),
+    );
+  }
+}
+
+class _BookTile extends ConsumerWidget {
+  const _BookTile({required this.book});
+  final UserBook book;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+    final bookmarkAsync = ref.watch(latestBookmarkProvider(book.id));
+    return ListTile(
+      contentPadding: EdgeInsets.symmetric(vertical: spacing.xs),
+      title: Text(book.book.title, style: theme.textTheme.bodyLarge),
+      subtitle: bookmarkAsync.when(
+        data: (bm) => bm != null
+            ? Text(
+                '${bm.page}페이지에서 멈췄어요',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.primary,
+                ),
+              )
+            : null,
+        loading: () => null,
+        error: (_, __) => null,
+      ),
+      trailing: FilledButton(
+        onPressed: () => Navigator.of(context).pop(book.id),
+        child: const Text('시작'),
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:book_club/features/reading/data/reading_repository.dart';
+import 'package:book_club/features/reading/domain/bookmark.dart';
 import 'package:book_club/features/reading/domain/goal_period.dart';
 import 'package:book_club/features/reading/domain/grade_summary.dart';
 import 'package:book_club/features/reading/domain/heatmap_day.dart';
@@ -61,6 +62,13 @@ class FakeReadingRepository implements ReadingRepository {
       createGoalCalls =
       <({GoalPeriod period, int targetBooks, int targetSeconds})>[];
   int currentGoalsCalls = 0;
+
+  // -- bookmarks --
+  Bookmark? createBookmarkResult;
+  Bookmark? latestBookmarkResult;
+  Object? bookmarkError;
+  final List<({String userBookId, int page, String? note})> createBookmarkCalls =
+      <({String userBookId, int page, String? note})>[];
 
   @override
   Future<ReadingSession> startSession({
@@ -143,6 +151,23 @@ class FakeReadingRepository implements ReadingRepository {
   Future<ReadingSession?> getActiveSession() async {
     if (activeSessionError != null) throw activeSessionError!;
     return activeSessionResult;
+  }
+
+  @override
+  Future<Bookmark> createBookmark({
+    required String userBookId,
+    required int page,
+    String? note,
+  }) async {
+    createBookmarkCalls.add((userBookId: userBookId, page: page, note: note));
+    if (bookmarkError != null) throw bookmarkError!;
+    return createBookmarkResult!;
+  }
+
+  @override
+  Future<Bookmark?> getLatestBookmark({required String userBookId}) async {
+    if (bookmarkError != null) throw bookmarkError!;
+    return latestBookmarkResult;
   }
 }
 
