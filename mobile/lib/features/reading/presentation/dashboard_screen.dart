@@ -191,13 +191,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final readingState = readingMap[BookStatus.reading];
     final List<UserBook> reading =
         readingState is LibraryListLoaded ? readingState.items : <UserBook>[];
-    if (reading.isEmpty) {
-      context.go('/library');
-      return;
-    }
     if (!mounted) return;
     // Capture the router before the async gap to avoid BuildContext warnings.
     final GoRouter router = GoRouter.of(context);
+    // targetId == null → cancelled, '' → free session, non-empty → book session.
     final String? targetId = await _StartReadingSheet.show(
       context,
       ref: ref,
@@ -205,7 +202,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
     if (targetId == null) return;
     if (!mounted) return;
-    router.push('/reading/timer?user_book_id=$targetId');
+    final String query = targetId.isEmpty
+        ? '?auto_start=true'
+        : '?user_book_id=$targetId&auto_start=true';
+    router.push('/reading/timer$query');
   }
 
   Future<void> _onManualLog() async {
@@ -741,9 +741,31 @@ class _StartReadingSheet extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text('어떤 책을 읽을까요?', style: theme.textTheme.titleLarge),
+          Text(
+            books.isEmpty ? '읽기를 시작할게요' : '어떤 책을 읽을까요?',
+            style: theme.textTheme.titleLarge,
+          ),
           SizedBox(height: spacing.md),
-          ...books.map((book) => _BookTile(book: book)),
+          if (books.isEmpty)
+            Padding(
+              padding: EdgeInsets.only(bottom: spacing.sm),
+              child: Text(
+                '서재에 읽는 중인 책이 없어요.\n책을 추가하면 독서 기록이 쌓여요.',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
+              ),
+            )
+          else ...<Widget>[
+            ...books.map((book) => _BookTile(book: book)),
+            Divider(height: spacing.lg),
+          ],
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.play_circle_outline_rounded),
+            title: const Text('책 없이 시작하기'),
+            onTap: () => Navigator.of(context).pop(''),
+          ),
         ],
       ),
     );
@@ -774,10 +796,8 @@ class _BookTile extends ConsumerWidget {
         loading: () => null,
         error: (_, __) => null,
       ),
-      trailing: FilledButton(
-        onPressed: () => Navigator.of(context).pop(book.id),
-        child: const Text('시작'),
-      ),
+      trailing: const Icon(Icons.chevron_right_rounded),
+      onTap: () => Navigator.of(context).pop(book.id),
     );
   }
 }

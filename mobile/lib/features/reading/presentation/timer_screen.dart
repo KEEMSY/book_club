@@ -22,9 +22,14 @@ import 'widgets/timer_ring.dart';
 /// `appBackgrounded`/`appResumed` path so the iOS 30-minute auto-end rule
 /// triggers when the user closes the app mid-session.
 class TimerScreen extends ConsumerStatefulWidget {
-  const TimerScreen({super.key, required this.userBookId});
+  const TimerScreen({
+    super.key,
+    required this.userBookId,
+    this.autoStart = false,
+  });
 
   final String userBookId;
+  final bool autoStart;
 
   @override
   ConsumerState<TimerScreen> createState() => _TimerScreenState();
@@ -40,6 +45,9 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     // user's current tier on first frame.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(gradeNotifierProvider.notifier).load();
+      if (widget.autoStart) {
+        ref.read(timerNotifierProvider.notifier).start(widget.userBookId);
+      }
     });
   }
 
@@ -70,6 +78,15 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
 
     ref.listen<TimerState>(timerNotifierProvider, (prev, next) async {
       if (next is TimerCompleted) {
+        final GoRouter router = GoRouter.of(context);
+
+        // Free session (no book) — skip grade refresh, bookmark, and summary.
+        if (next.completion.sessionId.isEmpty) {
+          ref.read(timerNotifierProvider.notifier).acknowledgeCompletion();
+          if (mounted) router.go('/home');
+          return;
+        }
+
         final gradeNotifier = ref.read(gradeNotifierProvider.notifier);
         gradeNotifier.applySessionCompletion(next.completion);
         ref
@@ -77,7 +94,6 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
             .invalidate();
 
         final NavigatorState nav = Navigator.of(context);
-        final GoRouter router = GoRouter.of(context);
 
         // Prompt the user to save a bookmark before showing the summary.
         final String userBookId = widget.userBookId;

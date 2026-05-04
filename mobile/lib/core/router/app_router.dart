@@ -162,7 +162,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final String userBookId =
               state.uri.queryParameters['user_book_id'] ?? '';
-          return TimerScreen(userBookId: userBookId);
+          final bool autoStart =
+              state.uri.queryParameters['auto_start'] == 'true';
+          return TimerScreen(userBookId: userBookId, autoStart: autoStart);
         },
       ),
       // Grade + Goals are reachable from the dashboard but render without

@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/storage/secure_storage.dart';
 import '../data/reading_repository.dart';
 
+import '../domain/reading_goal.dart';
 import 'reading_providers.dart';
 import 'timer_state.dart';
 
@@ -158,6 +159,17 @@ class TimerNotifier extends StateNotifier<TimerState> {
       return;
     }
     try {
+      if (userBookId.isEmpty) {
+        // Free session — no backend tracking, local timer only.
+        state = TimerState.running(
+          sessionId: '',
+          userBookId: '',
+          startedAt: _clock(),
+          pausedMs: 0,
+        );
+        await _persist();
+        return;
+      }
       final session = await _repository.startSession(
         userBookId: userBookId,
         device: _devicePlatform(),
@@ -213,16 +225,19 @@ class TimerNotifier extends StateNotifier<TimerState> {
     String sessionId;
     String userBookId;
     int pausedMs;
+    DateTime startedAt;
     DateTime endedAt;
 
     if (current is TimerRunning) {
       sessionId = current.sessionId;
       userBookId = current.userBookId;
+      startedAt = current.startedAt;
       pausedMs = current.pausedMs;
       endedAt = overrideEndedAt ?? _clock();
     } else if (current is TimerPaused) {
       sessionId = current.sessionId;
       userBookId = current.userBookId;
+      startedAt = current.startedAt;
       // Include the in-progress pause window in the reported total.
       final int inFlightPause =
           _clock().difference(current.pauseStartedAt).inMilliseconds;
@@ -235,6 +250,27 @@ class TimerNotifier extends StateNotifier<TimerState> {
 
     state = TimerState.ending(sessionId: sessionId, userBookId: userBookId);
     try {
+      if (sessionId.isEmpty) {
+        // Free session — synthesize a minimal completion (no grade/streak impact).
+        final int durationSec = (endedAt.difference(startedAt).inMilliseconds -
+                pausedMs)
+            .clamp(0, 999999 * 1000) ~/
+            1000;
+        state = TimerState.completed(
+          completion: SessionCompletion(
+            sessionId: '',
+            userBookId: '',
+            startedAt: startedAt,
+            endedAt: endedAt,
+            durationSec: durationSec,
+            grade: 0,
+            streakDays: 0,
+            gradeUp: false,
+          ),
+        );
+        await _clearPersisted();
+        return;
+      }
       final completion = await _repository.endSession(
         sessionId: sessionId,
         endedAt: endedAt,
