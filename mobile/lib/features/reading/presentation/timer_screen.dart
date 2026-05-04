@@ -293,8 +293,12 @@ class _StreakBadge extends ConsumerWidget {
 /// Bottom sheet shown after a reading session ends. Lets the user record the
 /// page they reached so the next session can resume from the right spot.
 class _BookmarkSaveModal extends ConsumerStatefulWidget {
-  const _BookmarkSaveModal({required this.userBookId});
+  const _BookmarkSaveModal({
+    required this.userBookId,
+    required this.messenger,
+  });
   final String userBookId;
+  final ScaffoldMessengerState messenger;
 
   static Future<void> show(
     BuildContext context, {
@@ -302,13 +306,19 @@ class _BookmarkSaveModal extends ConsumerStatefulWidget {
     required String userBookId,
   }) {
     final container = ProviderScope.containerOf(context);
+    // Capture the ScaffoldMessenger from the caller's context so error
+    // snackbars can be shown even after the sheet's own context is gone.
+    final messenger = ScaffoldMessenger.of(context);
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
       builder: (_) => UncontrolledProviderScope(
         container: container,
-        child: _BookmarkSaveModal(userBookId: userBookId),
+        child: _BookmarkSaveModal(
+          userBookId: userBookId,
+          messenger: messenger,
+        ),
       ),
     );
   }
@@ -320,6 +330,7 @@ class _BookmarkSaveModal extends ConsumerStatefulWidget {
 class _BookmarkSaveModalState extends ConsumerState<_BookmarkSaveModal> {
   final _pageCtrl = TextEditingController();
   bool _saving = false;
+  String? _pageError;
 
   @override
   void dispose() {
@@ -356,11 +367,15 @@ class _BookmarkSaveModalState extends ConsumerState<_BookmarkSaveModal> {
             controller: _pageCtrl,
             keyboardType: TextInputType.number,
             autofocus: true,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               hintText: '페이지 번호',
               suffixText: '페이지',
-              border: OutlineInputBorder(),
+              border: const OutlineInputBorder(),
+              errorText: _pageError,
             ),
+            onChanged: (_) {
+              if (_pageError != null) setState(() => _pageError = null);
+            },
           ),
           SizedBox(height: spacing.md),
           Row(
@@ -393,7 +408,10 @@ class _BookmarkSaveModalState extends ConsumerState<_BookmarkSaveModal> {
 
   Future<void> _save() async {
     final int? page = int.tryParse(_pageCtrl.text.trim());
-    if (page == null || page < 1) return;
+    if (page == null || page < 1) {
+      setState(() => _pageError = '1 이상의 페이지 번호를 입력해주세요');
+      return;
+    }
     setState(() => _saving = true);
     try {
       await ref.read(readingRepositoryProvider).createBookmark(
@@ -402,11 +420,9 @@ class _BookmarkSaveModalState extends ConsumerState<_BookmarkSaveModal> {
           );
       if (mounted) Navigator.of(context).pop();
     } catch (_) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('저장에 실패했습니다')),
-        );
-      }
+      widget.messenger.showSnackBar(
+        const SnackBar(content: Text('저장에 실패했습니다')),
+      );
     } finally {
       if (mounted) setState(() => _saving = false);
     }
