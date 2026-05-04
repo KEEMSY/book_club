@@ -1,14 +1,14 @@
 """club tables
 
 Revision ID: 0012
-Revises: 0011
+Revises: 0011_post_highlights
 Create Date: 2026-05-02
 """
 from alembic import op
 import sqlalchemy as sa
 
 revision = "0012"
-down_revision = "0011"
+down_revision = "0011_post_highlights"
 branch_labels = None
 depends_on = None
 
