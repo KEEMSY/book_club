@@ -246,6 +246,8 @@ class _ContentState extends ConsumerState<_Content> {
               onGoToLibrary: widget.onGoToLibrary,
             ),
             SizedBox(height: spacing.xl),
+            const Divider(height: 1),
+            SizedBox(height: spacing.lg),
             // ── Content area: highlights (private) vs community feed (public) ──
             if (inLibrary) ...<Widget>[
               _ContentToggle(
@@ -275,7 +277,7 @@ class _ContentState extends ConsumerState<_Content> {
   }
 }
 
-/// Two-segment toggle that separates private highlights from the public feed.
+/// Pill-track style toggle — visually consistent with the app's chip language.
 /// Shown only when the book is in the user's library.
 class _ContentToggle extends StatelessWidget {
   const _ContentToggle({required this.active, required this.onChanged});
@@ -287,25 +289,78 @@ class _ContentToggle extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final radii = theme.extension<AppRadius>()!;
-    return SegmentedButton<_DetailTab>(
-      segments: const <ButtonSegment<_DetailTab>>[
-        ButtonSegment<_DetailTab>(
-          value: _DetailTab.highlights,
-          icon: Icon(Icons.lock_outline_rounded, size: 15),
-          label: Text('내 하이라이트'),
-        ),
-        ButtonSegment<_DetailTab>(
-          value: _DetailTab.feed,
-          icon: Icon(Icons.people_outline_rounded, size: 15),
-          label: Text('커뮤니티 피드'),
-        ),
-      ],
-      selected: <_DetailTab>{active},
-      onSelectionChanged: (Set<_DetailTab> s) => onChanged(s.first),
-      showSelectedIcon: false,
-      style: SegmentedButton.styleFrom(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(radii.md)),
+    return Container(
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHigh,
+        borderRadius: BorderRadius.all(Radius.circular(radii.pill)),
+      ),
+      child: Row(
+        children: <Widget>[
+          _ToggleSegment(
+            icon: Icons.lock_outline_rounded,
+            label: '내 하이라이트',
+            selected: active == _DetailTab.highlights,
+            onTap: () => onChanged(_DetailTab.highlights),
+          ),
+          _ToggleSegment(
+            icon: Icons.people_outline_rounded,
+            label: '커뮤니티 피드',
+            selected: active == _DetailTab.feed,
+            onTap: () => onChanged(_DetailTab.feed),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ToggleSegment extends StatelessWidget {
+  const _ToggleSegment({
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final radii = theme.extension<AppRadius>()!;
+    final Color fg = selected
+        ? theme.colorScheme.onPrimary
+        : theme.colorScheme.onSurfaceVariant;
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: selected ? theme.colorScheme.primary : Colors.transparent,
+            borderRadius: BorderRadius.all(Radius.circular(radii.pill)),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Icon(icon, size: 14, color: fg),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: fg,
+                  fontWeight:
+                      selected ? FontWeight.w700 : FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
