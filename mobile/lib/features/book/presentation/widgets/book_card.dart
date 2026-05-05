@@ -18,7 +18,8 @@ class BookCard extends StatelessWidget {
     this.status,
     this.onTap,
     this.onLongPress,
-  }) : _layout = _BookCardLayout.list;
+  })  : _layout = _BookCardLayout.list,
+        onStatusTap = null;
 
   const BookCard.grid({
     super.key,
@@ -26,12 +27,14 @@ class BookCard extends StatelessWidget {
     this.status,
     this.onTap,
     this.onLongPress,
+    this.onStatusTap,
   }) : _layout = _BookCardLayout.grid;
 
   final Book book;
   final BookStatus? status;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
+  final VoidCallback? onStatusTap;
   final _BookCardLayout _layout;
 
   @override
@@ -56,6 +59,7 @@ class BookCard extends StatelessWidget {
           theme: theme,
           onTap: onTap,
           onLongPress: onLongPress,
+          onStatusTap: onStatusTap,
         );
     }
   }
@@ -158,6 +162,7 @@ class _GridLayout extends StatelessWidget {
     required this.theme,
     required this.onTap,
     this.onLongPress,
+    this.onStatusTap,
   });
 
   final Book book;
@@ -166,6 +171,7 @@ class _GridLayout extends StatelessWidget {
   final ThemeData theme;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
+  final VoidCallback? onStatusTap;
 
   @override
   Widget build(BuildContext context) {
@@ -187,7 +193,11 @@ class _GridLayout extends StatelessWidget {
                 Positioned(
                   right: spacing.xs,
                   bottom: spacing.xs,
-                  child: _StatusPill(status: status!),
+                  child: GestureDetector(
+                    onTap: onStatusTap,
+                    behavior: HitTestBehavior.opaque,
+                    child: _StatusPill(status: status!),
+                  ),
                 ),
             ],
           ),

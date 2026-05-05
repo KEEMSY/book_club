@@ -460,7 +460,20 @@ class _LibraryCard extends ConsumerWidget {
           extra: userBook.id,
         ),
         onLongPress: () => _showActions(context, ref, userBook),
+        onStatusTap: () => _showStatusDirect(context, userBook),
       ),
+    );
+  }
+
+  void _showStatusDirect(BuildContext context, UserBook userBook) {
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) => _StatusChangeSheet(userBook: userBook),
     );
   }
 
@@ -827,36 +840,39 @@ class _HighlightsTab extends ConsumerWidget {
   }
 }
 
-class _HighlightGroup extends StatelessWidget {
+class _HighlightGroup extends StatefulWidget {
   const _HighlightGroup({required this.group});
 
   final BookHighlightGroup group;
+
+  @override
+  State<_HighlightGroup> createState() => _HighlightGroupState();
+}
+
+class _HighlightGroupState extends State<_HighlightGroup> {
+  bool _expanded = false;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
     final radii = theme.extension<AppRadius>()!;
-    final int count = group.highlights.length;
+    final int count = widget.group.highlights.length;
 
     return Padding(
-      padding: EdgeInsets.only(bottom: spacing.xl),
+      padding: EdgeInsets.only(bottom: spacing.md),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          // ── 책 헤더 ──────────────────────────────────────────────────────
           InkWell(
-            onTap: () => context.push(
-              AppRoutes.bookDetail(group.bookId),
-              extra: group.userBookId,
-            ),
+            onTap: () => setState(() => _expanded = !_expanded),
             borderRadius: BorderRadius.all(Radius.circular(radii.sm)),
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: spacing.xs),
               child: Row(
                 children: <Widget>[
                   BookCover(
-                    coverUrl: group.bookCoverUrl,
+                    coverUrl: widget.group.bookCoverUrl,
                     width: 44,
                     height: 62,
                     borderRadius: BorderRadius.all(Radius.circular(radii.sm)),
@@ -867,7 +883,7 @@ class _HighlightGroup extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Text(
-                          group.bookTitle ?? '알 수 없는 책',
+                          widget.group.bookTitle ?? '알 수 없는 책',
                           style: theme.textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.w700,
                           ),
@@ -884,20 +900,25 @@ class _HighlightGroup extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Icon(
-                    Icons.chevron_right_rounded,
-                    size: 18,
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                  AnimatedRotation(
+                    turns: _expanded ? 0.25 : 0.0,
+                    duration: const Duration(milliseconds: 200),
+                    child: Icon(
+                      Icons.chevron_right_rounded,
+                      size: 18,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                    ),
                   ),
                 ],
               ),
             ),
           ),
-          SizedBox(height: spacing.sm),
-          // ── 하이라이트 카드 목록 ─────────────────────────────────────────
-          ...group.highlights.map(
-            (Highlight h) => _HighlightCard(highlight: h),
-          ),
+          if (_expanded) ...<Widget>[
+            SizedBox(height: spacing.xs),
+            ...widget.group.highlights.map(
+              (Highlight h) => _HighlightCard(highlight: h),
+            ),
+          ],
         ],
       ),
     );
