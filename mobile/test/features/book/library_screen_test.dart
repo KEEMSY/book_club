@@ -82,9 +82,13 @@ void main() {
     await tester.pumpWidget(buildApp(repo: repo));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('완독'));
+    // Use widgetWithText(Tab, ...) to target the TabBar tab specifically —
+    // the book card also renders a "완독" status pill on the same frame.
+    await tester.tap(find.widgetWithText(Tab, '완독'));
     await tester.pumpAndSettle();
 
+    // Loading the 전체 tab (index 0) already fetches all statuses, so
+    // completed is pre-loaded. The assertion verifies it was fetched at all.
     expect(
       repo.libraryCalls.any((c) => c.status == BookStatus.completed),
       isTrue,
@@ -97,7 +101,8 @@ void main() {
     await tester.pumpWidget(buildApp(repo: repo));
     await tester.pumpAndSettle();
 
-    expect(find.text('아직 읽는 중인 책이 없어요'), findsOneWidget);
+    // 전체 tab (default) shows the global empty state message.
+    expect(find.text('서재가 비어있어요'), findsOneWidget);
     expect(find.text('책 검색하기'), findsOneWidget);
   });
 }
