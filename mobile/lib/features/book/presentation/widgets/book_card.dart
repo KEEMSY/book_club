@@ -19,7 +19,8 @@ class BookCard extends StatelessWidget {
     this.onTap,
     this.onLongPress,
   })  : _layout = _BookCardLayout.list,
-        onStatusTap = null;
+        onStatusTap = null,
+        onMoreTap = null;
 
   const BookCard.grid({
     super.key,
@@ -28,6 +29,7 @@ class BookCard extends StatelessWidget {
     this.onTap,
     this.onLongPress,
     this.onStatusTap,
+    this.onMoreTap,
   }) : _layout = _BookCardLayout.grid;
 
   final Book book;
@@ -35,6 +37,7 @@ class BookCard extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final VoidCallback? onStatusTap;
+  final VoidCallback? onMoreTap;
   final _BookCardLayout _layout;
 
   @override
@@ -60,6 +63,7 @@ class BookCard extends StatelessWidget {
           onTap: onTap,
           onLongPress: onLongPress,
           onStatusTap: onStatusTap,
+          onMoreTap: onMoreTap,
         );
     }
   }
@@ -163,6 +167,7 @@ class _GridLayout extends StatelessWidget {
     required this.onTap,
     this.onLongPress,
     this.onStatusTap,
+    this.onMoreTap,
   });
 
   final Book book;
@@ -172,6 +177,7 @@ class _GridLayout extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final VoidCallback? onStatusTap;
+  final VoidCallback? onMoreTap;
 
   @override
   Widget build(BuildContext context) {
@@ -188,13 +194,33 @@ class _GridLayout extends StatelessWidget {
             borderRadius: BorderRadius.circular(radii.md),
           ),
           SizedBox(height: spacing.sm),
-          Text(
-            book.title,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Expanded(
+                child: Text(
+                  book.title,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              if (onMoreTap != null)
+                GestureDetector(
+                  onTap: onMoreTap,
+                  behavior: HitTestBehavior.opaque,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 4),
+                    child: Icon(
+                      Icons.more_vert,
+                      size: 18,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+            ],
           ),
           SizedBox(height: spacing.xs / 2),
           Text(

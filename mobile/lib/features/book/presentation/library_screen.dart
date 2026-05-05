@@ -461,6 +461,7 @@ class _LibraryCard extends ConsumerWidget {
         ),
         onLongPress: () => _showActions(context, ref, userBook),
         onStatusTap: () => _showStatusDirect(context, userBook),
+        onMoreTap: () => _showActions(context, ref, userBook),
       ),
     );
   }
@@ -557,8 +558,50 @@ class _LibraryActionsSheet extends ConsumerWidget {
                 style: TextStyle(color: theme.colorScheme.error),
               ),
               onTap: () async {
-                Navigator.of(context).pop();
-                await _confirmAndDelete(context, ref);
+                // Capture messenger/navigator BEFORE any async gap so they
+                // remain valid even after this sheet is popped.
+                final messenger = ScaffoldMessenger.of(context);
+                final navigator = Navigator.of(context);
+
+                final bool? confirmed = await showDialog<bool>(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: const Text('서재에서 삭제'),
+                    content:
+                        Text('"${userBook.book.title}"를 서재에서 삭제할까요?'),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () => Navigator.of(ctx).pop(false),
+                        child: const Text('취소'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.of(ctx).pop(true),
+                        child: Text(
+                          '삭제',
+                          style: TextStyle(
+                            color: Theme.of(ctx).colorScheme.error,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+                if (confirmed != true) return;
+                navigator.pop(); // close the actions sheet
+                try {
+                  await ref
+                      .read(libraryNotifierProvider.notifier)
+                      .removeFromLibrary(userBook.id);
+                  messenger.showSnackBar(
+                    const SnackBar(content: Text('서재에서 삭제됐어요')),
+                  );
+                } on Exception {
+                  messenger.showSnackBar(
+                    const SnackBar(
+                      content: Text('삭제에 실패했어요. 다시 시도해주세요.'),
+                    ),
+                  );
+                }
               },
             ),
           ],
@@ -578,46 +621,6 @@ class _LibraryActionsSheet extends ConsumerWidget {
       ),
       builder: (_) => AddHighlightSheet(userBookId: userBook.id),
     );
-  }
-
-  Future<void> _confirmAndDelete(BuildContext context, WidgetRef ref) async {
-    final bool? confirmed = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext ctx) => AlertDialog(
-        title: const Text('서재에서 삭제'),
-        content: Text('"${userBook.book.title}"를 서재에서 삭제할까요?'),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('취소'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(
-              '삭제',
-              style: TextStyle(color: Theme.of(ctx).colorScheme.error),
-            ),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true) return;
-    try {
-      await ref
-          .read(libraryNotifierProvider.notifier)
-          .removeFromLibrary(userBook.id);
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('서재에서 삭제됐어요')),
-        );
-      }
-    } on Exception {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('삭제에 실패했어요. 다시 시도해주세요.')),
-        );
-      }
-    }
   }
 
   Future<void> _showStatusSheet(
