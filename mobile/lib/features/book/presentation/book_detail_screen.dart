@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../feed/application/book_feed_notifier.dart';
 import '../../feed/application/highlight_notifier.dart';
 import '../../feed/application/highlight_state.dart';
 import '../../feed/domain/highlight.dart';
@@ -120,7 +121,9 @@ class BookDetailScreen extends ConsumerWidget {
   }
 }
 
-class _Content extends StatefulWidget {
+enum _DetailTab { highlights, feed }
+
+class _Content extends ConsumerStatefulWidget {
   const _Content({
     required this.book,
     required this.libraryState,
@@ -146,11 +149,12 @@ class _Content extends StatefulWidget {
   final String? initialUserBookId;
 
   @override
-  State<_Content> createState() => _ContentState();
+  ConsumerState<_Content> createState() => _ContentState();
 }
 
-class _ContentState extends State<_Content> {
-  bool _expanded = false;
+class _ContentState extends ConsumerState<_Content> {
+  bool _descExpanded = false;
+  _DetailTab _activeTab = _DetailTab.highlights;
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -165,16 +169,16 @@ class _ContentState extends State<_Content> {
     final shadows = theme.extension<AppShadows>()!;
     final radii = theme.extension<AppRadius>()!;
     final spacing = widget.spacing;
-
     final Book book = widget.book;
+
+    // Keep the feed provider alive while this screen is open so switching
+    // between highlights / feed tabs does not dispose and re-fetch the feed.
+    ref.listen(bookFeedNotifierProvider(book.id), (_, __) {});
+
     final String? description = book.description;
     final bool hasDescription =
         description != null && description.trim().isNotEmpty;
 
-    // Override CTA to "duplicate" when we already know the book is in the
-    // library (passed via route extra) but the async notifier hasn't resolved
-    // yet. Once the notifier settles to Added/Duplicate the real state takes
-    // over and the override is no longer applied.
     final LibraryCtaState effectiveLibraryState =
         (widget.libraryState is LibraryCtaIdle &&
                 widget.initialUserBookId != null)
@@ -182,6 +186,8 @@ class _ContentState extends State<_Content> {
                 duplicateUserBookId: widget.initialUserBookId,
               )
             : widget.libraryState;
+
+    final bool inLibrary = widget.userBookId != null;
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -195,7 +201,7 @@ class _ContentState extends State<_Content> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            // Hero cover: 160×240, centered, three-layer Airbnb shadow.
+            // Hero cover
             Center(
               child: Container(
                 decoration: BoxDecoration(
@@ -227,8 +233,9 @@ class _ContentState extends State<_Content> {
               SizedBox(height: spacing.lg),
               _Description(
                 text: description.trim(),
-                expanded: _expanded,
-                onToggle: () => setState(() => _expanded = !_expanded),
+                expanded: _descExpanded,
+                onToggle: () =>
+                    setState(() => _descExpanded = !_descExpanded),
               ),
             ],
             SizedBox(height: spacing.xl),
@@ -238,19 +245,67 @@ class _ContentState extends State<_Content> {
               onAddWishlist: widget.onAddWishlist,
               onGoToLibrary: widget.onGoToLibrary,
             ),
-            if (widget.userBookId != null) ...<Widget>[
-              SizedBox(height: spacing.xl),
-              _HighlightSection(
-                userBookId: widget.userBookId!,
-                bookId: book.id,
-              ),
-            ],
             SizedBox(height: spacing.xl),
-            BookFeedSection(
-              bookId: book.id,
-              scrollController: _scrollController,
-            ),
+            // ── Content area: highlights (private) vs community feed (public) ──
+            if (inLibrary) ...<Widget>[
+              _ContentToggle(
+                active: _activeTab,
+                onChanged: (tab) => setState(() => _activeTab = tab),
+              ),
+              SizedBox(height: spacing.lg),
+              if (_activeTab == _DetailTab.highlights)
+                _HighlightSection(
+                  userBookId: widget.userBookId!,
+                  bookId: book.id,
+                )
+              else
+                BookFeedSection(
+                  bookId: book.id,
+                  scrollController: _scrollController,
+                ),
+            ] else
+              BookFeedSection(
+                bookId: book.id,
+                scrollController: _scrollController,
+              ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Two-segment toggle that separates private highlights from the public feed.
+/// Shown only when the book is in the user's library.
+class _ContentToggle extends StatelessWidget {
+  const _ContentToggle({required this.active, required this.onChanged});
+
+  final _DetailTab active;
+  final ValueChanged<_DetailTab> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final radii = theme.extension<AppRadius>()!;
+    return SegmentedButton<_DetailTab>(
+      segments: const <ButtonSegment<_DetailTab>>[
+        ButtonSegment<_DetailTab>(
+          value: _DetailTab.highlights,
+          icon: Icon(Icons.lock_outline_rounded, size: 15),
+          label: Text('내 하이라이트'),
+        ),
+        ButtonSegment<_DetailTab>(
+          value: _DetailTab.feed,
+          icon: Icon(Icons.people_outline_rounded, size: 15),
+          label: Text('커뮤니티 피드'),
+        ),
+      ],
+      selected: <_DetailTab>{active},
+      onSelectionChanged: (Set<_DetailTab> s) => onChanged(s.first),
+      showSelectedIcon: false,
+      style: SegmentedButton.styleFrom(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(radii.md)),
         ),
       ),
     );

@@ -45,6 +45,10 @@ class _BookFeedSectionState extends ConsumerState<BookFeedSection> {
   void _ensureInitialLoad() {
     if (_initialLoadKicked) return;
     _initialLoadKicked = true;
+    // Skip if the provider is already loaded or loading — the parent may keep
+    // it alive across tab switches so we don't want to flash a reload spinner.
+    final current = ref.read(bookFeedNotifierProvider(widget.bookId));
+    if (current is BookFeedLoaded || current is BookFeedLoading) return;
     ref.read(bookFeedNotifierProvider(widget.bookId).notifier).load();
   }
 
