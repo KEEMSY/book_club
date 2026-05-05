@@ -260,6 +260,58 @@ void main() {
       expect(running.backgroundEnteredAt, isNull);
     });
 
+    test('end returns to Idle on SESSION_NOT_FOUND without persisting failure',
+        () async {
+      final clock = _ManualClock(DateTime.utc(2026, 4, 20, 12));
+      final storage = InMemorySecureStorage();
+      final repo = FakeReadingRepository()
+        ..startResult = buildSession(id: 's1')
+        ..endError = const ReadingRepositoryException(
+          code: 'SESSION_NOT_FOUND',
+          message: '세션을 찾을 수 없어요',
+          statusCode: 404,
+        );
+      final notifier = TimerNotifier(
+        repository: repo,
+        storage: storage,
+        clock: clock.now,
+      );
+
+      await notifier.start('ub1');
+      clock.advance(const Duration(minutes: 5));
+      await notifier.end();
+
+      // Terminal: silently resets to idle so the user can start a fresh session.
+      expect(notifier.state, isA<TimerIdle>());
+      // Persisted snapshot must be cleared so restore() on next launch is clean.
+      expect(await storage.readRaw('reading.active_session'), isNull);
+    });
+
+    test('end returns to Idle on SESSION_ALREADY_ENDED without persisting failure',
+        () async {
+      final clock = _ManualClock(DateTime.utc(2026, 4, 20, 12));
+      final storage = InMemorySecureStorage();
+      final repo = FakeReadingRepository()
+        ..startResult = buildSession(id: 's1')
+        ..endError = const ReadingRepositoryException(
+          code: 'SESSION_ALREADY_ENDED',
+          message: '이미 종료된 세션이에요',
+          statusCode: 409,
+        );
+      final notifier = TimerNotifier(
+        repository: repo,
+        storage: storage,
+        clock: clock.now,
+      );
+
+      await notifier.start('ub1');
+      clock.advance(const Duration(minutes: 5));
+      await notifier.end();
+
+      expect(notifier.state, isA<TimerIdle>());
+      expect(await storage.readRaw('reading.active_session'), isNull);
+    });
+
     test('acknowledgeCompletion returns notifier to Idle', () async {
       final clock = _ManualClock(DateTime.utc(2026, 4, 20, 12));
       final repo = FakeReadingRepository()

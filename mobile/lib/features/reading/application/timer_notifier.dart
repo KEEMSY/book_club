@@ -279,8 +279,15 @@ class TimerNotifier extends StateNotifier<TimerState> {
       state = TimerState.completed(completion: completion);
       await _clearPersisted();
     } on ReadingRepositoryException catch (e) {
-      state = TimerState.failure(code: e.code, message: e.message);
-      // Do not clear the persisted session on failure — user may retry.
+      // Terminal errors: the session is definitively gone on the server, so
+      // holding on to local state only blocks future starts. Clear and idle.
+      if (e.code == 'SESSION_NOT_FOUND' || e.code == 'SESSION_ALREADY_ENDED') {
+        state = const TimerState.idle();
+        await _clearPersisted();
+      } else {
+        state = TimerState.failure(code: e.code, message: e.message);
+        // Do not clear the persisted session on other failures — user may retry.
+      }
     }
   }
 
