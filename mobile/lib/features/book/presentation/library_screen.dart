@@ -401,7 +401,7 @@ class _LibraryGrid extends StatelessWidget {
               crossAxisCount: 2,
               mainAxisSpacing: spacing.md,
               crossAxisSpacing: spacing.md,
-              childAspectRatio: 2 / 3.8,
+              childAspectRatio: 2 / 4.3,
             ),
             delegate: SliverChildBuilderDelegate(
               (BuildContext ctx, int index) => _LibraryCard(

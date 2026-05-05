@@ -183,23 +183,9 @@ class _GridLayout extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Stack(
-            children: <Widget>[
-              BookCover(
-                coverUrl: book.coverUrl,
-                borderRadius: BorderRadius.circular(radii.md),
-              ),
-              if (status != null)
-                Positioned(
-                  right: spacing.xs,
-                  bottom: spacing.xs,
-                  child: GestureDetector(
-                    onTap: onStatusTap,
-                    behavior: HitTestBehavior.opaque,
-                    child: _StatusPill(status: status!),
-                  ),
-                ),
-            ],
+          BookCover(
+            coverUrl: book.coverUrl,
+            borderRadius: BorderRadius.circular(radii.md),
           ),
           SizedBox(height: spacing.sm),
           Text(
@@ -217,6 +203,10 @@ class _GridLayout extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
+          if (status != null) ...<Widget>[
+            SizedBox(height: spacing.xs),
+            _StatusChip(status: status!, onTap: onStatusTap),
+          ],
         ],
       ),
     );
@@ -268,6 +258,64 @@ class _StatusPill extends StatelessWidget {
         style: theme.textTheme.labelSmall?.copyWith(
           color: foreground,
           fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+}
+
+/// Tonal dropdown-style chip shown below the book title in the grid card.
+/// The down-arrow signals that tapping changes the reading status.
+class _StatusChip extends StatelessWidget {
+  const _StatusChip({required this.status, this.onTap});
+
+  final BookStatus status;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final radii = theme.extension<AppRadius>()!;
+
+    final Color chipColor = switch (status) {
+      BookStatus.reading => theme.colorScheme.primary,
+      BookStatus.completed => AppPalette.plusMagenta,
+      BookStatus.paused =>
+        theme.colorScheme.onSurface.withValues(alpha: 0.55),
+      BookStatus.dropped =>
+        theme.colorScheme.onSurface.withValues(alpha: 0.40),
+      BookStatus.wishlist => theme.colorScheme.secondary,
+    };
+
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: chipColor.withValues(alpha: 0.12),
+          border: Border.all(
+            color: chipColor.withValues(alpha: 0.45),
+          ),
+          borderRadius: BorderRadius.all(Radius.circular(radii.pill)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Text(
+              status.label,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: chipColor,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(width: 2),
+            Icon(
+              Icons.keyboard_arrow_down_rounded,
+              size: 13,
+              color: chipColor,
+            ),
+          ],
         ),
       ),
     );
