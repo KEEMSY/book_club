@@ -32,6 +32,7 @@ class TimerScreen extends ConsumerStatefulWidget {
 
   final String userBookId;
   final bool autoStart;
+
   /// When set the ring counts down from this duration and auto-ends at zero.
   final int? targetSeconds;
 
@@ -155,55 +156,57 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
         // TimerEnding: block silently — let the in-flight API call finish.
       },
       child: Scaffold(
-      // Let Scaffold inherit the theme's canvas so dark mode lands on #161616
-      // instead of the pinned warm light Foggy.
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        leading: IconButton(
-          icon: const Icon(Icons.close_rounded),
-          onPressed: () => Navigator.of(context).maybePop(),
+        // Let Scaffold inherit the theme's canvas so dark mode lands on #161616
+        // instead of the pinned warm light Foggy.
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          leading: IconButton(
+            icon: const Icon(Icons.close_rounded),
+            onPressed: () => Navigator.of(context).maybePop(),
+          ),
+          title: Text('독서 타이머', style: theme.textTheme.titleMedium),
         ),
-        title: Text('독서 타이머', style: theme.textTheme.titleMedium),
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: spacing.lg),
-          child: Column(
-            children: <Widget>[
-              const Spacer(),
-              _TimerReadout(
-                accent: accent,
-                state: state,
-                targetSeconds: widget.targetSeconds,
-              ),
-              const Spacer(),
-              _StreakBadge(),
-              if (widget.userBookId.isNotEmpty &&
-                  (state is TimerRunning || state is TimerPaused)) ...<Widget>[
-                SizedBox(height: spacing.sm),
-                TextButton.icon(
-                  icon: const Icon(Icons.format_quote_rounded, size: 18),
-                  label: const Text('하이라이트 추가'),
-                  onPressed: () => _showHighlightSheet(context),
+        body: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: spacing.lg),
+            child: Column(
+              children: <Widget>[
+                const Spacer(),
+                _TimerReadout(
+                  accent: accent,
+                  state: state,
+                  targetSeconds: widget.targetSeconds,
                 ),
+                const Spacer(),
+                _StreakBadge(),
+                if (widget.userBookId.isNotEmpty &&
+                    (state is TimerRunning ||
+                        state is TimerPaused)) ...<Widget>[
+                  SizedBox(height: spacing.sm),
+                  TextButton.icon(
+                    icon: const Icon(Icons.format_quote_rounded, size: 18),
+                    label: const Text('하이라이트 추가'),
+                    onPressed: () => _showHighlightSheet(context),
+                  ),
+                ],
+                SizedBox(height: spacing.md),
+                TimerControls(
+                  state: state,
+                  accent: accent,
+                  onStart: () => ref
+                      .read(timerNotifierProvider.notifier)
+                      .start(widget.userBookId),
+                  onPause: () =>
+                      ref.read(timerNotifierProvider.notifier).pause(),
+                  onResume: () =>
+                      ref.read(timerNotifierProvider.notifier).resume(),
+                  onEnd: () => _showExitDialog(context),
+                ),
+                SizedBox(height: spacing.lg),
               ],
-              SizedBox(height: spacing.md),
-              TimerControls(
-                state: state,
-                accent: accent,
-                onStart: () => ref
-                    .read(timerNotifierProvider.notifier)
-                    .start(widget.userBookId),
-                onPause: () => ref.read(timerNotifierProvider.notifier).pause(),
-                onResume: () =>
-                    ref.read(timerNotifierProvider.notifier).resume(),
-                onEnd: () => _showExitDialog(context),
-              ),
-              SizedBox(height: spacing.lg),
-            ],
+            ),
           ),
         ),
-      ),
       ),
     );
   }
@@ -265,7 +268,8 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                   final timerState = ref.read(timerNotifierProvider);
                   if (timerState is TimerRunning) {
                     context.pushReplacement(
-                        AppRoutes.timer(timerState.userBookId),);
+                      AppRoutes.timer(timerState.userBookId),
+                    );
                   }
                 },
               )

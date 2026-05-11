@@ -252,18 +252,18 @@ class BookService:
         # Sections that drive the pre-search discovery screen.  Queries are
         # independent so we fire them in parallel; a failed section must not
         # blank the whole screen — callers receive whatever succeeds.
-        _SECTIONS: list[tuple[str, str, str]] = [
+        section_configs: list[tuple[str, str, str]] = [
             ("popular", "인기 도서", "베스트셀러"),
             ("new", "새로 나온 책", "신간"),
             ("novel", "소설", "소설"),
             ("self_help", "자기계발", "자기계발"),
             ("essay", "에세이", "에세이"),
         ]
-        tasks = [self.search_books(query, page=1, size=10) for _, _, query in _SECTIONS]
+        tasks = [self.search_books(query, page=1, size=10) for _, _, query in section_configs]
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
         sections: list[DiscoverSection] = []
-        for (section_id, title, _), result in zip(_SECTIONS, results):
+        for (section_id, title, _), result in zip(section_configs, results, strict=False):
             if isinstance(result, BaseException):
                 # Log at warning level so ops can detect provider degradation
                 # without the error propagating to the client.

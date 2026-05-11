@@ -314,6 +314,7 @@ async def list_all_my_highlights(
                         user_book_id=h.user_book_id,
                         quote_text=h.quote_text,
                         page_number=h.page_number,
+                        note_text=h.note_text,
                         created_at=h.created_at,
                     )
                     for h in g.highlights

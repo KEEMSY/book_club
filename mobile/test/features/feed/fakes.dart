@@ -160,6 +160,7 @@ class FakeFeedRepository implements FeedRepository {
     required String userBookId,
     required String quoteText,
     int? pageNumber,
+    String? noteText,
   }) async {
     return createHighlightResult ??
         Highlight(

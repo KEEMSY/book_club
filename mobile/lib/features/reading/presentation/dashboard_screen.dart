@@ -7,7 +7,8 @@ import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../auth/application/auth_providers.dart';
 import '../../book/presentation/widgets/book_cover.dart';
-import '../data/reading_models.dart' show DailySessionDto, DailySessionsResponseDto;
+import '../data/reading_models.dart'
+    show DailySessionDto, DailySessionsResponseDto;
 import '../../auth/domain/auth_state.dart';
 import '../../book/application/library_notifier.dart';
 import '../../book/application/library_state.dart';
@@ -443,9 +444,12 @@ class _GradeRow extends ConsumerWidget {
       };
       // 마스터 등급은 tier 표시 없음
       if (state.summary.grade < 5 && state.summary.tier > 1) {
-        final String roman =
-            const <int, String>{1: 'I', 2: 'II', 3: 'III'}[state.summary.tier] ??
-                'I';
+        final String roman = const <int, String>{
+              1: 'I',
+              2: 'II',
+              3: 'III',
+            }[state.summary.tier] ??
+            'I';
         return '$name $roman';
       }
       return name;
@@ -540,15 +544,16 @@ class _HeatmapCardState extends ConsumerState<_HeatmapCard> {
                         Icons.chevron_left,
                         color: _year > _minYear ? mutedColor : disabledColor,
                       ),
-                      onPressed:
-                          _year > _minYear ? () => _changeYear(_year - 1) : null,
+                      onPressed: _year > _minYear
+                          ? () => _changeYear(_year - 1)
+                          : null,
                       tooltip: '이전 연도',
                     ),
                   ),
                   Text(
                     '$_year년',
-                    style: theme.textTheme.bodySmall
-                        ?.copyWith(color: mutedColor),
+                    style:
+                        theme.textTheme.bodySmall?.copyWith(color: mutedColor),
                   ),
                   SizedBox(
                     width: 28,
@@ -581,8 +586,8 @@ class _HeatmapCardState extends ConsumerState<_HeatmapCard> {
                   padding: EdgeInsets.symmetric(vertical: spacing.md),
                   child: Text(
                     '독서 캘린더를 불러오지 못했어요',
-                    style: theme.textTheme.bodyMedium
-                        ?.copyWith(color: mutedColor),
+                    style:
+                        theme.textTheme.bodyMedium?.copyWith(color: mutedColor),
                   ),
                 ),
               ),
@@ -619,8 +624,7 @@ class _DayDetailSheet extends ConsumerWidget {
 
   final HeatmapDay day;
 
-  String get _dateKey =>
-      '${day.date.year}-'
+  String get _dateKey => '${day.date.year}-'
       '${day.date.month.toString().padLeft(2, '0')}-'
       '${day.date.day.toString().padLeft(2, '0')}';
 
@@ -676,7 +680,9 @@ class _DayDetailSheet extends ConsumerWidget {
                       itemCount: value.sessions.length + 1,
                       separatorBuilder: (_, __) => const SizedBox(height: 12),
                       itemBuilder: (_, i) {
-                        if (i == 0) return _SummaryRow(data: value, theme: theme);
+                        if (i == 0) {
+                          return _SummaryRow(data: value, theme: theme);
+                        }
                         return _SessionRow(
                           session: value.sessions[i - 1],
                           theme: theme,
@@ -776,27 +782,27 @@ class _TopActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<String>(
-        icon: const Icon(Icons.more_vert_rounded),
-        onSelected: (String value) {
-          switch (value) {
-            case 'manual':
-              onManual();
-            case 'goals':
-              GoRouter.of(context).push('/goals');
-            case 'settings':
-              showModalBottomSheet<void>(
-                context: context,
-                builder: (_) => const DashboardSettingsSheet(),
-                isScrollControlled: true,
-                useSafeArea: true,
-              );
-          }
-        },
-        itemBuilder: (_) => const <PopupMenuEntry<String>>[
-          PopupMenuItem<String>(value: 'manual', child: Text('수동 기록')),
-          PopupMenuItem<String>(value: 'goals', child: Text('독서 목표')),
-          PopupMenuItem<String>(value: 'settings', child: Text('홈 설정')),
-        ],
+      icon: const Icon(Icons.more_vert_rounded),
+      onSelected: (String value) {
+        switch (value) {
+          case 'manual':
+            onManual();
+          case 'goals':
+            GoRouter.of(context).push('/goals');
+          case 'settings':
+            showModalBottomSheet<void>(
+              context: context,
+              builder: (_) => const DashboardSettingsSheet(),
+              isScrollControlled: true,
+              useSafeArea: true,
+            );
+        }
+      },
+      itemBuilder: (_) => const <PopupMenuEntry<String>>[
+        PopupMenuItem<String>(value: 'manual', child: Text('수동 기록')),
+        PopupMenuItem<String>(value: 'goals', child: Text('독서 목표')),
+        PopupMenuItem<String>(value: 'settings', child: Text('홈 설정')),
+      ],
     );
   }
 }
@@ -925,8 +931,7 @@ class _StartReadingSheetState extends ConsumerState<_StartReadingSheet> {
     });
   }
 
-  void _start(String bookId) =>
-      Navigator.of(context).pop((bookId, _targetSec));
+  void _start(String bookId) => Navigator.of(context).pop((bookId, _targetSec));
 
   @override
   Widget build(BuildContext context) {
@@ -989,8 +994,7 @@ class _StartReadingSheetState extends ConsumerState<_StartReadingSheet> {
                     color: selected
                         ? theme.colorScheme.onPrimary
                         : theme.colorScheme.onSurface,
-                    fontWeight:
-                        selected ? FontWeight.w600 : FontWeight.normal,
+                    fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
                   ),
                   onSelected: (_) => _selectPreset(sec),
                 );
@@ -1003,8 +1007,7 @@ class _StartReadingSheetState extends ConsumerState<_StartReadingSheet> {
                   color: _customMode
                       ? theme.colorScheme.onPrimary
                       : theme.colorScheme.onSurface,
-                  fontWeight:
-                      _customMode ? FontWeight.w600 : FontWeight.normal,
+                  fontWeight: _customMode ? FontWeight.w600 : FontWeight.normal,
                 ),
                 onSelected: (_) => _enableCustomMode(),
               ),
@@ -1043,7 +1046,8 @@ class _StartReadingSheetState extends ConsumerState<_StartReadingSheet> {
                   )
                 : OutlinedButton.icon(
                     onPressed: () => _start(''),
-                    icon: const Icon(Icons.play_circle_outline_rounded, size: 18),
+                    icon:
+                        const Icon(Icons.play_circle_outline_rounded, size: 18),
                     label: const Text('책 없이 시작하기'),
                   ),
           ),

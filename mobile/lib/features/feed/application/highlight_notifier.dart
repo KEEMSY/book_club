@@ -43,7 +43,11 @@ class HighlightNotifier extends StateNotifier<HighlightState> {
       // the HTTP call was in flight (e.g. opened from library sheet with no
       // watcher). Skip the optimistic state update rather than throwing.
       if (mounted) {
-        if (state case HighlightLoaded(:final List<Highlight> items, :final nextCursor)) {
+        if (state
+            case HighlightLoaded(
+              :final List<Highlight> items,
+              :final nextCursor
+            )) {
           state = HighlightState.loaded(
             items: <Highlight>[h, ...items],
             nextCursor: nextCursor,
@@ -57,7 +61,8 @@ class HighlightNotifier extends StateNotifier<HighlightState> {
   }
 
   Future<void> delete(String highlightId) async {
-    if (state case HighlightLoaded(:final List<Highlight> items, :final nextCursor)) {
+    if (state
+        case HighlightLoaded(:final List<Highlight> items, :final nextCursor)) {
       await _repo.deleteHighlight(
         userBookId: userBookId,
         highlightId: highlightId,
