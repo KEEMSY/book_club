@@ -36,50 +36,41 @@ class DiscoveryScreen extends ConsumerWidget {
                 spacing.lg,
                 spacing.md,
                 spacing.lg,
-                0,
+                spacing.md,
               ),
-              child: Text('탐색', style: theme.textTheme.displaySmall),
-            ),
-          ),
-          SliverAppBar(
-            floating: true,
-            toolbarHeight: 0,
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(56),
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(
-                  spacing.lg,
-                  0,
-                  spacing.lg,
-                  spacing.md,
-                ),
-                child: GestureDetector(
-                  onTap: () => context.push(AppRoutes.search),
-                  child: Container(
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(radii.md),
-                    ),
-                    child: Row(
-                      children: [
-                        SizedBox(width: spacing.md),
-                        Icon(
-                          Icons.search_rounded,
-                          color: theme.colorScheme.onSurfaceVariant,
-                          size: 20,
-                        ),
-                        SizedBox(width: spacing.sm),
-                        Text(
-                          '책 제목, 저자, ISBN 검색',
-                          style: theme.textTheme.bodyMedium?.copyWith(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('탐색', style: theme.textTheme.displaySmall),
+                  SizedBox(height: spacing.md),
+                  GestureDetector(
+                    onTap: () => context.push(AppRoutes.search),
+                    child: Container(
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(radii.md),
+                      ),
+                      child: Row(
+                        children: [
+                          SizedBox(width: spacing.md),
+                          Icon(
+                            Icons.search_rounded,
                             color: theme.colorScheme.onSurfaceVariant,
+                            size: 20,
                           ),
-                        ),
-                      ],
+                          SizedBox(width: spacing.sm),
+                          Text(
+                            '책 제목, 저자, ISBN 검색',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
             ),
           ),
