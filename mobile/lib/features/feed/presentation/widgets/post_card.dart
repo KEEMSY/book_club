@@ -37,8 +37,10 @@ class PostCard extends StatelessWidget {
   final String bookId;
   final Post post;
   final VoidCallback onTapComments;
+
   /// If provided, tapping the author avatar/nickname navigates to their profile.
   final void Function(String userId)? onTapAuthor;
+
   /// If provided, reaction toggles update the caller's list; otherwise falls
   /// back to BookFeedNotifier (book feed context).
   final void Function(
@@ -279,7 +281,8 @@ class _HighlightBody extends StatelessWidget {
                     Icon(
                       Icons.chevron_right,
                       size: 16,
-                      color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                      color: theme.colorScheme.onSurfaceVariant
+                          .withValues(alpha: 0.5),
                     ),
                   ],
                 ),

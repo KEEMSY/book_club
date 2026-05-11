@@ -68,7 +68,8 @@ class CommunityRepository {
     int limit = 20,
   }) =>
       _call(() async {
-        final dto = await _api.getUserPosts(userId, cursor: cursor, limit: limit);
+        final dto =
+            await _api.getUserPosts(userId, cursor: cursor, limit: limit);
         return PostPage(
           items: dto.items.map((d) => d.toDomain()).toList(),
           nextCursor: dto.nextCursor,

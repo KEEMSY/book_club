@@ -200,9 +200,8 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color fg = selected
-        ? accent
-        : theme.colorScheme.onSurface.withValues(alpha: 0.6);
+    final Color fg =
+        selected ? accent : theme.colorScheme.onSurface.withValues(alpha: 0.6);
 
     return Expanded(
       child: InkWell(
@@ -222,7 +221,8 @@ class _NavItem extends StatelessWidget {
                         borderRadius: BorderRadius.circular(16),
                       )
                     : null,
-                child: Icon(selected ? selectedIcon : icon, color: fg, size: 22),
+                child:
+                    Icon(selected ? selectedIcon : icon, color: fg, size: 22),
               ),
               const SizedBox(height: 2),
               Text(

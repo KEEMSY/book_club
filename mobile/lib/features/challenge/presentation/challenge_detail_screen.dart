@@ -22,7 +22,9 @@ class ChallengeDetailScreen extends ConsumerWidget {
       ),
       error: (e, _) => Scaffold(
         appBar: AppBar(),
-        body: _ErrorBody(onRetry: () => ref.invalidate(challengeDetailProvider(challengeId))),
+        body: _ErrorBody(
+            onRetry: () =>
+                ref.invalidate(challengeDetailProvider(challengeId))),
       ),
       data: (challenge) => _ChallengeDetailBody(challenge: challenge),
     );
@@ -120,8 +122,8 @@ class _ChallengeDetailBody extends ConsumerWidget {
                     Text(
                       challenge.description!,
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurface
-                            .withValues(alpha: 0.8),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.8),
                       ),
                     ),
                     SizedBox(height: spacing.md),
@@ -180,8 +182,9 @@ class _ConditionCard extends StatelessWidget {
       case 'streak':
         return '${challenge.targetValue}일 연속 독서';
       case 'genre':
-        final genre =
-            challenge.genreFilter != null ? ' (장르: ${challenge.genreFilter})' : '';
+        final genre = challenge.genreFilter != null
+            ? ' (장르: ${challenge.genreFilter})'
+            : '';
         return '${challenge.targetValue}권 완독$genre';
       default:
         return '${challenge.targetValue} 달성';
@@ -216,8 +219,11 @@ class _ConditionCard extends StatelessWidget {
         children: <Widget>[
           Row(
             children: <Widget>[
-              Icon(Icons.flag_outlined,
-                  size: 18, color: theme.colorScheme.primary,),
+              Icon(
+                Icons.flag_outlined,
+                size: 18,
+                color: theme.colorScheme.primary,
+              ),
               const SizedBox(width: 6),
               Text('달성 조건', style: theme.textTheme.labelLarge),
             ],
@@ -278,8 +284,11 @@ class _ProgressCard extends StatelessWidget {
         children: <Widget>[
           Row(
             children: <Widget>[
-              Icon(Icons.trending_up,
-                  size: 18, color: theme.colorScheme.primary,),
+              Icon(
+                Icons.trending_up,
+                size: 18,
+                color: theme.colorScheme.primary,
+              ),
               const SizedBox(width: 6),
               Text('내 진행 상황', style: theme.textTheme.labelLarge),
             ],
@@ -353,8 +362,8 @@ class _BadgeSection extends StatelessWidget {
                     Text(
                       badge.description,
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface
-                            .withValues(alpha: 0.7),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                     ),
                   ],
@@ -408,7 +417,9 @@ class _LeaderboardSliver extends ConsumerWidget {
           return SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsets.symmetric(
-                  horizontal: spacing.md, vertical: spacing.sm,),
+                horizontal: spacing.md,
+                vertical: spacing.sm,
+              ),
               child: Text(
                 '아직 참여자가 없어요.',
                 style: theme.textTheme.bodySmall?.copyWith(
@@ -442,7 +453,9 @@ class _LeaderboardTile extends StatelessWidget {
 
     return Padding(
       padding: EdgeInsets.symmetric(
-          horizontal: spacing.md, vertical: spacing.xs / 2,),
+        horizontal: spacing.md,
+        vertical: spacing.xs / 2,
+      ),
       child: Row(
         children: <Widget>[
           // Rank
@@ -452,8 +465,7 @@ class _LeaderboardTile extends StatelessWidget {
               '${entry.rank}',
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: isTop3 ? FontWeight.bold : FontWeight.normal,
-                color:
-                    isTop3 ? theme.colorScheme.primary : null,
+                color: isTop3 ? theme.colorScheme.primary : null,
               ),
               textAlign: TextAlign.center,
             ),
@@ -493,8 +505,11 @@ class _LeaderboardTile extends StatelessWidget {
           ),
           if (entry.achievedAt != null) ...<Widget>[
             const SizedBox(width: 4),
-            Icon(Icons.check_circle,
-                size: 14, color: theme.colorScheme.primary,),
+            Icon(
+              Icons.check_circle,
+              size: 14,
+              color: theme.colorScheme.primary,
+            ),
           ],
         ],
       ),

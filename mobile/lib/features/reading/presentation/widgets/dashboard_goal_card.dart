@@ -145,8 +145,7 @@ class _GoalRow extends StatelessWidget {
                 Text(
                   '${_hoursFormatted(progress.secondsDone)}h / 목표 ${_hoursFormatted(progress.goal.targetSeconds)}h',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color:
-                        theme.colorScheme.onSurface.withValues(alpha: 0.72),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.72),
                   ),
                 ),
                 if (achieved) ...<Widget>[
@@ -167,8 +166,7 @@ class _GoalRow extends StatelessWidget {
           child: LinearProgressIndicator(
             value: ratio,
             minHeight: 6,
-            backgroundColor:
-                theme.colorScheme.surfaceContainerHighest,
+            backgroundColor: theme.colorScheme.surfaceContainerHighest,
             valueColor: AlwaysStoppedAnimation<Color>(
               achieved ? Colors.green : accent,
             ),

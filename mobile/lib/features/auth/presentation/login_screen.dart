@@ -41,7 +41,8 @@ class LoginScreen extends ConsumerWidget {
 
     // Dev-mode flag: show DevLoginButton in addition to social buttons so local
     // dev flows remain usable without Kakao credentials.
-    const bool isDevMode = bool.fromEnvironment('SHOW_DEV_LOGIN', defaultValue: true);
+    const bool isDevMode =
+        bool.fromEnvironment('SHOW_DEV_LOGIN', defaultValue: true);
     final bool showApple = !kIsWeb && Platform.isIOS;
 
     return Scaffold(
@@ -68,10 +69,12 @@ class LoginScreen extends ConsumerWidget {
                     failureMessage: failureMessage,
                     showApple: showApple,
                     showDevLogin: isDevMode,
-                    onKakao: () =>
-                        ref.read(authNotifierProvider.notifier).loginWithKakao(),
-                    onApple: () =>
-                        ref.read(authNotifierProvider.notifier).loginWithApple(),
+                    onKakao: () => ref
+                        .read(authNotifierProvider.notifier)
+                        .loginWithKakao(),
+                    onApple: () => ref
+                        .read(authNotifierProvider.notifier)
+                        .loginWithApple(),
                     onDevLogin: () =>
                         ref.read(authNotifierProvider.notifier).loginDev(),
                   ),
@@ -338,7 +341,8 @@ class _BottomCtas extends StatelessWidget {
               'Dev 환경 전용',
               textAlign: TextAlign.center,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                color:
+                    theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
                 fontSize: 11,
               ),
             ),

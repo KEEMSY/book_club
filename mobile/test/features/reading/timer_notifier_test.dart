@@ -287,7 +287,8 @@ void main() {
       expect(await storage.readRaw('reading.active_session'), isNull);
     });
 
-    test('end returns to Idle on SESSION_ALREADY_ENDED without persisting failure',
+    test(
+        'end returns to Idle on SESSION_ALREADY_ENDED without persisting failure',
         () async {
       final clock = _ManualClock(DateTime.utc(2026, 4, 20, 12));
       final storage = InMemorySecureStorage();

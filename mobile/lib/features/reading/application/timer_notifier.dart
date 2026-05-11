@@ -252,10 +252,10 @@ class TimerNotifier extends StateNotifier<TimerState> {
     try {
       if (sessionId.isEmpty) {
         // Free session — synthesize a minimal completion (no grade/streak impact).
-        final int durationSec = (endedAt.difference(startedAt).inMilliseconds -
-                pausedMs)
-            .clamp(0, 999999 * 1000) ~/
-            1000;
+        final int durationSec =
+            (endedAt.difference(startedAt).inMilliseconds - pausedMs)
+                    .clamp(0, 999999 * 1000) ~/
+                1000;
         state = TimerState.completed(
           completion: SessionCompletion(
             sessionId: '',

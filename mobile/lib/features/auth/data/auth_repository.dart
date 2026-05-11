@@ -143,8 +143,7 @@ class AuthRepository {
   ///
   /// Null values are omitted from the request body so the backend applies
   /// a partial update — only the supplied fields are changed.
-  Future<void> updateProfile({String? nickname, String? bio}) =>
-      _call(
+  Future<void> updateProfile({String? nickname, String? bio}) => _call(
         () => _api.updateProfile({
           if (nickname != null) 'nickname': nickname,
           if (bio != null) 'bio': bio,

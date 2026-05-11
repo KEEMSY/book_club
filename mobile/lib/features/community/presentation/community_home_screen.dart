@@ -130,16 +130,14 @@ class _FollowingFeedTab extends ConsumerWidget {
         posts: feedState.posts,
         hasMore: feedState.hasMore,
         isLoading: feedState.isLoading,
-        onLoadMore: () =>
-            ref.read(followingFeedProvider.notifier).fetchMore(),
-        onReactionApplied: (postId, type, toggleState, counts) => ref
-            .read(followingFeedProvider.notifier)
-            .applyReactionResult(
-              postId: postId,
-              reactionType: type,
-              toggleState: toggleState,
-              counts: counts,
-            ),
+        onLoadMore: () => ref.read(followingFeedProvider.notifier).fetchMore(),
+        onReactionApplied: (postId, type, toggleState, counts) =>
+            ref.read(followingFeedProvider.notifier).applyReactionResult(
+                  postId: postId,
+                  reactionType: type,
+                  toggleState: toggleState,
+                  counts: counts,
+                ),
       ),
     );
   }
@@ -327,14 +325,13 @@ class _SortedFeedView extends ConsumerWidget {
         isLoading: feedState.isLoading,
         onLoadMore: () =>
             ref.read(exploreFeedProvider(sort).notifier).fetchMore(),
-        onReactionApplied: (postId, type, toggleState, counts) => ref
-            .read(exploreFeedProvider(sort).notifier)
-            .applyReactionResult(
-              postId: postId,
-              reactionType: type,
-              toggleState: toggleState,
-              counts: counts,
-            ),
+        onReactionApplied: (postId, type, toggleState, counts) =>
+            ref.read(exploreFeedProvider(sort).notifier).applyReactionResult(
+                  postId: postId,
+                  reactionType: type,
+                  toggleState: toggleState,
+                  counts: counts,
+                ),
       ),
     );
   }
@@ -395,7 +392,8 @@ class _PostFeedList extends StatelessWidget {
           return PostCard(
             bookId: post.bookId,
             post: post,
-            onTapAuthor: (userId) => context.push(AppRoutes.userProfile(userId)),
+            onTapAuthor: (userId) =>
+                context.push(AppRoutes.userProfile(userId)),
             onTapComments: () => CommentsSheet.show(
               context,
               bookId: post.bookId,
@@ -613,16 +611,14 @@ class _HighlightFeedTab extends ConsumerWidget {
         posts: feedState.posts,
         hasMore: feedState.hasMore,
         isLoading: feedState.isLoading,
-        onLoadMore: () =>
-            ref.read(highlightFeedProvider.notifier).fetchMore(),
-        onReactionApplied: (postId, type, toggleState, counts) => ref
-            .read(highlightFeedProvider.notifier)
-            .applyReactionResult(
-              postId: postId,
-              reactionType: type,
-              toggleState: toggleState,
-              counts: counts,
-            ),
+        onLoadMore: () => ref.read(highlightFeedProvider.notifier).fetchMore(),
+        onReactionApplied: (postId, type, toggleState, counts) =>
+            ref.read(highlightFeedProvider.notifier).applyReactionResult(
+                  postId: postId,
+                  reactionType: type,
+                  toggleState: toggleState,
+                  counts: counts,
+                ),
       ),
     );
   }

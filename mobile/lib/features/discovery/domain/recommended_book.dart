@@ -11,9 +11,11 @@ class RecommendedBook {
   final String title;
   final String author;
   final String? coverUrl;
-  final String reason; // "community_popular" | "similar_readers" | "recently_added"
+  final String
+      reason; // "community_popular" | "similar_readers" | "recently_added"
 
-  factory RecommendedBook.fromJson(Map<String, dynamic> json) => RecommendedBook(
+  factory RecommendedBook.fromJson(Map<String, dynamic> json) =>
+      RecommendedBook(
         id: json['id'] as String,
         title: json['title'] as String,
         author: json['author'] as String,

@@ -66,9 +66,8 @@ class _GradeScreenState extends ConsumerState<GradeScreen> {
     final Color accent = ref.watch(gradePrimaryProvider);
     final GradeState state = ref.watch(gradeNotifierProvider);
 
-    final String appBarTitle = state is GradeLoaded
-        ? _gradeTitleWithTier(state.summary)
-        : '나의 등급';
+    final String appBarTitle =
+        state is GradeLoaded ? _gradeTitleWithTier(state.summary) : '나의 등급';
 
     return Scaffold(
       appBar: AppBar(

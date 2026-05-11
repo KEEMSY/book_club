@@ -41,8 +41,8 @@ class _CreateEventSheetState extends ConsumerState<CreateEventSheet> {
     final bottom = MediaQuery.of(context).viewInsets.bottom;
 
     return Padding(
-      padding:
-          EdgeInsets.fromLTRB(spacing.lg, spacing.lg, spacing.lg, spacing.lg + bottom),
+      padding: EdgeInsets.fromLTRB(
+          spacing.lg, spacing.lg, spacing.lg, spacing.lg + bottom),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,

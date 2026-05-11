@@ -79,8 +79,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
               controller: _bioCtrl,
               maxLength: 200,
               maxLines: 4,
-              decoration:
-                  const InputDecoration(hintText: '독서 취향이나 소개를 적어보세요'),
+              decoration: const InputDecoration(hintText: '독서 취향이나 소개를 적어보세요'),
             ),
           ],
         ),

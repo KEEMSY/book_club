@@ -19,8 +19,7 @@ class WeeklyReportScreen extends ConsumerStatefulWidget {
   final String? weekStart;
 
   @override
-  ConsumerState<WeeklyReportScreen> createState() =>
-      _WeeklyReportScreenState();
+  ConsumerState<WeeklyReportScreen> createState() => _WeeklyReportScreenState();
 }
 
 class _WeeklyReportScreenState extends ConsumerState<WeeklyReportScreen> {
@@ -81,8 +80,7 @@ class _WeeklyReportScreenState extends ConsumerState<WeeklyReportScreen> {
 
   void _goBack() {
     setState(() {
-      _selectedMonday =
-          _selectedMonday.subtract(const Duration(days: 7));
+      _selectedMonday = _selectedMonday.subtract(const Duration(days: 7));
       _report = null;
     });
     _load();
@@ -109,8 +107,7 @@ class _WeeklyReportScreenState extends ConsumerState<WeeklyReportScreen> {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
 
-    final bool isThisWeek =
-        _toIso(_selectedMonday) == _toIso(_currentMonday());
+    final bool isThisWeek = _toIso(_selectedMonday) == _toIso(_currentMonday());
     final sunday = _selectedMonday.add(const Duration(days: 6));
     final weekLabel = isThisWeek
         ? '이번 주'

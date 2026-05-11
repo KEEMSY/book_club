@@ -57,8 +57,7 @@ class JanDeeGrid extends StatelessWidget {
       // GitHub-style: 52-week rolling window ending at today's Sunday.
       final DateTime endColumnSunday =
           today.subtract(Duration(days: today.weekday % 7));
-      startColumnDate =
-          endColumnSunday.subtract(const Duration(days: 7 * 51));
+      startColumnDate = endColumnSunday.subtract(const Duration(days: 7 * 51));
       columns = 52;
     } else {
       // Full calendar year for past years.
@@ -84,8 +83,7 @@ class JanDeeGrid extends StatelessWidget {
         final double cellSize =
             rawCellSize.clamp(_minCellSize, _maxCellSize).toDouble();
 
-        final double gridWidth =
-            columns * cellSize + (columns - 1) * _cellGap;
+        final double gridWidth = columns * cellSize + (columns - 1) * _cellGap;
         final bool needsScroll = rawCellSize < _minCellSize;
 
         final Widget gridBody = _GridBody(

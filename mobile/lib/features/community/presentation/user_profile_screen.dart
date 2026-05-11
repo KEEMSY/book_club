@@ -119,8 +119,8 @@ class _ProfileContent extends ConsumerWidget {
             SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: spacing.lg),
-                child:
-                    _RecentHighlightsSection(highlights: profile.recentHighlights),
+                child: _RecentHighlightsSection(
+                    highlights: profile.recentHighlights),
               ),
             ),
           SliverToBoxAdapter(
@@ -613,8 +613,7 @@ class _ActionButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     if (profile.isMe) {
       return OutlinedButton(
-        onPressed: () =>
-            context.push(AppRoutes.profileEdit, extra: profile),
+        onPressed: () => context.push(AppRoutes.profileEdit, extra: profile),
         child: const Text('프로필 편집'),
       );
     }
@@ -821,7 +820,8 @@ class _UserPostsSliverState extends ConsumerState<_UserPostsSliver> {
               if (feedState.isLoading) {
                 return const Padding(
                   padding: EdgeInsets.all(16),
-                  child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                  child:
+                      Center(child: CircularProgressIndicator(strokeWidth: 2)),
                 );
               }
               return null;

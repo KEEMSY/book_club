@@ -64,8 +64,7 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
         }
         return n;
       }).toList(),
-      unreadCount:
-          state.unreadCount > 0 ? state.unreadCount - 1 : 0,
+      unreadCount: state.unreadCount > 0 ? state.unreadCount - 1 : 0,
     );
     try {
       await _repository.markRead(id);

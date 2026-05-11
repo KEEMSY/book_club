@@ -25,9 +25,7 @@ class _NotificationBellState extends ConsumerState<NotificationBell> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref
-          .read(notificationNotifierProvider.notifier)
-          .refreshUnreadCount();
+      ref.read(notificationNotifierProvider.notifier).refreshUnreadCount();
     });
   }
 
@@ -55,8 +53,7 @@ class NotificationScreen extends ConsumerStatefulWidget {
   const NotificationScreen({super.key});
 
   @override
-  ConsumerState<NotificationScreen> createState() =>
-      _NotificationScreenState();
+  ConsumerState<NotificationScreen> createState() => _NotificationScreenState();
 }
 
 class _NotificationScreenState extends ConsumerState<NotificationScreen> {
@@ -80,8 +77,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
   }
 
   void _onScroll() {
-    if (_scroll.position.pixels >=
-        _scroll.position.maxScrollExtent - 200) {
+    if (_scroll.position.pixels >= _scroll.position.maxScrollExtent - 200) {
       ref.read(notificationNotifierProvider.notifier).loadMore();
     }
   }
@@ -107,14 +103,12 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
-    final NotificationState state =
-        ref.watch(notificationNotifierProvider);
+    final NotificationState state = ref.watch(notificationNotifierProvider);
 
     return Scaffold(
       body: RefreshIndicator(
         color: theme.colorScheme.primary,
-        onRefresh: () =>
-            ref.read(notificationNotifierProvider.notifier).load(),
+        onRefresh: () => ref.read(notificationNotifierProvider.notifier).load(),
         child: CustomScrollView(
           controller: _scroll,
           physics: const AlwaysScrollableScrollPhysics(),
@@ -235,7 +229,8 @@ class _EmptyOrError extends StatelessWidget {
 /// Unread items use `primaryContainer` tinted surface so they stand out
 /// without shouting — Airbnb's "subtle highlight on a light canvas" principle.
 class _NotificationCard extends StatelessWidget {
-  const _NotificationCard({required this.dto, required this.onTap, required this.onNavigate});
+  const _NotificationCard(
+      {required this.dto, required this.onTap, required this.onNavigate});
 
   final NotificationDto dto;
   final VoidCallback onTap;
@@ -253,9 +248,8 @@ class _NotificationCard extends StatelessWidget {
         onNavigate?.call();
       },
       child: Container(
-        color: unread
-            ? theme.colorScheme.primary.withValues(alpha: 0.06)
-            : null,
+        color:
+            unread ? theme.colorScheme.primary.withValues(alpha: 0.06) : null,
         padding: EdgeInsets.symmetric(
           horizontal: spacing.lg,
           vertical: spacing.md,
@@ -275,9 +269,8 @@ class _NotificationCard extends StatelessWidget {
                         child: Text(
                           dto.title,
                           style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: unread
-                                ? FontWeight.w600
-                                : FontWeight.w500,
+                            fontWeight:
+                                unread ? FontWeight.w600 : FontWeight.w500,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,

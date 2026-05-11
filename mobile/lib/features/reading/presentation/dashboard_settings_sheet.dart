@@ -23,8 +23,7 @@ class DashboardSettingsSheet extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               child: Text(
                 '홈 섹션 설정',
                 style: theme.textTheme.titleLarge,
@@ -35,29 +34,25 @@ class DashboardSettingsSheet extends ConsumerWidget {
               title: const Text('스트릭 카드'),
               subtitle: const Text('연속 독서 일수'),
               value: prefs.showStreak,
-              onChanged: (v) =>
-                  notifier.update(prefs.copyWith(showStreak: v)),
+              onChanged: (v) => notifier.update(prefs.copyWith(showStreak: v)),
             ),
             SwitchListTile(
               title: const Text('목표 진행률'),
               subtitle: const Text('주간 · 월간 · 연간 목표'),
               value: prefs.showGoal,
-              onChanged: (v) =>
-                  notifier.update(prefs.copyWith(showGoal: v)),
+              onChanged: (v) => notifier.update(prefs.copyWith(showGoal: v)),
             ),
             SwitchListTile(
               title: const Text('등급 카드'),
               subtitle: const Text('나의 독서 등급'),
               value: prefs.showGrade,
-              onChanged: (v) =>
-                  notifier.update(prefs.copyWith(showGrade: v)),
+              onChanged: (v) => notifier.update(prefs.copyWith(showGrade: v)),
             ),
             SwitchListTile(
               title: const Text('독서 잔디'),
               subtitle: const Text('1년간 독서 캘린더'),
               value: prefs.showHeatmap,
-              onChanged: (v) =>
-                  notifier.update(prefs.copyWith(showHeatmap: v)),
+              onChanged: (v) => notifier.update(prefs.copyWith(showHeatmap: v)),
             ),
             const SizedBox(height: 8),
           ],

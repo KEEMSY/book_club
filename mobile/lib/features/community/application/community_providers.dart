@@ -163,7 +163,7 @@ final highlightFeedProvider =
     StateNotifierProvider.autoDispose<_FeedNotifier, FeedState>((ref) {
   final repo = ref.watch(communityRepositoryProvider);
   return _FeedNotifier(
-    ({String? cursor}) =>
-        repo.getExploreFeed(sort: 'latest', postType: 'highlight', cursor: cursor),
+    ({String? cursor}) => repo.getExploreFeed(
+        sort: 'latest', postType: 'highlight', cursor: cursor),
   );
 });

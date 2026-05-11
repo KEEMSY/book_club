@@ -71,7 +71,11 @@ class _BadgeBody extends StatelessWidget {
         SliverToBoxAdapter(
           child: Padding(
             padding: EdgeInsets.fromLTRB(
-                spacing.md, spacing.md, spacing.md, spacing.sm,),
+              spacing.md,
+              spacing.md,
+              spacing.md,
+              spacing.sm,
+            ),
             child: Text('획득한 배지', style: theme.textTheme.titleMedium),
           ),
         ),
@@ -79,7 +83,9 @@ class _BadgeBody extends StatelessWidget {
           SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsets.symmetric(
-                  horizontal: spacing.md, vertical: spacing.sm,),
+                horizontal: spacing.md,
+                vertical: spacing.sm,
+              ),
               child: Text(
                 '아직 획득한 배지가 없어요. 챌린지에 참여해 배지를 모아보세요!',
                 style: theme.textTheme.bodyMedium?.copyWith(
@@ -118,7 +124,11 @@ class _BadgeBody extends StatelessWidget {
         SliverToBoxAdapter(
           child: Padding(
             padding: EdgeInsets.fromLTRB(
-                spacing.md, 0, spacing.md, spacing.sm,),
+              spacing.md,
+              0,
+              spacing.md,
+              spacing.sm,
+            ),
             child: Text('전체 배지 도감', style: theme.textTheme.titleMedium),
           ),
         ),
@@ -137,7 +147,11 @@ class _BadgeBody extends StatelessWidget {
         else
           SliverPadding(
             padding: EdgeInsets.fromLTRB(
-                spacing.md, 0, spacing.md, spacing.xl,),
+              spacing.md,
+              0,
+              spacing.md,
+              spacing.xl,
+            ),
             sliver: SliverGrid(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
@@ -213,8 +227,7 @@ class _BadgeCard extends StatelessWidget {
                 if (!earned)
                   Container(
                     decoration: BoxDecoration(
-                      color:
-                          theme.colorScheme.surface.withValues(alpha: 0.6),
+                      color: theme.colorScheme.surface.withValues(alpha: 0.6),
                       shape: BoxShape.circle,
                     ),
                     padding: const EdgeInsets.all(6),
@@ -282,7 +295,11 @@ class _BadgeDetailSheet extends StatelessWidget {
     return SafeArea(
       child: Padding(
         padding: EdgeInsets.fromLTRB(
-            spacing.lg, spacing.lg, spacing.lg, spacing.lg,),
+          spacing.lg,
+          spacing.lg,
+          spacing.lg,
+          spacing.lg,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[

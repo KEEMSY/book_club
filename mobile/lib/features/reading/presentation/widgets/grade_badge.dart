@@ -383,8 +383,7 @@ class _AnimatedBadgeState extends State<_AnimatedBadge>
               ? AnimatedBuilder(
                   animation: _glow!,
                   builder: (BuildContext _, Widget? child) {
-                    final double t =
-                        Curves.easeInOut.transform(_glow!.value);
+                    final double t = Curves.easeInOut.transform(_glow!.value);
                     // ±6° sway — slow enough to feel organic, not jittery.
                     final double angle = (t - 0.5) * 2 * 0.105; // ≈ ±6°
                     return Transform.rotate(angle: angle, child: child);

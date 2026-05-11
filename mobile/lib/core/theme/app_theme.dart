@@ -534,7 +534,8 @@ class AppTheme {
     // caused tofu characters on Flutter Web CanvasKit. Bundling avoids the
     // per-weight lazy download that caused broken text while fonts were fetching.
     const String koreanSans = 'NotoSansKR';
-    final TextStyle sansBase = TextStyle(fontFamily: koreanSans, color: onSurface);
+    final TextStyle sansBase =
+        TextStyle(fontFamily: koreanSans, color: onSurface);
     // Playfair Display (google_fonts, Latin serif) for hero/display text.
     // Korean book titles fall back to the bundled NotoSansKR.
     final TextStyle serifBase = GoogleFonts.playfairDisplay(color: onSurface)

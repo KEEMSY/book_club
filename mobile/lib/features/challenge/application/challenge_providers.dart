@@ -43,8 +43,7 @@ final endedChallengesProvider =
 
 final myChallengesProvider =
     FutureProvider.autoDispose<List<MyChallengeDto>>((ref) async {
-  final page =
-      await ref.watch(challengeRepositoryProvider).myChallenges();
+  final page = await ref.watch(challengeRepositoryProvider).myChallenges();
   return page.items;
 });
 
@@ -60,9 +59,8 @@ final challengeDetailProvider =
 final leaderboardProvider =
     FutureProvider.autoDispose.family<List<LeaderboardEntryDto>, String>(
   (ref, challengeId) async {
-    final page = await ref
-        .watch(challengeRepositoryProvider)
-        .leaderboard(challengeId);
+    final page =
+        await ref.watch(challengeRepositoryProvider).leaderboard(challengeId);
     return page.items;
   },
 );
@@ -71,8 +69,7 @@ final leaderboardProvider =
 // Badge providers
 // ---------------------------------------------------------------------------
 
-final badgesProvider =
-    FutureProvider.autoDispose<List<BadgeDto>>((ref) async {
+final badgesProvider = FutureProvider.autoDispose<List<BadgeDto>>((ref) async {
   final page = await ref.watch(challengeRepositoryProvider).listBadges();
   return page.items;
 });

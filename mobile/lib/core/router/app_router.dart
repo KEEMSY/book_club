@@ -291,8 +291,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                   ),
                   GoRoute(
                     path: 'badges',
-                    builder: (context, state) =>
-                        const BadgeCollectionScreen(),
+                    builder: (context, state) => const BadgeCollectionScreen(),
                   ),
                 ],
               ),

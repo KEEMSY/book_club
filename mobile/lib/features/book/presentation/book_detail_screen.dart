@@ -101,10 +101,14 @@ class BookDetailScreen extends ConsumerWidget {
             },
             onGoToLibrary: () {
               final (String? id, String? pendingTab) = switch (libraryState) {
-                LibraryCtaAdded(:final userBook) =>
-                  (userBook.id, userBook.status.wire),
-                LibraryCtaDuplicate(:final duplicateUserBookId) =>
-                  (duplicateUserBookId, null),
+                LibraryCtaAdded(:final userBook) => (
+                    userBook.id,
+                    userBook.status.wire
+                  ),
+                LibraryCtaDuplicate(:final duplicateUserBookId) => (
+                    duplicateUserBookId,
+                    null
+                  ),
                 _ => (null, null),
               };
               if (pendingTab != null) {
@@ -234,8 +238,7 @@ class _ContentState extends ConsumerState<_Content> {
               _Description(
                 text: description.trim(),
                 expanded: _descExpanded,
-                onToggle: () =>
-                    setState(() => _descExpanded = !_descExpanded),
+                onToggle: () => setState(() => _descExpanded = !_descExpanded),
               ),
             ],
             SizedBox(height: spacing.xl),
@@ -355,8 +358,7 @@ class _ToggleSegment extends StatelessWidget {
                 label,
                 style: theme.textTheme.labelMedium?.copyWith(
                   color: fg,
-                  fontWeight:
-                      selected ? FontWeight.w700 : FontWeight.w500,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                 ),
               ),
             ],
@@ -579,10 +581,12 @@ class _HighlightSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
-    final HighlightState state = ref.watch(highlightNotifierProvider(userBookId));
+    final HighlightState state =
+        ref.watch(highlightNotifierProvider(userBookId));
 
     // Load on first build.
-    ref.listen<HighlightState>(highlightNotifierProvider(userBookId), (_, __) {});
+    ref.listen<HighlightState>(
+        highlightNotifierProvider(userBookId), (_, __) {});
     if (state is HighlightInitial) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref.read(highlightNotifierProvider(userBookId).notifier).load();
@@ -620,8 +624,8 @@ class _HighlightSection extends ConsumerWidget {
             ),
           )
         else if (state is HighlightLoaded)
-          ...state.items
-              .map((Highlight h) => _HighlightCard(highlight: h, userBookId: userBookId)),
+          ...state.items.map((Highlight h) =>
+              _HighlightCard(highlight: h, userBookId: userBookId)),
       ],
     );
   }
@@ -702,4 +706,3 @@ class _HighlightCard extends ConsumerWidget {
     );
   }
 }
-

@@ -111,11 +111,11 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
   }
 
   int _tabIndexFor(BookStatus s) => switch (s) {
-    BookStatus.reading => 1,
-    BookStatus.completed => 2,
-    BookStatus.wishlist => 3,
-    _ => 0, // paused / dropped → 전체
-  };
+        BookStatus.reading => 1,
+        BookStatus.completed => 2,
+        BookStatus.wishlist => 3,
+        _ => 0, // paused / dropped → 전체
+      };
 
   @override
   Widget build(BuildContext context) {
@@ -152,9 +152,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
                     icon: const Icon(Icons.logout_outlined),
                     tooltip: '로그아웃',
                     onPressed: () async {
-                      await ref
-                          .read(authNotifierProvider.notifier)
-                          .logout();
+                      await ref.read(authNotifierProvider.notifier).logout();
                     },
                   ),
                 ],
@@ -190,9 +188,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
                     onRefresh: () async {
                       await Future.wait<void>(<Future<void>>[
                         for (final s in BookStatus.values)
-                          ref
-                              .read(libraryNotifierProvider.notifier)
-                              .refresh(s),
+                          ref.read(libraryNotifierProvider.notifier).refresh(s),
                       ]);
                     },
                   ),
@@ -567,8 +563,7 @@ class _LibraryActionsSheet extends ConsumerWidget {
                   context: context,
                   builder: (ctx) => AlertDialog(
                     title: const Text('서재에서 삭제'),
-                    content:
-                        Text('"${userBook.book.title}"를 서재에서 삭제할까요?'),
+                    content: Text('"${userBook.book.title}"를 서재에서 삭제할까요?'),
                     actions: <Widget>[
                       TextButton(
                         onPressed: () => Navigator.of(ctx).pop(false),
@@ -984,8 +979,7 @@ class _HighlightCard extends StatelessWidget {
             Align(
               alignment: Alignment.centerRight,
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
                   color: primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.all(

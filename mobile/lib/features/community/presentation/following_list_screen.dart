@@ -25,7 +25,8 @@ class FollowingListScreen extends ConsumerWidget {
       body: _UserList(
         futureProvider: userId.isEmpty
             ? ref.watch(socialRepositoryProvider).getMyFollowing
-            : () => ref.watch(socialRepositoryProvider).getUserFollowing(userId),
+            : () =>
+                ref.watch(socialRepositoryProvider).getUserFollowing(userId),
       ),
     );
   }
@@ -71,8 +72,7 @@ class _UserListState extends State<_UserList> {
         }
         return ListView.builder(
           itemCount: items.length,
-          itemBuilder: (context, index) =>
-              _UserSummaryTile(user: items[index]),
+          itemBuilder: (context, index) => _UserSummaryTile(user: items[index]),
         );
       },
     );

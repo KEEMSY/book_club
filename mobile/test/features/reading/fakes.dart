@@ -69,8 +69,8 @@ class FakeReadingRepository implements ReadingRepository {
   Bookmark? createBookmarkResult;
   Bookmark? latestBookmarkResult;
   Object? bookmarkError;
-  final List<({String userBookId, int page, String? note})> createBookmarkCalls =
-      <({String userBookId, int page, String? note})>[];
+  final List<({String userBookId, int page, String? note})>
+      createBookmarkCalls = <({String userBookId, int page, String? note})>[];
 
   @override
   Future<ReadingSession> startSession({

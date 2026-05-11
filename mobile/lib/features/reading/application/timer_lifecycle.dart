@@ -97,8 +97,7 @@ class AndroidForegroundServiceBridge implements BackgroundTimerBridge {
   Future<void> update({required Duration elapsed}) async {
     if (kIsWeb || !Platform.isAndroid) return;
     try {
-      final String label =
-          '${elapsed.inHours.toString().padLeft(2, '0')}:'
+      final String label = '${elapsed.inHours.toString().padLeft(2, '0')}:'
           '${(elapsed.inMinutes % 60).toString().padLeft(2, '0')}:'
           '${(elapsed.inSeconds % 60).toString().padLeft(2, '0')}';
       FlutterBackgroundService().invoke('update', <String, dynamic>{

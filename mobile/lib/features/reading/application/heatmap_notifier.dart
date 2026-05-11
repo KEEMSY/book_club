@@ -55,7 +55,7 @@ class HeatmapNotifier extends StateNotifier<HeatmapState> {
   Future<void> invalidate() => load(force: true);
 }
 
-final heatmapNotifierProvider = StateNotifierProvider.family<HeatmapNotifier,
-    HeatmapState, int>(
+final heatmapNotifierProvider =
+    StateNotifierProvider.family<HeatmapNotifier, HeatmapState, int>(
   (ref, year) => HeatmapNotifier(ref.watch(readingRepositoryProvider), year),
 );

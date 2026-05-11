@@ -52,8 +52,7 @@ class ClubDetailScreen extends ConsumerWidget {
                   Text(
                     '${club.memberCount}/${club.maxMembers}명 참여 중',
                     style: theme.textTheme.labelMedium?.copyWith(
-                      color:
-                          theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                   SizedBox(height: spacing.lg),
@@ -112,8 +111,7 @@ class ClubDetailScreen extends ConsumerWidget {
                     ),
                   )
                 : SliverPadding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: spacing.md),
+                    padding: EdgeInsets.symmetric(horizontal: spacing.md),
                     sliver: SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (_, i) => _EventCard(
@@ -153,9 +151,7 @@ class _EventCard extends ConsumerWidget {
             Row(
               children: [
                 Icon(
-                  isOnline
-                      ? Icons.videocam_rounded
-                      : Icons.place_rounded,
+                  isOnline ? Icons.videocam_rounded : Icons.place_rounded,
                   size: 16,
                   color: theme.colorScheme.primary,
                 ),
@@ -218,8 +214,7 @@ class _RsvpButtons extends ConsumerWidget {
           Text(
             '${event.maybeCount}명 미정',
             style: theme.textTheme.labelSmall?.copyWith(
-              color:
-                  theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
             ),
           ),
         ],

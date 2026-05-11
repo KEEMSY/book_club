@@ -39,14 +39,12 @@ class ChallengeRepository {
         () => _api.listChallenges(status: status, limit: limit, cursor: cursor),
       );
 
-  Future<MyChallengePageDto> myChallenges() =>
-      _call(() => _api.myChallenges());
+  Future<MyChallengePageDto> myChallenges() => _call(() => _api.myChallenges());
 
   Future<ChallengeDto> getChallenge(String id) =>
       _call(() => _api.getChallenge(id));
 
-  Future<void> joinChallenge(String id) =>
-      _call(() => _api.joinChallenge(id));
+  Future<void> joinChallenge(String id) => _call(() => _api.joinChallenge(id));
 
   Future<void> leaveChallenge(String id) =>
       _call(() => _api.leaveChallenge(id));

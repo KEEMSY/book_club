@@ -37,7 +37,10 @@ class DiscoveryScreen extends ConsumerWidget {
               preferredSize: const Size.fromHeight(56),
               child: Padding(
                 padding: EdgeInsets.fromLTRB(
-                  spacing.lg, 0, spacing.lg, spacing.md,
+                  spacing.lg,
+                  0,
+                  spacing.lg,
+                  spacing.md,
                 ),
                 child: GestureDetector(
                   onTap: () => context.push(AppRoutes.search),
@@ -156,8 +159,8 @@ class _SectionHeader extends StatelessWidget {
       ),
       child: Text(
         title,
-        style: theme.textTheme.titleMedium
-            ?.copyWith(fontWeight: FontWeight.w700),
+        style:
+            theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
       ),
     );
   }

@@ -306,10 +306,8 @@ class _StatusChip extends StatelessWidget {
     final Color chipColor = switch (status) {
       BookStatus.reading => theme.colorScheme.primary,
       BookStatus.completed => AppPalette.plusMagenta,
-      BookStatus.paused =>
-        theme.colorScheme.onSurface.withValues(alpha: 0.55),
-      BookStatus.dropped =>
-        theme.colorScheme.onSurface.withValues(alpha: 0.40),
+      BookStatus.paused => theme.colorScheme.onSurface.withValues(alpha: 0.55),
+      BookStatus.dropped => theme.colorScheme.onSurface.withValues(alpha: 0.40),
       BookStatus.wishlist => theme.colorScheme.secondary,
     };
 

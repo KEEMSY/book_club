@@ -30,7 +30,8 @@ class _FakeNotificationRepository implements NotificationRepository {
   Future<NotificationListResponse> getNotifications({
     String? cursor,
     int limit = 20,
-  }) async => const NotificationListResponse(items: [], unreadCount: 0);
+  }) async =>
+      const NotificationListResponse(items: [], unreadCount: 0);
 
   @override
   Future<void> markRead(String id) async {}
