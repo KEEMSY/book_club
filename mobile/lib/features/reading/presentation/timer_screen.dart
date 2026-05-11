@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../feed/presentation/widgets/add_highlight_sheet.dart';
 import '../application/grade_notifier.dart';
 import '../application/grade_state.dart';
 import '../application/heatmap_notifier.dart';
@@ -26,10 +27,13 @@ class TimerScreen extends ConsumerStatefulWidget {
     super.key,
     required this.userBookId,
     this.autoStart = false,
+    this.targetSeconds,
   });
 
   final String userBookId;
   final bool autoStart;
+  /// When set the ring counts down from this duration and auto-ends at zero.
+  final int? targetSeconds;
 
   @override
   ConsumerState<TimerScreen> createState() => _TimerScreenState();
@@ -75,6 +79,20 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     final spacing = theme.extension<AppSpacing>()!;
     final state = ref.watch(timerNotifierProvider);
     final Color accent = ref.watch(gradePrimaryProvider);
+
+    // Auto-end when the countdown hits zero.
+    if (widget.targetSeconds != null) {
+      ref.listen<AsyncValue<DateTime>>(timerTickProvider, (_, tick) {
+        final DateTime now = tick.valueOrNull ?? DateTime.now();
+        final notifier = ref.read(timerNotifierProvider.notifier);
+        final Duration elapsed = notifier.elapsedAt(now);
+        final timerState = ref.read(timerNotifierProvider);
+        if (timerState is TimerRunning &&
+            elapsed.inSeconds >= widget.targetSeconds!) {
+          notifier.end();
+        }
+      });
+    }
 
     ref.listen<TimerState>(timerNotifierProvider, (prev, next) async {
       if (next is TimerCompleted) {
@@ -123,7 +141,20 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
       }
     });
 
-    return Scaffold(
+    // canPop is true only while the timer is idle (not yet started).
+    // Running/Paused → dialog; Ending → silently blocked until the API returns.
+    final bool canPop = state is TimerIdle;
+
+    return PopScope(
+      canPop: canPop,
+      onPopInvokedWithResult: (bool didPop, _) {
+        if (didPop) return;
+        if (state is TimerRunning || state is TimerPaused) {
+          _showExitDialog(context);
+        }
+        // TimerEnding: block silently — let the in-flight API call finish.
+      },
+      child: Scaffold(
       // Let Scaffold inherit the theme's canvas so dark mode lands on #161616
       // instead of the pinned warm light Foggy.
       appBar: AppBar(
@@ -140,10 +171,23 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
           child: Column(
             children: <Widget>[
               const Spacer(),
-              _TimerReadout(accent: accent, state: state),
+              _TimerReadout(
+                accent: accent,
+                state: state,
+                targetSeconds: widget.targetSeconds,
+              ),
               const Spacer(),
               _StreakBadge(),
-              SizedBox(height: spacing.xl),
+              if (widget.userBookId.isNotEmpty &&
+                  (state is TimerRunning || state is TimerPaused)) ...<Widget>[
+                SizedBox(height: spacing.sm),
+                TextButton.icon(
+                  icon: const Icon(Icons.format_quote_rounded, size: 18),
+                  label: const Text('하이라이트 추가'),
+                  onPressed: () => _showHighlightSheet(context),
+                ),
+              ],
+              SizedBox(height: spacing.md),
               TimerControls(
                 state: state,
                 accent: accent,
@@ -153,12 +197,49 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                 onPause: () => ref.read(timerNotifierProvider.notifier).pause(),
                 onResume: () =>
                     ref.read(timerNotifierProvider.notifier).resume(),
-                onEnd: () => ref.read(timerNotifierProvider.notifier).end(),
+                onEnd: () => _showExitDialog(context),
               ),
               SizedBox(height: spacing.lg),
             ],
           ),
         ),
+      ),
+      ),
+    );
+  }
+
+  Future<void> _showExitDialog(BuildContext context) async {
+    final bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('독서를 중단할까요?'),
+        content: const Text('종료하면 지금까지의 독서 시간이 기록돼요.'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('계속 읽기'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('종료하기'),
+          ),
+        ],
+      ),
+    );
+    if (confirm == true && mounted) {
+      ref.read(timerNotifierProvider.notifier).end();
+    }
+  }
+
+  void _showHighlightSheet(BuildContext context) {
+    final container = ProviderScope.containerOf(context);
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (_) => UncontrolledProviderScope(
+        container: container,
+        child: AddHighlightSheet(userBookId: widget.userBookId),
       ),
     );
   }
@@ -216,10 +297,15 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
 }
 
 class _TimerReadout extends ConsumerWidget {
-  const _TimerReadout({required this.accent, required this.state});
+  const _TimerReadout({
+    required this.accent,
+    required this.state,
+    this.targetSeconds,
+  });
 
   final Color accent;
   final TimerState state;
+  final int? targetSeconds;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -228,17 +314,62 @@ class _TimerReadout extends ConsumerWidget {
         ref.watch(timerTickProvider).valueOrNull ?? DateTime.now();
     final notifier = ref.read(timerNotifierProvider.notifier);
     final Duration elapsed = notifier.elapsedAt(now);
+    final bool indeterminate = state is TimerEnding;
 
-    // Goal-proportional progress: ring fills to 1.0 when the user reaches their
-    // daily target, then stays full. Falls back to 30-min default when no preset
-    // has been saved yet.
+    // Countdown mode: ring fills elapsed/target, center shows remaining time.
+    if (targetSeconds != null) {
+      final int target = targetSeconds!;
+      final double progress = (elapsed.inSeconds / target).clamp(0.0, 1.0);
+      final Duration remaining =
+          Duration(seconds: (target - elapsed.inSeconds).clamp(0, target));
+      final bool done = elapsed.inSeconds >= target;
+
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          TimerRing(
+            color: accent,
+            progress: progress,
+            indeterminate: indeterminate,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text(
+                  formatElapsed(remaining),
+                  style: theme.textTheme.displayLarge?.copyWith(
+                    color: theme.colorScheme.onSurface,
+                    fontFeatures: const <FontFeature>[
+                      FontFeature.tabularFigures(),
+                    ],
+                  ),
+                ),
+                Text(
+                  '남음',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (done) ...<Widget>[
+            const SizedBox(height: 12),
+            Chip(
+              avatar: Icon(Icons.check_circle_rounded, size: 16, color: accent),
+              label: const Text('목표 달성! 마무리해볼까요?'),
+              labelStyle: theme.textTheme.labelMedium,
+              backgroundColor: theme.colorScheme.surfaceContainerHigh,
+            ),
+          ],
+        ],
+      );
+    }
+
+    // Free mode: ring fills proportionally to daily goal.
     final int goalSeconds =
         ref.watch(dailyGoalSecondsProvider).valueOrNull ?? 1800;
-    final double progress =
-        (elapsed.inSeconds / goalSeconds).clamp(0.0, 1.0);
+    final double progress = (elapsed.inSeconds / goalSeconds).clamp(0.0, 1.0);
     final bool goalReached = elapsed.inSeconds >= goalSeconds;
-
-    final bool indeterminate = state is TimerEnding;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
