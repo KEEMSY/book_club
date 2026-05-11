@@ -64,4 +64,7 @@ abstract class BookApi {
     @Query('cursor') String? cursor,
     @Query('limit') int limit = 20,
   });
+
+  @GET('/books/discover')
+  Future<DiscoverResponseDto> getDiscover();
 }

@@ -44,6 +44,16 @@ class SearchBooksResponse(BaseModel):
     has_more: bool
 
 
+class DiscoverSectionPublic(BaseModel):
+    id: str
+    title: str
+    books: list[SearchBookItem]
+
+
+class DiscoverResponse(BaseModel):
+    sections: list[DiscoverSectionPublic]
+
+
 _LibraryStatus = Literal["reading", "completed", "paused", "dropped", "wishlist"]
 
 

@@ -125,6 +125,28 @@ class UpdateStatusRequest with _$UpdateStatusRequest {
       _$UpdateStatusRequestFromJson(json);
 }
 
+/// Single horizontal section returned by `GET /books/discover`.
+@freezed
+class DiscoverSectionDto with _$DiscoverSectionDto {
+  const factory DiscoverSectionDto({
+    required String id,
+    required String title,
+    required List<BookDto> books,
+  }) = _DiscoverSectionDto;
+  factory DiscoverSectionDto.fromJson(Map<String, dynamic> json) =>
+      _$DiscoverSectionDtoFromJson(json);
+}
+
+/// Top-level envelope for `GET /books/discover`.
+@freezed
+class DiscoverResponseDto with _$DiscoverResponseDto {
+  const factory DiscoverResponseDto({
+    required List<DiscoverSectionDto> sections,
+  }) = _DiscoverResponseDto;
+  factory DiscoverResponseDto.fromJson(Map<String, dynamic> json) =>
+      _$DiscoverResponseDtoFromJson(json);
+}
+
 /// Request body for `POST /me/library/{user_book_id}/review`.
 /// Backend validates rating (1..5) and review length (<=200). [oneLineReview]
 /// stays nullable because the review field is optional — the backend accepts

@@ -12,7 +12,7 @@ _$BookDtoImpl _$$BookDtoImplFromJson(Map<String, dynamic> json) =>
       isbn13: json['isbn13'] as String,
       title: json['title'] as String,
       author: json['author'] as String,
-      publisher: json['publisher'] as String,
+      publisher: (json['publisher'] as String?) ?? '',
       coverUrl: json['cover_url'] as String?,
       description: json['description'] as String?,
     );
@@ -113,6 +113,38 @@ Map<String, dynamic> _$$UpdateStatusRequestImplToJson(
         _$UpdateStatusRequestImpl instance) =>
     <String, dynamic>{
       'status': instance.status,
+    };
+
+_$DiscoverSectionDtoImpl _$$DiscoverSectionDtoImplFromJson(
+        Map<String, dynamic> json) =>
+    _$DiscoverSectionDtoImpl(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      books: (json['books'] as List<dynamic>)
+          .map((e) => BookDto.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
+Map<String, dynamic> _$$DiscoverSectionDtoImplToJson(
+        _$DiscoverSectionDtoImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'title': instance.title,
+      'books': instance.books.map((e) => e.toJson()).toList(),
+    };
+
+_$DiscoverResponseDtoImpl _$$DiscoverResponseDtoImplFromJson(
+        Map<String, dynamic> json) =>
+    _$DiscoverResponseDtoImpl(
+      sections: (json['sections'] as List<dynamic>)
+          .map((e) => DiscoverSectionDto.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
+Map<String, dynamic> _$$DiscoverResponseDtoImplToJson(
+        _$DiscoverResponseDtoImpl instance) =>
+    <String, dynamic>{
+      'sections': instance.sections.map((e) => e.toJson()).toList(),
     };
 
 _$SubmitReviewRequestImpl _$$SubmitReviewRequestImplFromJson(

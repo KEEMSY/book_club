@@ -1,10 +1,12 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../book/application/book_providers.dart';
+import '../../book/data/book_models.dart' show DiscoverSectionDto;
+import '../../book/presentation/widgets/book_cover.dart';
 import '../application/discovery_providers.dart';
 import '../domain/recommended_book.dart';
 
@@ -15,7 +17,15 @@ class DiscoveryScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
+    final radii = theme.extension<AppRadius>()!;
     final recommendationsAsync = ref.watch(recommendationsProvider);
+    final discoverAsync = ref.watch(discoverBooksProvider);
+
+    final List<RecommendedBook> recs = recommendationsAsync.valueOrNull ?? [];
+    final List<DiscoverSectionDto> sections =
+        discoverAsync.valueOrNull?.sections ?? [];
+    // Show spinner only when there is genuinely nothing to display yet.
+    final bool showSpinner = discoverAsync is AsyncLoading && recs.isEmpty;
 
     return Scaffold(
       body: CustomScrollView(
@@ -26,15 +36,16 @@ class DiscoveryScreen extends ConsumerWidget {
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(56),
               child: Padding(
-                padding:
-                    EdgeInsets.fromLTRB(spacing.lg, 0, spacing.lg, spacing.md),
+                padding: EdgeInsets.fromLTRB(
+                  spacing.lg, 0, spacing.lg, spacing.md,
+                ),
                 child: GestureDetector(
                   onTap: () => context.push(AppRoutes.search),
                   child: Container(
                     height: 44,
                     decoration: BoxDecoration(
                       color: theme.colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(radii.md),
                     ),
                     child: Row(
                       children: [
@@ -58,120 +69,84 @@ class DiscoveryScreen extends ConsumerWidget {
               ),
             ),
           ),
-          recommendationsAsync.when(
-            loading: () => const SliverFillRemaining(
+          if (showSpinner)
+            const SliverFillRemaining(
               child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
-            ),
-            error: (_, __) => SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.all(spacing.lg),
-                child: Text(
-                  '추천을 불러오지 못했어요',
-                  style: theme.textTheme.bodyMedium,
-                  textAlign: TextAlign.center,
+            )
+          else ...[
+            // ── 맞춤 추천 (personalized, shown only when available) ──────
+            if (recs.isNotEmpty) ...[
+              const SliverToBoxAdapter(
+                child: _SectionHeader(title: '맞춤 추천'),
+              ),
+              SliverToBoxAdapter(
+                child: _BookRow(
+                  books: recs
+                      .map(
+                        (r) => _BookRowItem(
+                          id: r.id,
+                          title: r.title,
+                          author: r.author,
+                          coverUrl: r.coverUrl,
+                        ),
+                      )
+                      .toList(growable: false),
                 ),
               ),
-            ),
-            data: (items) => items.isEmpty
-                ? SliverFillRemaining(
-                    child: Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(spacing.lg),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.auto_awesome_rounded,
-                              size: 48,
-                              color: theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.3),
-                            ),
-                            SizedBox(height: spacing.md),
-                            Text(
-                              '더 많은 책을 읽으면\n맞춤 추천이 생겨요',
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: theme.colorScheme.onSurface
-                                    .withValues(alpha: 0.5),
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
+            ],
+            // ── 인기차트 (popular/new sections, always the default) ───────
+            for (final section in sections) ...[
+              SliverToBoxAdapter(child: _SectionHeader(title: section.title)),
+              SliverToBoxAdapter(
+                child: _BookRow(
+                  books: section.books
+                      .map(
+                        (dto) => _BookRowItem(
+                          id: dto.id,
+                          title: dto.title,
+                          author: dto.author,
+                          coverUrl: dto.coverUrl,
                         ),
-                      ),
-                    ),
-                  )
-                : _RecommendationSliver(items: items),
-          ),
+                      )
+                      .toList(growable: false),
+                ),
+              ),
+            ],
+            SliverToBoxAdapter(
+              child: SizedBox(height: spacing.xl * 2),
+            ),
+          ],
         ],
       ),
     );
   }
 }
 
-class _RecommendationSliver extends StatelessWidget {
-  const _RecommendationSliver({required this.items});
+/// Normalised card data so both recommendation and discover books share the
+/// same row widget without coupling it to either domain type.
+class _BookRowItem {
+  const _BookRowItem({
+    required this.id,
+    required this.title,
+    required this.author,
+    this.coverUrl,
+  });
 
-  final List<RecommendedBook> items;
+  final String id;
+  final String title;
+  final String author;
+  final String? coverUrl;
+}
+
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader({required this.title});
+
+  final String title;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
-
-    final popular =
-        items.where((b) => b.reason == 'community_popular').toList();
-    final similar =
-        items.where((b) => b.reason == 'similar_readers').toList();
-    final recent =
-        items.where((b) => b.reason == 'recently_added').toList();
-
-    return SliverPadding(
-      padding: EdgeInsets.only(bottom: spacing.xl),
-      sliver: SliverList(
-        delegate: SliverChildListDelegate([
-          if (popular.isNotEmpty) ...[
-            _SectionHeader(
-              title: '커뮤니티에서 화제',
-              spacing: spacing,
-              theme: theme,
-            ),
-            _HorizontalBookScroll(books: popular),
-          ],
-          if (similar.isNotEmpty) ...[
-            _SectionHeader(
-              title: '비슷한 독자들이 읽는 책',
-              spacing: spacing,
-              theme: theme,
-            ),
-            _HorizontalBookScroll(books: similar),
-          ],
-          if (recent.isNotEmpty) ...[
-            _SectionHeader(
-              title: '요즘 많이 추가하는 책',
-              spacing: spacing,
-              theme: theme,
-            ),
-            _HorizontalBookScroll(books: recent),
-          ],
-        ]),
-      ),
-    );
-  }
-}
-
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({
-    required this.title,
-    required this.spacing,
-    required this.theme,
-  });
-
-  final String title;
-  final AppSpacing spacing;
-  final ThemeData theme;
-
-  @override
-  Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.fromLTRB(
         spacing.lg,
@@ -188,83 +163,68 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-class _HorizontalBookScroll extends StatelessWidget {
-  const _HorizontalBookScroll({required this.books});
+class _BookRow extends StatelessWidget {
+  const _BookRow({required this.books});
 
-  final List<RecommendedBook> books;
+  final List<_BookRowItem> books;
 
   @override
   Widget build(BuildContext context) {
+    final spacing = Theme.of(context).extension<AppSpacing>()!;
     return SizedBox(
-      height: 200,
+      height: 220,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: EdgeInsets.symmetric(horizontal: spacing.lg),
         itemCount: books.length,
-        itemBuilder: (context, i) => _BookCard(book: books[i]),
+        itemBuilder: (_, i) => _BookCard(item: books[i]),
       ),
     );
   }
 }
 
 class _BookCard extends StatelessWidget {
-  const _BookCard({required this.book});
+  const _BookCard({required this.item});
 
-  final RecommendedBook book;
+  final _BookRowItem item;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+    final radii = theme.extension<AppRadius>()!;
+
     return GestureDetector(
-      onTap: () => context.push(AppRoutes.bookDetail(book.id)),
+      onTap: () => context.push('/books/${item.id}'),
       child: Container(
-        width: 120,
-        margin: const EdgeInsets.only(right: 12),
+        width: 100,
+        margin: EdgeInsets.only(right: spacing.sm),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: book.coverUrl != null
-                  ? CachedNetworkImage(
-                      imageUrl: book.coverUrl!,
-                      width: 120,
-                      height: 160,
-                      fit: BoxFit.cover,
-                      errorWidget: (_, __, ___) =>
-                          _CoverPlaceholder(theme: theme),
-                    )
-                  : _CoverPlaceholder(theme: theme),
+          children: <Widget>[
+            BookCover(
+              coverUrl: item.coverUrl,
+              width: 100,
+              borderRadius: BorderRadius.circular(radii.md),
             ),
-            const SizedBox(height: 6),
+            SizedBox(height: spacing.xs),
             Text(
-              book.title,
-              style: theme.textTheme.labelSmall,
+              item.title,
+              style: theme.textTheme.labelMedium,
               maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 2),
+            Text(
+              item.author,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _CoverPlaceholder extends StatelessWidget {
-  const _CoverPlaceholder({required this.theme});
-
-  final ThemeData theme;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 120,
-      height: 160,
-      color: theme.colorScheme.surfaceContainerHighest,
-      child: Icon(
-        Icons.book_rounded,
-        color: theme.colorScheme.onSurfaceVariant,
-        size: 40,
       ),
     );
   }

@@ -3,10 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../application/book_providers.dart';
 import '../application/book_search_notifier.dart';
 import '../application/book_search_state.dart';
+import '../data/book_models.dart' show DiscoverSectionDto;
 import '../domain/book.dart';
 import 'widgets/book_card.dart';
+import 'widgets/book_cover.dart';
 import 'widgets/empty_states.dart';
 
 /// Full-width Airbnb-style search. Debounce lives inside the notifier so the
@@ -130,11 +133,7 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     switch (state) {
       case BookSearchIdle():
-        return const BookEmptyState(
-          icon: Icons.search_rounded,
-          title: '읽고 싶은 책을 검색해보세요',
-          subtitle: '제목이나 저자를 입력하면 바로 찾아드려요.',
-        );
+        return const _DiscoverView();
       case BookSearchLoading():
         return const _SkeletonList();
       case BookSearchError(:final String code, :final String message):
@@ -250,6 +249,122 @@ class _ErrorView extends ConsumerWidget {
               onPressed: () =>
                   ref.read(bookSearchNotifierProvider.notifier).retry(),
               child: const Text('다시 시도'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Discover sections shown in idle state before the user types a query.
+class _DiscoverView extends ConsumerWidget {
+  const _DiscoverView();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final async = ref.watch(discoverBooksProvider);
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+
+    return switch (async) {
+      AsyncLoading() => const Center(child: CircularProgressIndicator()),
+      AsyncError() => const BookEmptyState(
+          icon: Icons.search_rounded,
+          title: '읽고 싶은 책을 검색해보세요',
+          subtitle: '제목이나 저자를 입력하면 바로 찾아드려요.',
+        ),
+      AsyncData(:final value) when value.sections.isEmpty =>
+        const BookEmptyState(
+          icon: Icons.search_rounded,
+          title: '읽고 싶은 책을 검색해보세요',
+          subtitle: '제목이나 저자를 입력하면 바로 찾아드려요.',
+        ),
+      AsyncData(:final value) => ListView.builder(
+          padding: EdgeInsets.only(top: spacing.md, bottom: spacing.lg),
+          itemCount: value.sections.length,
+          itemBuilder: (_, i) => _DiscoverSection(section: value.sections[i]),
+        ),
+      _ => const SizedBox.shrink(),
+    };
+  }
+}
+
+class _DiscoverSection extends StatelessWidget {
+  const _DiscoverSection({required this.section});
+  final DiscoverSectionDto section;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: EdgeInsets.fromLTRB(
+            spacing.md,
+            spacing.sm,
+            spacing.md,
+            spacing.sm,
+          ),
+          child: Text(section.title, style: theme.textTheme.titleMedium),
+        ),
+        SizedBox(
+          height: 196,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: spacing.md),
+            itemCount: section.books.length,
+            itemBuilder: (_, i) =>
+                _DiscoverBookCard(book: section.books[i].toDomain()),
+          ),
+        ),
+        SizedBox(height: spacing.sm),
+      ],
+    );
+  }
+}
+
+class _DiscoverBookCard extends StatelessWidget {
+  const _DiscoverBookCard({required this.book});
+  final Book book;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+    final radii = theme.extension<AppRadius>()!;
+
+    return GestureDetector(
+      onTap: () => context.push('/books/${book.id}'),
+      child: Container(
+        width: 100,
+        margin: EdgeInsets.only(right: spacing.sm),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            BookCover(
+              coverUrl: book.coverUrl,
+              width: 100,
+              borderRadius: BorderRadius.circular(radii.md),
+            ),
+            SizedBox(height: spacing.xs),
+            Text(
+              book.title,
+              style: theme.textTheme.labelMedium,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 2),
+            Text(
+              book.author,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),

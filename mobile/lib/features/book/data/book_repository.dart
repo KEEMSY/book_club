@@ -115,6 +115,10 @@ class BookRepository {
   Future<void> removeFromLibrary(String userBookId) =>
       _call(() => _api.removeFromLibrary(userBookId));
 
+  Future<DiscoverResponseDto> getDiscover() async {
+    return _call(() => _api.getDiscover());
+  }
+
   Future<LibraryPage> listLibrary({
     BookStatus? status,
     String? cursor,

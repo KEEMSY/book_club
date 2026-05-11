@@ -23,6 +23,8 @@ from app.domains.book.providers import get_book_service
 from app.domains.book.schemas import (
     AddToLibraryRequest,
     BookPublic,
+    DiscoverResponse,
+    DiscoverSectionPublic,
     LibraryResponse,
     SearchBookItem,
     SearchBooksResponse,
@@ -106,6 +108,24 @@ async def proxy_book_cover(url: Annotated[str, Query()]) -> Response:
             "Cache-Control": "public, max-age=86400",
             "Access-Control-Allow-Origin": "*",
         },
+    )
+
+
+@router.get("/books/discover", response_model=DiscoverResponse)
+async def discover_books(
+    _user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[BookService, Depends(get_book_service)],
+) -> DiscoverResponse:
+    sections = await service.get_discover_sections()
+    return DiscoverResponse(
+        sections=[
+            DiscoverSectionPublic(
+                id=s.id,
+                title=s.title,
+                books=[SearchBookItem.model_validate(b) for b in s.books],
+            )
+            for s in sections
+        ]
     )
 
 

@@ -1296,6 +1296,361 @@ abstract class _UpdateStatusRequest implements UpdateStatusRequest {
       throw _privateConstructorUsedError;
 }
 
+DiscoverSectionDto _$DiscoverSectionDtoFromJson(Map<String, dynamic> json) {
+  return _DiscoverSectionDto.fromJson(json);
+}
+
+/// @nodoc
+mixin _$DiscoverSectionDto {
+  String get id => throw _privateConstructorUsedError;
+  String get title => throw _privateConstructorUsedError;
+  List<BookDto> get books => throw _privateConstructorUsedError;
+
+  /// Serializes this DiscoverSectionDto to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of DiscoverSectionDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $DiscoverSectionDtoCopyWith<DiscoverSectionDto> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $DiscoverSectionDtoCopyWith<$Res> {
+  factory $DiscoverSectionDtoCopyWith(
+          DiscoverSectionDto value, $Res Function(DiscoverSectionDto) then) =
+      _$DiscoverSectionDtoCopyWithImpl<$Res, DiscoverSectionDto>;
+  @useResult
+  $Res call({String id, String title, List<BookDto> books});
+}
+
+/// @nodoc
+class _$DiscoverSectionDtoCopyWithImpl<$Res, $Val extends DiscoverSectionDto>
+    implements $DiscoverSectionDtoCopyWith<$Res> {
+  _$DiscoverSectionDtoCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of DiscoverSectionDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? title = null,
+    Object? books = null,
+  }) {
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      title: null == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      books: null == books
+          ? _value.books
+          : books // ignore: cast_nullable_to_non_nullable
+              as List<BookDto>,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$DiscoverSectionDtoImplCopyWith<$Res>
+    implements $DiscoverSectionDtoCopyWith<$Res> {
+  factory _$$DiscoverSectionDtoImplCopyWith(_$DiscoverSectionDtoImpl value,
+          $Res Function(_$DiscoverSectionDtoImpl) then) =
+      __$$DiscoverSectionDtoImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String id, String title, List<BookDto> books});
+}
+
+/// @nodoc
+class __$$DiscoverSectionDtoImplCopyWithImpl<$Res>
+    extends _$DiscoverSectionDtoCopyWithImpl<$Res, _$DiscoverSectionDtoImpl>
+    implements _$$DiscoverSectionDtoImplCopyWith<$Res> {
+  __$$DiscoverSectionDtoImplCopyWithImpl(_$DiscoverSectionDtoImpl _value,
+      $Res Function(_$DiscoverSectionDtoImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of DiscoverSectionDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? title = null,
+    Object? books = null,
+  }) {
+    return _then(_$DiscoverSectionDtoImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      title: null == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      books: null == books
+          ? _value._books
+          : books // ignore: cast_nullable_to_non_nullable
+              as List<BookDto>,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$DiscoverSectionDtoImpl implements _DiscoverSectionDto {
+  const _$DiscoverSectionDtoImpl(
+      {required this.id,
+      required this.title,
+      required final List<BookDto> books})
+      : _books = books;
+
+  factory _$DiscoverSectionDtoImpl.fromJson(Map<String, dynamic> json) =>
+      _$$DiscoverSectionDtoImplFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final String title;
+  final List<BookDto> _books;
+  @override
+  List<BookDto> get books {
+    if (_books is EqualUnmodifiableListView) return _books;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_books);
+  }
+
+  @override
+  String toString() {
+    return 'DiscoverSectionDto(id: $id, title: $title, books: $books)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$DiscoverSectionDtoImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.title, title) || other.title == title) &&
+            const DeepCollectionEquality().equals(other._books, _books));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, id, title, const DeepCollectionEquality().hash(_books));
+
+  /// Create a copy of DiscoverSectionDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$DiscoverSectionDtoImplCopyWith<_$DiscoverSectionDtoImpl> get copyWith =>
+      __$$DiscoverSectionDtoImplCopyWithImpl<_$DiscoverSectionDtoImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$DiscoverSectionDtoImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _DiscoverSectionDto implements DiscoverSectionDto {
+  const factory _DiscoverSectionDto(
+      {required final String id,
+      required final String title,
+      required final List<BookDto> books}) = _$DiscoverSectionDtoImpl;
+
+  factory _DiscoverSectionDto.fromJson(Map<String, dynamic> json) =
+      _$DiscoverSectionDtoImpl.fromJson;
+
+  @override
+  String get id;
+  @override
+  String get title;
+  @override
+  List<BookDto> get books;
+
+  /// Create a copy of DiscoverSectionDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$DiscoverSectionDtoImplCopyWith<_$DiscoverSectionDtoImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+DiscoverResponseDto _$DiscoverResponseDtoFromJson(Map<String, dynamic> json) {
+  return _DiscoverResponseDto.fromJson(json);
+}
+
+/// @nodoc
+mixin _$DiscoverResponseDto {
+  List<DiscoverSectionDto> get sections => throw _privateConstructorUsedError;
+
+  /// Serializes this DiscoverResponseDto to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of DiscoverResponseDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $DiscoverResponseDtoCopyWith<DiscoverResponseDto> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $DiscoverResponseDtoCopyWith<$Res> {
+  factory $DiscoverResponseDtoCopyWith(
+          DiscoverResponseDto value, $Res Function(DiscoverResponseDto) then) =
+      _$DiscoverResponseDtoCopyWithImpl<$Res, DiscoverResponseDto>;
+  @useResult
+  $Res call({List<DiscoverSectionDto> sections});
+}
+
+/// @nodoc
+class _$DiscoverResponseDtoCopyWithImpl<$Res, $Val extends DiscoverResponseDto>
+    implements $DiscoverResponseDtoCopyWith<$Res> {
+  _$DiscoverResponseDtoCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of DiscoverResponseDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? sections = null,
+  }) {
+    return _then(_value.copyWith(
+      sections: null == sections
+          ? _value.sections
+          : sections // ignore: cast_nullable_to_non_nullable
+              as List<DiscoverSectionDto>,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$DiscoverResponseDtoImplCopyWith<$Res>
+    implements $DiscoverResponseDtoCopyWith<$Res> {
+  factory _$$DiscoverResponseDtoImplCopyWith(_$DiscoverResponseDtoImpl value,
+          $Res Function(_$DiscoverResponseDtoImpl) then) =
+      __$$DiscoverResponseDtoImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({List<DiscoverSectionDto> sections});
+}
+
+/// @nodoc
+class __$$DiscoverResponseDtoImplCopyWithImpl<$Res>
+    extends _$DiscoverResponseDtoCopyWithImpl<$Res, _$DiscoverResponseDtoImpl>
+    implements _$$DiscoverResponseDtoImplCopyWith<$Res> {
+  __$$DiscoverResponseDtoImplCopyWithImpl(_$DiscoverResponseDtoImpl _value,
+      $Res Function(_$DiscoverResponseDtoImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of DiscoverResponseDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? sections = null,
+  }) {
+    return _then(_$DiscoverResponseDtoImpl(
+      sections: null == sections
+          ? _value._sections
+          : sections // ignore: cast_nullable_to_non_nullable
+              as List<DiscoverSectionDto>,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$DiscoverResponseDtoImpl implements _DiscoverResponseDto {
+  const _$DiscoverResponseDtoImpl(
+      {required final List<DiscoverSectionDto> sections})
+      : _sections = sections;
+
+  factory _$DiscoverResponseDtoImpl.fromJson(Map<String, dynamic> json) =>
+      _$$DiscoverResponseDtoImplFromJson(json);
+
+  final List<DiscoverSectionDto> _sections;
+  @override
+  List<DiscoverSectionDto> get sections {
+    if (_sections is EqualUnmodifiableListView) return _sections;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_sections);
+  }
+
+  @override
+  String toString() {
+    return 'DiscoverResponseDto(sections: $sections)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$DiscoverResponseDtoImpl &&
+            const DeepCollectionEquality().equals(other._sections, _sections));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(_sections));
+
+  /// Create a copy of DiscoverResponseDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$DiscoverResponseDtoImplCopyWith<_$DiscoverResponseDtoImpl> get copyWith =>
+      __$$DiscoverResponseDtoImplCopyWithImpl<_$DiscoverResponseDtoImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$DiscoverResponseDtoImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _DiscoverResponseDto implements DiscoverResponseDto {
+  const factory _DiscoverResponseDto(
+          {required final List<DiscoverSectionDto> sections}) =
+      _$DiscoverResponseDtoImpl;
+
+  factory _DiscoverResponseDto.fromJson(Map<String, dynamic> json) =
+      _$DiscoverResponseDtoImpl.fromJson;
+
+  @override
+  List<DiscoverSectionDto> get sections;
+
+  /// Create a copy of DiscoverResponseDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$DiscoverResponseDtoImplCopyWith<_$DiscoverResponseDtoImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
 SubmitReviewRequest _$SubmitReviewRequestFromJson(Map<String, dynamic> json) {
   return _SubmitReviewRequest.fromJson(json);
 }

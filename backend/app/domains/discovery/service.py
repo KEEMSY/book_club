@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 from dataclasses import dataclass
 from uuid import UUID
 
@@ -12,11 +11,9 @@ class DiscoveryService:
     repo: DiscoveryRepository
 
     async def get_recommendations(self, user_id: UUID) -> list[dict]:  # type: ignore[type-arg]
-        popular, similar, recent = await asyncio.gather(
-            self.repo.community_popular(user_id=user_id),
-            self.repo.similar_readers(user_id=user_id),
-            self.repo.recently_added(user_id=user_id),
-        )
+        popular = await self.repo.community_popular(user_id=user_id)
+        similar = await self.repo.similar_readers(user_id=user_id)
+        recent = await self.repo.recently_added(user_id=user_id)
         seen: set[UUID] = set()
         result: list[dict] = []  # type: ignore[type-arg]
         for book_id, title, author, cover_url in popular:

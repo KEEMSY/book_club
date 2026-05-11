@@ -1,3 +1,5 @@
+import 'package:book_club/features/book/data/book_models.dart'
+    show DiscoverResponseDto;
 import 'package:book_club/features/book/data/book_repository.dart';
 import 'package:book_club/features/book/domain/book.dart';
 import 'package:book_club/features/book/domain/book_status.dart';
@@ -103,7 +105,8 @@ class FakeBookRepository implements BookRepository {
   }
 
   @override
-  Future<UserBook> addToWishlist(String bookId) => addToLibrary(bookId, status: BookStatus.wishlist);
+  Future<UserBook> addToWishlist(String bookId) =>
+      addToLibrary(bookId, status: BookStatus.wishlist);
 
   @override
   Future<UserBook> updateStatus({
@@ -151,6 +154,15 @@ class FakeBookRepository implements BookRepository {
       return libraryQueue.removeAt(0);
     }
     return defaultLibraryPage;
+  }
+
+  DiscoverResponseDto? discoverResult;
+  Object? discoverError;
+
+  @override
+  Future<DiscoverResponseDto> getDiscover() async {
+    if (discoverError != null) throw discoverError!;
+    return discoverResult ?? const DiscoverResponseDto(sections: []);
   }
 }
 
