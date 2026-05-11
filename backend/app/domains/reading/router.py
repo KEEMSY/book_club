@@ -20,6 +20,8 @@ from app.domains.reading.schemas import (
     BookmarkPublic,
     CreateBookmarkRequest,
     CreateGoalRequest,
+    DailySessionPublic,
+    DailySessionsResponse,
     EndSessionRequest,
     GoalProgressPublic,
     GoalPublic,
@@ -102,6 +104,36 @@ async def log_manual_session(
         note=body.note,
     )
     return ReadingSessionPublic.from_row(row)
+
+
+@router.get("/sessions/daily", response_model=DailySessionsResponse)
+async def get_daily_sessions(
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ReadingService, Depends(get_reading_service)],
+    target_date: Annotated[date, Query(alias="date")],
+) -> DailySessionsResponse:
+    sessions = await service.get_daily_sessions(
+        user_id=UUID(user_id),
+        target_date=target_date,
+    )
+    return DailySessionsResponse(
+        date=target_date.isoformat(),
+        total_seconds=sum(s.duration_sec for s in sessions),
+        sessions=[
+            DailySessionPublic(
+                session_id=s.session_id,
+                started_at=s.started_at,
+                ended_at=s.ended_at,
+                duration_sec=s.duration_sec,
+                source=s.source,  # type: ignore[arg-type]
+                book_id=s.book_id,
+                book_title=s.book_title,
+                book_author=s.book_author,
+                book_cover_url=s.book_cover_url,
+            )
+            for s in sessions
+        ],
+    )
 
 
 @router.get("/heatmap", response_model=HeatmapResponse)

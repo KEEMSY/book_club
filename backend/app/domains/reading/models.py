@@ -227,7 +227,9 @@ class Bookmark(Base):
         Index("ix_bookmarks_user_id", "user_id"),
     )
 
-    id: Mapped[uuid.UUID] = mapped_column(PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
     user_book_id: Mapped[uuid.UUID] = mapped_column(
         PGUUID(as_uuid=True),
         ForeignKey("user_books.id", ondelete="CASCADE"),

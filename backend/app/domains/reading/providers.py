@@ -20,11 +20,13 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import Depends
-from sqlalchemy import and_, func, select
+from sqlalchemy import Date, and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_session
-from app.domains.book.models import UserBook, UserBookStatus
+from app.domains.book.models import Book, UserBook, UserBookStatus
+from app.domains.reading.models import ReadingSession
+from app.domains.reading.ports import DailySessionInfo
 from app.domains.reading.repository import (
     BookmarkRepository,
     DailyStatRepository,
@@ -86,6 +88,53 @@ class BookQueryAdapter:
         result = await self._session.execute(stmt)
         count = result.scalar_one()
         return int(count or 0)
+
+    async def get_daily_sessions_with_book_info(
+        self,
+        *,
+        user_id: UUID,
+        target_date: date,
+    ) -> list[DailySessionInfo]:
+        # Cast ended_at to date server-side to match the target_date filter
+        # without pulling every session row into Python.
+        stmt = (
+            select(
+                ReadingSession.id,
+                ReadingSession.started_at,
+                ReadingSession.ended_at,
+                ReadingSession.duration_sec,
+                ReadingSession.source,
+                Book.id.label("book_id"),
+                Book.title.label("book_title"),
+                Book.author.label("book_author"),
+                Book.cover_url.label("book_cover_url"),
+            )
+            .join(UserBook, ReadingSession.user_book_id == UserBook.id)
+            .join(Book, UserBook.book_id == Book.id)
+            .where(
+                and_(
+                    ReadingSession.user_id == user_id,
+                    ReadingSession.ended_at.is_not(None),
+                    func.cast(ReadingSession.ended_at, Date) == target_date,
+                )
+            )
+            .order_by(ReadingSession.started_at.asc())
+        )
+        rows = (await self._session.execute(stmt)).all()
+        return [
+            DailySessionInfo(
+                session_id=row.id,
+                started_at=row.started_at,
+                ended_at=row.ended_at,
+                duration_sec=row.duration_sec,
+                source=row.source.value if hasattr(row.source, "value") else row.source,
+                book_id=row.book_id,
+                book_title=row.book_title,
+                book_author=row.book_author,
+                book_cover_url=row.book_cover_url,
+            )
+            for row in rows
+        ]
 
 
 @lru_cache(maxsize=1)

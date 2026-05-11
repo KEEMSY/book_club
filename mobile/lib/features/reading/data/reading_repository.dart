@@ -165,6 +165,12 @@ class ReadingRepository {
     });
   }
 
+  Future<DailySessionsResponseDto> getDailySessions(DateTime date) async {
+    return _call(
+      () => _api.getDailySessions(date: _dateWire.format(date)),
+    );
+  }
+
   Future<T> _call<T>(Future<T> Function() fn) async {
     try {
       return await fn();

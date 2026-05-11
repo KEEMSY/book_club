@@ -5,6 +5,7 @@ import '../../../core/network/dio_provider.dart';
 import '../../../core/theme/grade_theme.dart';
 import '../data/reading_api.dart';
 import '../data/reading_repository.dart';
+import '../data/reading_models.dart' show DailySessionsResponseDto;
 import '../domain/bookmark.dart';
 import 'grade_notifier.dart';
 import 'grade_state.dart';
@@ -40,6 +41,14 @@ final latestBookmarkProvider = FutureProvider.autoDispose
     .family<Bookmark?, String>((ref, userBookId) async {
   final repo = ref.read(readingRepositoryProvider);
   return repo.getLatestBookmark(userBookId: userBookId);
+});
+
+/// Sessions + book metadata for a given calendar date ("YYYY-MM-DD").
+/// Used by the heatmap day-detail bottom sheet.
+final dailySessionsProvider = FutureProvider.autoDispose
+    .family<DailySessionsResponseDto, String>((ref, date) async {
+  final repo = ref.read(readingRepositoryProvider);
+  return repo.getDailySessions(DateTime.parse(date));
 });
 
 /// Single-source-of-truth for the grade accent color. TimerRing, GradeBadge,

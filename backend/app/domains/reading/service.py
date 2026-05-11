@@ -68,6 +68,7 @@ from app.domains.reading.events import (
 from app.domains.reading.grade_policy import calculate_grade_tier, next_threshold
 from app.domains.reading.models import Bookmark, Goal, GoalPeriod, ReadingSession
 from app.domains.reading.ports import (
+    DailySessionInfo,
     DailyStatRepositoryPort,
     GoalProgress,
     GoalRepositoryPort,
@@ -327,6 +328,17 @@ class ReadingService:
                 )
             )
         return out
+
+    async def get_daily_sessions(
+        self,
+        *,
+        user_id: UUID,
+        target_date: date,
+    ) -> list[DailySessionInfo]:
+        return await self.book_query.get_daily_sessions_with_book_info(
+            user_id=user_id,
+            target_date=target_date,
+        )
 
     async def add_bookmark(
         self,

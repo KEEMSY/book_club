@@ -211,6 +211,38 @@ class GoalProgressDto with _$GoalProgressDto {
   }
 }
 
+/// Mirror of a single session row in `GET /reading/sessions/daily` response.
+@freezed
+class DailySessionDto with _$DailySessionDto {
+  const factory DailySessionDto({
+    required String sessionId,
+    required DateTime startedAt,
+    required DateTime endedAt,
+    required int durationSec,
+    required String source,
+    required String bookId,
+    required String bookTitle,
+    required String bookAuthor,
+    String? bookCoverUrl,
+  }) = _DailySessionDto;
+
+  factory DailySessionDto.fromJson(Map<String, dynamic> json) =>
+      _$DailySessionDtoFromJson(json);
+}
+
+/// Envelope for `GET /reading/sessions/daily`.
+@freezed
+class DailySessionsResponseDto with _$DailySessionsResponseDto {
+  const factory DailySessionsResponseDto({
+    required String date,
+    required int totalSeconds,
+    required List<DailySessionDto> sessions,
+  }) = _DailySessionsResponseDto;
+
+  factory DailySessionsResponseDto.fromJson(Map<String, dynamic> json) =>
+      _$DailySessionsResponseDtoFromJson(json);
+}
+
 // -- Request bodies --------------------------------------------------------
 
 /// Body for `POST /reading/sessions/start`.

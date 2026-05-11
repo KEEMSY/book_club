@@ -195,3 +195,21 @@ class BookmarkPublic(BaseModel):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class DailySessionPublic(BaseModel):
+    session_id: UUID
+    started_at: datetime
+    ended_at: datetime
+    duration_sec: int
+    source: Literal["timer", "manual"]
+    book_id: UUID
+    book_title: str
+    book_author: str
+    book_cover_url: str | None
+
+
+class DailySessionsResponse(BaseModel):
+    date: str  # "YYYY-MM-DD"
+    total_seconds: int
+    sessions: list[DailySessionPublic]

@@ -66,4 +66,9 @@ abstract class ReadingApi {
   Future<Map<String, dynamic>?> getLatestBookmark(
     @Path('userBookId') String userBookId,
   );
+
+  @GET('/reading/sessions/daily')
+  Future<DailySessionsResponseDto> getDailySessions({
+    @Query('date') required String date,
+  });
 }

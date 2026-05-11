@@ -1836,6 +1836,529 @@ abstract class _GoalProgressDto extends GoalProgressDto {
       throw _privateConstructorUsedError;
 }
 
+DailySessionDto _$DailySessionDtoFromJson(Map<String, dynamic> json) {
+  return _DailySessionDto.fromJson(json);
+}
+
+/// @nodoc
+mixin _$DailySessionDto {
+  String get sessionId => throw _privateConstructorUsedError;
+  DateTime get startedAt => throw _privateConstructorUsedError;
+  DateTime get endedAt => throw _privateConstructorUsedError;
+  int get durationSec => throw _privateConstructorUsedError;
+  String get source => throw _privateConstructorUsedError;
+  String get bookId => throw _privateConstructorUsedError;
+  String get bookTitle => throw _privateConstructorUsedError;
+  String get bookAuthor => throw _privateConstructorUsedError;
+  String? get bookCoverUrl => throw _privateConstructorUsedError;
+
+  /// Serializes this DailySessionDto to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of DailySessionDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $DailySessionDtoCopyWith<DailySessionDto> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $DailySessionDtoCopyWith<$Res> {
+  factory $DailySessionDtoCopyWith(
+          DailySessionDto value, $Res Function(DailySessionDto) then) =
+      _$DailySessionDtoCopyWithImpl<$Res, DailySessionDto>;
+  @useResult
+  $Res call(
+      {String sessionId,
+      DateTime startedAt,
+      DateTime endedAt,
+      int durationSec,
+      String source,
+      String bookId,
+      String bookTitle,
+      String bookAuthor,
+      String? bookCoverUrl});
+}
+
+/// @nodoc
+class _$DailySessionDtoCopyWithImpl<$Res, $Val extends DailySessionDto>
+    implements $DailySessionDtoCopyWith<$Res> {
+  _$DailySessionDtoCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of DailySessionDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? sessionId = null,
+    Object? startedAt = null,
+    Object? endedAt = null,
+    Object? durationSec = null,
+    Object? source = null,
+    Object? bookId = null,
+    Object? bookTitle = null,
+    Object? bookAuthor = null,
+    Object? bookCoverUrl = freezed,
+  }) {
+    return _then(_value.copyWith(
+      sessionId: null == sessionId
+          ? _value.sessionId
+          : sessionId // ignore: cast_nullable_to_non_nullable
+              as String,
+      startedAt: null == startedAt
+          ? _value.startedAt
+          : startedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      endedAt: null == endedAt
+          ? _value.endedAt
+          : endedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      durationSec: null == durationSec
+          ? _value.durationSec
+          : durationSec // ignore: cast_nullable_to_non_nullable
+              as int,
+      source: null == source
+          ? _value.source
+          : source // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookId: null == bookId
+          ? _value.bookId
+          : bookId // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookTitle: null == bookTitle
+          ? _value.bookTitle
+          : bookTitle // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookAuthor: null == bookAuthor
+          ? _value.bookAuthor
+          : bookAuthor // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookCoverUrl: freezed == bookCoverUrl
+          ? _value.bookCoverUrl
+          : bookCoverUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$DailySessionDtoImplCopyWith<$Res>
+    implements $DailySessionDtoCopyWith<$Res> {
+  factory _$$DailySessionDtoImplCopyWith(_$DailySessionDtoImpl value,
+          $Res Function(_$DailySessionDtoImpl) then) =
+      __$$DailySessionDtoImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String sessionId,
+      DateTime startedAt,
+      DateTime endedAt,
+      int durationSec,
+      String source,
+      String bookId,
+      String bookTitle,
+      String bookAuthor,
+      String? bookCoverUrl});
+}
+
+/// @nodoc
+class __$$DailySessionDtoImplCopyWithImpl<$Res>
+    extends _$DailySessionDtoCopyWithImpl<$Res, _$DailySessionDtoImpl>
+    implements _$$DailySessionDtoImplCopyWith<$Res> {
+  __$$DailySessionDtoImplCopyWithImpl(
+      _$DailySessionDtoImpl _value, $Res Function(_$DailySessionDtoImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of DailySessionDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? sessionId = null,
+    Object? startedAt = null,
+    Object? endedAt = null,
+    Object? durationSec = null,
+    Object? source = null,
+    Object? bookId = null,
+    Object? bookTitle = null,
+    Object? bookAuthor = null,
+    Object? bookCoverUrl = freezed,
+  }) {
+    return _then(_$DailySessionDtoImpl(
+      sessionId: null == sessionId
+          ? _value.sessionId
+          : sessionId // ignore: cast_nullable_to_non_nullable
+              as String,
+      startedAt: null == startedAt
+          ? _value.startedAt
+          : startedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      endedAt: null == endedAt
+          ? _value.endedAt
+          : endedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      durationSec: null == durationSec
+          ? _value.durationSec
+          : durationSec // ignore: cast_nullable_to_non_nullable
+              as int,
+      source: null == source
+          ? _value.source
+          : source // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookId: null == bookId
+          ? _value.bookId
+          : bookId // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookTitle: null == bookTitle
+          ? _value.bookTitle
+          : bookTitle // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookAuthor: null == bookAuthor
+          ? _value.bookAuthor
+          : bookAuthor // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookCoverUrl: freezed == bookCoverUrl
+          ? _value.bookCoverUrl
+          : bookCoverUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$DailySessionDtoImpl implements _DailySessionDto {
+  const _$DailySessionDtoImpl(
+      {required this.sessionId,
+      required this.startedAt,
+      required this.endedAt,
+      required this.durationSec,
+      required this.source,
+      required this.bookId,
+      required this.bookTitle,
+      required this.bookAuthor,
+      this.bookCoverUrl});
+
+  factory _$DailySessionDtoImpl.fromJson(Map<String, dynamic> json) =>
+      _$$DailySessionDtoImplFromJson(json);
+
+  @override
+  final String sessionId;
+  @override
+  final DateTime startedAt;
+  @override
+  final DateTime endedAt;
+  @override
+  final int durationSec;
+  @override
+  final String source;
+  @override
+  final String bookId;
+  @override
+  final String bookTitle;
+  @override
+  final String bookAuthor;
+  @override
+  final String? bookCoverUrl;
+
+  @override
+  String toString() {
+    return 'DailySessionDto(sessionId: $sessionId, startedAt: $startedAt, endedAt: $endedAt, durationSec: $durationSec, source: $source, bookId: $bookId, bookTitle: $bookTitle, bookAuthor: $bookAuthor, bookCoverUrl: $bookCoverUrl)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$DailySessionDtoImpl &&
+            (identical(other.sessionId, sessionId) ||
+                other.sessionId == sessionId) &&
+            (identical(other.startedAt, startedAt) ||
+                other.startedAt == startedAt) &&
+            (identical(other.endedAt, endedAt) || other.endedAt == endedAt) &&
+            (identical(other.durationSec, durationSec) ||
+                other.durationSec == durationSec) &&
+            (identical(other.source, source) || other.source == source) &&
+            (identical(other.bookId, bookId) || other.bookId == bookId) &&
+            (identical(other.bookTitle, bookTitle) ||
+                other.bookTitle == bookTitle) &&
+            (identical(other.bookAuthor, bookAuthor) ||
+                other.bookAuthor == bookAuthor) &&
+            (identical(other.bookCoverUrl, bookCoverUrl) ||
+                other.bookCoverUrl == bookCoverUrl));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, sessionId, startedAt, endedAt,
+      durationSec, source, bookId, bookTitle, bookAuthor, bookCoverUrl);
+
+  /// Create a copy of DailySessionDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$DailySessionDtoImplCopyWith<_$DailySessionDtoImpl> get copyWith =>
+      __$$DailySessionDtoImplCopyWithImpl<_$DailySessionDtoImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$DailySessionDtoImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _DailySessionDto implements DailySessionDto {
+  const factory _DailySessionDto(
+      {required final String sessionId,
+      required final DateTime startedAt,
+      required final DateTime endedAt,
+      required final int durationSec,
+      required final String source,
+      required final String bookId,
+      required final String bookTitle,
+      required final String bookAuthor,
+      final String? bookCoverUrl}) = _$DailySessionDtoImpl;
+
+  factory _DailySessionDto.fromJson(Map<String, dynamic> json) =
+      _$DailySessionDtoImpl.fromJson;
+
+  @override
+  String get sessionId;
+  @override
+  DateTime get startedAt;
+  @override
+  DateTime get endedAt;
+  @override
+  int get durationSec;
+  @override
+  String get source;
+  @override
+  String get bookId;
+  @override
+  String get bookTitle;
+  @override
+  String get bookAuthor;
+  @override
+  String? get bookCoverUrl;
+
+  /// Create a copy of DailySessionDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$DailySessionDtoImplCopyWith<_$DailySessionDtoImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+DailySessionsResponseDto _$DailySessionsResponseDtoFromJson(
+    Map<String, dynamic> json) {
+  return _DailySessionsResponseDto.fromJson(json);
+}
+
+/// @nodoc
+mixin _$DailySessionsResponseDto {
+  String get date => throw _privateConstructorUsedError;
+  int get totalSeconds => throw _privateConstructorUsedError;
+  List<DailySessionDto> get sessions => throw _privateConstructorUsedError;
+
+  /// Serializes this DailySessionsResponseDto to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of DailySessionsResponseDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $DailySessionsResponseDtoCopyWith<DailySessionsResponseDto> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $DailySessionsResponseDtoCopyWith<$Res> {
+  factory $DailySessionsResponseDtoCopyWith(DailySessionsResponseDto value,
+          $Res Function(DailySessionsResponseDto) then) =
+      _$DailySessionsResponseDtoCopyWithImpl<$Res, DailySessionsResponseDto>;
+  @useResult
+  $Res call({String date, int totalSeconds, List<DailySessionDto> sessions});
+}
+
+/// @nodoc
+class _$DailySessionsResponseDtoCopyWithImpl<$Res,
+        $Val extends DailySessionsResponseDto>
+    implements $DailySessionsResponseDtoCopyWith<$Res> {
+  _$DailySessionsResponseDtoCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of DailySessionsResponseDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? date = null,
+    Object? totalSeconds = null,
+    Object? sessions = null,
+  }) {
+    return _then(_value.copyWith(
+      date: null == date
+          ? _value.date
+          : date // ignore: cast_nullable_to_non_nullable
+              as String,
+      totalSeconds: null == totalSeconds
+          ? _value.totalSeconds
+          : totalSeconds // ignore: cast_nullable_to_non_nullable
+              as int,
+      sessions: null == sessions
+          ? _value.sessions
+          : sessions // ignore: cast_nullable_to_non_nullable
+              as List<DailySessionDto>,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$DailySessionsResponseDtoImplCopyWith<$Res>
+    implements $DailySessionsResponseDtoCopyWith<$Res> {
+  factory _$$DailySessionsResponseDtoImplCopyWith(
+          _$DailySessionsResponseDtoImpl value,
+          $Res Function(_$DailySessionsResponseDtoImpl) then) =
+      __$$DailySessionsResponseDtoImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String date, int totalSeconds, List<DailySessionDto> sessions});
+}
+
+/// @nodoc
+class __$$DailySessionsResponseDtoImplCopyWithImpl<$Res>
+    extends _$DailySessionsResponseDtoCopyWithImpl<$Res,
+        _$DailySessionsResponseDtoImpl>
+    implements _$$DailySessionsResponseDtoImplCopyWith<$Res> {
+  __$$DailySessionsResponseDtoImplCopyWithImpl(
+      _$DailySessionsResponseDtoImpl _value,
+      $Res Function(_$DailySessionsResponseDtoImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of DailySessionsResponseDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? date = null,
+    Object? totalSeconds = null,
+    Object? sessions = null,
+  }) {
+    return _then(_$DailySessionsResponseDtoImpl(
+      date: null == date
+          ? _value.date
+          : date // ignore: cast_nullable_to_non_nullable
+              as String,
+      totalSeconds: null == totalSeconds
+          ? _value.totalSeconds
+          : totalSeconds // ignore: cast_nullable_to_non_nullable
+              as int,
+      sessions: null == sessions
+          ? _value._sessions
+          : sessions // ignore: cast_nullable_to_non_nullable
+              as List<DailySessionDto>,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$DailySessionsResponseDtoImpl implements _DailySessionsResponseDto {
+  const _$DailySessionsResponseDtoImpl(
+      {required this.date,
+      required this.totalSeconds,
+      required final List<DailySessionDto> sessions})
+      : _sessions = sessions;
+
+  factory _$DailySessionsResponseDtoImpl.fromJson(Map<String, dynamic> json) =>
+      _$$DailySessionsResponseDtoImplFromJson(json);
+
+  @override
+  final String date;
+  @override
+  final int totalSeconds;
+  final List<DailySessionDto> _sessions;
+  @override
+  List<DailySessionDto> get sessions {
+    if (_sessions is EqualUnmodifiableListView) return _sessions;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_sessions);
+  }
+
+  @override
+  String toString() {
+    return 'DailySessionsResponseDto(date: $date, totalSeconds: $totalSeconds, sessions: $sessions)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$DailySessionsResponseDtoImpl &&
+            (identical(other.date, date) || other.date == date) &&
+            (identical(other.totalSeconds, totalSeconds) ||
+                other.totalSeconds == totalSeconds) &&
+            const DeepCollectionEquality().equals(other._sessions, _sessions));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, date, totalSeconds,
+      const DeepCollectionEquality().hash(_sessions));
+
+  /// Create a copy of DailySessionsResponseDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$DailySessionsResponseDtoImplCopyWith<_$DailySessionsResponseDtoImpl>
+      get copyWith => __$$DailySessionsResponseDtoImplCopyWithImpl<
+          _$DailySessionsResponseDtoImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$DailySessionsResponseDtoImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _DailySessionsResponseDto implements DailySessionsResponseDto {
+  const factory _DailySessionsResponseDto(
+          {required final String date,
+          required final int totalSeconds,
+          required final List<DailySessionDto> sessions}) =
+      _$DailySessionsResponseDtoImpl;
+
+  factory _DailySessionsResponseDto.fromJson(Map<String, dynamic> json) =
+      _$DailySessionsResponseDtoImpl.fromJson;
+
+  @override
+  String get date;
+  @override
+  int get totalSeconds;
+  @override
+  List<DailySessionDto> get sessions;
+
+  /// Create a copy of DailySessionsResponseDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$DailySessionsResponseDtoImplCopyWith<_$DailySessionsResponseDtoImpl>
+      get copyWith => throw _privateConstructorUsedError;
+}
+
 StartSessionRequest _$StartSessionRequestFromJson(Map<String, dynamic> json) {
   return _StartSessionRequest.fromJson(json);
 }

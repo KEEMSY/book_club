@@ -1,3 +1,5 @@
+import 'package:book_club/features/reading/data/reading_models.dart'
+    show DailySessionsResponseDto;
 import 'package:book_club/features/reading/data/reading_repository.dart';
 import 'package:book_club/features/reading/domain/bookmark.dart';
 import 'package:book_club/features/reading/domain/goal_period.dart';
@@ -168,6 +170,15 @@ class FakeReadingRepository implements ReadingRepository {
   Future<Bookmark?> getLatestBookmark({required String userBookId}) async {
     if (bookmarkError != null) throw bookmarkError!;
     return latestBookmarkResult;
+  }
+
+  @override
+  Future<DailySessionsResponseDto> getDailySessions(DateTime date) async {
+    return const DailySessionsResponseDto(
+      date: '',
+      totalSeconds: 0,
+      sessions: [],
+    );
   }
 }
 

@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../auth/application/auth_providers.dart';
+import '../../book/presentation/widgets/book_cover.dart';
+import '../data/reading_models.dart' show DailySessionDto, DailySessionsResponseDto;
 import '../../auth/domain/auth_state.dart';
 import '../../book/application/library_notifier.dart';
 import '../../book/application/library_state.dart';
@@ -194,18 +196,19 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     if (!mounted) return;
     // Capture the router before the async gap to avoid BuildContext warnings.
     final GoRouter router = GoRouter.of(context);
-    // targetId == null → cancelled, '' → free session, non-empty → book session.
-    final String? targetId = await _StartReadingSheet.show(
+    // null → cancelled; ('', null) → free session, no limit; ('id', 1800) → book + countdown.
+    final (String, int?)? result = await _StartReadingSheet.show(
       context,
       ref: ref,
       books: reading,
     );
-    if (targetId == null) return;
+    if (result == null) return;
     if (!mounted) return;
-    final String query = targetId.isEmpty
-        ? '?auto_start=true'
-        : '?user_book_id=$targetId&auto_start=true';
-    router.push('/reading/timer$query');
+    final (String targetId, int? targetSec) = result;
+    final List<String> params = <String>['auto_start=true'];
+    if (targetId.isNotEmpty) params.add('user_book_id=$targetId');
+    if (targetSec != null) params.add('target_seconds=$targetSec');
+    router.push('/reading/timer?${params.join('&')}');
   }
 
   Future<void> _onManualLog() async {
@@ -596,34 +599,171 @@ class _HeatmapCardState extends ConsumerState<_HeatmapCard> {
   }
 
   void _showDaySheet(BuildContext context, HeatmapDay day) {
-    final theme = Theme.of(context);
     showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
-      backgroundColor: theme.colorScheme.surface,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder: (_) => Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              '${day.date.year}.${day.date.month.toString().padLeft(2, '0')}.${day.date.day.toString().padLeft(2, '0')}',
-              style: theme.textTheme.titleLarge,
+      builder: (_) => _DayDetailSheet(day: day),
+    );
+  }
+}
+
+/// Bottom sheet that fetches and displays session + book detail for a heatmap day.
+class _DayDetailSheet extends ConsumerWidget {
+  const _DayDetailSheet({required this.day});
+
+  final HeatmapDay day;
+
+  String get _dateKey =>
+      '${day.date.year}-'
+      '${day.date.month.toString().padLeft(2, '0')}-'
+      '${day.date.day.toString().padLeft(2, '0')}';
+
+  String get _dateLabel =>
+      '${day.date.year}.${day.date.month.toString().padLeft(2, '0')}.${day.date.day.toString().padLeft(2, '0')}';
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final async = ref.watch(dailySessionsProvider(_dateKey));
+
+    return DraggableScrollableSheet(
+      expand: false,
+      initialChildSize: 0.5,
+      minChildSize: 0.3,
+      maxChildSize: 0.85,
+      builder: (_, controller) => Padding(
+        padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+        child: CustomScrollView(
+          controller: controller,
+          slivers: <Widget>[
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Text(_dateLabel, style: theme.textTheme.titleLarge),
+              ),
             ),
-            const SizedBox(height: 12),
-            Text(
-              day.totalSeconds == 0
-                  ? '이 날은 기록이 없어요'
-                  : '총 ${(day.totalSeconds ~/ 60)}분 · ${day.sessionCount}세션',
-              style: theme.textTheme.bodyLarge,
-            ),
+            switch (async) {
+              AsyncLoading() => const SliverFillRemaining(
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+              AsyncError(:final error) => SliverFillRemaining(
+                  child: Center(
+                    child: Text(
+                      '불러오지 못했어요\n$error',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.error,
+                      ),
+                    ),
+                  ),
+                ),
+              AsyncData(:final value) => value.sessions.isEmpty
+                  ? SliverFillRemaining(
+                      child: Center(
+                        child: Text(
+                          '이 날은 기록이 없어요',
+                          style: theme.textTheme.bodyLarge,
+                        ),
+                      ),
+                    )
+                  : SliverList.separated(
+                      itemCount: value.sessions.length + 1,
+                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      itemBuilder: (_, i) {
+                        if (i == 0) return _SummaryRow(data: value, theme: theme);
+                        return _SessionRow(
+                          session: value.sessions[i - 1],
+                          theme: theme,
+                        );
+                      },
+                    ),
+              _ => const SliverToBoxAdapter(child: SizedBox.shrink()),
+            },
           ],
         ),
       ),
+    );
+  }
+}
+
+class _SummaryRow extends StatelessWidget {
+  const _SummaryRow({required this.data, required this.theme});
+
+  final DailySessionsResponseDto data;
+  final ThemeData theme;
+
+  @override
+  Widget build(BuildContext context) {
+    final int minutes = data.totalSeconds ~/ 60;
+    final String label = minutes >= 60
+        ? '총 ${minutes ~/ 60}시간 ${minutes % 60}분 · ${data.sessions.length}세션'
+        : '총 $minutes분 · ${data.sessions.length}세션';
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(label, style: theme.textTheme.bodyLarge),
+        const Divider(height: 24),
+      ],
+    );
+  }
+}
+
+class _SessionRow extends StatelessWidget {
+  const _SessionRow({required this.session, required this.theme});
+
+  final DailySessionDto session;
+  final ThemeData theme;
+
+  String _durationLabel() {
+    final int m = session.durationSec ~/ 60;
+    if (m >= 60) return '${m ~/ 60}시간 ${m % 60}분';
+    return '$m분';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        BookCover(coverUrl: session.bookCoverUrl, width: 40, height: 56),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                session.bookTitle,
+                style: theme.textTheme.bodyMedium
+                    ?.copyWith(fontWeight: FontWeight.w600),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 2),
+              Text(
+                session.bookAuthor,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          _durationLabel(),
+          style: theme.textTheme.bodySmall?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -701,21 +841,20 @@ class _StartReadingButton extends StatelessWidget {
   }
 }
 
-/// Bottom sheet shown when the user taps "지금 읽기 시작" with multiple books
-/// in progress. Displays each book's latest bookmark so the user can pick up
-/// exactly where they left off.
-class _StartReadingSheet extends ConsumerWidget {
+/// Bottom sheet shown when the user taps "지금 읽기 시작". Lets the user pick
+/// a book (or free session) and an optional countdown duration.
+class _StartReadingSheet extends ConsumerStatefulWidget {
   const _StartReadingSheet({required this.books});
 
   final List<UserBook> books;
 
-  static Future<String?> show(
+  static Future<(String, int?)?> show(
     BuildContext context, {
     required WidgetRef ref,
     required List<UserBook> books,
   }) {
     final container = ProviderScope.containerOf(context);
-    return showModalBottomSheet<String>(
+    return showModalBottomSheet<(String, int?)>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
@@ -727,26 +866,93 @@ class _StartReadingSheet extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_StartReadingSheet> createState() => _StartReadingSheetState();
+}
+
+class _StartReadingSheetState extends ConsumerState<_StartReadingSheet> {
+  // null = 자유롭게 (no limit)
+  int? _targetSec;
+  bool _customMode = false;
+  final TextEditingController _customCtrl = TextEditingController();
+  String? _customError;
+
+  static const List<(String label, int? seconds)> _presets = <(String, int?)>[
+    ('자유롭게', null),
+    ('15분', 15 * 60),
+    ('30분', 30 * 60),
+    ('45분', 45 * 60),
+    ('1시간', 60 * 60),
+  ];
+
+  @override
+  void dispose() {
+    _customCtrl.dispose();
+    super.dispose();
+  }
+
+  void _selectPreset(int? sec) {
+    setState(() {
+      _targetSec = sec;
+      _customMode = false;
+      _customError = null;
+    });
+  }
+
+  void _enableCustomMode() {
+    setState(() {
+      _customMode = true;
+      _targetSec = null;
+      _customError = null;
+    });
+  }
+
+  void _onCustomChanged(String value) {
+    final int? minutes = int.tryParse(value.trim());
+    setState(() {
+      if (value.trim().isEmpty) {
+        _targetSec = null;
+        _customError = null;
+      } else if (minutes == null || minutes < 1) {
+        _targetSec = null;
+        _customError = '1분 이상 입력해주세요';
+      } else if (minutes > 480) {
+        _targetSec = null;
+        _customError = '480분(8시간) 이하로 입력해주세요';
+      } else {
+        _targetSec = minutes * 60;
+        _customError = null;
+      }
+    });
+  }
+
+  void _start(String bookId) =>
+      Navigator.of(context).pop((bookId, _targetSec));
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
+    final Color accent = ref.watch(gradePrimaryProvider);
+    // keyboard inset so the sheet lifts above the keyboard
+    final double keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
+
     return Padding(
       padding: EdgeInsets.fromLTRB(
         spacing.lg,
         spacing.lg,
         spacing.lg,
-        spacing.xl,
+        spacing.xl + keyboardInset,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            books.isEmpty ? '읽기를 시작할게요' : '어떤 책을 읽을까요?',
+            widget.books.isEmpty ? '읽기를 시작할게요' : '어떤 책을 읽을까요?',
             style: theme.textTheme.titleLarge,
           ),
           SizedBox(height: spacing.md),
-          if (books.isEmpty)
+          if (widget.books.isEmpty)
             Padding(
               padding: EdgeInsets.only(bottom: spacing.sm),
               child: Text(
@@ -757,14 +963,89 @@ class _StartReadingSheet extends ConsumerWidget {
               ),
             )
           else ...<Widget>[
-            ...books.map((book) => _BookTile(book: book)),
+            ...widget.books.map(
+              (book) => _BookTile(
+                book: book,
+                onTap: () => _start(book.id),
+              ),
+            ),
             Divider(height: spacing.lg),
           ],
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.play_circle_outline_rounded),
-            title: const Text('책 없이 시작하기'),
-            onTap: () => Navigator.of(context).pop(''),
+          // ---------- Duration picker ----------
+          Text('얼마나 읽을까요?', style: theme.textTheme.titleSmall),
+          SizedBox(height: spacing.sm),
+          Wrap(
+            spacing: spacing.sm,
+            runSpacing: spacing.xs,
+            children: <Widget>[
+              ..._presets.map((preset) {
+                final (String label, int? sec) = preset;
+                final bool selected = !_customMode && _targetSec == sec;
+                return ChoiceChip(
+                  label: Text(label),
+                  selected: selected,
+                  selectedColor: accent,
+                  labelStyle: theme.textTheme.labelMedium?.copyWith(
+                    color: selected
+                        ? theme.colorScheme.onPrimary
+                        : theme.colorScheme.onSurface,
+                    fontWeight:
+                        selected ? FontWeight.w600 : FontWeight.normal,
+                  ),
+                  onSelected: (_) => _selectPreset(sec),
+                );
+              }),
+              ChoiceChip(
+                label: const Text('직접 입력'),
+                selected: _customMode,
+                selectedColor: accent,
+                labelStyle: theme.textTheme.labelMedium?.copyWith(
+                  color: _customMode
+                      ? theme.colorScheme.onPrimary
+                      : theme.colorScheme.onSurface,
+                  fontWeight:
+                      _customMode ? FontWeight.w600 : FontWeight.normal,
+                ),
+                onSelected: (_) => _enableCustomMode(),
+              ),
+            ],
+          ),
+          if (_customMode) ...<Widget>[
+            SizedBox(height: spacing.sm),
+            TextField(
+              controller: _customCtrl,
+              autofocus: true,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                hintText: '분 단위로 입력',
+                suffixText: '분',
+                isDense: true,
+                border: const OutlineInputBorder(),
+                errorText: _customError,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+              ),
+              onChanged: _onCustomChanged,
+            ),
+          ],
+          SizedBox(height: spacing.lg),
+          // ---------- Free-session button ----------
+          // Primary when there are no books (only action); outlined/secondary otherwise.
+          SizedBox(
+            width: double.infinity,
+            child: widget.books.isEmpty
+                ? FilledButton.icon(
+                    onPressed: () => _start(''),
+                    icon: const Icon(Icons.play_circle_outline_rounded),
+                    label: const Text('바로 시작하기'),
+                  )
+                : OutlinedButton.icon(
+                    onPressed: () => _start(''),
+                    icon: const Icon(Icons.play_circle_outline_rounded, size: 18),
+                    label: const Text('책 없이 시작하기'),
+                  ),
           ),
         ],
       ),
@@ -773,8 +1054,9 @@ class _StartReadingSheet extends ConsumerWidget {
 }
 
 class _BookTile extends ConsumerWidget {
-  const _BookTile({required this.book});
+  const _BookTile({required this.book, required this.onTap});
   final UserBook book;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -797,7 +1079,7 @@ class _BookTile extends ConsumerWidget {
         error: (_, __) => null,
       ),
       trailing: const Icon(Icons.chevron_right_rounded),
-      onTap: () => Navigator.of(context).pop(book.id),
+      onTap: onTap,
     );
   }
 }

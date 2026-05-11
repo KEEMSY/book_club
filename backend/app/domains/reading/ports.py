@@ -86,6 +86,21 @@ class SessionCompletion:
     grade_up: bool
 
 
+@dataclass(frozen=True, slots=True)
+class DailySessionInfo:
+    """Per-session aggregate enriched with book metadata for the daily view."""
+
+    session_id: UUID
+    started_at: datetime
+    ended_at: datetime
+    duration_sec: int
+    source: str  # "timer" | "manual"
+    book_id: UUID
+    book_title: str
+    book_author: str
+    book_cover_url: str | None
+
+
 class ReadingSessionRepositoryPort(Protocol):
     async def get_active_session(self, user_id: UUID) -> ReadingSession | None: ...
 
@@ -200,3 +215,10 @@ class ReadingBookQueryPort(Protocol):
         from_date: date | None = None,
         to_date: date | None = None,
     ) -> int: ...
+
+    async def get_daily_sessions_with_book_info(
+        self,
+        *,
+        user_id: UUID,
+        target_date: date,
+    ) -> list[DailySessionInfo]: ...

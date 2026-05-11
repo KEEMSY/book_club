@@ -157,6 +157,52 @@ Map<String, dynamic> _$$GoalProgressDtoImplToJson(
       'percent': instance.percent,
     };
 
+_$DailySessionDtoImpl _$$DailySessionDtoImplFromJson(
+        Map<String, dynamic> json) =>
+    _$DailySessionDtoImpl(
+      sessionId: json['session_id'] as String,
+      startedAt: DateTime.parse(json['started_at'] as String),
+      endedAt: DateTime.parse(json['ended_at'] as String),
+      durationSec: (json['duration_sec'] as num).toInt(),
+      source: json['source'] as String,
+      bookId: json['book_id'] as String,
+      bookTitle: json['book_title'] as String,
+      bookAuthor: json['book_author'] as String,
+      bookCoverUrl: json['book_cover_url'] as String?,
+    );
+
+Map<String, dynamic> _$$DailySessionDtoImplToJson(
+        _$DailySessionDtoImpl instance) =>
+    <String, dynamic>{
+      'session_id': instance.sessionId,
+      'started_at': instance.startedAt.toIso8601String(),
+      'ended_at': instance.endedAt.toIso8601String(),
+      'duration_sec': instance.durationSec,
+      'source': instance.source,
+      'book_id': instance.bookId,
+      'book_title': instance.bookTitle,
+      'book_author': instance.bookAuthor,
+      'book_cover_url': instance.bookCoverUrl,
+    };
+
+_$DailySessionsResponseDtoImpl _$$DailySessionsResponseDtoImplFromJson(
+        Map<String, dynamic> json) =>
+    _$DailySessionsResponseDtoImpl(
+      date: json['date'] as String,
+      totalSeconds: (json['total_seconds'] as num).toInt(),
+      sessions: (json['sessions'] as List<dynamic>)
+          .map((e) => DailySessionDto.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
+Map<String, dynamic> _$$DailySessionsResponseDtoImplToJson(
+        _$DailySessionsResponseDtoImpl instance) =>
+    <String, dynamic>{
+      'date': instance.date,
+      'total_seconds': instance.totalSeconds,
+      'sessions': instance.sessions.map((e) => e.toJson()).toList(),
+    };
+
 _$StartSessionRequestImpl _$$StartSessionRequestImplFromJson(
         Map<String, dynamic> json) =>
     _$StartSessionRequestImpl(
