@@ -30,9 +30,20 @@ class DiscoveryScreen extends ConsumerWidget {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(
+                spacing.lg,
+                spacing.md,
+                spacing.lg,
+                0,
+              ),
+              child: Text('탐색', style: theme.textTheme.displaySmall),
+            ),
+          ),
           SliverAppBar(
             floating: true,
-            title: const Text('탐색'),
+            toolbarHeight: 0,
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(56),
               child: Padding(
