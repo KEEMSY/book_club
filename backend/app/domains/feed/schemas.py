@@ -142,6 +142,7 @@ class CommentResponse(BaseModel):
 class CreateHighlightRequest(BaseModel):
     quote_text: str = Field(min_length=1, max_length=500)
     page_number: int | None = Field(default=None, ge=1)
+    note_text: str | None = Field(default=None, max_length=300)
 
 
 class HighlightPublic(BaseModel):
@@ -149,6 +150,7 @@ class HighlightPublic(BaseModel):
     user_book_id: UUID
     quote_text: str
     page_number: int | None
+    note_text: str | None
     created_at: datetime
 
 

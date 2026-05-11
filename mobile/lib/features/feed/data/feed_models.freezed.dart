@@ -2337,6 +2337,7 @@ mixin _$HighlightDto {
   String get userBookId => throw _privateConstructorUsedError;
   String get quoteText => throw _privateConstructorUsedError;
   int? get pageNumber => throw _privateConstructorUsedError;
+  String? get noteText => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
 
   /// Serializes this HighlightDto to a JSON map.
@@ -2360,6 +2361,7 @@ abstract class $HighlightDtoCopyWith<$Res> {
       String userBookId,
       String quoteText,
       int? pageNumber,
+      String? noteText,
       DateTime createdAt});
 }
 
@@ -2382,6 +2384,7 @@ class _$HighlightDtoCopyWithImpl<$Res, $Val extends HighlightDto>
     Object? userBookId = null,
     Object? quoteText = null,
     Object? pageNumber = freezed,
+    Object? noteText = freezed,
     Object? createdAt = null,
   }) {
     return _then(_value.copyWith(
@@ -2401,6 +2404,10 @@ class _$HighlightDtoCopyWithImpl<$Res, $Val extends HighlightDto>
           ? _value.pageNumber
           : pageNumber // ignore: cast_nullable_to_non_nullable
               as int?,
+      noteText: freezed == noteText
+          ? _value.noteText
+          : noteText // ignore: cast_nullable_to_non_nullable
+              as String?,
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -2422,6 +2429,7 @@ abstract class _$$HighlightDtoImplCopyWith<$Res>
       String userBookId,
       String quoteText,
       int? pageNumber,
+      String? noteText,
       DateTime createdAt});
 }
 
@@ -2442,6 +2450,7 @@ class __$$HighlightDtoImplCopyWithImpl<$Res>
     Object? userBookId = null,
     Object? quoteText = null,
     Object? pageNumber = freezed,
+    Object? noteText = freezed,
     Object? createdAt = null,
   }) {
     return _then(_$HighlightDtoImpl(
@@ -2461,6 +2470,10 @@ class __$$HighlightDtoImplCopyWithImpl<$Res>
           ? _value.pageNumber
           : pageNumber // ignore: cast_nullable_to_non_nullable
               as int?,
+      noteText: freezed == noteText
+          ? _value.noteText
+          : noteText // ignore: cast_nullable_to_non_nullable
+              as String?,
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -2477,6 +2490,7 @@ class _$HighlightDtoImpl extends _HighlightDto {
       required this.userBookId,
       required this.quoteText,
       this.pageNumber,
+      this.noteText,
       required this.createdAt})
       : super._();
 
@@ -2492,11 +2506,13 @@ class _$HighlightDtoImpl extends _HighlightDto {
   @override
   final int? pageNumber;
   @override
+  final String? noteText;
+  @override
   final DateTime createdAt;
 
   @override
   String toString() {
-    return 'HighlightDto(id: $id, userBookId: $userBookId, quoteText: $quoteText, pageNumber: $pageNumber, createdAt: $createdAt)';
+    return 'HighlightDto(id: $id, userBookId: $userBookId, quoteText: $quoteText, pageNumber: $pageNumber, noteText: $noteText, createdAt: $createdAt)';
   }
 
   @override
@@ -2511,6 +2527,8 @@ class _$HighlightDtoImpl extends _HighlightDto {
                 other.quoteText == quoteText) &&
             (identical(other.pageNumber, pageNumber) ||
                 other.pageNumber == pageNumber) &&
+            (identical(other.noteText, noteText) ||
+                other.noteText == noteText) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt));
   }
@@ -2518,7 +2536,7 @@ class _$HighlightDtoImpl extends _HighlightDto {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
-      runtimeType, id, userBookId, quoteText, pageNumber, createdAt);
+      runtimeType, id, userBookId, quoteText, pageNumber, noteText, createdAt);
 
   /// Create a copy of HighlightDto
   /// with the given fields replaced by the non-null parameter values.
@@ -2542,6 +2560,7 @@ abstract class _HighlightDto extends HighlightDto {
       required final String userBookId,
       required final String quoteText,
       final int? pageNumber,
+      final String? noteText,
       required final DateTime createdAt}) = _$HighlightDtoImpl;
   const _HighlightDto._() : super._();
 
@@ -2556,6 +2575,8 @@ abstract class _HighlightDto extends HighlightDto {
   String get quoteText;
   @override
   int? get pageNumber;
+  @override
+  String? get noteText;
   @override
   DateTime get createdAt;
 
@@ -2756,6 +2777,7 @@ CreateHighlightRequest _$CreateHighlightRequestFromJson(
 mixin _$CreateHighlightRequest {
   String get quoteText => throw _privateConstructorUsedError;
   int? get pageNumber => throw _privateConstructorUsedError;
+  String? get noteText => throw _privateConstructorUsedError;
 
   /// Serializes this CreateHighlightRequest to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -2773,7 +2795,7 @@ abstract class $CreateHighlightRequestCopyWith<$Res> {
           $Res Function(CreateHighlightRequest) then) =
       _$CreateHighlightRequestCopyWithImpl<$Res, CreateHighlightRequest>;
   @useResult
-  $Res call({String quoteText, int? pageNumber});
+  $Res call({String quoteText, int? pageNumber, String? noteText});
 }
 
 /// @nodoc
@@ -2794,6 +2816,7 @@ class _$CreateHighlightRequestCopyWithImpl<$Res,
   $Res call({
     Object? quoteText = null,
     Object? pageNumber = freezed,
+    Object? noteText = freezed,
   }) {
     return _then(_value.copyWith(
       quoteText: null == quoteText
@@ -2804,6 +2827,10 @@ class _$CreateHighlightRequestCopyWithImpl<$Res,
           ? _value.pageNumber
           : pageNumber // ignore: cast_nullable_to_non_nullable
               as int?,
+      noteText: freezed == noteText
+          ? _value.noteText
+          : noteText // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -2817,7 +2844,7 @@ abstract class _$$CreateHighlightRequestImplCopyWith<$Res>
       __$$CreateHighlightRequestImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String quoteText, int? pageNumber});
+  $Res call({String quoteText, int? pageNumber, String? noteText});
 }
 
 /// @nodoc
@@ -2837,6 +2864,7 @@ class __$$CreateHighlightRequestImplCopyWithImpl<$Res>
   $Res call({
     Object? quoteText = null,
     Object? pageNumber = freezed,
+    Object? noteText = freezed,
   }) {
     return _then(_$CreateHighlightRequestImpl(
       quoteText: null == quoteText
@@ -2847,6 +2875,10 @@ class __$$CreateHighlightRequestImplCopyWithImpl<$Res>
           ? _value.pageNumber
           : pageNumber // ignore: cast_nullable_to_non_nullable
               as int?,
+      noteText: freezed == noteText
+          ? _value.noteText
+          : noteText // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -2855,7 +2887,7 @@ class __$$CreateHighlightRequestImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$CreateHighlightRequestImpl implements _CreateHighlightRequest {
   const _$CreateHighlightRequestImpl(
-      {required this.quoteText, this.pageNumber});
+      {required this.quoteText, this.pageNumber, this.noteText});
 
   factory _$CreateHighlightRequestImpl.fromJson(Map<String, dynamic> json) =>
       _$$CreateHighlightRequestImplFromJson(json);
@@ -2864,10 +2896,12 @@ class _$CreateHighlightRequestImpl implements _CreateHighlightRequest {
   final String quoteText;
   @override
   final int? pageNumber;
+  @override
+  final String? noteText;
 
   @override
   String toString() {
-    return 'CreateHighlightRequest(quoteText: $quoteText, pageNumber: $pageNumber)';
+    return 'CreateHighlightRequest(quoteText: $quoteText, pageNumber: $pageNumber, noteText: $noteText)';
   }
 
   @override
@@ -2878,12 +2912,14 @@ class _$CreateHighlightRequestImpl implements _CreateHighlightRequest {
             (identical(other.quoteText, quoteText) ||
                 other.quoteText == quoteText) &&
             (identical(other.pageNumber, pageNumber) ||
-                other.pageNumber == pageNumber));
+                other.pageNumber == pageNumber) &&
+            (identical(other.noteText, noteText) ||
+                other.noteText == noteText));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, quoteText, pageNumber);
+  int get hashCode => Object.hash(runtimeType, quoteText, pageNumber, noteText);
 
   /// Create a copy of CreateHighlightRequest
   /// with the given fields replaced by the non-null parameter values.
@@ -2905,7 +2941,8 @@ class _$CreateHighlightRequestImpl implements _CreateHighlightRequest {
 abstract class _CreateHighlightRequest implements CreateHighlightRequest {
   const factory _CreateHighlightRequest(
       {required final String quoteText,
-      final int? pageNumber}) = _$CreateHighlightRequestImpl;
+      final int? pageNumber,
+      final String? noteText}) = _$CreateHighlightRequestImpl;
 
   factory _CreateHighlightRequest.fromJson(Map<String, dynamic> json) =
       _$CreateHighlightRequestImpl.fromJson;
@@ -2914,6 +2951,8 @@ abstract class _CreateHighlightRequest implements CreateHighlightRequest {
   String get quoteText;
   @override
   int? get pageNumber;
+  @override
+  String? get noteText;
 
   /// Create a copy of CreateHighlightRequest
   /// with the given fields replaced by the non-null parameter values.

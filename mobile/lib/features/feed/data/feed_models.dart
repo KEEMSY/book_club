@@ -234,6 +234,7 @@ class HighlightDto with _$HighlightDto {
     required String userBookId,
     required String quoteText,
     int? pageNumber,
+    String? noteText,
     required DateTime createdAt,
   }) = _HighlightDto;
 
@@ -245,6 +246,7 @@ class HighlightDto with _$HighlightDto {
         userBookId: userBookId,
         quoteText: quoteText,
         pageNumber: pageNumber,
+        noteText: noteText,
         createdAt: createdAt,
       );
 }
@@ -274,6 +276,7 @@ class CreateHighlightRequest with _$CreateHighlightRequest {
   const factory CreateHighlightRequest({
     required String quoteText,
     int? pageNumber,
+    String? noteText,
   }) = _CreateHighlightRequest;
 
   factory CreateHighlightRequest.fromJson(Map<String, dynamic> json) =>

@@ -141,14 +141,16 @@ class FeedRepository {
     required String userBookId,
     required String quoteText,
     int? pageNumber,
+    String? noteText,
   }) async {
     final HighlightDto dto = await _call(
       () => _api.createHighlight(
         userBookId,
-        <String, dynamic>{
-          'quote_text': quoteText,
-          if (pageNumber != null) 'page_number': pageNumber,
-        },
+        CreateHighlightRequest(
+          quoteText: quoteText,
+          pageNumber: pageNumber,
+          noteText: noteText,
+        ).toJson(),
       ),
     );
     return dto.toDomain();

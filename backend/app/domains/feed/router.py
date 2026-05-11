@@ -253,12 +253,14 @@ async def create_highlight(
         user_book_id=user_book_id,
         quote_text=body.quote_text,
         page_number=body.page_number,
+        note_text=body.note_text,
     )
     return HighlightPublic(
         id=highlight.id,
         user_book_id=highlight.user_book_id,
         quote_text=highlight.quote_text,
         page_number=highlight.page_number,
+        note_text=highlight.note_text,
         created_at=highlight.created_at,
     )
 
@@ -284,6 +286,7 @@ async def list_highlights(
                 user_book_id=h.user_book_id,
                 quote_text=h.quote_text,
                 page_number=h.page_number,
+                note_text=h.note_text,
                 created_at=h.created_at,
             )
             for h in page.items

@@ -332,6 +332,7 @@ class FeedService:
         user_book_id: UUID,
         quote_text: str,
         page_number: int | None,
+        note_text: str | None = None,
     ) -> PostHighlight:
         if not quote_text:
             raise ConflictError("quote text empty", code="QUOTE_EMPTY")
@@ -342,6 +343,7 @@ class FeedService:
             user_book_id=user_book_id,
             quote_text=quote_text,
             page_number=page_number,
+            note_text=note_text,
         )
 
     async def list_highlights(

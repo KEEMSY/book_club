@@ -21,12 +21,14 @@ class AddHighlightSheet extends ConsumerStatefulWidget {
 class _AddHighlightSheetState extends ConsumerState<AddHighlightSheet> {
   final TextEditingController _quoteController = TextEditingController();
   final TextEditingController _pageController = TextEditingController();
+  final TextEditingController _noteController = TextEditingController();
   bool _saving = false;
 
   @override
   void dispose() {
     _quoteController.dispose();
     _pageController.dispose();
+    _noteController.dispose();
     super.dispose();
   }
 
@@ -68,6 +70,17 @@ class _AddHighlightSheetState extends ConsumerState<AddHighlightSheet> {
               prefixText: 'p.',
             ),
           ),
+          SizedBox(height: spacing.sm),
+          TextField(
+            controller: _noteController,
+            maxLength: 300,
+            maxLines: 3,
+            minLines: 2,
+            decoration: const InputDecoration(
+              hintText: '내 생각 (선택)',
+              border: OutlineInputBorder(),
+            ),
+          ),
           SizedBox(height: spacing.lg),
           FilledButton(
             onPressed: _saving ? null : _save,
@@ -91,11 +104,14 @@ class _AddHighlightSheetState extends ConsumerState<AddHighlightSheet> {
     final String quote = _quoteController.text.trim();
     if (quote.isEmpty) return;
     final int? page = int.tryParse(_pageController.text.trim());
+    final String? note = _noteController.text.trim().isEmpty
+        ? null
+        : _noteController.text.trim();
     setState(() => _saving = true);
     try {
       final Highlight? h = await ref
           .read(highlightNotifierProvider(widget.userBookId).notifier)
-          .add(quoteText: quote, pageNumber: page);
+          .add(quoteText: quote, pageNumber: page, noteText: note);
       if (!mounted) return;
       setState(() => _saving = false);
       if (h != null) {

@@ -296,12 +296,14 @@ class HighlightRepository:
         user_book_id: UUID,
         quote_text: str,
         page_number: int | None,
+        note_text: str | None,
     ) -> PostHighlight:
         row = PostHighlight(
             user_id=user_id,
             user_book_id=user_book_id,
             quote_text=quote_text,
             page_number=page_number,
+            note_text=note_text,
         )
         self._session.add(row)
         await self._session.flush()

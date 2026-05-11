@@ -27,12 +27,17 @@ class HighlightNotifier extends StateNotifier<HighlightState> {
   }
 
   /// Adds a highlight optimistically — prepends on success, stays put on error.
-  Future<Highlight?> add({required String quoteText, int? pageNumber}) async {
+  Future<Highlight?> add({
+    required String quoteText,
+    int? pageNumber,
+    String? noteText,
+  }) async {
     try {
       final Highlight h = await _repo.createHighlight(
         userBookId: userBookId,
         quoteText: quoteText,
         pageNumber: pageNumber,
+        noteText: noteText,
       );
       // Guard against autoDispose: the provider may have been collected while
       // the HTTP call was in flight (e.g. opened from library sheet with no

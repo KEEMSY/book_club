@@ -199,6 +199,7 @@ _$HighlightDtoImpl _$$HighlightDtoImplFromJson(Map<String, dynamic> json) =>
       userBookId: json['user_book_id'] as String,
       quoteText: json['quote_text'] as String,
       pageNumber: (json['page_number'] as num?)?.toInt(),
+      noteText: json['note_text'] as String?,
       createdAt: DateTime.parse(json['created_at'] as String),
     );
 
@@ -208,6 +209,7 @@ Map<String, dynamic> _$$HighlightDtoImplToJson(_$HighlightDtoImpl instance) =>
       'user_book_id': instance.userBookId,
       'quote_text': instance.quoteText,
       'page_number': instance.pageNumber,
+      'note_text': instance.noteText,
       'created_at': instance.createdAt.toIso8601String(),
     };
 
@@ -232,6 +234,7 @@ _$CreateHighlightRequestImpl _$$CreateHighlightRequestImplFromJson(
     _$CreateHighlightRequestImpl(
       quoteText: json['quote_text'] as String,
       pageNumber: (json['page_number'] as num?)?.toInt(),
+      noteText: json['note_text'] as String?,
     );
 
 Map<String, dynamic> _$$CreateHighlightRequestImplToJson(
@@ -239,6 +242,7 @@ Map<String, dynamic> _$$CreateHighlightRequestImplToJson(
     <String, dynamic>{
       'quote_text': instance.quoteText,
       'page_number': instance.pageNumber,
+      'note_text': instance.noteText,
     };
 
 _$BookHighlightGroupDtoImpl _$$BookHighlightGroupDtoImplFromJson(

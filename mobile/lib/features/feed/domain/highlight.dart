@@ -9,6 +9,7 @@ class Highlight with _$Highlight {
     required String userBookId,
     required String quoteText,
     int? pageNumber,
+    String? noteText,
     required DateTime createdAt,
   }) = _Highlight;
 }

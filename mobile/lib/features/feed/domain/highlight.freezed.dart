@@ -20,6 +20,7 @@ mixin _$Highlight {
   String get userBookId => throw _privateConstructorUsedError;
   String get quoteText => throw _privateConstructorUsedError;
   int? get pageNumber => throw _privateConstructorUsedError;
+  String? get noteText => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
 
   /// Create a copy of Highlight
@@ -39,6 +40,7 @@ abstract class $HighlightCopyWith<$Res> {
       String userBookId,
       String quoteText,
       int? pageNumber,
+      String? noteText,
       DateTime createdAt});
 }
 
@@ -61,6 +63,7 @@ class _$HighlightCopyWithImpl<$Res, $Val extends Highlight>
     Object? userBookId = null,
     Object? quoteText = null,
     Object? pageNumber = freezed,
+    Object? noteText = freezed,
     Object? createdAt = null,
   }) {
     return _then(_value.copyWith(
@@ -80,6 +83,10 @@ class _$HighlightCopyWithImpl<$Res, $Val extends Highlight>
           ? _value.pageNumber
           : pageNumber // ignore: cast_nullable_to_non_nullable
               as int?,
+      noteText: freezed == noteText
+          ? _value.noteText
+          : noteText // ignore: cast_nullable_to_non_nullable
+              as String?,
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -101,6 +108,7 @@ abstract class _$$HighlightImplCopyWith<$Res>
       String userBookId,
       String quoteText,
       int? pageNumber,
+      String? noteText,
       DateTime createdAt});
 }
 
@@ -121,6 +129,7 @@ class __$$HighlightImplCopyWithImpl<$Res>
     Object? userBookId = null,
     Object? quoteText = null,
     Object? pageNumber = freezed,
+    Object? noteText = freezed,
     Object? createdAt = null,
   }) {
     return _then(_$HighlightImpl(
@@ -140,6 +149,10 @@ class __$$HighlightImplCopyWithImpl<$Res>
           ? _value.pageNumber
           : pageNumber // ignore: cast_nullable_to_non_nullable
               as int?,
+      noteText: freezed == noteText
+          ? _value.noteText
+          : noteText // ignore: cast_nullable_to_non_nullable
+              as String?,
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -156,6 +169,7 @@ class _$HighlightImpl implements _Highlight {
       required this.userBookId,
       required this.quoteText,
       this.pageNumber,
+      this.noteText,
       required this.createdAt});
 
   @override
@@ -167,11 +181,13 @@ class _$HighlightImpl implements _Highlight {
   @override
   final int? pageNumber;
   @override
+  final String? noteText;
+  @override
   final DateTime createdAt;
 
   @override
   String toString() {
-    return 'Highlight(id: $id, userBookId: $userBookId, quoteText: $quoteText, pageNumber: $pageNumber, createdAt: $createdAt)';
+    return 'Highlight(id: $id, userBookId: $userBookId, quoteText: $quoteText, pageNumber: $pageNumber, noteText: $noteText, createdAt: $createdAt)';
   }
 
   @override
@@ -186,13 +202,15 @@ class _$HighlightImpl implements _Highlight {
                 other.quoteText == quoteText) &&
             (identical(other.pageNumber, pageNumber) ||
                 other.pageNumber == pageNumber) &&
+            (identical(other.noteText, noteText) ||
+                other.noteText == noteText) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt));
   }
 
   @override
   int get hashCode => Object.hash(
-      runtimeType, id, userBookId, quoteText, pageNumber, createdAt);
+      runtimeType, id, userBookId, quoteText, pageNumber, noteText, createdAt);
 
   /// Create a copy of Highlight
   /// with the given fields replaced by the non-null parameter values.
@@ -209,6 +227,7 @@ abstract class _Highlight implements Highlight {
       required final String userBookId,
       required final String quoteText,
       final int? pageNumber,
+      final String? noteText,
       required final DateTime createdAt}) = _$HighlightImpl;
 
   @override
@@ -219,6 +238,8 @@ abstract class _Highlight implements Highlight {
   String get quoteText;
   @override
   int? get pageNumber;
+  @override
+  String? get noteText;
   @override
   DateTime get createdAt;
 

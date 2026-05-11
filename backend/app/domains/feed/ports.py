@@ -218,6 +218,7 @@ class HighlightRepositoryPort(Protocol):
         user_book_id: UUID,
         quote_text: str,
         page_number: int | None,
+        note_text: str | None,
     ) -> PostHighlight: ...
 
     async def list_by_user_book(
