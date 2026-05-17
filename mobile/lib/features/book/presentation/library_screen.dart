@@ -520,6 +520,21 @@ class _LibraryActionsSheet extends ConsumerWidget {
               overflow: TextOverflow.ellipsis,
             ),
             SizedBox(height: spacing.sm),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: () {
+                  final router = GoRouter.of(context);
+                  Navigator.of(context).pop();
+                  router.push(
+                    '/reading/timer?user_book_id=${userBook.id}&auto_start=true',
+                  );
+                },
+                icon: const Icon(Icons.play_circle_outline_rounded),
+                label: const Text('읽기 시작'),
+              ),
+            ),
+            SizedBox(height: spacing.xs),
             ListTile(
               leading: const Icon(Icons.swap_horiz_rounded),
               title: const Text('상태 변경'),
