@@ -10,8 +10,13 @@ import '../../book/presentation/widgets/book_cover.dart';
 import '../data/reading_models.dart'
     show DailySessionDto, DailySessionsResponseDto;
 import '../../auth/domain/auth_state.dart';
+import '../../book/application/book_providers.dart';
+import '../../book/application/book_search_notifier.dart';
+import '../../book/application/book_search_state.dart';
 import '../../book/application/library_notifier.dart';
 import '../../book/application/library_state.dart';
+import '../../book/data/book_repository.dart';
+import '../../book/domain/book.dart';
 import '../../book/domain/book_status.dart';
 import '../../book/domain/user_book.dart';
 import '../application/dashboard_prefs_notifier.dart';
@@ -882,6 +887,10 @@ class _StartReadingSheetState extends ConsumerState<_StartReadingSheet> {
   final TextEditingController _customCtrl = TextEditingController();
   String? _customError;
 
+  bool _showSearch = false;
+  final TextEditingController _searchCtrl = TextEditingController();
+  String? _addingBookId;
+
   static const List<(String label, int? seconds)> _presets = <(String, int?)>[
     ('자유롭게', null),
     ('15분', 15 * 60),
@@ -893,7 +902,111 @@ class _StartReadingSheetState extends ConsumerState<_StartReadingSheet> {
   @override
   void dispose() {
     _customCtrl.dispose();
+    _searchCtrl.dispose();
     super.dispose();
+  }
+
+  Future<void> _selectSearchBook(Book book) async {
+    if (_addingBookId != null) return;
+    setState(() => _addingBookId = book.id);
+    try {
+      final repo = ref.read(bookRepositoryProvider);
+      final UserBook added =
+          await repo.addToLibrary(book.id, status: BookStatus.reading);
+      ref.read(libraryNotifierProvider.notifier).refresh(BookStatus.reading);
+      if (mounted) Navigator.of(context).pop((added.id, _targetSec));
+    } on BookRepositoryException catch (e) {
+      if (e.code == 'BOOK_ALREADY_IN_LIBRARY') {
+        final UserBook? existing = _findInLibrary(book.id);
+        if (existing != null && mounted) {
+          Navigator.of(context).pop((existing.id, _targetSec));
+          return;
+        }
+      }
+      if (mounted) setState(() => _addingBookId = null);
+    }
+  }
+
+  UserBook? _findInLibrary(String bookId) {
+    for (final state in ref.read(libraryNotifierProvider).values) {
+      if (state is LibraryListLoaded) {
+        for (final ub in state.items) {
+          if (ub.book.id == bookId) return ub;
+        }
+      }
+    }
+    return null;
+  }
+
+  Widget _buildSearchResults(ThemeData theme, AppSpacing spacing) {
+    final searchState = ref.watch(bookSearchNotifierProvider);
+    return switch (searchState) {
+      BookSearchIdle() => const SizedBox.shrink(),
+      BookSearchLoading() => const Padding(
+          padding: EdgeInsets.symmetric(vertical: 12),
+          child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+        ),
+      BookSearchError(:final message) => Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Text(
+            message,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.error,
+            ),
+          ),
+        ),
+      BookSearchLoaded(:final items) => ConstrainedBox(
+          constraints: const BoxConstraints(maxHeight: 260),
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: items.length > 5 ? 5 : items.length,
+            itemBuilder: (_, i) {
+              final Book book = items[i];
+              final bool isAdding = _addingBookId == book.id;
+              return ListTile(
+                contentPadding: EdgeInsets.symmetric(vertical: spacing.xs),
+                leading: BookCover(
+                  coverUrl: book.coverUrl,
+                  width: 36,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                title: Text(
+                  book.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodyMedium,
+                ),
+                subtitle: Text(
+                  book.author,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall,
+                ),
+                trailing: isAdding
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : FilledButton.tonal(
+                        onPressed: _addingBookId == null
+                            ? () => _selectSearchBook(book)
+                            : null,
+                        style: FilledButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          minimumSize: const Size(0, 32),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: const Text('시작'),
+                      ),
+                onTap: _addingBookId == null
+                    ? () => _selectSearchBook(book)
+                    : null,
+              );
+            },
+          ),
+        ),
+    };
   }
 
   void _selectPreset(int? sec) {
@@ -961,7 +1074,7 @@ class _StartReadingSheetState extends ConsumerState<_StartReadingSheet> {
             Padding(
               padding: EdgeInsets.only(bottom: spacing.sm),
               child: Text(
-                '서재에 읽는 중인 책이 없어요.\n책을 추가하면 독서 기록이 쌓여요.',
+                '서재에 읽는 중인 책이 없어요.',
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
@@ -974,8 +1087,40 @@ class _StartReadingSheetState extends ConsumerState<_StartReadingSheet> {
                 onTap: () => _start(book.id),
               ),
             ),
-            Divider(height: spacing.lg),
           ],
+          // ── Book search ──────────────────────────────────────────────────
+          if (!_showSearch) ...<Widget>[
+            TextButton.icon(
+              onPressed: () => setState(() => _showSearch = true),
+              icon: const Icon(Icons.search_rounded, size: 18),
+              label: const Text('다른 책 찾기'),
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.zero,
+                visualDensity: VisualDensity.compact,
+              ),
+            ),
+          ] else ...<Widget>[
+            SizedBox(height: spacing.sm),
+            TextField(
+              controller: _searchCtrl,
+              autofocus: true,
+              decoration: const InputDecoration(
+                hintText: '책 제목, 저자 검색',
+                prefixIcon: Icon(Icons.search_rounded, size: 20),
+                isDense: true,
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+              ),
+              onChanged: (v) =>
+                  ref.read(bookSearchNotifierProvider.notifier).queryChanged(v),
+            ),
+            _buildSearchResults(theme, spacing),
+            SizedBox(height: spacing.xs),
+          ],
+          Divider(height: spacing.lg),
           // ---------- Duration picker ----------
           Text('얼마나 읽을까요?', style: theme.textTheme.titleSmall),
           SizedBox(height: spacing.sm),
