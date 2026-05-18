@@ -20,7 +20,8 @@ class BookCard extends StatelessWidget {
     this.onLongPress,
   })  : _layout = _BookCardLayout.list,
         onStatusTap = null,
-        onMoreTap = null;
+        onMoreTap = null,
+        onPlayTap = null;
 
   const BookCard.grid({
     super.key,
@@ -30,6 +31,7 @@ class BookCard extends StatelessWidget {
     this.onLongPress,
     this.onStatusTap,
     this.onMoreTap,
+    this.onPlayTap,
   }) : _layout = _BookCardLayout.grid;
 
   final Book book;
@@ -38,6 +40,7 @@ class BookCard extends StatelessWidget {
   final VoidCallback? onLongPress;
   final VoidCallback? onStatusTap;
   final VoidCallback? onMoreTap;
+  final VoidCallback? onPlayTap;
   final _BookCardLayout _layout;
 
   @override
@@ -64,6 +67,7 @@ class BookCard extends StatelessWidget {
           onLongPress: onLongPress,
           onStatusTap: onStatusTap,
           onMoreTap: onMoreTap,
+          onPlayTap: onPlayTap,
         );
     }
   }
@@ -168,6 +172,7 @@ class _GridLayout extends StatelessWidget {
     this.onLongPress,
     this.onStatusTap,
     this.onMoreTap,
+    this.onPlayTap,
   });
 
   final Book book;
@@ -178,6 +183,7 @@ class _GridLayout extends StatelessWidget {
   final VoidCallback? onLongPress;
   final VoidCallback? onStatusTap;
   final VoidCallback? onMoreTap;
+  final VoidCallback? onPlayTap;
 
   @override
   Widget build(BuildContext context) {
@@ -189,9 +195,36 @@ class _GridLayout extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          BookCover(
-            coverUrl: book.coverUrl,
-            borderRadius: BorderRadius.circular(radii.md),
+          Stack(
+            children: <Widget>[
+              BookCover(
+                coverUrl: book.coverUrl,
+                borderRadius: BorderRadius.circular(radii.md),
+              ),
+              if (onPlayTap != null)
+                Positioned(
+                  right: 6,
+                  bottom: 6,
+                  child: GestureDetector(
+                    onTap: onPlayTap,
+                    behavior: HitTestBehavior.opaque,
+                    child: Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color:
+                            theme.colorScheme.surface.withValues(alpha: 0.88),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.play_arrow_rounded,
+                        size: 20,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
           SizedBox(height: spacing.sm),
           Row(

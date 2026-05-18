@@ -458,6 +458,12 @@ class _LibraryCard extends ConsumerWidget {
         onLongPress: () => _showActions(context, ref, userBook),
         onStatusTap: () => _showStatusDirect(context, userBook),
         onMoreTap: () => _showActions(context, ref, userBook),
+        onPlayTap: () {
+          final router = GoRouter.of(context);
+          router.push(
+            '/reading/timer?user_book_id=${userBook.id}&auto_start=true',
+          );
+        },
       ),
     );
   }
