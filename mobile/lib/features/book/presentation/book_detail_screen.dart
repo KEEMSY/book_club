@@ -247,6 +247,13 @@ class _ContentState extends ConsumerState<_Content> {
               onAdd: widget.onAdd,
               onAddWishlist: widget.onAddWishlist,
               onGoToLibrary: widget.onGoToLibrary,
+              onStartReading: widget.userBookId != null
+                  ? () => context.push(
+                        '/reading/timer'
+                        '?user_book_id=${widget.userBookId}'
+                        '&auto_start=true',
+                      )
+                  : null,
             ),
             SizedBox(height: spacing.xl),
             const Divider(height: 1),
@@ -437,12 +444,14 @@ class _LibraryCta extends StatelessWidget {
     required this.onAdd,
     required this.onAddWishlist,
     required this.onGoToLibrary,
+    this.onStartReading,
   });
 
   final LibraryCtaState state;
   final VoidCallback onAdd;
   final VoidCallback onAddWishlist;
   final VoidCallback onGoToLibrary;
+  final VoidCallback? onStartReading;
 
   @override
   Widget build(BuildContext context) {
@@ -491,24 +500,39 @@ class _LibraryCta extends StatelessWidget {
             ),
           ),
         ),
-      LibraryCtaAdded() => FilledButton(
-          style: pillStyle,
-          onPressed: onGoToLibrary,
-          child: const Text('서재에서 보기'),
+      LibraryCtaAdded() => Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            if (onStartReading != null) ...<Widget>[
+              FilledButton.icon(
+                style: pillStyle,
+                onPressed: onStartReading,
+                icon: const Icon(Icons.play_circle_outline_rounded),
+                label: const Text('읽기 시작'),
+              ),
+              const SizedBox(height: 8),
+            ],
+            OutlinedButton(
+              style: outlinePillStyle,
+              onPressed: onGoToLibrary,
+              child: const Text('서재에서 보기'),
+            ),
+          ],
         ),
       LibraryCtaDuplicate() => Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Text(
-              '이미 서재에 있는 책이에요',
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
+            if (onStartReading != null) ...<Widget>[
+              FilledButton.icon(
+                style: pillStyle,
+                onPressed: onStartReading,
+                icon: const Icon(Icons.play_circle_outline_rounded),
+                label: const Text('읽기 시작'),
               ),
-            ),
-            const SizedBox(height: 8),
-            FilledButton(
-              style: pillStyle,
+              const SizedBox(height: 8),
+            ],
+            OutlinedButton(
+              style: outlinePillStyle,
               onPressed: onGoToLibrary,
               child: const Text('서재에서 보기'),
             ),
