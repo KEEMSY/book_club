@@ -11,6 +11,7 @@ import '../application/heatmap_notifier.dart';
 import '../application/reading_providers.dart';
 import '../application/timer_notifier.dart';
 import '../application/timer_state.dart';
+import '../domain/bookmark.dart';
 import 'session_summary_screen.dart';
 import 'widgets/elapsed_formatter.dart';
 import 'widgets/timer_controls.dart';
@@ -80,6 +81,9 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     final spacing = theme.extension<AppSpacing>()!;
     final state = ref.watch(timerNotifierProvider);
     final Color accent = ref.watch(gradePrimaryProvider);
+    final Bookmark? bookmark = widget.userBookId.isNotEmpty
+        ? ref.watch(latestBookmarkProvider(widget.userBookId)).valueOrNull
+        : null;
 
     // Auto-end when the countdown hits zero.
     if (widget.targetSeconds != null) {
@@ -178,6 +182,10 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                   targetSeconds: widget.targetSeconds,
                 ),
                 const Spacer(),
+                if (state is TimerIdle && bookmark != null) ...<Widget>[
+                  _BookmarkChip(bookmark: bookmark),
+                  SizedBox(height: spacing.md),
+                ],
                 _StreakBadge(),
                 if (widget.userBookId.isNotEmpty &&
                     (state is TimerRunning ||
@@ -421,6 +429,56 @@ class _StreakBadge extends ConsumerWidget {
       label: Text('연속 $streak일 독서 중'),
       labelStyle: theme.textTheme.labelMedium,
       backgroundColor: theme.colorScheme.surfaceContainerHigh,
+    );
+  }
+}
+
+/// Subtle chip shown on the idle timer screen when a previous bookmark exists.
+class _BookmarkChip extends StatelessWidget {
+  const _BookmarkChip({required this.bookmark});
+
+  final Bookmark bookmark;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final radii = theme.extension<AppRadius>()!;
+    final spacing = theme.extension<AppSpacing>()!;
+
+    final String label = bookmark.note != null && bookmark.note!.isNotEmpty
+        ? '${bookmark.page}페이지 — "${bookmark.note}"'
+        : '${bookmark.page}페이지에서 멈췄어요';
+
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: spacing.md,
+        vertical: spacing.sm,
+      ),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHigh,
+        borderRadius: BorderRadius.all(Radius.circular(radii.pill)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Icon(
+            Icons.bookmark_rounded,
+            size: 16,
+            color: theme.colorScheme.primary,
+          ),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              label,
+              style: theme.textTheme.labelMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
