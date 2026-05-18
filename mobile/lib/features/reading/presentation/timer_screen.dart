@@ -182,7 +182,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                   targetSeconds: widget.targetSeconds,
                 ),
                 const Spacer(),
-                if (state is TimerIdle && bookmark != null) ...<Widget>[
+                if (bookmark != null) ...<Widget>[
                   _BookmarkChip(bookmark: bookmark),
                   SizedBox(height: spacing.md),
                 ],
