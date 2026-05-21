@@ -40,6 +40,7 @@ from app.domains.book.models import Book, BookSource, UserBook, UserBookStatus
 from app.domains.book.ports import (
     BookRepositoryPort,
     BookSearchPort,
+    ReviewRow,
     UserBookRepositoryPort,
 )
 
@@ -248,6 +249,23 @@ class BookService:
                 next_cursor = last.started_at.isoformat()
         return LibraryPage(items=rows, next_cursor=next_cursor)
 
+    async def list_book_reviews(
+        self,
+        *,
+        book_id: UUID,
+        exclude_user_id: UUID | None = None,
+        limit: int = 20,
+    ) -> list[ReviewRow]:
+        book = await self.books.get_by_id(book_id)
+        if book is None:
+            raise NotFoundError("book not found", code="BOOK_NOT_FOUND")
+        clamped = max(1, min(limit, 50))
+        return await self.user_books.list_reviews_for_book(
+            book_id,
+            exclude_user_id=exclude_user_id,
+            limit=clamped,
+        )
+
     async def get_discover_sections(self) -> list[DiscoverSection]:
         # Sections that drive the pre-search discovery screen.  Queries are
         # independent so we fire them in parallel; a failed section must not
@@ -277,5 +295,6 @@ __all__ = [
     "BookSource",
     "DiscoverSection",
     "LibraryPage",
+    "ReviewRow",
     "SearchBooksResult",
 ]

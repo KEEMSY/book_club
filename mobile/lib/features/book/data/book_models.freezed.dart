@@ -1819,3 +1819,428 @@ abstract class _SubmitReviewRequest implements SubmitReviewRequest {
   _$$SubmitReviewRequestImplCopyWith<_$SubmitReviewRequestImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
+
+BookReviewDto _$BookReviewDtoFromJson(Map<String, dynamic> json) {
+  return _BookReviewDto.fromJson(json);
+}
+
+/// @nodoc
+mixin _$BookReviewDto {
+  String get userBookId => throw _privateConstructorUsedError;
+  int get rating => throw _privateConstructorUsedError;
+  String? get oneLineReview => throw _privateConstructorUsedError;
+  String get authorNickname => throw _privateConstructorUsedError;
+  String? get authorProfileImageUrl => throw _privateConstructorUsedError;
+  DateTime get reviewedAt => throw _privateConstructorUsedError;
+
+  /// Serializes this BookReviewDto to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of BookReviewDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $BookReviewDtoCopyWith<BookReviewDto> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $BookReviewDtoCopyWith<$Res> {
+  factory $BookReviewDtoCopyWith(
+          BookReviewDto value, $Res Function(BookReviewDto) then) =
+      _$BookReviewDtoCopyWithImpl<$Res, BookReviewDto>;
+  @useResult
+  $Res call(
+      {String userBookId,
+      int rating,
+      String? oneLineReview,
+      String authorNickname,
+      String? authorProfileImageUrl,
+      DateTime reviewedAt});
+}
+
+/// @nodoc
+class _$BookReviewDtoCopyWithImpl<$Res, $Val extends BookReviewDto>
+    implements $BookReviewDtoCopyWith<$Res> {
+  _$BookReviewDtoCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of BookReviewDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? userBookId = null,
+    Object? rating = null,
+    Object? oneLineReview = freezed,
+    Object? authorNickname = null,
+    Object? authorProfileImageUrl = freezed,
+    Object? reviewedAt = null,
+  }) {
+    return _then(_value.copyWith(
+      userBookId: null == userBookId
+          ? _value.userBookId
+          : userBookId // ignore: cast_nullable_to_non_nullable
+              as String,
+      rating: null == rating
+          ? _value.rating
+          : rating // ignore: cast_nullable_to_non_nullable
+              as int,
+      oneLineReview: freezed == oneLineReview
+          ? _value.oneLineReview
+          : oneLineReview // ignore: cast_nullable_to_non_nullable
+              as String?,
+      authorNickname: null == authorNickname
+          ? _value.authorNickname
+          : authorNickname // ignore: cast_nullable_to_non_nullable
+              as String,
+      authorProfileImageUrl: freezed == authorProfileImageUrl
+          ? _value.authorProfileImageUrl
+          : authorProfileImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      reviewedAt: null == reviewedAt
+          ? _value.reviewedAt
+          : reviewedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$BookReviewDtoImplCopyWith<$Res>
+    implements $BookReviewDtoCopyWith<$Res> {
+  factory _$$BookReviewDtoImplCopyWith(
+          _$BookReviewDtoImpl value, $Res Function(_$BookReviewDtoImpl) then) =
+      __$$BookReviewDtoImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String userBookId,
+      int rating,
+      String? oneLineReview,
+      String authorNickname,
+      String? authorProfileImageUrl,
+      DateTime reviewedAt});
+}
+
+/// @nodoc
+class __$$BookReviewDtoImplCopyWithImpl<$Res>
+    extends _$BookReviewDtoCopyWithImpl<$Res, _$BookReviewDtoImpl>
+    implements _$$BookReviewDtoImplCopyWith<$Res> {
+  __$$BookReviewDtoImplCopyWithImpl(
+      _$BookReviewDtoImpl _value, $Res Function(_$BookReviewDtoImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of BookReviewDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? userBookId = null,
+    Object? rating = null,
+    Object? oneLineReview = freezed,
+    Object? authorNickname = null,
+    Object? authorProfileImageUrl = freezed,
+    Object? reviewedAt = null,
+  }) {
+    return _then(_$BookReviewDtoImpl(
+      userBookId: null == userBookId
+          ? _value.userBookId
+          : userBookId // ignore: cast_nullable_to_non_nullable
+              as String,
+      rating: null == rating
+          ? _value.rating
+          : rating // ignore: cast_nullable_to_non_nullable
+              as int,
+      oneLineReview: freezed == oneLineReview
+          ? _value.oneLineReview
+          : oneLineReview // ignore: cast_nullable_to_non_nullable
+              as String?,
+      authorNickname: null == authorNickname
+          ? _value.authorNickname
+          : authorNickname // ignore: cast_nullable_to_non_nullable
+              as String,
+      authorProfileImageUrl: freezed == authorProfileImageUrl
+          ? _value.authorProfileImageUrl
+          : authorProfileImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      reviewedAt: null == reviewedAt
+          ? _value.reviewedAt
+          : reviewedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$BookReviewDtoImpl extends _BookReviewDto {
+  const _$BookReviewDtoImpl(
+      {required this.userBookId,
+      required this.rating,
+      this.oneLineReview,
+      required this.authorNickname,
+      this.authorProfileImageUrl,
+      required this.reviewedAt})
+      : super._();
+
+  factory _$BookReviewDtoImpl.fromJson(Map<String, dynamic> json) =>
+      _$$BookReviewDtoImplFromJson(json);
+
+  @override
+  final String userBookId;
+  @override
+  final int rating;
+  @override
+  final String? oneLineReview;
+  @override
+  final String authorNickname;
+  @override
+  final String? authorProfileImageUrl;
+  @override
+  final DateTime reviewedAt;
+
+  @override
+  String toString() {
+    return 'BookReviewDto(userBookId: $userBookId, rating: $rating, oneLineReview: $oneLineReview, authorNickname: $authorNickname, authorProfileImageUrl: $authorProfileImageUrl, reviewedAt: $reviewedAt)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$BookReviewDtoImpl &&
+            (identical(other.userBookId, userBookId) ||
+                other.userBookId == userBookId) &&
+            (identical(other.rating, rating) || other.rating == rating) &&
+            (identical(other.oneLineReview, oneLineReview) ||
+                other.oneLineReview == oneLineReview) &&
+            (identical(other.authorNickname, authorNickname) ||
+                other.authorNickname == authorNickname) &&
+            (identical(other.authorProfileImageUrl, authorProfileImageUrl) ||
+                other.authorProfileImageUrl == authorProfileImageUrl) &&
+            (identical(other.reviewedAt, reviewedAt) ||
+                other.reviewedAt == reviewedAt));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, userBookId, rating,
+      oneLineReview, authorNickname, authorProfileImageUrl, reviewedAt);
+
+  /// Create a copy of BookReviewDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$BookReviewDtoImplCopyWith<_$BookReviewDtoImpl> get copyWith =>
+      __$$BookReviewDtoImplCopyWithImpl<_$BookReviewDtoImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$BookReviewDtoImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _BookReviewDto extends BookReviewDto {
+  const factory _BookReviewDto(
+      {required final String userBookId,
+      required final int rating,
+      final String? oneLineReview,
+      required final String authorNickname,
+      final String? authorProfileImageUrl,
+      required final DateTime reviewedAt}) = _$BookReviewDtoImpl;
+  const _BookReviewDto._() : super._();
+
+  factory _BookReviewDto.fromJson(Map<String, dynamic> json) =
+      _$BookReviewDtoImpl.fromJson;
+
+  @override
+  String get userBookId;
+  @override
+  int get rating;
+  @override
+  String? get oneLineReview;
+  @override
+  String get authorNickname;
+  @override
+  String? get authorProfileImageUrl;
+  @override
+  DateTime get reviewedAt;
+
+  /// Create a copy of BookReviewDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$BookReviewDtoImplCopyWith<_$BookReviewDtoImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+BookReviewsResponseDto _$BookReviewsResponseDtoFromJson(
+    Map<String, dynamic> json) {
+  return _BookReviewsResponseDto.fromJson(json);
+}
+
+/// @nodoc
+mixin _$BookReviewsResponseDto {
+  List<BookReviewDto> get items => throw _privateConstructorUsedError;
+
+  /// Serializes this BookReviewsResponseDto to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of BookReviewsResponseDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $BookReviewsResponseDtoCopyWith<BookReviewsResponseDto> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $BookReviewsResponseDtoCopyWith<$Res> {
+  factory $BookReviewsResponseDtoCopyWith(BookReviewsResponseDto value,
+          $Res Function(BookReviewsResponseDto) then) =
+      _$BookReviewsResponseDtoCopyWithImpl<$Res, BookReviewsResponseDto>;
+  @useResult
+  $Res call({List<BookReviewDto> items});
+}
+
+/// @nodoc
+class _$BookReviewsResponseDtoCopyWithImpl<$Res,
+        $Val extends BookReviewsResponseDto>
+    implements $BookReviewsResponseDtoCopyWith<$Res> {
+  _$BookReviewsResponseDtoCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of BookReviewsResponseDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? items = null,
+  }) {
+    return _then(_value.copyWith(
+      items: null == items
+          ? _value.items
+          : items // ignore: cast_nullable_to_non_nullable
+              as List<BookReviewDto>,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$BookReviewsResponseDtoImplCopyWith<$Res>
+    implements $BookReviewsResponseDtoCopyWith<$Res> {
+  factory _$$BookReviewsResponseDtoImplCopyWith(
+          _$BookReviewsResponseDtoImpl value,
+          $Res Function(_$BookReviewsResponseDtoImpl) then) =
+      __$$BookReviewsResponseDtoImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({List<BookReviewDto> items});
+}
+
+/// @nodoc
+class __$$BookReviewsResponseDtoImplCopyWithImpl<$Res>
+    extends _$BookReviewsResponseDtoCopyWithImpl<$Res,
+        _$BookReviewsResponseDtoImpl>
+    implements _$$BookReviewsResponseDtoImplCopyWith<$Res> {
+  __$$BookReviewsResponseDtoImplCopyWithImpl(
+      _$BookReviewsResponseDtoImpl _value,
+      $Res Function(_$BookReviewsResponseDtoImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of BookReviewsResponseDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? items = null,
+  }) {
+    return _then(_$BookReviewsResponseDtoImpl(
+      items: null == items
+          ? _value._items
+          : items // ignore: cast_nullable_to_non_nullable
+              as List<BookReviewDto>,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$BookReviewsResponseDtoImpl implements _BookReviewsResponseDto {
+  const _$BookReviewsResponseDtoImpl({required final List<BookReviewDto> items})
+      : _items = items;
+
+  factory _$BookReviewsResponseDtoImpl.fromJson(Map<String, dynamic> json) =>
+      _$$BookReviewsResponseDtoImplFromJson(json);
+
+  final List<BookReviewDto> _items;
+  @override
+  List<BookReviewDto> get items {
+    if (_items is EqualUnmodifiableListView) return _items;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_items);
+  }
+
+  @override
+  String toString() {
+    return 'BookReviewsResponseDto(items: $items)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$BookReviewsResponseDtoImpl &&
+            const DeepCollectionEquality().equals(other._items, _items));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(_items));
+
+  /// Create a copy of BookReviewsResponseDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$BookReviewsResponseDtoImplCopyWith<_$BookReviewsResponseDtoImpl>
+      get copyWith => __$$BookReviewsResponseDtoImplCopyWithImpl<
+          _$BookReviewsResponseDtoImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$BookReviewsResponseDtoImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _BookReviewsResponseDto implements BookReviewsResponseDto {
+  const factory _BookReviewsResponseDto(
+          {required final List<BookReviewDto> items}) =
+      _$BookReviewsResponseDtoImpl;
+
+  factory _BookReviewsResponseDto.fromJson(Map<String, dynamic> json) =
+      _$BookReviewsResponseDtoImpl.fromJson;
+
+  @override
+  List<BookReviewDto> get items;
+
+  /// Create a copy of BookReviewsResponseDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$BookReviewsResponseDtoImplCopyWith<_$BookReviewsResponseDtoImpl>
+      get copyWith => throw _privateConstructorUsedError;
+}

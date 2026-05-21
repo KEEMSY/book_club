@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
 import '../domain/book.dart';
+import '../domain/book_review.dart';
 import '../domain/book_status.dart';
 import '../domain/user_book.dart';
 import 'book_api.dart';
@@ -117,6 +118,16 @@ class BookRepository {
 
   Future<DiscoverResponseDto> getDiscover() async {
     return _call(() => _api.getDiscover());
+  }
+
+  Future<List<BookReview>> getBookReviews(
+    String bookId, {
+    int limit = 20,
+  }) async {
+    final BookReviewsResponseDto resp = await _call(
+      () => _api.getBookReviews(bookId, limit: limit),
+    );
+    return resp.items.map((dto) => dto.toDomain()).toList(growable: false);
   }
 
   Future<LibraryPage> listLibrary({

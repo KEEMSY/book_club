@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../domain/book.dart';
+import '../domain/book_review.dart';
 import '../domain/book_status.dart';
 import '../domain/user_book.dart';
 
@@ -160,4 +161,44 @@ class SubmitReviewRequest with _$SubmitReviewRequest {
 
   factory SubmitReviewRequest.fromJson(Map<String, dynamic> json) =>
       _$SubmitReviewRequestFromJson(json);
+}
+
+/// Single review item from `GET /books/{book_id}/reviews`.
+@freezed
+class BookReviewDto with _$BookReviewDto {
+  const BookReviewDto._();
+
+  const factory BookReviewDto({
+    required String userBookId,
+    required int rating,
+    String? oneLineReview,
+    required String authorNickname,
+    String? authorProfileImageUrl,
+    required DateTime reviewedAt,
+  }) = _BookReviewDto;
+
+  factory BookReviewDto.fromJson(Map<String, dynamic> json) =>
+      _$BookReviewDtoFromJson(json);
+
+  BookReview toDomain() {
+    return BookReview(
+      userBookId: userBookId,
+      rating: rating,
+      oneLineReview: oneLineReview,
+      authorNickname: authorNickname,
+      authorProfileImageUrl: authorProfileImageUrl,
+      reviewedAt: reviewedAt,
+    );
+  }
+}
+
+/// Response envelope for `GET /books/{book_id}/reviews`.
+@freezed
+class BookReviewsResponseDto with _$BookReviewsResponseDto {
+  const factory BookReviewsResponseDto({
+    required List<BookReviewDto> items,
+  }) = _BookReviewsResponseDto;
+
+  factory BookReviewsResponseDto.fromJson(Map<String, dynamic> json) =>
+      _$BookReviewsResponseDtoFromJson(json);
 }

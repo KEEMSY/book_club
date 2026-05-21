@@ -12,7 +12,7 @@ _$BookDtoImpl _$$BookDtoImplFromJson(Map<String, dynamic> json) =>
       isbn13: json['isbn13'] as String,
       title: json['title'] as String,
       author: json['author'] as String,
-      publisher: (json['publisher'] as String?) ?? '',
+      publisher: json['publisher'] as String,
       coverUrl: json['cover_url'] as String?,
       description: json['description'] as String?,
     );
@@ -159,4 +159,38 @@ Map<String, dynamic> _$$SubmitReviewRequestImplToJson(
     <String, dynamic>{
       'rating': instance.rating,
       'one_line_review': instance.oneLineReview,
+    };
+
+_$BookReviewDtoImpl _$$BookReviewDtoImplFromJson(Map<String, dynamic> json) =>
+    _$BookReviewDtoImpl(
+      userBookId: json['user_book_id'] as String,
+      rating: (json['rating'] as num).toInt(),
+      oneLineReview: json['one_line_review'] as String?,
+      authorNickname: json['author_nickname'] as String,
+      authorProfileImageUrl: json['author_profile_image_url'] as String?,
+      reviewedAt: DateTime.parse(json['reviewed_at'] as String),
+    );
+
+Map<String, dynamic> _$$BookReviewDtoImplToJson(_$BookReviewDtoImpl instance) =>
+    <String, dynamic>{
+      'user_book_id': instance.userBookId,
+      'rating': instance.rating,
+      'one_line_review': instance.oneLineReview,
+      'author_nickname': instance.authorNickname,
+      'author_profile_image_url': instance.authorProfileImageUrl,
+      'reviewed_at': instance.reviewedAt.toIso8601String(),
+    };
+
+_$BookReviewsResponseDtoImpl _$$BookReviewsResponseDtoImplFromJson(
+        Map<String, dynamic> json) =>
+    _$BookReviewsResponseDtoImpl(
+      items: (json['items'] as List<dynamic>)
+          .map((e) => BookReviewDto.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
+Map<String, dynamic> _$$BookReviewsResponseDtoImplToJson(
+        _$BookReviewsResponseDtoImpl instance) =>
+    <String, dynamic>{
+      'items': instance.items.map((e) => e.toJson()).toList(),
     };

@@ -100,3 +100,16 @@ class UserBookPublic(BaseModel):
 class LibraryResponse(BaseModel):
     items: list[UserBookPublic]
     next_cursor: str | None
+
+
+class BookReviewPublic(BaseModel):
+    user_book_id: UUID
+    rating: int
+    one_line_review: str | None
+    author_nickname: str
+    author_profile_image_url: str | None
+    reviewed_at: datetime
+
+
+class BookReviewsResponse(BaseModel):
+    items: list[BookReviewPublic]

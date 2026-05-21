@@ -23,6 +23,8 @@ from app.domains.book.providers import get_book_service
 from app.domains.book.schemas import (
     AddToLibraryRequest,
     BookPublic,
+    BookReviewPublic,
+    BookReviewsResponse,
     DiscoverResponse,
     DiscoverSectionPublic,
     LibraryResponse,
@@ -125,6 +127,33 @@ async def discover_books(
                 books=[SearchBookItem.model_validate(b) for b in s.books],
             )
             for s in sections
+        ]
+    )
+
+
+@router.get("/books/{book_id}/reviews", response_model=BookReviewsResponse)
+async def list_book_reviews(
+    book_id: UUID,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[BookService, Depends(get_book_service)],
+    limit: Annotated[int, Query(ge=1, le=50)] = 20,
+) -> BookReviewsResponse:
+    rows = await service.list_book_reviews(
+        book_id=book_id,
+        exclude_user_id=UUID(user_id),
+        limit=limit,
+    )
+    return BookReviewsResponse(
+        items=[
+            BookReviewPublic(
+                user_book_id=r.user_book_id,
+                rating=r.rating,
+                one_line_review=r.one_line_review,
+                author_nickname=r.author_nickname,
+                author_profile_image_url=r.author_profile_image_url,
+                reviewed_at=r.reviewed_at,
+            )
+            for r in rows
         ]
     )
 

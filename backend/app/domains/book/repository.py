@@ -29,7 +29,9 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import ConflictError, NotFoundError
+from app.domains.auth.models import User
 from app.domains.book.models import Book, BookSource, UserBook, UserBookStatus
+from app.domains.book.ports import ReviewRow
 
 
 class BookRepository:
@@ -188,6 +190,45 @@ class UserBookRepository:
         if ub is None:
             raise NotFoundError("user_book not found", code="USER_BOOK_NOT_FOUND")
         await self._session.delete(ub)
+
+    async def list_reviews_for_book(
+        self,
+        book_id: UUID,
+        *,
+        exclude_user_id: UUID | None = None,
+        limit: int = 20,
+    ) -> list[ReviewRow]:
+        conditions = [
+            UserBook.book_id == book_id,
+            UserBook.rating.is_not(None),
+            User.deleted_at.is_(None),
+        ]
+        if exclude_user_id is not None:
+            conditions.append(UserBook.user_id != exclude_user_id)
+
+        stmt = (
+            select(UserBook, User)
+            .join(User, UserBook.user_id == User.id)
+            .where(and_(*conditions))
+            .order_by(UserBook.updated_at.desc())
+            .limit(limit)
+        )
+        result = await self._session.execute(stmt)
+        rows: list[ReviewRow] = []
+        for ub, user in result.all():
+            rows.append(
+                ReviewRow(
+                    user_book_id=ub.id,
+                    book_id=ub.book_id,
+                    rating=ub.rating,
+                    one_line_review=ub.one_line_review,
+                    author_user_id=user.id,
+                    author_nickname=user.nickname,
+                    author_profile_image_url=user.profile_image_url,
+                    reviewed_at=ub.updated_at,
+                )
+            )
+        return rows
 
     async def list_for_user(
         self,

@@ -13,9 +13,13 @@ import '../application/book_detail_notifier.dart';
 import '../application/book_detail_state.dart';
 import '../application/book_providers.dart';
 import '../application/library_notifier.dart';
+import '../application/library_state.dart';
 import '../domain/book.dart';
+import '../domain/book_review.dart';
 import '../domain/book_status.dart';
+import '../domain/user_book.dart';
 import 'widgets/book_cover.dart';
+import 'widgets/review_modal.dart';
 
 /// Two-pane Airbnb-toned book detail:
 ///   * Hero cover with a three-layer shadow (AppShadows.elevated).
@@ -125,7 +129,7 @@ class BookDetailScreen extends ConsumerWidget {
   }
 }
 
-enum _DetailTab { highlights, feed }
+enum _DetailTab { highlights, reviews, feed }
 
 class _Content extends ConsumerStatefulWidget {
   const _Content({
@@ -165,6 +169,25 @@ class _ContentState extends ConsumerState<_Content> {
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+
+  /// Returns the UserBook for the current user if available, preferring the
+  /// fresh library cache (reactive after review submit) over the detail state.
+  UserBook? _resolveUserBook() {
+    final String? ubId = widget.userBookId;
+    if (ubId == null) return null;
+
+    final lib = ref.read(libraryNotifierProvider);
+    for (final listState in lib.values) {
+      if (listState is LibraryListLoaded) {
+        final int idx = listState.items.indexWhere((b) => b.id == ubId);
+        if (idx != -1) return listState.items[idx];
+      }
+    }
+    // Fall back to the state that was passed at construction (e.g. just-added).
+    final ls = widget.libraryState;
+    if (ls is LibraryCtaAdded) return ls.userBook;
+    return null;
   }
 
   @override
@@ -258,7 +281,7 @@ class _ContentState extends ConsumerState<_Content> {
             SizedBox(height: spacing.xl),
             const Divider(height: 1),
             SizedBox(height: spacing.lg),
-            // ── Content area: highlights (private) vs community feed (public) ──
+            // ── Content area: highlights / reviews / community feed ──
             if (inLibrary) ...<Widget>[
               _ContentToggle(
                 active: _activeTab,
@@ -269,6 +292,12 @@ class _ContentState extends ConsumerState<_Content> {
                 _HighlightSection(
                   userBookId: widget.userBookId!,
                   bookId: book.id,
+                )
+              else if (_activeTab == _DetailTab.reviews)
+                _ReviewsSection(
+                  bookId: book.id,
+                  userBookId: widget.userBookId,
+                  initialUserBook: _resolveUserBook(),
                 )
               else
                 BookFeedSection(
@@ -308,14 +337,20 @@ class _ContentToggle extends StatelessWidget {
       child: Row(
         children: <Widget>[
           _ToggleSegment(
-            icon: Icons.lock_outline_rounded,
-            label: '내 하이라이트',
+            icon: Icons.bookmark_outline_rounded,
+            label: '하이라이트',
             selected: active == _DetailTab.highlights,
             onTap: () => onChanged(_DetailTab.highlights),
           ),
           _ToggleSegment(
+            icon: Icons.star_outline_rounded,
+            label: '리뷰',
+            selected: active == _DetailTab.reviews,
+            onTap: () => onChanged(_DetailTab.reviews),
+          ),
+          _ToggleSegment(
             icon: Icons.people_outline_rounded,
-            label: '커뮤니티 피드',
+            label: '피드',
             selected: active == _DetailTab.feed,
             onTap: () => onChanged(_DetailTab.feed),
           ),
@@ -585,6 +620,279 @@ class _ErrorView extends StatelessWidget {
               child: const Text('다시 시도'),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Reviews section
+// ---------------------------------------------------------------------------
+
+class _ReviewsSection extends ConsumerWidget {
+  const _ReviewsSection({
+    required this.bookId,
+    this.userBookId,
+    this.initialUserBook,
+  });
+
+  final String bookId;
+  final String? userBookId;
+  final UserBook? initialUserBook;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+
+    // Prefer the live library cache so the section updates immediately after
+    // a review is saved without requiring a full screen reload.
+    UserBook? myUserBook = initialUserBook;
+    if (userBookId != null) {
+      final lib = ref.watch(libraryNotifierProvider);
+      for (final listState in lib.values) {
+        if (listState is LibraryListLoaded) {
+          final int idx =
+              listState.items.indexWhere((b) => b.id == userBookId);
+          if (idx != -1) {
+            myUserBook = listState.items[idx];
+            break;
+          }
+        }
+      }
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        if (myUserBook != null) ...<Widget>[
+          _MyReviewCard(userBook: myUserBook),
+          SizedBox(height: spacing.xl),
+        ],
+        Text('커뮤니티 리뷰', style: theme.textTheme.titleMedium),
+        SizedBox(height: spacing.md),
+        _CommunityReviewsList(bookId: bookId),
+      ],
+    );
+  }
+}
+
+class _MyReviewCard extends ConsumerWidget {
+  const _MyReviewCard({required this.userBook});
+
+  final UserBook userBook;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+    final radii = theme.extension<AppRadius>()!;
+
+    final bool hasReview = userBook.rating != null;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Row(
+          children: <Widget>[
+            Expanded(
+              child: Text('내 리뷰', style: theme.textTheme.titleMedium),
+            ),
+            TextButton(
+              onPressed: () => _openReviewModal(context, ref),
+              child: Text(hasReview ? '수정' : '작성'),
+            ),
+          ],
+        ),
+        SizedBox(height: spacing.xs),
+        if (!hasReview)
+          Text(
+            '아직 리뷰를 작성하지 않았어요.',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          )
+        else
+          Container(
+            padding: EdgeInsets.all(spacing.md),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerLow,
+              borderRadius: BorderRadius.all(Radius.circular(radii.md)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                _ReadOnlyStars(rating: userBook.rating!, size: 20),
+                if (userBook.oneLineReview != null &&
+                    userBook.oneLineReview!.isNotEmpty) ...<Widget>[
+                  SizedBox(height: spacing.sm),
+                  Text(
+                    userBook.oneLineReview!,
+                    style: theme.textTheme.bodyMedium?.copyWith(height: 1.5),
+                  ),
+                ],
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+
+  Future<void> _openReviewModal(BuildContext context, WidgetRef ref) async {
+    await ReviewModal.show(context, userBook: userBook);
+  }
+}
+
+class _CommunityReviewsList extends ConsumerWidget {
+  const _CommunityReviewsList({required this.bookId});
+
+  final String bookId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+    final AsyncValue<List<BookReview>> asyncReviews =
+        ref.watch(bookReviewsProvider(bookId));
+
+    return asyncReviews.when(
+      loading: () => const Padding(
+        padding: EdgeInsets.symmetric(vertical: 24),
+        child: Center(child: CircularProgressIndicator()),
+      ),
+      error: (_, __) => Padding(
+        padding: EdgeInsets.symmetric(vertical: spacing.md),
+        child: Text(
+          '리뷰를 불러오지 못했어요.',
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ),
+      data: (reviews) {
+        if (reviews.isEmpty) {
+          return Padding(
+            padding: EdgeInsets.symmetric(vertical: spacing.md),
+            child: Text(
+              '아직 다른 독자의 리뷰가 없어요.',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          );
+        }
+        return Column(
+          children: reviews
+              .map((r) => _CommunityReviewCard(review: r))
+              .toList(growable: false),
+        );
+      },
+    );
+  }
+}
+
+class _CommunityReviewCard extends StatelessWidget {
+  const _CommunityReviewCard({required this.review});
+
+  final BookReview review;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+    final radii = theme.extension<AppRadius>()!;
+
+    return Container(
+      margin: EdgeInsets.only(bottom: spacing.sm),
+      padding: EdgeInsets.all(spacing.md),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.all(Radius.circular(radii.md)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              CircleAvatar(
+                radius: 16,
+                backgroundColor: theme.colorScheme.secondaryContainer,
+                backgroundImage: review.authorProfileImageUrl != null
+                    ? NetworkImage(review.authorProfileImageUrl!)
+                    : null,
+                child: review.authorProfileImageUrl == null
+                    ? Text(
+                        review.authorNickname.isNotEmpty
+                            ? review.authorNickname[0]
+                            : '?',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.onSecondaryContainer,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      )
+                    : null,
+              ),
+              SizedBox(width: spacing.sm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      review.authorNickname,
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    _ReadOnlyStars(rating: review.rating, size: 13),
+                  ],
+                ),
+              ),
+              Text(
+                _formatDate(review.reviewedAt),
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+          if (review.oneLineReview != null &&
+              review.oneLineReview!.isNotEmpty) ...<Widget>[
+            SizedBox(height: spacing.sm),
+            Text(
+              review.oneLineReview!,
+              style: theme.textTheme.bodySmall?.copyWith(height: 1.5),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  String _formatDate(DateTime dt) {
+    return '${dt.year}.${dt.month.toString().padLeft(2, '0')}.${dt.day.toString().padLeft(2, '0')}';
+  }
+}
+
+class _ReadOnlyStars extends StatelessWidget {
+  const _ReadOnlyStars({required this.rating, this.size = 16});
+
+  final int rating;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: List<Widget>.generate(
+        5,
+        (int i) => Icon(
+          i < rating ? Icons.star_rounded : Icons.star_outline_rounded,
+          size: size,
+          color: i < rating
+              ? theme.colorScheme.primary
+              : theme.colorScheme.outline,
         ),
       ),
     );

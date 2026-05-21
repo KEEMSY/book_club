@@ -67,4 +67,10 @@ abstract class BookApi {
 
   @GET('/books/discover')
   Future<DiscoverResponseDto> getDiscover();
+
+  @GET('/books/{book_id}/reviews')
+  Future<BookReviewsResponseDto> getBookReviews(
+    @Path('book_id') String bookId, {
+    @Query('limit') int limit = 20,
+  });
 }

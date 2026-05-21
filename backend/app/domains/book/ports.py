@@ -20,6 +20,24 @@ from app.domains.book.models import Book, BookSource, UserBook, UserBookStatus
 
 
 @dataclass(frozen=True, slots=True)
+class ReviewRow:
+    """Flattened shape for a single book review, including author info.
+
+    Returned by ``list_reviews_for_book`` so the service and router never
+    touch auth models directly.
+    """
+
+    user_book_id: UUID
+    book_id: UUID
+    rating: int
+    one_line_review: str | None
+    author_user_id: UUID
+    author_nickname: str
+    author_profile_image_url: str | None
+    reviewed_at: datetime
+
+
+@dataclass(frozen=True, slots=True)
 class ExternalBook:
     """Normalized shape returned by any external book search adapter.
 
@@ -91,6 +109,14 @@ class UserBookRepositoryPort(Protocol):
     ) -> UserBook: ...
 
     async def delete(self, user_book_id: UUID) -> None: ...
+
+    async def list_reviews_for_book(
+        self,
+        book_id: UUID,
+        *,
+        exclude_user_id: UUID | None = None,
+        limit: int = 20,
+    ) -> list[ReviewRow]: ...
 
     async def list_for_user(
         self,
