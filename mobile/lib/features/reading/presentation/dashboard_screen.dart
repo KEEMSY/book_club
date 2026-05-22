@@ -842,26 +842,52 @@ class _YearStatsCard extends ConsumerWidget {
         border: Border.all(color: theme.colorScheme.outlineVariant),
         boxShadow: theme.extension<AppShadows>()!.elevated,
       ),
-      child: async.when(
-        loading: () => const SizedBox(
-          height: 72,
-          child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
-        ),
-        error: (_, __) => const SizedBox(
-          height: 72,
-          child: Center(child: Icon(Icons.cloud_off_rounded)),
-        ),
-        data: (ReadingYearStats stats) => Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              '${stats.year}년 독서 여정',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w700,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            '$year년 독서 여정',
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          SizedBox(height: spacing.md),
+          async.when(
+            loading: () => const SizedBox(
+              height: 48,
+              child: Center(
+                child: CircularProgressIndicator(strokeWidth: 2),
               ),
             ),
-            SizedBox(height: spacing.md),
-            Row(
+            error: (_, __) => Row(
+              children: <Widget>[
+                Icon(
+                  Icons.cloud_off_rounded,
+                  size: 18,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    '통계를 불러오지 못했어요',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => ref.invalidate(yearStatsProvider(year)),
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    minimumSize: const Size(0, 0),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  child: const Text('다시 시도'),
+                ),
+              ],
+            ),
+            data: (ReadingYearStats stats) => Row(
               children: <Widget>[
                 Expanded(
                   child: _YearStatItem(
@@ -894,8 +920,8 @@ class _YearStatsCard extends ConsumerWidget {
                   ),
               ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
