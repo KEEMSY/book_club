@@ -71,4 +71,9 @@ abstract class ReadingApi {
   Future<DailySessionsResponseDto> getDailySessions({
     @Query('date') required String date,
   });
+
+  @GET('/reading/stats')
+  Future<ReadingYearStatsDto> getYearStats({
+    @Query('year') required int year,
+  });
 }

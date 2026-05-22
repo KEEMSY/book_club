@@ -7,6 +7,7 @@ import '../domain/grade_summary.dart';
 import '../domain/heatmap_day.dart';
 import '../domain/reading_goal.dart';
 import '../domain/reading_session.dart';
+import '../domain/reading_year_stats.dart';
 import 'reading_api.dart';
 import 'reading_models.dart';
 
@@ -169,6 +170,12 @@ class ReadingRepository {
     return _call(
       () => _api.getDailySessions(date: _dateWire.format(date)),
     );
+  }
+
+  Future<ReadingYearStats> getYearStats(int year) async {
+    final ReadingYearStatsDto dto =
+        await _call(() => _api.getYearStats(year: year));
+    return dto.toDomain();
   }
 
   Future<T> _call<T>(Future<T> Function() fn) async {

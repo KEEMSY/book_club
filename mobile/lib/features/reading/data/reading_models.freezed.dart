@@ -3102,3 +3102,337 @@ abstract class _CreateGoalRequest implements CreateGoalRequest {
   _$$CreateGoalRequestImplCopyWith<_$CreateGoalRequestImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
+
+ReadingYearStatsDto _$ReadingYearStatsDtoFromJson(Map<String, dynamic> json) {
+  return _ReadingYearStatsDto.fromJson(json);
+}
+
+/// @nodoc
+mixin _$ReadingYearStatsDto {
+  int get year => throw _privateConstructorUsedError;
+  int get yearBooks => throw _privateConstructorUsedError;
+  int get yearSeconds => throw _privateConstructorUsedError;
+  String? get yearBestDayDate => throw _privateConstructorUsedError;
+  int? get yearBestDaySeconds => throw _privateConstructorUsedError;
+  int get totalBooks => throw _privateConstructorUsedError;
+  int get totalSeconds => throw _privateConstructorUsedError;
+  int get streakDays => throw _privateConstructorUsedError;
+  int get longestStreak => throw _privateConstructorUsedError;
+
+  /// Serializes this ReadingYearStatsDto to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of ReadingYearStatsDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $ReadingYearStatsDtoCopyWith<ReadingYearStatsDto> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $ReadingYearStatsDtoCopyWith<$Res> {
+  factory $ReadingYearStatsDtoCopyWith(
+          ReadingYearStatsDto value, $Res Function(ReadingYearStatsDto) then) =
+      _$ReadingYearStatsDtoCopyWithImpl<$Res, ReadingYearStatsDto>;
+  @useResult
+  $Res call(
+      {int year,
+      int yearBooks,
+      int yearSeconds,
+      String? yearBestDayDate,
+      int? yearBestDaySeconds,
+      int totalBooks,
+      int totalSeconds,
+      int streakDays,
+      int longestStreak});
+}
+
+/// @nodoc
+class _$ReadingYearStatsDtoCopyWithImpl<$Res, $Val extends ReadingYearStatsDto>
+    implements $ReadingYearStatsDtoCopyWith<$Res> {
+  _$ReadingYearStatsDtoCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of ReadingYearStatsDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? year = null,
+    Object? yearBooks = null,
+    Object? yearSeconds = null,
+    Object? yearBestDayDate = freezed,
+    Object? yearBestDaySeconds = freezed,
+    Object? totalBooks = null,
+    Object? totalSeconds = null,
+    Object? streakDays = null,
+    Object? longestStreak = null,
+  }) {
+    return _then(_value.copyWith(
+      year: null == year
+          ? _value.year
+          : year // ignore: cast_nullable_to_non_nullable
+              as int,
+      yearBooks: null == yearBooks
+          ? _value.yearBooks
+          : yearBooks // ignore: cast_nullable_to_non_nullable
+              as int,
+      yearSeconds: null == yearSeconds
+          ? _value.yearSeconds
+          : yearSeconds // ignore: cast_nullable_to_non_nullable
+              as int,
+      yearBestDayDate: freezed == yearBestDayDate
+          ? _value.yearBestDayDate
+          : yearBestDayDate // ignore: cast_nullable_to_non_nullable
+              as String?,
+      yearBestDaySeconds: freezed == yearBestDaySeconds
+          ? _value.yearBestDaySeconds
+          : yearBestDaySeconds // ignore: cast_nullable_to_non_nullable
+              as int?,
+      totalBooks: null == totalBooks
+          ? _value.totalBooks
+          : totalBooks // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalSeconds: null == totalSeconds
+          ? _value.totalSeconds
+          : totalSeconds // ignore: cast_nullable_to_non_nullable
+              as int,
+      streakDays: null == streakDays
+          ? _value.streakDays
+          : streakDays // ignore: cast_nullable_to_non_nullable
+              as int,
+      longestStreak: null == longestStreak
+          ? _value.longestStreak
+          : longestStreak // ignore: cast_nullable_to_non_nullable
+              as int,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$ReadingYearStatsDtoImplCopyWith<$Res>
+    implements $ReadingYearStatsDtoCopyWith<$Res> {
+  factory _$$ReadingYearStatsDtoImplCopyWith(_$ReadingYearStatsDtoImpl value,
+          $Res Function(_$ReadingYearStatsDtoImpl) then) =
+      __$$ReadingYearStatsDtoImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {int year,
+      int yearBooks,
+      int yearSeconds,
+      String? yearBestDayDate,
+      int? yearBestDaySeconds,
+      int totalBooks,
+      int totalSeconds,
+      int streakDays,
+      int longestStreak});
+}
+
+/// @nodoc
+class __$$ReadingYearStatsDtoImplCopyWithImpl<$Res>
+    extends _$ReadingYearStatsDtoCopyWithImpl<$Res, _$ReadingYearStatsDtoImpl>
+    implements _$$ReadingYearStatsDtoImplCopyWith<$Res> {
+  __$$ReadingYearStatsDtoImplCopyWithImpl(_$ReadingYearStatsDtoImpl _value,
+      $Res Function(_$ReadingYearStatsDtoImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of ReadingYearStatsDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? year = null,
+    Object? yearBooks = null,
+    Object? yearSeconds = null,
+    Object? yearBestDayDate = freezed,
+    Object? yearBestDaySeconds = freezed,
+    Object? totalBooks = null,
+    Object? totalSeconds = null,
+    Object? streakDays = null,
+    Object? longestStreak = null,
+  }) {
+    return _then(_$ReadingYearStatsDtoImpl(
+      year: null == year
+          ? _value.year
+          : year // ignore: cast_nullable_to_non_nullable
+              as int,
+      yearBooks: null == yearBooks
+          ? _value.yearBooks
+          : yearBooks // ignore: cast_nullable_to_non_nullable
+              as int,
+      yearSeconds: null == yearSeconds
+          ? _value.yearSeconds
+          : yearSeconds // ignore: cast_nullable_to_non_nullable
+              as int,
+      yearBestDayDate: freezed == yearBestDayDate
+          ? _value.yearBestDayDate
+          : yearBestDayDate // ignore: cast_nullable_to_non_nullable
+              as String?,
+      yearBestDaySeconds: freezed == yearBestDaySeconds
+          ? _value.yearBestDaySeconds
+          : yearBestDaySeconds // ignore: cast_nullable_to_non_nullable
+              as int?,
+      totalBooks: null == totalBooks
+          ? _value.totalBooks
+          : totalBooks // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalSeconds: null == totalSeconds
+          ? _value.totalSeconds
+          : totalSeconds // ignore: cast_nullable_to_non_nullable
+              as int,
+      streakDays: null == streakDays
+          ? _value.streakDays
+          : streakDays // ignore: cast_nullable_to_non_nullable
+              as int,
+      longestStreak: null == longestStreak
+          ? _value.longestStreak
+          : longestStreak // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$ReadingYearStatsDtoImpl extends _ReadingYearStatsDto {
+  const _$ReadingYearStatsDtoImpl(
+      {required this.year,
+      required this.yearBooks,
+      required this.yearSeconds,
+      this.yearBestDayDate,
+      this.yearBestDaySeconds,
+      required this.totalBooks,
+      required this.totalSeconds,
+      required this.streakDays,
+      required this.longestStreak})
+      : super._();
+
+  factory _$ReadingYearStatsDtoImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ReadingYearStatsDtoImplFromJson(json);
+
+  @override
+  final int year;
+  @override
+  final int yearBooks;
+  @override
+  final int yearSeconds;
+  @override
+  final String? yearBestDayDate;
+  @override
+  final int? yearBestDaySeconds;
+  @override
+  final int totalBooks;
+  @override
+  final int totalSeconds;
+  @override
+  final int streakDays;
+  @override
+  final int longestStreak;
+
+  @override
+  String toString() {
+    return 'ReadingYearStatsDto(year: $year, yearBooks: $yearBooks, yearSeconds: $yearSeconds, yearBestDayDate: $yearBestDayDate, yearBestDaySeconds: $yearBestDaySeconds, totalBooks: $totalBooks, totalSeconds: $totalSeconds, streakDays: $streakDays, longestStreak: $longestStreak)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ReadingYearStatsDtoImpl &&
+            (identical(other.year, year) || other.year == year) &&
+            (identical(other.yearBooks, yearBooks) ||
+                other.yearBooks == yearBooks) &&
+            (identical(other.yearSeconds, yearSeconds) ||
+                other.yearSeconds == yearSeconds) &&
+            (identical(other.yearBestDayDate, yearBestDayDate) ||
+                other.yearBestDayDate == yearBestDayDate) &&
+            (identical(other.yearBestDaySeconds, yearBestDaySeconds) ||
+                other.yearBestDaySeconds == yearBestDaySeconds) &&
+            (identical(other.totalBooks, totalBooks) ||
+                other.totalBooks == totalBooks) &&
+            (identical(other.totalSeconds, totalSeconds) ||
+                other.totalSeconds == totalSeconds) &&
+            (identical(other.streakDays, streakDays) ||
+                other.streakDays == streakDays) &&
+            (identical(other.longestStreak, longestStreak) ||
+                other.longestStreak == longestStreak));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      year,
+      yearBooks,
+      yearSeconds,
+      yearBestDayDate,
+      yearBestDaySeconds,
+      totalBooks,
+      totalSeconds,
+      streakDays,
+      longestStreak);
+
+  /// Create a copy of ReadingYearStatsDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ReadingYearStatsDtoImplCopyWith<_$ReadingYearStatsDtoImpl> get copyWith =>
+      __$$ReadingYearStatsDtoImplCopyWithImpl<_$ReadingYearStatsDtoImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$ReadingYearStatsDtoImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _ReadingYearStatsDto extends ReadingYearStatsDto {
+  const factory _ReadingYearStatsDto(
+      {required final int year,
+      required final int yearBooks,
+      required final int yearSeconds,
+      final String? yearBestDayDate,
+      final int? yearBestDaySeconds,
+      required final int totalBooks,
+      required final int totalSeconds,
+      required final int streakDays,
+      required final int longestStreak}) = _$ReadingYearStatsDtoImpl;
+  const _ReadingYearStatsDto._() : super._();
+
+  factory _ReadingYearStatsDto.fromJson(Map<String, dynamic> json) =
+      _$ReadingYearStatsDtoImpl.fromJson;
+
+  @override
+  int get year;
+  @override
+  int get yearBooks;
+  @override
+  int get yearSeconds;
+  @override
+  String? get yearBestDayDate;
+  @override
+  int? get yearBestDaySeconds;
+  @override
+  int get totalBooks;
+  @override
+  int get totalSeconds;
+  @override
+  int get streakDays;
+  @override
+  int get longestStreak;
+
+  /// Create a copy of ReadingYearStatsDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$ReadingYearStatsDtoImplCopyWith<_$ReadingYearStatsDtoImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}

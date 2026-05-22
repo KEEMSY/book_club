@@ -33,6 +33,7 @@ import '../domain/goal_period.dart';
 import '../domain/grade_summary.dart';
 import '../domain/heatmap_day.dart';
 import '../domain/reading_goal.dart';
+import '../domain/reading_year_stats.dart';
 import 'dashboard_settings_sheet.dart';
 import 'widgets/daily_total_card.dart';
 import 'widgets/dashboard_goal_card.dart';
@@ -122,6 +123,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           RefreshIndicator(
             color: accent,
             onRefresh: () async {
+              ref.invalidate(yearStatsProvider(DateTime.now().year));
               await Future.wait<void>(<Future<void>>[
                 ref.read(gradeNotifierProvider.notifier).refresh(),
                 ref
@@ -160,6 +162,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   ),
                   SizedBox(height: spacing.md),
                 ],
+                _YearStatsCard(accent: accent),
+                SizedBox(height: spacing.md),
                 if (prefs.showGoal) ...<Widget>[
                   DashboardGoalCard(
                     items: goalItems,
@@ -807,6 +811,139 @@ class _TopActions extends StatelessWidget {
         PopupMenuItem<String>(value: 'manual', child: Text('수동 기록')),
         PopupMenuItem<String>(value: 'goals', child: Text('독서 목표')),
         PopupMenuItem<String>(value: 'settings', child: Text('홈 설정')),
+      ],
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 연간 독서 통계 카드
+// ---------------------------------------------------------------------------
+
+class _YearStatsCard extends ConsumerWidget {
+  const _YearStatsCard({required this.accent});
+
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+    final radii = theme.extension<AppRadius>()!;
+    final int year = DateTime.now().year;
+    final AsyncValue<ReadingYearStats> async =
+        ref.watch(yearStatsProvider(year));
+
+    return Container(
+      padding: EdgeInsets.all(spacing.lg),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerLowest,
+        borderRadius: BorderRadius.all(Radius.circular(radii.lg)),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
+        boxShadow: theme.extension<AppShadows>()!.elevated,
+      ),
+      child: async.when(
+        loading: () => const SizedBox(
+          height: 72,
+          child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+        ),
+        error: (_, __) => const SizedBox(
+          height: 72,
+          child: Center(child: Icon(Icons.cloud_off_rounded)),
+        ),
+        data: (ReadingYearStats stats) => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              '${stats.year}년 독서 여정',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            SizedBox(height: spacing.md),
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: _YearStatItem(
+                    label: '완독한 책',
+                    value: '${stats.yearBooks}권',
+                    accent: accent,
+                  ),
+                ),
+                Expanded(
+                  child: _YearStatItem(
+                    label: '읽은 시간',
+                    value: _fmtHours(stats.yearSeconds),
+                    accent: accent,
+                  ),
+                ),
+                Expanded(
+                  child: _YearStatItem(
+                    label: '최장 연속',
+                    value: '${stats.longestStreak}일',
+                    accent: accent,
+                  ),
+                ),
+                if (stats.yearBestDaySeconds != null)
+                  Expanded(
+                    child: _YearStatItem(
+                      label: '하루 최고',
+                      value: _fmtMinutes(stats.yearBestDaySeconds!),
+                      accent: accent,
+                    ),
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _fmtHours(int sec) {
+    final double h = sec / 3600;
+    if (h >= 1) return '${h.toStringAsFixed(1)}h';
+    return '${sec ~/ 60}분';
+  }
+
+  String _fmtMinutes(int sec) {
+    final int m = sec ~/ 60;
+    if (m >= 60) return '${m ~/ 60}h ${m % 60}m';
+    return '$m분';
+  }
+}
+
+class _YearStatItem extends StatelessWidget {
+  const _YearStatItem({
+    required this.label,
+    required this.value,
+    required this.accent,
+  });
+
+  final String label;
+  final String value;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Text(
+          value,
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w700,
+            color: accent,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
       ],
     );
   }

@@ -30,6 +30,7 @@ from app.domains.reading.schemas import (
     HeatmapResponse,
     ManualSessionRequest,
     ReadingSessionPublic,
+    ReadingYearStatsPublic,
     SessionCompletionResponse,
     StartSessionRequest,
 )
@@ -158,6 +159,27 @@ async def get_grade(
 ) -> GradeSummaryPublic:
     summary = await service.get_grade(user_id=UUID(user_id))
     return GradeSummaryPublic.from_summary(summary)
+
+
+@router.get("/stats", response_model=ReadingYearStatsPublic)
+async def get_year_stats(
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ReadingService, Depends(get_reading_service)],
+    year: Annotated[int, Query(ge=2000, le=2100)] = 0,
+) -> ReadingYearStatsPublic:
+    effective_year = year if year > 0 else datetime.now(tz=UTC).year
+    stats = await service.get_year_stats(user_id=UUID(user_id), year=effective_year)
+    return ReadingYearStatsPublic(
+        year=stats.year,
+        year_books=stats.year_books,
+        year_seconds=stats.year_seconds,
+        year_best_day_date=stats.year_best_day_date,
+        year_best_day_seconds=stats.year_best_day_seconds,
+        total_books=stats.total_books,
+        total_seconds=stats.total_seconds,
+        streak_days=stats.streak_days,
+        longest_streak=stats.longest_streak,
+    )
 
 
 @router.post(

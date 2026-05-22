@@ -272,7 +272,10 @@ class _ReadingApi implements ReadingApi {
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
     late Map<String, dynamic> _value;
     try {
-      _value = _result.data!;
+      _value = _result.data!.map(
+        (k, dynamic v) =>
+            MapEntry(k, dynamic.fromJson(v as Map<String, dynamic>)),
+      );
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;
@@ -296,9 +299,18 @@ class _ReadingApi implements ReadingApi {
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
-    final _result = await _dio.fetch<Map<String, dynamic>?>(_options);
-    if (_result.data == null) return null;
-    return _result.data;
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late Map<String, dynamic>? _value;
+    try {
+      _value = _result.data?.map(
+        (k, dynamic v) =>
+            MapEntry(k, dynamic.fromJson(v as Map<String, dynamic>)),
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   @override
@@ -323,6 +335,33 @@ class _ReadingApi implements ReadingApi {
     late DailySessionsResponseDto _value;
     try {
       _value = DailySessionsResponseDto.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<ReadingYearStatsDto> getYearStats({required int year}) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'year': year};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<ReadingYearStatsDto>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/reading/stats',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ReadingYearStatsDto _value;
+    try {
+      _value = ReadingYearStatsDto.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;

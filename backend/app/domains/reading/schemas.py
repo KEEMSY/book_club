@@ -213,3 +213,15 @@ class DailySessionsResponse(BaseModel):
     date: str  # "YYYY-MM-DD"
     total_seconds: int
     sessions: list[DailySessionPublic]
+
+
+class ReadingYearStatsPublic(BaseModel):
+    year: int
+    year_books: int
+    year_seconds: int
+    year_best_day_date: date | None
+    year_best_day_seconds: int | None
+    total_books: int
+    total_seconds: int
+    streak_days: int
+    longest_streak: int

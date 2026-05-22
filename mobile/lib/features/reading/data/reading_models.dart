@@ -5,6 +5,7 @@ import '../domain/grade_summary.dart';
 import '../domain/heatmap_day.dart';
 import '../domain/reading_goal.dart';
 import '../domain/reading_session.dart';
+import '../domain/reading_year_stats.dart';
 
 part 'reading_models.freezed.dart';
 part 'reading_models.g.dart';
@@ -296,4 +297,40 @@ class CreateGoalRequest with _$CreateGoalRequest {
 
   factory CreateGoalRequest.fromJson(Map<String, dynamic> json) =>
       _$CreateGoalRequestFromJson(json);
+}
+
+/// Mirror of `GET /reading/stats` response.
+@freezed
+class ReadingYearStatsDto with _$ReadingYearStatsDto {
+  const ReadingYearStatsDto._();
+
+  const factory ReadingYearStatsDto({
+    required int year,
+    required int yearBooks,
+    required int yearSeconds,
+    String? yearBestDayDate,
+    int? yearBestDaySeconds,
+    required int totalBooks,
+    required int totalSeconds,
+    required int streakDays,
+    required int longestStreak,
+  }) = _ReadingYearStatsDto;
+
+  factory ReadingYearStatsDto.fromJson(Map<String, dynamic> json) =>
+      _$ReadingYearStatsDtoFromJson(json);
+
+  ReadingYearStats toDomain() {
+    return ReadingYearStats(
+      year: year,
+      yearBooks: yearBooks,
+      yearSeconds: yearSeconds,
+      yearBestDayDate:
+          yearBestDayDate != null ? DateTime.parse(yearBestDayDate!) : null,
+      yearBestDaySeconds: yearBestDaySeconds,
+      totalBooks: totalBooks,
+      totalSeconds: totalSeconds,
+      streakDays: streakDays,
+      longestStreak: longestStreak,
+    );
+  }
 }

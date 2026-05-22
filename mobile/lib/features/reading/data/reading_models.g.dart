@@ -264,3 +264,31 @@ Map<String, dynamic> _$$CreateGoalRequestImplToJson(
       'target_books': instance.targetBooks,
       'target_seconds': instance.targetSeconds,
     };
+
+_$ReadingYearStatsDtoImpl _$$ReadingYearStatsDtoImplFromJson(
+        Map<String, dynamic> json) =>
+    _$ReadingYearStatsDtoImpl(
+      year: (json['year'] as num).toInt(),
+      yearBooks: (json['year_books'] as num).toInt(),
+      yearSeconds: (json['year_seconds'] as num).toInt(),
+      yearBestDayDate: json['year_best_day_date'] as String?,
+      yearBestDaySeconds: (json['year_best_day_seconds'] as num?)?.toInt(),
+      totalBooks: (json['total_books'] as num).toInt(),
+      totalSeconds: (json['total_seconds'] as num).toInt(),
+      streakDays: (json['streak_days'] as num).toInt(),
+      longestStreak: (json['longest_streak'] as num).toInt(),
+    );
+
+Map<String, dynamic> _$$ReadingYearStatsDtoImplToJson(
+        _$ReadingYearStatsDtoImpl instance) =>
+    <String, dynamic>{
+      'year': instance.year,
+      'year_books': instance.yearBooks,
+      'year_seconds': instance.yearSeconds,
+      'year_best_day_date': instance.yearBestDayDate,
+      'year_best_day_seconds': instance.yearBestDaySeconds,
+      'total_books': instance.totalBooks,
+      'total_seconds': instance.totalSeconds,
+      'streak_days': instance.streakDays,
+      'longest_streak': instance.longestStreak,
+    };

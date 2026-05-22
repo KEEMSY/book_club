@@ -7,6 +7,7 @@ import '../data/reading_api.dart';
 import '../data/reading_repository.dart';
 import '../data/reading_models.dart' show DailySessionsResponseDto;
 import '../domain/bookmark.dart';
+import '../domain/reading_year_stats.dart';
 import 'grade_notifier.dart';
 import 'grade_state.dart';
 import 'reading_journey_inputs.dart';
@@ -50,6 +51,13 @@ final dailySessionsProvider = FutureProvider.autoDispose
   final repo = ref.read(readingRepositoryProvider);
   return repo.getDailySessions(DateTime.parse(date));
 });
+
+/// Year-level reading stats — books completed, time read, best day.
+/// Keyed by calendar year so the dashboard and stats view share the same cache.
+final yearStatsProvider =
+    FutureProvider.autoDispose.family<ReadingYearStats, int>(
+  (ref, year) => ref.read(readingRepositoryProvider).getYearStats(year),
+);
 
 /// Single-source-of-truth for the grade accent color. TimerRing, GradeBadge,
 /// JanDeeGrid, and the dashboard's today CTA read this provider so the whole

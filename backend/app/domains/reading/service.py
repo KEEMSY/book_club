@@ -55,6 +55,7 @@ completed-book count, recomputes grade + streak, and emits a derived
 
 from __future__ import annotations
 
+import asyncio
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
@@ -87,6 +88,19 @@ from app.shared.event_bus import EventBus
 StageEventFn = Callable[[object], None]
 
 _MAX_HEATMAP_DAYS = 366
+
+
+@dataclass(frozen=True, slots=True)
+class YearStats:
+    year: int
+    year_books: int
+    year_seconds: int
+    year_best_day_date: date | None
+    year_best_day_seconds: int | None
+    total_books: int
+    total_seconds: int
+    streak_days: int
+    longest_streak: int
 _MIN_TIMER_DURATION_SEC = 1
 _MANUAL_MIN_SEC = 60
 _MANUAL_MAX_SEC = 4 * 60 * 60
@@ -269,6 +283,31 @@ class ReadingService:
 
     async def get_grade(self, *, user_id: UUID) -> GradeSummary:
         return await self._grade_summary(user_id)
+
+    async def get_year_stats(self, *, user_id: UUID, year: int) -> YearStats:
+        year_start = date(year, 1, 1)
+        year_end = date(year, 12, 31)
+
+        year_books, daily_rows, grade = await asyncio.gather(
+            self.book_query.count_completed_books(
+                user_id=user_id, from_date=year_start, to_date=year_end
+            ),
+            self.daily_stats.range(user_id, year_start, year_end),
+            self._grade_summary(user_id),
+        )
+        year_seconds = sum(r.total_seconds for r in daily_rows)
+        best = max(daily_rows, key=lambda r: r.total_seconds, default=None)
+        return YearStats(
+            year=year,
+            year_books=year_books,
+            year_seconds=year_seconds,
+            year_best_day_date=best.date if best else None,
+            year_best_day_seconds=best.total_seconds if best else None,
+            total_books=grade.total_books,
+            total_seconds=grade.total_seconds,
+            streak_days=grade.streak_days,
+            longest_streak=grade.longest_streak,
+        )
 
     async def create_goal(
         self,
