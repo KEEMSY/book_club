@@ -288,13 +288,14 @@ class ReadingService:
         year_start = date(year, 1, 1)
         year_end = date(year, 12, 31)
 
-        year_books, daily_rows, grade = await asyncio.gather(
-            self.book_query.count_completed_books(
-                user_id=user_id, from_date=year_start, to_date=year_end
-            ),
-            self.daily_stats.range(user_id, year_start, year_end),
-            self._grade_summary(user_id),
+        # Sequential — all three share the same SQLAlchemy async session;
+        # concurrent gather on a single session causes connection drops.
+        year_books = await self.book_query.count_completed_books(
+            user_id=user_id, from_date=year_start, to_date=year_end
         )
+        daily_rows = await self.daily_stats.range(user_id, year_start, year_end)
+        grade = await self._grade_summary(user_id)
+
         year_seconds = sum(r.total_seconds for r in daily_rows)
         best = max(daily_rows, key=lambda r: r.total_seconds, default=None)
         return YearStats(
