@@ -158,7 +158,6 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
                 ],
               ),
             ),
-            const _BookshelfStrip(),
             TabBar(
               controller: _tab,
               isScrollable: true,
@@ -1024,96 +1023,3 @@ class _HighlightCard extends StatelessWidget {
   }
 }
 
-// ---------------------------------------------------------------------------
-// 시각적 책장 — 완독 책 표지 수평 스트립
-// ---------------------------------------------------------------------------
-
-class _BookshelfStrip extends ConsumerWidget {
-  const _BookshelfStrip();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final map = ref.watch(libraryNotifierProvider);
-    final state = map[BookStatus.completed];
-    if (state is! LibraryListLoaded) return const SizedBox.shrink();
-    final List<UserBook> completed = state.items;
-    if (completed.isEmpty) return const SizedBox.shrink();
-
-    final spacing = Theme.of(context).extension<AppSpacing>()!;
-
-    return SizedBox(
-      height: 116,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: EdgeInsets.fromLTRB(
-          spacing.lg,
-          spacing.sm,
-          spacing.lg,
-          spacing.sm,
-        ),
-        itemCount: completed.length,
-        itemBuilder: (BuildContext ctx, int index) {
-          final UserBook ub = completed[index];
-          return Padding(
-            padding: EdgeInsets.only(right: spacing.sm),
-            child: _BookshelfItem(userBook: ub),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _BookshelfItem extends StatelessWidget {
-  const _BookshelfItem({required this.userBook});
-
-  final UserBook userBook;
-
-  @override
-  Widget build(BuildContext context) {
-    final radii = Theme.of(context).extension<AppRadius>()!;
-    return GestureDetector(
-      onTap: () => context.push(
-        AppRoutes.bookDetail(userBook.book.id),
-        extra: userBook.id,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          BookCover(
-            coverUrl: userBook.book.coverUrl,
-            width: 60,
-            height: 84,
-            borderRadius: BorderRadius.all(Radius.circular(radii.sm)),
-          ),
-          const SizedBox(height: 4),
-          _TinyStars(rating: userBook.rating),
-        ],
-      ),
-    );
-  }
-}
-
-class _TinyStars extends StatelessWidget {
-  const _TinyStars({required this.rating});
-
-  final int? rating;
-
-  @override
-  Widget build(BuildContext context) {
-    final int filled = rating ?? 0;
-    final Color primary = Theme.of(context).colorScheme.primary;
-    final Color outline = Theme.of(context).colorScheme.outlineVariant;
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: List<Widget>.generate(
-        5,
-        (i) => Icon(
-          i < filled ? Icons.star_rounded : Icons.star_outline_rounded,
-          size: 10,
-          color: i < filled ? primary : outline,
-        ),
-      ),
-    );
-  }
-}
