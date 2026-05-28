@@ -73,10 +73,12 @@ class SessionSummaryScreen extends ConsumerWidget {
               SizedBox(height: spacing.sm),
               Text(
                 '오늘의 독서 기록이 저장되었어요',
-                style: theme.textTheme.bodyLarge,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: accent.withValues(alpha: 0.8),
+                ),
               ),
               SizedBox(height: spacing.xl),
-              _StreakRow(streak: completion.streakDays),
+              _StreakRow(streak: completion.streakDays, accent: accent),
               const Spacer(),
               SizedBox(
                 width: double.infinity,
@@ -513,9 +515,10 @@ class _SessionBookCard extends ConsumerWidget {
 }
 
 class _StreakRow extends StatelessWidget {
-  const _StreakRow({required this.streak});
+  const _StreakRow({required this.streak, required this.accent});
 
   final int streak;
+  final Color accent;
 
   @override
   Widget build(BuildContext context) {
@@ -524,11 +527,11 @@ class _StreakRow extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        const Icon(Icons.local_fire_department_rounded, size: 24),
+        Icon(Icons.local_fire_department_rounded, size: 24, color: accent),
         const SizedBox(width: 6),
         Text(
           '연속 $streak일 독서 중',
-          style: theme.textTheme.titleLarge,
+          style: theme.textTheme.titleLarge?.copyWith(color: accent),
         ),
       ],
     );
