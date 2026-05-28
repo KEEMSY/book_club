@@ -1,12 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/grade_theme.dart';
+import '../../book/application/library_notifier.dart';
+import '../../book/application/library_state.dart';
+import '../../book/domain/book_status.dart';
+import '../../book/domain/user_book.dart';
+import '../../book/presentation/widgets/book_cover.dart';
+import '../application/goal_notifier.dart';
+import '../application/goal_state.dart';
 import '../application/grade_notifier.dart';
 import '../application/grade_state.dart';
 import '../application/reading_providers.dart';
+import '../domain/goal_period.dart';
 import '../domain/grade_summary.dart';
+import '../domain/reading_goal.dart';
+import '../domain/reading_year_stats.dart';
 import 'widgets/elapsed_formatter.dart';
 import 'widgets/grade_badge.dart';
 import 'widgets/grade_progress.dart';
@@ -57,6 +69,9 @@ class _GradeScreenState extends ConsumerState<GradeScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(gradeNotifierProvider.notifier).load();
+      ref
+          .read(libraryNotifierProvider.notifier)
+          .ensureLoaded(BookStatus.completed);
     });
   }
 
@@ -145,9 +160,13 @@ class _GradeBody extends StatelessWidget {
         SizedBox(height: spacing.lg),
         GradeProgress(summary: summary, accent: accent),
         SizedBox(height: spacing.md),
+        _YearSummaryCard(accent: accent),
+        SizedBox(height: spacing.md),
         StreakCard(streak: summary.streakDays, longest: summary.longestStreak),
         SizedBox(height: spacing.md),
         _TotalsCard(summary: summary),
+        SizedBox(height: spacing.md),
+        _RecentCompletedSection(accent: accent),
         SizedBox(height: spacing.md),
         _InfoLink(),
       ],
@@ -316,6 +335,296 @@ class _ErrorBody extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 올해 독서 현황 — 완독 수, 읽은 시간, 연간 목표 진행률
+// ---------------------------------------------------------------------------
+
+class _YearSummaryCard extends ConsumerWidget {
+  const _YearSummaryCard({required this.accent});
+
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final int year = DateTime.now().year;
+    final AsyncValue<ReadingYearStats> statsAsync =
+        ref.watch(yearStatsProvider(year));
+    final GoalState goalState = ref.watch(goalNotifierProvider);
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+    final radii = theme.extension<AppRadius>()!;
+    final AppShadows shadows = theme.extension<AppShadows>()!;
+
+    GoalProgress? yearlyGoal;
+    if (goalState is GoalLoaded) {
+      for (final GoalProgress g in goalState.items) {
+        if (g.goal.period == GoalPeriod.yearly) {
+          yearlyGoal = g;
+          break;
+        }
+      }
+    }
+
+    return statsAsync.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (ReadingYearStats stats) {
+        final int yearBooks = stats.yearBooks;
+        final double? progress = yearlyGoal != null
+            ? (yearBooks / yearlyGoal.goal.targetBooks).clamp(0.0, 1.0)
+            : null;
+
+        return Container(
+          padding: EdgeInsets.all(spacing.lg),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surfaceContainerLowest,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: theme.colorScheme.outlineVariant),
+            boxShadow: shadows.elevated,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                '$year년 독서 현황',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              SizedBox(height: spacing.md),
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: _SummaryCell(
+                      label: '완독한 책',
+                      value: '$yearBooks권',
+                      accent: accent,
+                    ),
+                  ),
+                  Container(
+                    width: 1,
+                    height: 32,
+                    color: theme.colorScheme.outline,
+                  ),
+                  Expanded(
+                    child: _SummaryCell(
+                      label: '읽은 시간',
+                      value: formatDurationKorean(stats.yearSeconds),
+                      accent: accent,
+                    ),
+                  ),
+                  Container(
+                    width: 1,
+                    height: 32,
+                    color: theme.colorScheme.outline,
+                  ),
+                  Expanded(
+                    child: _SummaryCell(
+                      label: '최장 연속',
+                      value: '${stats.longestStreak}일',
+                      accent: accent,
+                    ),
+                  ),
+                ],
+              ),
+              if (progress != null) ...<Widget>[
+                SizedBox(height: spacing.md),
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius:
+                            BorderRadius.all(Radius.circular(radii.pill)),
+                        child: LinearProgressIndicator(
+                          value: progress,
+                          minHeight: 6,
+                          backgroundColor: accent.withValues(alpha: 0.15),
+                          valueColor: AlwaysStoppedAnimation<Color>(accent),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      '$yearBooks/${yearlyGoal!.goal.targetBooks}권',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: spacing.xs),
+                Text(
+                  _goalSubtitle(yearBooks, yearlyGoal.goal.targetBooks),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ] else ...<Widget>[
+                SizedBox(height: spacing.sm),
+                GestureDetector(
+                  onTap: () => context.push('/goals'),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Text(
+                        '연간 독서 목표 설정하기',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: accent,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(width: 2),
+                      Icon(
+                        Icons.arrow_forward_rounded,
+                        size: 14,
+                        color: accent,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  String _goalSubtitle(int done, int target) {
+    final int remaining = target - done;
+    if (remaining <= 0) return '🎉 연간 목표를 달성했어요!';
+    return '목표까지 $remaining권 남았어요';
+  }
+}
+
+class _SummaryCell extends StatelessWidget {
+  const _SummaryCell({
+    required this.label,
+    required this.value,
+    required this.accent,
+  });
+
+  final String label;
+  final String value;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      children: <Widget>[
+        Text(
+          value,
+          style: theme.textTheme.titleLarge?.copyWith(
+            color: accent,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 최근 완독 — 가로 스크롤 책 표지 최대 6권
+// ---------------------------------------------------------------------------
+
+class _RecentCompletedSection extends ConsumerWidget {
+  const _RecentCompletedSection({required this.accent});
+
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+    final radii = theme.extension<AppRadius>()!;
+
+    final Map<BookStatus, LibraryListState> libraryMap =
+        ref.watch(libraryNotifierProvider);
+    final LibraryListState? completedState =
+        libraryMap[BookStatus.completed];
+    if (completedState is! LibraryListLoaded) return const SizedBox.shrink();
+    final List<UserBook> recent = completedState.items.take(6).toList();
+    if (recent.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          '최근 완독한 책',
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        SizedBox(height: spacing.sm),
+        SizedBox(
+          height: 190,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: recent.length,
+            separatorBuilder: (_, __) => SizedBox(width: spacing.sm),
+            itemBuilder: (BuildContext ctx, int index) {
+              final UserBook ub = recent[index];
+              return GestureDetector(
+                onTap: () => ctx.push(
+                  AppRoutes.bookDetail(ub.book.id),
+                  extra: ub.id,
+                ),
+                child: SizedBox(
+                  width: 92,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      BookCover(
+                        coverUrl: ub.book.coverUrl,
+                        width: 92,
+                        height: 130,
+                        borderRadius:
+                            BorderRadius.all(Radius.circular(radii.md)),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        ub.book.title,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (ub.rating != null && ub.rating! > 0) ...<Widget>[
+                        const SizedBox(height: 2),
+                        Row(
+                          children: List<Widget>.generate(
+                            ub.rating!.clamp(0, 5),
+                            (_) => Icon(
+                              Icons.star_rounded,
+                              size: 10,
+                              color: accent,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }

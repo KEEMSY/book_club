@@ -14,12 +14,6 @@ import '../application/library_notifier.dart';
 import '../application/library_state.dart';
 import '../domain/book_status.dart';
 import '../domain/user_book.dart';
-import '../../reading/application/goal_notifier.dart';
-import '../../reading/application/goal_state.dart';
-import '../../reading/application/reading_providers.dart';
-import '../../reading/domain/goal_period.dart';
-import '../../reading/domain/reading_goal.dart';
-import '../../reading/domain/reading_year_stats.dart';
 import 'widgets/book_card.dart';
 import 'widgets/book_cover.dart';
 import 'widgets/empty_states.dart';
@@ -218,7 +212,6 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
                     onRefresh: () => ref
                         .read(libraryNotifierProvider.notifier)
                         .refresh(BookStatus.completed),
-                    onSetGoal: () => context.push('/goals'),
                   ),
                   _StatusTab(
                     status: BookStatus.wishlist,
@@ -1030,7 +1023,7 @@ class _HighlightCard extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// 완독 탭 — 동기부여 헤더 + 개선된 카드
+// 완독 탭 — 별점·완독일이 포함된 2열 그리드
 // ---------------------------------------------------------------------------
 
 class _CompletedTab extends StatelessWidget {
@@ -1040,7 +1033,6 @@ class _CompletedTab extends StatelessWidget {
     required this.highlightUserBookId,
     required this.onBrowse,
     required this.onRefresh,
-    required this.onSetGoal,
   });
 
   final LibraryListState state;
@@ -1048,7 +1040,6 @@ class _CompletedTab extends StatelessWidget {
   final String? highlightUserBookId;
   final VoidCallback onBrowse;
   final Future<void> Function() onRefresh;
-  final VoidCallback onSetGoal;
 
   @override
   Widget build(BuildContext context) {
@@ -1081,38 +1072,32 @@ class _CompletedTab extends StatelessWidget {
                   controller: controller,
                   showFooter: nextCursor != null || isLoadingMore,
                   highlightUserBookId: highlightUserBookId,
-                  onSetGoal: onSetGoal,
                 ),
               ),
     };
   }
 }
 
-class _CompletedGrid extends ConsumerWidget {
+class _CompletedGrid extends StatelessWidget {
   const _CompletedGrid({
     required this.items,
     required this.controller,
     required this.showFooter,
     required this.highlightUserBookId,
-    required this.onSetGoal,
   });
 
   final List<UserBook> items;
   final ScrollController controller;
   final bool showFooter;
   final String? highlightUserBookId;
-  final VoidCallback onSetGoal;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final spacing = Theme.of(context).extension<AppSpacing>()!;
 
     return CustomScrollView(
       controller: controller,
       slivers: <Widget>[
-        SliverToBoxAdapter(
-          child: _CompletedHeader(onSetGoal: onSetGoal),
-        ),
         SliverPadding(
           padding: EdgeInsets.fromLTRB(
             spacing.md,
@@ -1151,207 +1136,6 @@ class _CompletedGrid extends ConsumerWidget {
           ),
       ],
     );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// 동기부여 헤더 — 연간 진행률 + 연속 독서
-// ---------------------------------------------------------------------------
-
-class _CompletedHeader extends ConsumerWidget {
-  const _CompletedHeader({required this.onSetGoal});
-
-  final VoidCallback onSetGoal;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final spacing = theme.extension<AppSpacing>()!;
-    final radii = theme.extension<AppRadius>()!;
-    final int year = DateTime.now().year;
-    final AsyncValue<ReadingYearStats> statsAsync =
-        ref.watch(yearStatsProvider(year));
-    final GoalState goalState = ref.watch(goalNotifierProvider);
-
-    GoalProgress? yearlyGoal;
-    if (goalState is GoalLoaded) {
-      for (final g in goalState.items) {
-        if (g.goal.period == GoalPeriod.yearly) {
-          yearlyGoal = g;
-          break;
-        }
-      }
-    }
-
-    return statsAsync.when(
-      loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
-      data: (ReadingYearStats stats) {
-        final Color primary = theme.colorScheme.primary;
-        final int yearBooks = stats.yearBooks;
-        final int streakDays = stats.streakDays;
-        final double? progress = yearlyGoal != null
-            ? (yearBooks / yearlyGoal.goal.targetBooks).clamp(0.0, 1.0)
-            : null;
-
-        return Container(
-          margin: EdgeInsets.fromLTRB(
-            spacing.md,
-            spacing.md,
-            spacing.md,
-            0,
-          ),
-          padding: EdgeInsets.all(spacing.lg),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: <Color>[
-                primary.withValues(alpha: 0.12),
-                primary.withValues(alpha: 0.04),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.all(Radius.circular(radii.lg)),
-            border: Border.all(color: primary.withValues(alpha: 0.18)),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Expanded(
-                    child: RichText(
-                      text: TextSpan(
-                        children: <TextSpan>[
-                          TextSpan(
-                            text: '$year년 ',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                          TextSpan(
-                            text: '$yearBooks권',
-                            style: theme.textTheme.headlineMedium?.copyWith(
-                              fontWeight: FontWeight.w800,
-                              color: primary,
-                            ),
-                          ),
-                          TextSpan(
-                            text: ' 완독',
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: theme.colorScheme.onSurface,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  if (streakDays > 0)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: primary.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(radii.pill),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Icon(
-                            Icons.local_fire_department_rounded,
-                            size: 14,
-                            color: primary,
-                          ),
-                          const SizedBox(width: 3),
-                          Text(
-                            '$streakDays일 연속',
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: primary,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                ],
-              ),
-              if (progress != null) ...<Widget>[
-                SizedBox(height: spacing.md),
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(radii.pill),
-                        ),
-                        child: LinearProgressIndicator(
-                          value: progress,
-                          minHeight: 6,
-                          backgroundColor:
-                              primary.withValues(alpha: 0.15),
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(primary),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      '$yearBooks/${yearlyGoal!.goal.targetBooks}권',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: spacing.xs),
-                Text(
-                  _goalSubtitle(yearBooks, yearlyGoal.goal.targetBooks),
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ] else ...<Widget>[
-                SizedBox(height: spacing.sm),
-                GestureDetector(
-                  onTap: onSetGoal,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Text(
-                        '올해 독서 목표 설정하기',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: primary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(width: 2),
-                      Icon(
-                        Icons.arrow_forward_rounded,
-                        size: 14,
-                        color: primary,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  String _goalSubtitle(int done, int target) {
-    final int remaining = target - done;
-    if (remaining <= 0) return '🎉 연간 목표를 달성했어요!';
-    return '목표까지 $remaining권 남았어요';
   }
 }
 

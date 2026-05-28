@@ -5,7 +5,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/grade_theme.dart';
+import '../../book/application/library_notifier.dart';
+import '../../book/application/library_state.dart';
+import '../../book/domain/book_status.dart';
+import '../../book/domain/user_book.dart';
+import '../../book/presentation/widgets/book_cover.dart';
 import '../application/reading_providers.dart';
+import '../domain/bookmark.dart';
 import '../domain/reading_goal.dart';
 import 'widgets/elapsed_formatter.dart';
 import 'widgets/grade_badge.dart';
@@ -57,6 +63,13 @@ class SessionSummaryScreen extends ConsumerWidget {
                 formatElapsed(elapsed),
                 style: theme.textTheme.displayLarge?.copyWith(color: accent),
               ),
+              if (completion.userBookId.isNotEmpty) ...<Widget>[
+                SizedBox(height: spacing.lg),
+                _SessionBookCard(
+                  userBookId: completion.userBookId,
+                  accent: accent,
+                ),
+              ],
               SizedBox(height: spacing.sm),
               Text(
                 '오늘의 독서 기록이 저장되었어요',
@@ -364,6 +377,138 @@ class _SparkleDot extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 읽은 책 + 북마크 카드
+// ---------------------------------------------------------------------------
+
+class _SessionBookCard extends ConsumerWidget {
+  const _SessionBookCard({
+    required this.userBookId,
+    required this.accent,
+  });
+
+  final String userBookId;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+    final radii = theme.extension<AppRadius>()!;
+    final AppShadows shadows = theme.extension<AppShadows>()!;
+
+    // Find the UserBook from in-memory library cache.
+    final Map<BookStatus, LibraryListState> libraryMap =
+        ref.watch(libraryNotifierProvider);
+    UserBook? userBook;
+    for (final LibraryListState state in libraryMap.values) {
+      if (state is LibraryListLoaded) {
+        try {
+          userBook = state.items.firstWhere((b) => b.id == userBookId);
+          break;
+        } catch (_) {
+          // not in this status list — continue
+        }
+      }
+    }
+    if (userBook == null) return const SizedBox.shrink();
+
+    // Fetch the latest bookmark (may be the one just saved in the modal).
+    final AsyncValue<Bookmark?> bookmarkAsync =
+        ref.watch(latestBookmarkProvider(userBookId));
+    final Bookmark? bookmark = bookmarkAsync.valueOrNull;
+
+    return Container(
+      padding: EdgeInsets.all(spacing.md),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.all(Radius.circular(radii.lg)),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
+        boxShadow: shadows.elevated,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          BookCover(
+            coverUrl: userBook.book.coverUrl,
+            width: 52,
+            height: 74,
+            borderRadius: BorderRadius.all(Radius.circular(radii.sm)),
+          ),
+          SizedBox(width: spacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  userBook.book.title,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  userBook.book.author,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (bookmark != null) ...<Widget>[
+                  SizedBox(height: spacing.sm),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: accent.withValues(alpha: 0.1),
+                      borderRadius:
+                          BorderRadius.all(Radius.circular(radii.pill)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Icon(
+                          Icons.bookmark_rounded,
+                          size: 12,
+                          color: accent,
+                        ),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            _bookmarkLabel(bookmark),
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: accent,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _bookmarkLabel(Bookmark b) {
+    if (b.note != null && b.note!.isNotEmpty) {
+      return '${b.page}p — "${b.note}"';
+    }
+    return '${b.page}페이지까지 읽었어요';
   }
 }
 

@@ -92,7 +92,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
   }
 
   /// Re-hydrates an active session from secure storage on app launch. No-op
-  /// if the stored blob is missing or malformed.
+  /// if the stored blob is missing, malformed, or too old to be legitimate.
   Future<void> restore() async {
     final String? raw = await _readPersisted();
     if (raw == null) {
@@ -103,6 +103,16 @@ class TimerNotifier extends StateNotifier<TimerState> {
       final PersistedTimerSession? persisted =
           PersistedTimerSession.tryFromJson(json);
       if (persisted == null) {
+        await _clearPersisted();
+        return;
+      }
+      // Stale-session guard: the iOS background auto-end rule (30 min) means
+      // no legitimately active session survives more than a few hours. If the
+      // persisted session is older than 12 h it is leftover from a crash or a
+      // failed end() call that did not clear storage — discard it so the next
+      // start() opens a clean new session instead of resuming a day-old clock.
+      const Duration kMaxRestorableAge = Duration(hours: 12);
+      if (_clock().difference(persisted.startedAt) > kMaxRestorableAge) {
         await _clearPersisted();
         return;
       }
