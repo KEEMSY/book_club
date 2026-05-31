@@ -611,6 +611,9 @@ class _BookmarkSaveModalState extends ConsumerState<_BookmarkSaveModal> {
             userBookId: widget.userBookId,
             page: page,
           );
+      // Invalidate so SessionSummaryScreen reads the freshly saved bookmark,
+      // not the stale cached value from before this save.
+      ref.invalidate(latestBookmarkProvider(widget.userBookId));
       if (mounted) Navigator.of(context).pop();
     } catch (_) {
       widget.messenger.showSnackBar(
