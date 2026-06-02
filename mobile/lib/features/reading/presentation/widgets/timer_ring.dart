@@ -21,6 +21,7 @@ class TimerRing extends StatelessWidget {
     this.strokeWidth = 10,
     this.child,
     this.indeterminate = false,
+    this.paused = false,
   });
 
   final Color color;
@@ -29,16 +30,20 @@ class TimerRing extends StatelessWidget {
   final double strokeWidth;
   final Widget? child;
   final bool indeterminate;
+  /// When true, the foreground arc is drawn at reduced opacity to signal
+  /// that the timer is suspended without losing the current progress marker.
+  final bool paused;
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    final Color ringColor = paused ? color.withValues(alpha: 0.4) : color;
     return SizedBox(
       width: size,
       height: size,
       child: CustomPaint(
         painter: _TimerRingPainter(
-          color: color,
+          color: ringColor,
           // outlineVariant is already tuned per-theme (warm near-white on light,
           // #2E2E2E on dark) so the track stays visible without the low-alpha
           // borderGray hack that used to vanish on the dark canvas.

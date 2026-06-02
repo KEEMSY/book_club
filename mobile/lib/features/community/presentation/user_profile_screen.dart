@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/grade_theme.dart';
+import '../../auth/application/auth_providers.dart';
 import '../../feed/presentation/comments_sheet.dart';
 import '../../feed/presentation/widgets/post_card.dart';
 import '../../reading/presentation/widgets/grade_badge.dart';
@@ -70,8 +71,55 @@ class _ProfileContent extends ConsumerWidget {
       appBar: AppBar(
         title: Text(profile.nickname),
         actions: profile.isMe
-            ? null
-            : [
+            ? <Widget>[
+                PopupMenuButton<_OwnProfileAction>(
+                  icon: const Icon(Icons.more_vert_rounded),
+                  onSelected: (action) async {
+                    if (action == _OwnProfileAction.logout) {
+                      final bool? confirmed = await showDialog<bool>(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text('로그아웃'),
+                          content: const Text('정말 로그아웃할까요?'),
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () => Navigator.of(ctx).pop(false),
+                              child: const Text('취소'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.of(ctx).pop(true),
+                              child: Text(
+                                '로그아웃',
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.error,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                      if (confirmed == true && context.mounted) {
+                        await ref
+                            .read(authNotifierProvider.notifier)
+                            .logout();
+                      }
+                    }
+                  },
+                  itemBuilder: (_) => <PopupMenuEntry<_OwnProfileAction>>[
+                    const PopupMenuItem<_OwnProfileAction>(
+                      value: _OwnProfileAction.logout,
+                      child: Row(
+                        children: <Widget>[
+                          Icon(Icons.logout_outlined),
+                          SizedBox(width: 12),
+                          Text('로그아웃'),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ]
+            : <Widget>[
                 _ThreeDotMenu(profile: profile),
               ],
       ),
@@ -120,7 +168,8 @@ class _ProfileContent extends ConsumerWidget {
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: spacing.lg),
                 child: _RecentHighlightsSection(
-                    highlights: profile.recentHighlights),
+                  highlights: profile.recentHighlights,
+                ),
               ),
             ),
           SliverToBoxAdapter(
@@ -862,3 +911,5 @@ class _UserPostsSliverState extends ConsumerState<_UserPostsSliver> {
     );
   }
 }
+
+enum _OwnProfileAction { logout }

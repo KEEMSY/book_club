@@ -309,11 +309,13 @@ class TimerNotifier extends StateNotifier<TimerState> {
     }
   }
 
-  /// Clears a failure surface without losing an active session.
-  void clearFailure() {
-    if (state is TimerFailure) {
-      state = const TimerState.idle();
-    }
+  /// Clears a failure surface. For non-terminal end() failures the persisted
+  /// session is still in storage, so restore() brings it back to running/paused
+  /// instead of silently dropping to idle while the server session is active.
+  Future<void> clearFailure() async {
+    if (state is! TimerFailure) return;
+    await restore();
+    // restore() leaves state idle if nothing is persisted (e.g. start() failure).
   }
 
   /// Marks the moment the app went to background. Running-state only.

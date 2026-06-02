@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../auth/application/auth_providers.dart';
 import '../../feed/application/feed_providers.dart';
 import '../../feed/domain/book_highlight_group.dart';
 import '../../feed/domain/highlight.dart';
@@ -143,20 +142,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
                 spacing.sm,
                 0,
               ),
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Text('내 서재', style: theme.textTheme.displaySmall),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.logout_outlined),
-                    tooltip: '로그아웃',
-                    onPressed: () async {
-                      await ref.read(authNotifierProvider.notifier).logout();
-                    },
-                  ),
-                ],
-              ),
+              child: Text('내 서재', style: theme.textTheme.displaySmall),
             ),
             TabBar(
               controller: _tab,
@@ -1143,14 +1129,14 @@ class _CompletedGrid extends StatelessWidget {
 // 완독 카드 — 별점 + 완독일 표시
 // ---------------------------------------------------------------------------
 
-class _CompletedCard extends StatelessWidget {
+class _CompletedCard extends ConsumerWidget {
   const _CompletedCard({required this.userBook, required this.highlight});
 
   final UserBook userBook;
   final bool highlight;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
     final radii = theme.extension<AppRadius>()!;
@@ -1169,6 +1155,7 @@ class _CompletedCard extends StatelessWidget {
           AppRoutes.bookDetail(userBook.book.id),
           extra: userBook.id,
         ),
+        onLongPress: () => _showActions(context, ref, userBook),
         borderRadius: BorderRadius.all(Radius.circular(radii.md)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1196,20 +1183,21 @@ class _CompletedCard extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 4),
-            Row(
-              children: List<Widget>.generate(5, (i) {
-                final int filled = userBook.rating ?? 0;
-                return Icon(
-                  i < filled
-                      ? Icons.star_rounded
-                      : Icons.star_outline_rounded,
-                  size: 13,
-                  color: i < filled
-                      ? primary
-                      : theme.colorScheme.outlineVariant,
-                );
-              }),
-            ),
+            if (userBook.rating != null && userBook.rating! > 0)
+              Row(
+                children: List<Widget>.generate(
+                  userBook.rating!.clamp(0, 5),
+                  (_) => Icon(Icons.star_rounded, size: 13, color: primary),
+                ),
+              )
+            else
+              Text(
+                '별점 주기',
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant
+                      .withValues(alpha: 0.55),
+                ),
+              ),
             if (userBook.finishedAt != null) ...<Widget>[
               const SizedBox(height: 2),
               Text(
@@ -1223,6 +1211,18 @@ class _CompletedCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void _showActions(BuildContext context, WidgetRef ref, UserBook userBook) {
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) => _LibraryActionsSheet(userBook: userBook),
     );
   }
 

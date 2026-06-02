@@ -90,7 +90,9 @@ class SessionSummaryScreen extends ConsumerWidget {
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: const StadiumBorder(),
                   ),
-                  child: const Text('계속'),
+                  child: Text(
+                    completion.gradeUp ? '새 등급 확인하기' : '홈으로',
+                  ),
                 ),
               ),
               SizedBox(height: spacing.md),

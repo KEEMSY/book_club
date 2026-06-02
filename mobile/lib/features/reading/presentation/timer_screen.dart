@@ -222,6 +222,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
   Future<void> _showExitDialog(BuildContext context) async {
     final bool? confirm = await showDialog<bool>(
       context: context,
+      barrierDismissible: false,
       builder: (ctx) => AlertDialog(
         title: const Text('독서를 중단할까요?'),
         content: const Text('종료하면 지금까지의 독서 시간이 기록돼요.'),
@@ -285,9 +286,9 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
         duration: const Duration(seconds: 4),
       ),
     );
-    Future<void>.delayed(const Duration(milliseconds: 400)).then((_) {
+    Future<void>.delayed(const Duration(milliseconds: 400)).then((_) async {
       if (!mounted || restoreTriggered) return;
-      ref.read(timerNotifierProvider.notifier).clearFailure();
+      await ref.read(timerNotifierProvider.notifier).clearFailure();
     });
   }
 
@@ -327,6 +328,7 @@ class _TimerReadout extends ConsumerWidget {
     final notifier = ref.read(timerNotifierProvider.notifier);
     final Duration elapsed = notifier.elapsedAt(now);
     final bool indeterminate = state is TimerEnding;
+    final bool paused = state is TimerPaused;
 
     // Countdown mode: ring fills elapsed/target, center shows remaining time.
     if (targetSeconds != null) {
@@ -343,20 +345,29 @@ class _TimerReadout extends ConsumerWidget {
             color: accent,
             progress: progress,
             indeterminate: indeterminate,
+            paused: paused,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
+                if (paused)
+                  Icon(
+                    Icons.pause_rounded,
+                    size: 28,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                  ),
                 Text(
                   formatElapsed(remaining),
                   style: theme.textTheme.displayLarge?.copyWith(
-                    color: theme.colorScheme.onSurface,
+                    color: paused
+                        ? theme.colorScheme.onSurface.withValues(alpha: 0.45)
+                        : theme.colorScheme.onSurface,
                     fontFeatures: const <FontFeature>[
                       FontFeature.tabularFigures(),
                     ],
                   ),
                 ),
                 Text(
-                  '남음',
+                  paused ? '일시정지' : '남음',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -390,15 +401,38 @@ class _TimerReadout extends ConsumerWidget {
           color: accent,
           progress: progress,
           indeterminate: indeterminate,
-          child: Text(
-            formatElapsed(elapsed),
-            style: theme.textTheme.displayLarge?.copyWith(
-              color: theme.colorScheme.onSurface,
-              fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
-            ),
+          paused: paused,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              if (paused)
+                Icon(
+                  Icons.pause_rounded,
+                  size: 28,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                ),
+              Text(
+                formatElapsed(elapsed),
+                style: theme.textTheme.displayLarge?.copyWith(
+                  color: paused
+                      ? theme.colorScheme.onSurface.withValues(alpha: 0.45)
+                      : theme.colorScheme.onSurface,
+                  fontFeatures: const <FontFeature>[
+                    FontFeature.tabularFigures(),
+                  ],
+                ),
+              ),
+              if (paused)
+                Text(
+                  '일시정지',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+            ],
           ),
         ),
-        if (goalReached) ...<Widget>[
+        if (goalReached && !paused) ...<Widget>[
           const SizedBox(height: 12),
           Chip(
             avatar: Icon(Icons.check_circle_rounded, size: 16, color: accent),
@@ -417,6 +451,7 @@ class _StreakBadge extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final grade = ref.watch(gradeNotifierProvider);
+    final Color accent = ref.watch(gradePrimaryProvider);
     final int streak = switch (grade) {
       GradeLoaded(:final summary) => summary.streakDays,
       _ => 0,
@@ -425,10 +460,17 @@ class _StreakBadge extends ConsumerWidget {
       return const SizedBox.shrink();
     }
     return Chip(
-      avatar: const Icon(Icons.local_fire_department_rounded, size: 18),
-      label: Text('연속 $streak일 독서 중'),
-      labelStyle: theme.textTheme.labelMedium,
-      backgroundColor: theme.colorScheme.surfaceContainerHigh,
+      avatar: Icon(
+        Icons.local_fire_department_rounded,
+        size: 18,
+        color: accent,
+      ),
+      label: Text(
+        '연속 $streak일 독서 중',
+        style: theme.textTheme.labelMedium?.copyWith(color: accent),
+      ),
+      backgroundColor: accent.withValues(alpha: 0.1),
+      side: BorderSide(color: accent.withValues(alpha: 0.25)),
     );
   }
 }
