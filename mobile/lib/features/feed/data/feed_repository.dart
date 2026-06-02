@@ -174,6 +174,27 @@ class FeedRepository {
     await _call(() => _api.deleteHighlight(userBookId, highlightId));
   }
 
+  Future<Highlight> updateHighlight({
+    required String userBookId,
+    required String highlightId,
+    required String quoteText,
+    int? pageNumber,
+    String? noteText,
+  }) async {
+    final HighlightDto dto = await _call(
+      () => _api.updateHighlight(
+        userBookId,
+        highlightId,
+        CreateHighlightRequest(
+          quoteText: quoteText,
+          pageNumber: pageNumber,
+          noteText: noteText,
+        ).toJson(),
+      ),
+    );
+    return dto.toDomain();
+  }
+
   Future<List<BookHighlightGroup>> listAllHighlights() async {
     try {
       final AllHighlightsResponseDto dto = await _api.listAllHighlights();

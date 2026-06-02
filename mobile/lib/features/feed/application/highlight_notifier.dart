@@ -60,6 +60,41 @@ class HighlightNotifier extends StateNotifier<HighlightState> {
     }
   }
 
+  /// Updates an existing highlight and replaces it in state on success.
+  Future<Highlight?> update({
+    required String highlightId,
+    required String quoteText,
+    int? pageNumber,
+    String? noteText,
+  }) async {
+    try {
+      final Highlight updated = await _repo.updateHighlight(
+        userBookId: userBookId,
+        highlightId: highlightId,
+        quoteText: quoteText,
+        pageNumber: pageNumber,
+        noteText: noteText,
+      );
+      if (mounted) {
+        if (state
+            case HighlightLoaded(
+              :final List<Highlight> items,
+              :final nextCursor
+            )) {
+          state = HighlightState.loaded(
+            items: items
+                .map((Highlight h) => h.id == highlightId ? updated : h)
+                .toList(),
+            nextCursor: nextCursor,
+          );
+        }
+      }
+      return updated;
+    } on FeedRepositoryException {
+      return null;
+    }
+  }
+
   Future<void> delete(String highlightId) async {
     if (state
         case HighlightLoaded(:final List<Highlight> items, :final nextCursor)) {

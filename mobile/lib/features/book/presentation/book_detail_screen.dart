@@ -18,6 +18,7 @@ import '../domain/book.dart';
 import '../domain/book_review.dart';
 import '../domain/book_status.dart';
 import '../domain/user_book.dart';
+import '../../reading/application/reading_providers.dart';
 import 'widgets/book_cover.dart';
 import 'widgets/review_modal.dart';
 
@@ -723,7 +724,11 @@ class _MyReviewCard extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                _ReadOnlyStars(rating: userBook.rating!, size: 20),
+                _ReadOnlyStars(
+                  rating: userBook.rating!,
+                  size: 20,
+                  color: ref.watch(gradePrimaryProvider),
+                ),
                 if (userBook.oneLineReview != null &&
                     userBook.oneLineReview!.isNotEmpty) ...<Widget>[
                   SizedBox(height: spacing.sm),
@@ -875,14 +880,18 @@ class _CommunityReviewCard extends StatelessWidget {
 }
 
 class _ReadOnlyStars extends StatelessWidget {
-  const _ReadOnlyStars({required this.rating, this.size = 16});
+  const _ReadOnlyStars({required this.rating, this.size = 16, this.color});
 
   final int rating;
   final double size;
+  // When null, falls back to theme.colorScheme.primary (community reviews use
+  // the generic primary; _MyReviewCard passes the grade-specific accent).
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final filledColor = color ?? theme.colorScheme.primary;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: List<Widget>.generate(
@@ -890,9 +899,7 @@ class _ReadOnlyStars extends StatelessWidget {
         (int i) => Icon(
           i < rating ? Icons.star_rounded : Icons.star_outline_rounded,
           size: size,
-          color: i < rating
-              ? theme.colorScheme.primary
-              : theme.colorScheme.outline,
+          color: i < rating ? filledColor : theme.colorScheme.outline,
         ),
       ),
     );
@@ -918,7 +925,9 @@ class _HighlightSection extends ConsumerWidget {
 
     // Load on first build.
     ref.listen<HighlightState>(
-        highlightNotifierProvider(userBookId), (_, __) {});
+      highlightNotifierProvider(userBookId),
+      (_, __) {},
+    );
     if (state is HighlightInitial) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref.read(highlightNotifierProvider(userBookId).notifier).load();
@@ -956,8 +965,9 @@ class _HighlightSection extends ConsumerWidget {
             ),
           )
         else if (state is HighlightLoaded)
-          ...state.items.map((Highlight h) =>
-              _HighlightCard(highlight: h, userBookId: userBookId)),
+          ...state.items.map(
+            (Highlight h) => _HighlightCard(highlight: h, userBookId: userBookId),
+          ),
       ],
     );
   }
@@ -1027,6 +1037,11 @@ class _HighlightCard extends ConsumerWidget {
             ),
           ),
           IconButton(
+            icon: const Icon(Icons.edit_outlined, size: 18),
+            onPressed: () => _showEditModal(context),
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+          IconButton(
             icon: const Icon(Icons.delete_outline, size: 18),
             onPressed: () => ref
                 .read(highlightNotifierProvider(userBookId).notifier)
@@ -1034,6 +1049,22 @@ class _HighlightCard extends ConsumerWidget {
             color: theme.colorScheme.onSurfaceVariant,
           ),
         ],
+      ),
+    );
+  }
+
+  Future<void> _showEditModal(BuildContext context) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) => AddHighlightSheet(
+        userBookId: userBookId,
+        initialHighlight: highlight,
       ),
     );
   }

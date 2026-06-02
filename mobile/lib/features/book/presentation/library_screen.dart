@@ -929,13 +929,13 @@ class _HighlightGroupState extends State<_HighlightGroup> {
   }
 }
 
-class _HighlightCard extends StatelessWidget {
+class _HighlightCard extends ConsumerWidget {
   const _HighlightCard({required this.highlight});
 
   final Highlight highlight;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final radii = theme.extension<AppRadius>()!;
     final spacing = theme.extension<AppSpacing>()!;
@@ -956,7 +956,7 @@ class _HighlightCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          // 인용구
+          // 인용구 + 삭제 버튼
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -975,6 +975,20 @@ class _HighlightCard extends StatelessWidget {
                     height: 1.65,
                     color: theme.colorScheme.onSurface,
                   ),
+                ),
+              ),
+              SizedBox(
+                width: 28,
+                height: 28,
+                child: IconButton(
+                  padding: EdgeInsets.zero,
+                  iconSize: 18,
+                  icon: Icon(
+                    Icons.delete_outline_rounded,
+                    color: theme.colorScheme.onSurfaceVariant
+                        .withValues(alpha: 0.55),
+                  ),
+                  onPressed: () => _confirmDelete(context, ref),
                 ),
               ),
             ],
@@ -1005,6 +1019,51 @@ class _HighlightCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
+    // Capture messenger BEFORE any async gap.
+    final messenger = ScaffoldMessenger.of(context);
+
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        title: const Text('하이라이트 삭제'),
+        content: const Text('이 하이라이트를 삭제할까요?'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('취소'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(
+              '삭제',
+              style: TextStyle(
+                color: Theme.of(ctx).colorScheme.error,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    try {
+      await ref.read(feedRepositoryProvider).deleteHighlight(
+            userBookId: highlight.userBookId,
+            highlightId: highlight.id,
+          );
+      ref.invalidate(allHighlightsProvider);
+      messenger.showSnackBar(
+        const SnackBar(content: Text('하이라이트가 삭제됐어요')),
+      );
+    } on Exception {
+      messenger.showSnackBar(
+        const SnackBar(content: Text('삭제에 실패했어요. 다시 시도해주세요.')),
+      );
+    }
   }
 }
 

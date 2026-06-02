@@ -549,7 +549,15 @@ class _ActionRow extends ConsumerWidget {
         const SizedBox(width: 12),
         Expanded(
           child: FilledButton(
-            onPressed: () => GoRouter.of(context).go('/home'),
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('홈 화면에서 책을 선택해 기록하세요'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+              GoRouter.of(context).go('/home');
+            },
             style: FilledButton.styleFrom(
               backgroundColor: accent,
               foregroundColor: Colors.white,

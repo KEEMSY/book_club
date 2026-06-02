@@ -90,6 +90,13 @@ abstract class FeedApi {
     @Path('highlight_id') String highlightId,
   );
 
+  @PATCH('/me/library/{user_book_id}/highlights/{highlight_id}')
+  Future<HighlightDto> updateHighlight(
+    @Path('user_book_id') String userBookId,
+    @Path('highlight_id') String highlightId,
+    @Body() Map<String, dynamic> body,
+  );
+
   @GET('/me/highlights')
   Future<AllHighlightsResponseDto> listAllHighlights();
 }
