@@ -128,3 +128,13 @@ class BadgeListResponse(BaseModel):
     """Badge list endpoint response envelope."""
 
     items: list[BadgeView]
+
+
+class BadgeReorderRequest(BaseModel):
+    """Request body for PATCH /me/badges/reorder.
+
+    ``badge_ids`` lists badge UUIDs in the desired display order (index 0 first).
+    Badges omitted from the list have their pin_order reset to 0.
+    """
+
+    badge_ids: list[UUID]

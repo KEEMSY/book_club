@@ -4,6 +4,7 @@ import '../domain/goal_period.dart';
 import '../domain/grade_summary.dart';
 import '../domain/heatmap_day.dart';
 import '../domain/reading_goal.dart';
+import '../domain/reading_recap.dart';
 import '../domain/reading_session.dart';
 import '../domain/reading_year_stats.dart';
 
@@ -331,6 +332,62 @@ abstract class ReadingYearStatsDto with _$ReadingYearStatsDto {
       totalSeconds: totalSeconds,
       streakDays: streakDays,
       longestStreak: longestStreak,
+    );
+  }
+}
+
+/// Mirror of a single book entry in `GET /reading/recap` response.
+@freezed
+abstract class RecapBookDto with _$RecapBookDto {
+  const RecapBookDto._();
+
+  const factory RecapBookDto({
+    required String bookId,
+    required String title,
+    required String author,
+    String? coverUrl,
+    required int readSeconds,
+  }) = _RecapBookDto;
+
+  factory RecapBookDto.fromJson(Map<String, dynamic> json) =>
+      _$RecapBookDtoFromJson(json);
+
+  RecapBook toDomain() {
+    return RecapBook(
+      bookId: bookId,
+      title: title,
+      author: author,
+      coverUrl: coverUrl,
+      readSeconds: readSeconds,
+    );
+  }
+}
+
+/// Mirror of `GET /reading/recap?year=&half=` response.
+@freezed
+abstract class ReadingRecapDto with _$ReadingRecapDto {
+  const ReadingRecapDto._();
+
+  const factory ReadingRecapDto({
+    required int year,
+    required int half,
+    required int totalBooks,
+    required int totalSeconds,
+    required int longestStreakDays,
+    @Default(<RecapBookDto>[]) List<RecapBookDto> topBooks,
+  }) = _ReadingRecapDto;
+
+  factory ReadingRecapDto.fromJson(Map<String, dynamic> json) =>
+      _$ReadingRecapDtoFromJson(json);
+
+  ReadingRecap toDomain() {
+    return ReadingRecap(
+      year: year,
+      half: half,
+      totalBooks: totalBooks,
+      totalSeconds: totalSeconds,
+      longestStreakDays: longestStreakDays,
+      topBooks: topBooks.map((b) => b.toDomain()).toList(growable: false),
     );
   }
 }

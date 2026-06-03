@@ -6,6 +6,7 @@ import '../domain/goal_period.dart';
 import '../domain/grade_summary.dart';
 import '../domain/heatmap_day.dart';
 import '../domain/reading_goal.dart';
+import '../domain/reading_recap.dart';
 import '../domain/reading_session.dart';
 import '../domain/reading_year_stats.dart';
 import 'reading_api.dart';
@@ -175,6 +176,16 @@ class ReadingRepository {
   Future<ReadingYearStats> getYearStats(int year) async {
     final ReadingYearStatsDto dto =
         await _call(() => _api.getYearStats(year: year));
+    return dto.toDomain();
+  }
+
+  /// Fetches half-year recap (상반기/하반기) for the given [year] and [half] (1 or 2).
+  Future<ReadingRecap> getReadingRecap({
+    required int year,
+    required int half,
+  }) async {
+    final ReadingRecapDto dto =
+        await _call(() => _api.getRecap(year: year, half: half));
     return dto.toDomain();
   }
 

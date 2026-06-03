@@ -273,3 +273,44 @@ Map<String, dynamic> _$ReadingYearStatsDtoToJson(
       'streak_days': instance.streakDays,
       'longest_streak': instance.longestStreak,
     };
+
+_RecapBookDto _$RecapBookDtoFromJson(Map<String, dynamic> json) =>
+    _RecapBookDto(
+      bookId: json['book_id'] as String,
+      title: json['title'] as String,
+      author: json['author'] as String,
+      coverUrl: json['cover_url'] as String?,
+      readSeconds: (json['read_seconds'] as num).toInt(),
+    );
+
+Map<String, dynamic> _$RecapBookDtoToJson(_RecapBookDto instance) =>
+    <String, dynamic>{
+      'book_id': instance.bookId,
+      'title': instance.title,
+      'author': instance.author,
+      'cover_url': instance.coverUrl,
+      'read_seconds': instance.readSeconds,
+    };
+
+_ReadingRecapDto _$ReadingRecapDtoFromJson(Map<String, dynamic> json) =>
+    _ReadingRecapDto(
+      year: (json['year'] as num).toInt(),
+      half: (json['half'] as num).toInt(),
+      totalBooks: (json['total_books'] as num).toInt(),
+      totalSeconds: (json['total_seconds'] as num).toInt(),
+      longestStreakDays: (json['longest_streak_days'] as num).toInt(),
+      topBooks: (json['top_books'] as List<dynamic>?)
+              ?.map((e) => RecapBookDto.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const <RecapBookDto>[],
+    );
+
+Map<String, dynamic> _$ReadingRecapDtoToJson(_ReadingRecapDto instance) =>
+    <String, dynamic>{
+      'year': instance.year,
+      'half': instance.half,
+      'total_books': instance.totalBooks,
+      'total_seconds': instance.totalSeconds,
+      'longest_streak_days': instance.longestStreakDays,
+      'top_books': instance.topBooks.map((e) => e.toJson()).toList(),
+    };

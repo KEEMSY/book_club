@@ -79,13 +79,15 @@ from app.domains.reading.ports import (
     HeatmapDay,
     MonthlyHours,
     ReadingBookQueryPort,
+    ReadingRecap,
     ReadingSessionRepositoryPort,
     ReadingSpeedStats,
     ReadingStats,
+    RecapCardData,
     SessionCompletion,
     UserGradeRepositoryPort,
 )
-from app.domains.reading.repository import BookmarkRepository, ReadingStatsRepository
+from app.domains.reading.repository import BookmarkRepository, ReadingStatsRepository, RecapBookRow
 from app.domains.reading.streak_policy import update_streak
 from app.shared.event_bus import EventBus
 
@@ -105,6 +107,8 @@ class YearStats:
     total_seconds: int
     streak_days: int
     longest_streak: int
+
+
 _MIN_TIMER_DURATION_SEC = 1
 _MANUAL_MIN_SEC = 60
 _MANUAL_MAX_SEC = 4 * 60 * 60
@@ -442,15 +446,66 @@ class ReadingService:
                 audio=fmt.get("audio", 0),
             ),
             monthly_hours=[
-                MonthlyHours(month=str(m["month"]), hours=float(m["hours"]))
-                for m in monthly
+                MonthlyHours(month=str(m["month"]), hours=float(str(m["hours"]))) for m in monthly
             ],
             genre_breakdown=[
-                GenreBreakdown(genre=str(g["genre"]), count=int(g["count"]))
-                for g in genres
+                GenreBreakdown(genre=str(g["genre"]), count=int(str(g["count"]))) for g in genres
             ],
             avg_completion_days=avg_days,
         )
+
+    async def get_reading_recap(
+        self,
+        *,
+        user_id: UUID,
+        period: str,
+    ) -> ReadingRecap:
+        """Return up to four recap cards for the given half-year/year period.
+
+        ``period`` format: ``YYYY-H1`` (Jan-Jun), ``YYYY-H2`` (Jul-Dec),
+        or ``YYYY`` (full year).  Each card is only included when data
+        exists — so the list may have 0 to 4 items.
+
+        Queries are run sequentially on the shared AsyncSession (same
+        constraint as ``get_year_stats``).
+        """
+        from_date, to_date = _parse_recap_period(period)
+
+        rows = [
+            (
+                "most_time",
+                await self.stats_repo.recap_most_time(user_id, from_date, to_date),
+            ),
+            (
+                "first_completed",
+                await self.stats_repo.recap_first_completed(user_id, from_date, to_date),
+            ),
+            (
+                "thickest",
+                await self.stats_repo.recap_thickest(user_id, from_date, to_date),
+            ),
+            (
+                "most_highlighted",
+                await self.stats_repo.recap_most_highlighted(user_id, from_date, to_date),
+            ),
+        ]
+
+        cards: list[RecapCardData] = []
+        for card_type, row in rows:
+            if row is None:
+                continue
+            stat_value = _format_recap_stat(card_type, row)
+            cards.append(
+                RecapCardData(
+                    card_type=card_type,
+                    title=row.title,
+                    cover_url=row.cover_url,
+                    author=row.author,
+                    stat_value=stat_value,
+                )
+            )
+
+        return ReadingRecap(period=period, cards=cards)
 
     # ------------------------------------------------------------------
     # Internal helpers
@@ -593,10 +648,54 @@ def _compute_window(period: GoalPeriod, anchor: date) -> tuple[date, date]:
     return (first, last)
 
 
+def _parse_recap_period(period: str) -> tuple[date, date]:
+    """Parse ``period`` into an inclusive [from_date, to_date] pair.
+
+    Accepted formats:
+    - ``YYYY``    — full calendar year
+    - ``YYYY-H1`` — first half (January-June)
+    - ``YYYY-H2`` — second half (July-December)
+
+    Raises ``ValueError`` for malformed input so the router can return 422.
+    """
+    period = period.strip()
+    if "-H" in period:
+        parts = period.split("-H")
+        if len(parts) != 2:
+            raise ValueError(f"invalid recap period: {period!r}")
+        year_str, half_str = parts
+        year = int(year_str)
+        half = int(half_str)
+        if half == 1:
+            return date(year, 1, 1), date(year, 6, 30)
+        if half == 2:
+            return date(year, 7, 1), date(year, 12, 31)
+        raise ValueError(f"invalid half in recap period: {period!r}")
+    year = int(period)
+    return date(year, 1, 1), date(year, 12, 31)
+
+
+def _format_recap_stat(card_type: str, row: RecapBookRow) -> str:
+    """Return the human-readable ``stat_value`` string for a card."""
+    if card_type == "most_time":
+        hours = (row.stat_int or 0) // 3600
+        return f"총 {hours}시간"
+    if card_type == "first_completed":
+        if row.stat_date is not None:
+            return f"{row.stat_date.month}월 {row.stat_date.day}일"
+        return "—"
+    if card_type == "thickest":
+        return f"{row.stat_int or 0}페이지"
+    if card_type == "most_highlighted":
+        return f"하이라이트 {row.stat_int or 0}개"
+    return "—"
+
+
 __all__ = [
     "ReadingService",
     "SessionCompletion",
     "StageEventFn",
     "_compute_window",
+    "_parse_recap_period",
     "_reconcile_duration",
 ]

@@ -290,6 +290,39 @@ class ChallengeRepository:
         result = await self._session.execute(stmt)
         return [(row.Badge, row.UserBadge) for row in result]
 
+    async def reorder_pinned_badges(
+        self,
+        user_id: UUID,
+        ordered_badge_ids: list[UUID],
+    ) -> None:
+        """Bulk-update pin_order for a user's badges.
+
+        Badges in ``ordered_badge_ids`` receive pin_order = their list index.
+        All other earned badges for this user are reset to pin_order = 0.
+        Two UPDATE statements are issued: one bulk reset, one per-badge set.
+        Callers must verify ownership before calling; no auth check is done here.
+        """
+        # Reset all badges the user owns first, then apply the ordered set.
+        reset_stmt = (
+            update(UserBadge)
+            .where(UserBadge.user_id == user_id)
+            .values(pin_order=0)
+        )
+        await self._session.execute(reset_stmt)
+
+        for order, badge_id in enumerate(ordered_badge_ids):
+            set_stmt = (
+                update(UserBadge)
+                .where(
+                    UserBadge.user_id == user_id,
+                    UserBadge.badge_id == badge_id,
+                )
+                .values(pin_order=order)
+            )
+            await self._session.execute(set_stmt)
+
+        await self._session.flush()
+
     async def badge_earner_count(self, badge_id: UUID) -> int:
         """Return the number of users who have earned a badge."""
         from sqlalchemy import func as sqlfunc

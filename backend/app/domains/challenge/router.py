@@ -21,6 +21,7 @@ from app.core.deps import get_current_user_id
 from app.domains.challenge.providers import get_challenge_service
 from app.domains.challenge.schemas import (
     BadgeListResponse,
+    BadgeReorderRequest,
     ChallengeDetailView,
     ChallengePage,
     ChallengePublic,
@@ -126,3 +127,17 @@ async def my_badges(
 ) -> MyBadgeResponse:
     items = await service.my_badges(UUID(user_id))
     return MyBadgeResponse(items=items)
+
+
+@router.patch(
+    "/me/badges/reorder",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="배지 핀 순서 변경",
+)
+async def reorder_badges(
+    body: BadgeReorderRequest,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ChallengeService, Depends(get_challenge_service)],
+) -> Response:
+    await service.reorder_pinned_badges(UUID(user_id), body.badge_ids)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

@@ -166,3 +166,6 @@ class UserBadge(Base):
     earned_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
+    # Display order when the badge is pinned to the user's profile.
+    # 0 means unpinned or first position; re-ordered via PATCH /me/badges/reorder.
+    pin_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")

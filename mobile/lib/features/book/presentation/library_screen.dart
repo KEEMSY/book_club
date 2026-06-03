@@ -1,9 +1,17 @@
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../auth/application/auth_notifier.dart';
+import '../../auth/domain/auth_state.dart';
+import '../../auth/domain/auth_user.dart';
 import '../../feed/application/feed_providers.dart';
 import '../../feed/domain/book_highlight_group.dart';
 import '../../feed/domain/highlight.dart';
@@ -79,6 +87,40 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
     super.dispose();
   }
 
+  void _showCaptureSheet(BuildContext context) {
+    final map = ref.read(libraryNotifierProvider);
+    final List<UserBook> completedBooks = switch (map[BookStatus.completed]) {
+      LibraryListLoaded(:final items) => items,
+      _ => <UserBook>[],
+    };
+    final int totalBooks = BookStatus.values.fold(0, (sum, s) {
+      return sum +
+          switch (map[s]) {
+            LibraryListLoaded(:final items) => items.length,
+            _ => 0,
+          };
+    });
+    final AuthUser? user = switch (ref.read(authNotifierProvider)) {
+      Authenticated(:final user) => user,
+      _ => null,
+    };
+
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (_) => _LibraryCaptureSheet(
+        coverBooks: completedBooks.take(6).toList(),
+        totalBooks: totalBooks,
+        nickname: user?.nickname ?? '독서가',
+      ),
+    );
+  }
+
   void _onTabChange() {
     if (_tab.indexIsChanging) return;
     _loadTab(_tab.index);
@@ -142,7 +184,22 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
                 spacing.sm,
                 0,
               ),
-              child: Text('내 서재', style: theme.textTheme.displaySmall),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Expanded(
+                    child: Text(
+                      '내 서재',
+                      style: theme.textTheme.displaySmall,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.camera_alt_outlined),
+                    tooltip: '서재 캡처',
+                    onPressed: () => _showCaptureSheet(context),
+                  ),
+                ],
+              ),
             ),
             TabBar(
               controller: _tab,
@@ -1293,4 +1350,343 @@ class _CompletedCard extends ConsumerWidget {
     return '${local.year}.${local.month}.${local.day} 완독';
   }
 }
+
+// ---------------------------------------------------------------------------
+// 서재 캡처 시트
+// ---------------------------------------------------------------------------
+
+/// Aspect ratio options for the capture card.
+enum _CaptureAspect {
+  square, // 1:1
+  portrait, // 9:16
+}
+
+class _LibraryCaptureSheet extends StatefulWidget {
+  const _LibraryCaptureSheet({
+    required this.coverBooks,
+    required this.totalBooks,
+    required this.nickname,
+  });
+
+  final List<UserBook> coverBooks;
+  final int totalBooks;
+  final String nickname;
+
+  @override
+  State<_LibraryCaptureSheet> createState() => _LibraryCaptureSheetState();
+}
+
+class _LibraryCaptureSheetState extends State<_LibraryCaptureSheet> {
+  final GlobalKey _captureKey = GlobalKey();
+  _CaptureAspect _aspect = _CaptureAspect.square;
+  bool _sharing = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          spacing.lg,
+          spacing.sm,
+          spacing.lg,
+          spacing.lg,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Text(
+              '서재 공유',
+              style: theme.textTheme.headlineMedium,
+            ),
+            SizedBox(height: spacing.md),
+            // Capture preview
+            Center(
+              child: RepaintBoundary(
+                key: _captureKey,
+                child: _LibraryCaptureWidget(
+                  coverBooks: widget.coverBooks,
+                  totalBooks: widget.totalBooks,
+                  nickname: widget.nickname,
+                  aspect: _aspect,
+                ),
+              ),
+            ),
+            SizedBox(height: spacing.md),
+            // Aspect ratio toggle
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                _AspectButton(
+                  label: '정사각형',
+                  selected: _aspect == _CaptureAspect.square,
+                  onTap: () => setState(() => _aspect = _CaptureAspect.square),
+                ),
+                SizedBox(width: spacing.sm),
+                _AspectButton(
+                  label: '세로형',
+                  selected: _aspect == _CaptureAspect.portrait,
+                  onTap: () =>
+                      setState(() => _aspect = _CaptureAspect.portrait),
+                ),
+              ],
+            ),
+            SizedBox(height: spacing.md),
+            // Share button
+            FilledButton.icon(
+              onPressed: _sharing ? null : _captureAndShare,
+              icon: _sharing
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : const Icon(Icons.share_rounded),
+              label: const Text('캡처 & 공유'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _captureAndShare() async {
+    setState(() => _sharing = true);
+    try {
+      final boundary = _captureKey.currentContext!.findRenderObject()!
+          as RenderRepaintBoundary;
+      final ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+      final ByteData? data =
+          await image.toByteData(format: ui.ImageByteFormat.png);
+      if (data == null) {
+        setState(() => _sharing = false);
+        return;
+      }
+      final List<int> pngBytes = data.buffer.asUint8List();
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [
+            XFile.fromData(
+              Uint8List.fromList(pngBytes),
+              name: 'my_library.png',
+              mimeType: 'image/png',
+            ),
+          ],
+          subject: '내 서재 — Book Club',
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _sharing = false);
+    }
+  }
+}
+
+class _AspectButton extends StatelessWidget {
+  const _AspectButton({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final radii = theme.extension<AppRadius>()!;
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        decoration: BoxDecoration(
+          color: selected
+              ? theme.colorScheme.primary
+              : theme.colorScheme.surfaceContainerLow,
+          borderRadius: BorderRadius.all(Radius.circular(radii.pill)),
+        ),
+        child: Text(
+          label,
+          style: theme.textTheme.labelLarge?.copyWith(
+            color: selected
+                ? theme.colorScheme.onPrimary
+                : theme.colorScheme.onSurface,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 캡처 전용 위젯 — RepaintBoundary 내부에 렌더링되는 실제 카드
+// ---------------------------------------------------------------------------
+
+class _LibraryCaptureWidget extends StatelessWidget {
+  const _LibraryCaptureWidget({
+    required this.coverBooks,
+    required this.totalBooks,
+    required this.nickname,
+    required this.aspect,
+  });
+
+  final List<UserBook> coverBooks;
+  final int totalBooks;
+  final String nickname;
+  final _CaptureAspect aspect;
+
+  static const double _cardWidth = 300.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final double height = aspect == _CaptureAspect.portrait
+        ? _cardWidth * 16 / 9
+        : _cardWidth;
+
+    return Container(
+      width: _cardWidth,
+      height: height,
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          // Header: nickname + label
+          Container(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        nickname,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '내 서재',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.menu_book_rounded,
+                  color: theme.colorScheme.primary,
+                  size: 22,
+                ),
+              ],
+            ),
+          ),
+          // Book cover grid — 2 columns × 3 rows
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: _CoverGrid(books: coverBooks),
+            ),
+          ),
+          // Footer: stats + watermark
+          Container(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primary.withValues(alpha: 0.06),
+            ),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    '읽은 책 $totalBooks권',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                ),
+                Text(
+                  'Book Club',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.primary,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CoverGrid extends StatelessWidget {
+  const _CoverGrid({required this.books});
+
+  final List<UserBook> books;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final radii = theme.extension<AppRadius>()!;
+
+    // Fill up to 6 slots; empty slots render a placeholder tint.
+    final List<UserBook?> slots = List<UserBook?>.generate(
+      6,
+      (i) => i < books.length ? books[i] : null,
+    );
+
+    return GridView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        mainAxisSpacing: 6,
+        crossAxisSpacing: 6,
+        childAspectRatio: 2 / 3,
+      ),
+      itemCount: 6,
+      itemBuilder: (_, i) {
+        final UserBook? book = slots[i];
+        if (book == null) {
+          return Container(
+            decoration: BoxDecoration(
+              color:
+                  theme.colorScheme.primary.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.all(Radius.circular(radii.sm)),
+            ),
+          );
+        }
+        return BookCover(
+          coverUrl: book.book.coverUrl,
+          borderRadius: BorderRadius.all(Radius.circular(radii.sm)),
+        );
+      },
+    );
+  }
+}
+
 

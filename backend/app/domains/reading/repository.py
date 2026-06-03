@@ -21,6 +21,7 @@ Key design choices:
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from datetime import date, datetime
 from uuid import UUID
 
@@ -39,6 +40,22 @@ from app.domains.reading.models import (
     ReadingSessionSource,
     UserGrade,
 )
+
+
+@dataclass(frozen=True, slots=True)
+class RecapBookRow:
+    """Intermediate result from a single recap card query.
+
+    ``stat_int`` carries a numeric value (seconds, page count, highlight
+    count); ``stat_date`` carries a completion date.  Exactly one of the
+    two will be populated depending on the card type.
+    """
+
+    title: str
+    cover_url: str | None
+    author: str
+    stat_int: int | None
+    stat_date: date | None
 
 
 class ReadingSessionRepository:
@@ -494,9 +511,7 @@ class ReadingStatsRepository:
             LIMIT :top_n
             """
         )
-        rows = (
-            await self._session.execute(stmt, {"user_id": user_id, "top_n": top_n})
-        ).all()
+        rows = (await self._session.execute(stmt, {"user_id": user_id, "top_n": top_n})).all()
         return [{"genre": str(row[0]), "count": int(row[1])} for row in rows]
 
     async def avg_completion_days(self, user_id: UUID) -> float | None:
@@ -516,3 +531,173 @@ class ReadingStatsRepository:
         )
         result = (await self._session.execute(raw, {"user_id": user_id})).scalar_one()
         return float(result) if result is not None else None
+
+    async def recap_most_time(
+        self, user_id: UUID, from_date: date, to_date: date
+    ) -> RecapBookRow | None:
+        """Completed book with the highest total reading seconds in the period.
+
+        Joins ``reading_sessions`` to ``user_books`` and ``books`` so we
+        avoid a cross-domain service call from the repository layer.
+        Duration is summed across ALL timer sessions for each completed
+        user_book that was finished within the period window.
+        """
+        stmt = text(
+            """
+            SELECT
+                b.title,
+                b.cover_url,
+                b.author,
+                SUM(rs.duration_sec) AS total_sec,
+                ub.finished_at
+            FROM user_books ub
+            JOIN books b ON b.id = ub.book_id
+            JOIN reading_sessions rs ON rs.user_book_id = ub.id
+            WHERE ub.user_id = :user_id
+              AND ub.status = 'completed'
+              AND ub.finished_at IS NOT NULL
+              AND ub.finished_at::date >= :from_date
+              AND ub.finished_at::date <= :to_date
+              AND rs.ended_at IS NOT NULL
+              AND rs.source = 'timer'
+            GROUP BY b.title, b.cover_url, b.author, ub.finished_at
+            ORDER BY total_sec DESC, ub.finished_at DESC
+            LIMIT 1
+            """
+        )
+        row = (
+            await self._session.execute(
+                stmt, {"user_id": user_id, "from_date": from_date, "to_date": to_date}
+            )
+        ).one_or_none()
+        if row is None:
+            return None
+        return RecapBookRow(
+            title=str(row.title),
+            cover_url=str(row.cover_url) if row.cover_url else None,
+            author=str(row.author),
+            stat_int=int(row.total_sec),
+            stat_date=None,
+        )
+
+    async def recap_first_completed(
+        self, user_id: UUID, from_date: date, to_date: date
+    ) -> RecapBookRow | None:
+        """The very first book the user completed within the period."""
+        stmt = text(
+            """
+            SELECT
+                b.title,
+                b.cover_url,
+                b.author,
+                ub.finished_at
+            FROM user_books ub
+            JOIN books b ON b.id = ub.book_id
+            WHERE ub.user_id = :user_id
+              AND ub.status = 'completed'
+              AND ub.finished_at IS NOT NULL
+              AND ub.finished_at::date >= :from_date
+              AND ub.finished_at::date <= :to_date
+            ORDER BY ub.finished_at ASC
+            LIMIT 1
+            """
+        )
+        row = (
+            await self._session.execute(
+                stmt, {"user_id": user_id, "from_date": from_date, "to_date": to_date}
+            )
+        ).one_or_none()
+        if row is None:
+            return None
+        return RecapBookRow(
+            title=str(row.title),
+            cover_url=str(row.cover_url) if row.cover_url else None,
+            author=str(row.author),
+            stat_int=None,
+            stat_date=row.finished_at.date() if hasattr(row.finished_at, "date") else None,
+        )
+
+    async def recap_thickest(
+        self, user_id: UUID, from_date: date, to_date: date
+    ) -> RecapBookRow | None:
+        """Completed book with the highest max bookmark page in the period.
+
+        ``books`` has no ``page_count`` column yet, so we infer thickness
+        from the maximum page number saved in ``bookmarks`` for the
+        user_book — the same proxy used by ``avg_speed``.
+        """
+        stmt = text(
+            """
+            SELECT
+                b.title,
+                b.cover_url,
+                b.author,
+                MAX(bm.page) AS max_page,
+                ub.finished_at
+            FROM user_books ub
+            JOIN books b ON b.id = ub.book_id
+            JOIN bookmarks bm ON bm.user_book_id = ub.id
+            WHERE ub.user_id = :user_id
+              AND ub.status = 'completed'
+              AND ub.finished_at IS NOT NULL
+              AND ub.finished_at::date >= :from_date
+              AND ub.finished_at::date <= :to_date
+            GROUP BY b.title, b.cover_url, b.author, ub.finished_at
+            ORDER BY max_page DESC, ub.finished_at DESC
+            LIMIT 1
+            """
+        )
+        row = (
+            await self._session.execute(
+                stmt, {"user_id": user_id, "from_date": from_date, "to_date": to_date}
+            )
+        ).one_or_none()
+        if row is None:
+            return None
+        return RecapBookRow(
+            title=str(row.title),
+            cover_url=str(row.cover_url) if row.cover_url else None,
+            author=str(row.author),
+            stat_int=int(row.max_page),
+            stat_date=None,
+        )
+
+    async def recap_most_highlighted(
+        self, user_id: UUID, from_date: date, to_date: date
+    ) -> RecapBookRow | None:
+        """Completed book with the most highlights saved in the period."""
+        stmt = text(
+            """
+            SELECT
+                b.title,
+                b.cover_url,
+                b.author,
+                COUNT(ph.id) AS highlight_count,
+                ub.finished_at
+            FROM user_books ub
+            JOIN books b ON b.id = ub.book_id
+            JOIN post_highlights ph ON ph.user_book_id = ub.id
+            WHERE ub.user_id = :user_id
+              AND ub.status = 'completed'
+              AND ub.finished_at IS NOT NULL
+              AND ub.finished_at::date >= :from_date
+              AND ub.finished_at::date <= :to_date
+            GROUP BY b.title, b.cover_url, b.author, ub.finished_at
+            ORDER BY highlight_count DESC, ub.finished_at DESC
+            LIMIT 1
+            """
+        )
+        row = (
+            await self._session.execute(
+                stmt, {"user_id": user_id, "from_date": from_date, "to_date": to_date}
+            )
+        ).one_or_none()
+        if row is None:
+            return None
+        return RecapBookRow(
+            title=str(row.title),
+            cover_url=str(row.cover_url) if row.cover_url else None,
+            author=str(row.author),
+            stat_int=int(row.highlight_count),
+            stat_date=None,
+        )

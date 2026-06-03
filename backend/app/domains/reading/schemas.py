@@ -7,6 +7,7 @@ The router never leaks SQLAlchemy models past this shell.
 from __future__ import annotations
 
 from datetime import date, datetime
+from enum import StrEnum
 from typing import Literal
 from uuid import UUID
 
@@ -254,3 +255,30 @@ class ReadingStatsResponse(BaseModel):
     monthly_hours: list[MonthlyHoursPublic]
     genre_breakdown: list[GenreBreakdownPublic]
     avg_completion_days: float | None
+
+
+# ---- reading recap card schemas ----
+
+
+class RecapCardType(StrEnum):
+    most_time = "most_time"
+    first_completed = "first_completed"
+    thickest = "thickest"
+    most_highlighted = "most_highlighted"
+
+
+class RecapBook(BaseModel):
+    title: str
+    cover_url: str | None
+    author: str
+
+
+class RecapCard(BaseModel):
+    card_type: RecapCardType
+    book: RecapBook
+    stat_value: str
+
+
+class ReadingRecapResponse(BaseModel):
+    period: str
+    cards: list[RecapCard]

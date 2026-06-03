@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,7 +8,8 @@ import '../../../core/theme/app_theme.dart';
 import '../application/challenge_providers.dart';
 import '../data/challenge_models.dart';
 
-/// Badge collection screen — earned badges + full catalogue with lock overlay.
+/// Badge collection screen — pinned badges (reorderable) + earned grid +
+/// full catalogue with lock overlay.
 class BadgeCollectionScreen extends ConsumerWidget {
   const BadgeCollectionScreen({super.key});
 
@@ -52,27 +55,74 @@ class BadgeCollectionScreen extends ConsumerWidget {
 // Body
 // ---------------------------------------------------------------------------
 
-class _BadgeBody extends StatelessWidget {
+class _BadgeBody extends ConsumerWidget {
   const _BadgeBody({required this.myBadges, required this.allBadges});
 
   final List<BadgeEarnedDto> myBadges;
   final List<BadgeDto> allBadges;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
-    // Build a set of earned badge IDs for O(1) lookup.
-    final earnedIds = {for (final e in myBadges) e.badge.id: e};
+    final pinAsync = ref.watch(badgePinNotifierProvider);
+    final earnedMap = {for (final e in myBadges) e.badge.id: e};
+    final allBadgeMap = {for (final b in allBadges) b.id: b};
 
     return CustomScrollView(
       slivers: <Widget>[
-        // My badges section
+        // ── Pinned badges section ──────────────────────────────────────────
         SliverToBoxAdapter(
           child: Padding(
             padding: EdgeInsets.fromLTRB(
               spacing.md,
               spacing.md,
+              spacing.md,
+              spacing.xs,
+            ),
+            child: Row(
+              children: <Widget>[
+                Text('핀된 배지', style: theme.textTheme.titleMedium),
+                const SizedBox(width: 6),
+                Text(
+                  '(최대 $kMaxPinnedBadges개 · 길게 눌러 순서 변경)',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        pinAsync.when(
+          loading: () => const SliverToBoxAdapter(
+            child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+          ),
+          error: (_, __) => const SliverToBoxAdapter(child: SizedBox.shrink()),
+          data: (pinnedIds) {
+            return SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: spacing.md),
+                child: _PinnedBadgesGrid(
+                  pinnedIds: pinnedIds,
+                  earnedMap: earnedMap,
+                  allBadgeMap: allBadgeMap,
+                  onReorder: (newIds) =>
+                      ref.read(badgePinNotifierProvider.notifier).reorder(newIds),
+                ),
+              ),
+            );
+          },
+        ),
+
+        SliverToBoxAdapter(child: SizedBox(height: spacing.lg)),
+
+        // ── Earned badges section ──────────────────────────────────────────
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(
+              spacing.md,
+              0,
               spacing.md,
               spacing.sm,
             ),
@@ -120,7 +170,7 @@ class _BadgeBody extends StatelessWidget {
 
         SliverToBoxAdapter(child: SizedBox(height: spacing.lg)),
 
-        // All badges section
+        // ── All badges catalogue ───────────────────────────────────────────
         SliverToBoxAdapter(
           child: Padding(
             padding: EdgeInsets.fromLTRB(
@@ -162,7 +212,7 @@ class _BadgeBody extends StatelessWidget {
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
                   final badge = allBadges[index];
-                  final earnedItem = earnedIds[badge.id];
+                  final earnedItem = earnedMap[badge.id];
                   return _BadgeCard(
                     badge: badge,
                     earned: earnedItem != null,
@@ -176,6 +226,210 @@ class _BadgeBody extends StatelessWidget {
       ],
     );
   }
+}
+
+// ---------------------------------------------------------------------------
+// Pinned badges grid (3 × 2 = 6 slots) with ReorderableListView rows
+// ---------------------------------------------------------------------------
+
+class _PinnedBadgesGrid extends StatefulWidget {
+  const _PinnedBadgesGrid({
+    required this.pinnedIds,
+    required this.earnedMap,
+    required this.allBadgeMap,
+    required this.onReorder,
+  });
+
+  final List<String> pinnedIds;
+  final Map<String, BadgeEarnedDto> earnedMap;
+  final Map<String, BadgeDto> allBadgeMap;
+  final void Function(List<String> newIds) onReorder;
+
+  @override
+  State<_PinnedBadgesGrid> createState() => _PinnedBadgesGridState();
+}
+
+class _PinnedBadgesGridState extends State<_PinnedBadgesGrid> {
+  late List<String?> _slots; // length == kMaxPinnedBadges, null = empty slot
+
+  @override
+  void initState() {
+    super.initState();
+    _slots = _buildSlots(widget.pinnedIds);
+  }
+
+  @override
+  void didUpdateWidget(_PinnedBadgesGrid old) {
+    super.didUpdateWidget(old);
+    if (old.pinnedIds != widget.pinnedIds) {
+      _slots = _buildSlots(widget.pinnedIds);
+    }
+  }
+
+  List<String?> _buildSlots(List<String> ids) {
+    final slots = List<String?>.filled(kMaxPinnedBadges, null);
+    for (var i = 0; i < ids.length && i < kMaxPinnedBadges; i++) {
+      slots[i] = ids[i];
+    }
+    return slots;
+  }
+
+  void _handleReorder(int oldIndex, int newIndex) {
+    setState(() {
+      if (newIndex > oldIndex) newIndex--;
+      final item = _slots.removeAt(oldIndex);
+      _slots.insert(newIndex, item);
+    });
+    final ids = _slots.whereType<String>().toList();
+    widget.onReorder(ids);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    // Split 6 slots into 2 rows of 3 for the grid layout.
+    // ReorderableListView wraps both rows, where each row is a ReorderableListView item.
+    // Because Flutter's ReorderableListView is list-based (single axis), we
+    // use it as a vertical list of rows (each row holds 3 items) and embed
+    // individual drag handles on each badge tile.
+
+    // Alternative approach: flat ReorderableListView with 6 items rendered
+    // as a Wrap-like grid using LayoutBuilder. Flutter's ReorderableListView
+    // supports any child layout via proxyDecorator.
+
+    return SizedBox(
+      // 2 rows × (tile height ~80) + spacing
+      height: 180,
+      child: ReorderableListView.builder(
+        scrollDirection: Axis.horizontal,
+        buildDefaultDragHandles: false,
+        itemCount: kMaxPinnedBadges,
+        itemBuilder: (ctx, index) {
+          final id = _slots[index];
+          final badge = id != null ? widget.allBadgeMap[id] : null;
+          final earned = id != null ? widget.earnedMap[id] : null;
+          return ReorderableDragStartListener(
+            key: ValueKey('pin_$index'),
+            index: index,
+            child: _PinnedSlotTile(
+              badge: badge,
+              earnedAt: earned?.earnedAt,
+            ),
+          );
+        },
+        onReorder: _handleReorder,
+        proxyDecorator: (child, index, animation) {
+          return AnimatedBuilder(
+            animation: animation,
+            builder: (_, __) {
+              final scale = lerpDouble(1.0, 1.12, animation.value)!;
+              return Transform.scale(
+                scale: scale,
+                child: Material(
+                  color: Colors.transparent,
+                  elevation: 4 * animation.value,
+                  shadowColor: theme.colorScheme.shadow.withValues(alpha: 0.4),
+                  child: child,
+                ),
+              );
+            },
+            child: child,
+          );
+        },
+      ),
+    );
+  }
+}
+
+/// A single pinned slot — either a badge tile or an empty dashed-border slot.
+class _PinnedSlotTile extends StatelessWidget {
+  const _PinnedSlotTile({this.badge, this.earnedAt});
+
+  final BadgeDto? badge;
+  final DateTime? earnedAt;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final radius = theme.extension<AppRadius>()!;
+
+    if (badge == null) {
+      return SizedBox(
+        width: 80,
+        height: 80,
+        child: CustomPaint(
+          painter: _DashedBorderPainter(
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.6),
+            borderRadius: radius.md,
+          ),
+          child: Center(
+            child: Icon(
+              Icons.add,
+              size: 22,
+              color: theme.colorScheme.outlineVariant,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return SizedBox(
+      width: 80,
+      height: 80,
+      child: Padding(
+        padding: const EdgeInsets.all(4),
+        child: _BadgeCard(
+          badge: badge!,
+          earned: true,
+          earnedAt: earnedAt,
+        ),
+      ),
+    );
+  }
+}
+
+/// CustomPainter that draws a rounded dashed border.
+class _DashedBorderPainter extends CustomPainter {
+  const _DashedBorderPainter({
+    required this.color,
+    required this.borderRadius,
+  });
+
+  final Color color;
+  final double borderRadius;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1.5
+      ..style = PaintingStyle.stroke;
+
+    const dashWidth = 5.0;
+    const dashSpace = 4.0;
+    final rrect = RRect.fromRectAndRadius(
+      Rect.fromLTWH(1, 1, size.width - 2, size.height - 2),
+      Radius.circular(borderRadius),
+    );
+    final path = Path()..addRRect(rrect);
+    final metrics = path.computeMetrics();
+    for (final metric in metrics) {
+      var distance = 0.0;
+      while (distance < metric.length) {
+        final next = distance + dashWidth;
+        canvas.drawPath(
+          metric.extractPath(distance, next.clamp(0, metric.length)),
+          paint,
+        );
+        distance += dashWidth + dashSpace;
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_DashedBorderPainter old) =>
+      old.color != color || old.borderRadius != borderRadius;
 }
 
 // ---------------------------------------------------------------------------

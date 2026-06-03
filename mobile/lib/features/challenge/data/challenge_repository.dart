@@ -57,6 +57,11 @@ class ChallengeRepository {
 
   Future<MyBadgePageDto> myBadges() => _call(() => _api.myBadges());
 
+  /// Persists the pinned-badge display order (max 6 IDs) to the server.
+  Future<void> reorderBadges(List<String> badgeIds) => _call(
+        () => _api.reorderBadges({'badge_ids': badgeIds}),
+      );
+
   Future<T> _call<T>(Future<T> Function() fn) async {
     try {
       return await fn();

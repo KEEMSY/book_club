@@ -282,6 +282,28 @@ class ChallengeService:
             for b, ub in rows
         ]
 
+    async def reorder_pinned_badges(
+        self,
+        user_id: UUID,
+        badge_ids: list[UUID],
+    ) -> None:
+        """Set pin_order for the given badges in the supplied order.
+
+        Raises:
+            NotFoundError: one or more badge_ids are not owned by the user.
+        """
+        if badge_ids:
+            owned = await self._get_repo().my_badges(user_id)
+            owned_ids = {ub.badge_id for _, ub in owned}
+            unknown = [str(bid) for bid in badge_ids if bid not in owned_ids]
+            if unknown:
+                raise NotFoundError(
+                    f"badges not owned by user: {', '.join(unknown)}",
+                    code="BADGE_NOT_OWNED",
+                )
+
+        await self._get_repo().reorder_pinned_badges(user_id, badge_ids)
+
     async def award_badge(self, user_id: UUID, badge_id: UUID) -> None:
         """Award a badge to the user if they do not already own it.
 

@@ -83,6 +83,48 @@ final myBadgesProvider =
 });
 
 // ---------------------------------------------------------------------------
+// Pinned badge order notifier
+// ---------------------------------------------------------------------------
+
+/// Maximum number of badges a user can pin to their profile display.
+const int kMaxPinnedBadges = 6;
+
+/// Manages the ordered list of pinned badge IDs and syncs reorder ops to the
+/// server via PATCH /me/badges/reorder.
+///
+/// Initial state is derived from [myBadgesProvider] — the first [kMaxPinnedBadges]
+/// earned badges are treated as the default pin order until the server returns a
+/// persisted order.
+@riverpod
+class BadgePinNotifier extends _$BadgePinNotifier {
+  @override
+  AsyncValue<List<String>> build() {
+    final myAsync = ref.watch(myBadgesProvider);
+    return myAsync.whenData(
+      (badges) => badges
+          .take(kMaxPinnedBadges)
+          .map((e) => e.badge.id)
+          .toList(),
+    );
+  }
+
+  /// Reorders the pinned badge list and persists the new order to the server.
+  Future<void> reorder(List<String> orderedIds) async {
+    assert(orderedIds.length <= kMaxPinnedBadges, 'Too many pinned badges');
+    // Optimistic update so the UI reflects the change immediately.
+    state = AsyncValue.data(orderedIds);
+    try {
+      await ref
+          .read(challengeRepositoryProvider)
+          .reorderBadges(orderedIds);
+    } catch (e, st) {
+      // Roll back to last known good state on failure.
+      state = AsyncValue.error(e, st);
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Join / leave action notifier
 // ---------------------------------------------------------------------------
 

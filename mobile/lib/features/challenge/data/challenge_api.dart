@@ -16,6 +16,7 @@ part 'challenge_api.g.dart';
 ///   * `GET /challenges/{id}/leaderboard`          → top participants
 ///   * `GET /badges?category=`                     → badge catalogue
 ///   * `GET /badges/my`                            → earned badges
+///   * `PATCH /me/badges/reorder`                  → update pinned badge order
 @RestApi()
 abstract class ChallengeApi {
   factory ChallengeApi(Dio dio, {String baseUrl}) = _ChallengeApi;
@@ -50,4 +51,7 @@ abstract class ChallengeApi {
 
   @GET('/badges/my')
   Future<MyBadgePageDto> myBadges();
+
+  @PATCH('/me/badges/reorder')
+  Future<void> reorderBadges(@Body() Map<String, dynamic> body);
 }

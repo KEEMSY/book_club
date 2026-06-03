@@ -77,6 +77,8 @@ dependencies:
   # show/hide toggle for Streak / Goal / Grade / Heatmap sections across
   # cold restarts. Tiny footprint — no native channel beyond the plugin.
   shared_preferences: ^2.3.0
+  share_plus: ^12.0.2
+  flutter_svg: ^2.3.0
 
 dev_dependencies:
   flutter_test:
@@ -118,3 +120,4 @@ flutter:
 
   assets:
     - assets/fonts/
+    - assets/illustrations/

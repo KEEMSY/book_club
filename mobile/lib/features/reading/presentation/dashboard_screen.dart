@@ -40,6 +40,7 @@ import 'widgets/dashboard_goal_card.dart';
 import 'widgets/grade_badge.dart';
 import 'widgets/jan_dee_grid.dart';
 import 'widgets/manual_log_modal.dart';
+import 'widgets/recap_banner.dart';
 import 'widgets/streak_card.dart';
 import '../../notification/presentation/notification_screen.dart';
 
@@ -149,6 +150,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   onManual: _onManualLog,
                 ),
                 SizedBox(height: spacing.lg),
+                // RecapBanner returns SizedBox.shrink outside June / December,
+                // so no extra spacing guard is needed.
+                const RecapBanner(),
+                const _RecapBannerSpacer(),
                 DailyTotalCard(
                   todaySeconds: todaySeconds,
                   weeklyGoalSeconds: weeklyGoalSeconds,
@@ -264,6 +269,20 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       }
     }
     return null;
+  }
+}
+
+/// Emits a spacing gap only when [RecapBanner] is visible (June / December).
+/// Avoids an orphan gap during the other 10 months.
+class _RecapBannerSpacer extends StatelessWidget {
+  const _RecapBannerSpacer();
+
+  @override
+  Widget build(BuildContext context) {
+    final int month = DateTime.now().month;
+    if (month != 6 && month != 12) return const SizedBox.shrink();
+    final spacing = Theme.of(context).extension<AppSpacing>()!;
+    return SizedBox(height: spacing.md);
   }
 }
 

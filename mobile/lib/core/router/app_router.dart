@@ -21,9 +21,11 @@ import '../../features/social/domain/user_summary.dart';
 import '../../features/feed/presentation/post_compose_screen.dart';
 import '../../features/notification/presentation/notification_screen.dart';
 import '../../features/notification/presentation/weekly_report_screen.dart';
+import '../../features/reading/application/recap_notifier.dart';
 import '../../features/reading/presentation/dashboard_screen.dart';
 import '../../features/reading/presentation/goal_screen.dart';
 import '../../features/reading/presentation/grade_screen.dart';
+import '../../features/reading/presentation/reading_recap_screen.dart';
 import '../../features/reading/presentation/timer_screen.dart';
 import 'app_shell.dart';
 
@@ -66,6 +68,9 @@ class AppRoutes {
 
   // Profile edit — own profile only.
   static const profileEdit = '/profile/edit';
+
+  // Reading recap — half-year card view, shown in June and December.
+  static const readingRecap = '/reading/recap';
 }
 
 /// Adapter that bridges a Riverpod [ValueNotifier]-free state stream into a
@@ -185,6 +190,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.goals,
         parentNavigatorKey: _rootKey,
         builder: (context, state) => const GoalScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.readingRecap,
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) {
+          // RecapKey is passed via go_router extra from RecapBanner.
+          final RecapKey key = state.extra! as RecapKey;
+          return ReadingRecapScreen(recapKey: key);
+        },
       ),
       GoRoute(
         path: AppRoutes.notifications,

@@ -1,9 +1,9 @@
 import 'dart:io' show Platform;
-import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../application/auth_notifier.dart';
@@ -127,165 +127,20 @@ class _Illustration extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final radius = theme.extension<AppRadius>()!;
     return Padding(
       padding: EdgeInsets.symmetric(vertical: spacing.md),
-      child: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: theme.colorScheme.primary.withValues(alpha: 0.07),
-          borderRadius: BorderRadius.all(Radius.circular(radius.md)),
-        ),
-        child: CustomPaint(
-          painter: _BookStackPainter(
-            primary: theme.colorScheme.primary,
-            surface: theme.colorScheme.surface,
-            onSurface: theme.colorScheme.onSurface,
-          ),
-          size: const Size(double.infinity, 160),
+      child: Center(
+        child: SvgPicture.asset(
+          'assets/illustrations/login_hero.svg',
+          width: 220,
+          height: 252,
+          placeholderBuilder: (_) => const SizedBox(width: 220, height: 252),
         ),
       ),
     );
   }
 }
 
-/// Paints three stacked books at slight angles — a warm, intentional
-/// illustration that scales to any container width.
-class _BookStackPainter extends CustomPainter {
-  _BookStackPainter({
-    required this.primary,
-    required this.surface,
-    required this.onSurface,
-  });
-
-  final Color primary;
-  final Color surface;
-  final Color onSurface;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final double cx = size.width / 2;
-    final double cy = size.height / 2;
-
-    // Book specs: [x-center offset, y-center offset, width, height, rotation-deg, color-alpha]
-    // Back book (slightly left, tilted -12°)
-    _drawBook(
-      canvas,
-      cx: cx - 28,
-      cy: cy + 6,
-      w: 72,
-      h: 96,
-      angleDeg: -12,
-      coverColor: primary.withValues(alpha: 0.28),
-      pageColor: surface.withValues(alpha: 0.80),
-    );
-
-    // Middle book (slightly right, tilted +8°)
-    _drawBook(
-      canvas,
-      cx: cx + 22,
-      cy: cy + 4,
-      w: 68,
-      h: 92,
-      angleDeg: 8,
-      coverColor: primary.withValues(alpha: 0.50),
-      pageColor: surface.withValues(alpha: 0.85),
-    );
-
-    // Front book (center, straight, primary color)
-    _drawBook(
-      canvas,
-      cx: cx - 4,
-      cy: cy - 2,
-      w: 70,
-      h: 96,
-      angleDeg: 0,
-      coverColor: primary.withValues(alpha: 0.85),
-      pageColor: surface.withValues(alpha: 0.92),
-      showLines: true,
-    );
-  }
-
-  void _drawBook(
-    Canvas canvas, {
-    required double cx,
-    required double cy,
-    required double w,
-    required double h,
-    required double angleDeg,
-    required Color coverColor,
-    required Color pageColor,
-    bool showLines = false,
-  }) {
-    canvas.save();
-    canvas.translate(cx, cy);
-    canvas.rotate(angleDeg * math.pi / 180);
-
-    final Rect cover = Rect.fromCenter(
-      center: Offset.zero,
-      width: w,
-      height: h,
-    );
-    final RRect coverRRect =
-        RRect.fromRectAndRadius(cover, const Radius.circular(4));
-
-    // Drop shadow
-    final Paint shadowPaint = Paint()
-      ..color = onSurface.withValues(alpha: 0.10)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
-    canvas.drawRRect(
-      coverRRect.shift(const Offset(2, 3)),
-      shadowPaint,
-    );
-
-    // Book cover
-    canvas.drawRRect(coverRRect, Paint()..color = coverColor);
-
-    // Page block (right side strip, suggesting page thickness)
-    final Rect pageBlock = Rect.fromLTWH(
-      w / 2 - 6,
-      -h / 2 + 4,
-      5,
-      h - 8,
-    );
-    canvas.drawRect(pageBlock, Paint()..color = pageColor);
-
-    // Spine line
-    canvas.drawLine(
-      Offset(-w / 2 + 7, -h / 2 + 6),
-      Offset(-w / 2 + 7, h / 2 - 6),
-      Paint()
-        ..color = onSurface.withValues(alpha: 0.15)
-        ..strokeWidth = 1.5,
-    );
-
-    // Text lines on front book
-    if (showLines) {
-      final Paint linePaint = Paint()
-        ..color = pageColor.withValues(alpha: 0.55)
-        ..strokeWidth = 1.5
-        ..strokeCap = StrokeCap.round;
-      for (int i = 0; i < 5; i++) {
-        final double y = -22 + i * 11.0;
-        final double lineW = i == 4 ? w * 0.30 : w * 0.52;
-        canvas.drawLine(
-          Offset(-w / 2 + 14, y),
-          Offset(-w / 2 + 14 + lineW, y),
-          linePaint,
-        );
-      }
-    }
-
-    canvas.restore();
-  }
-
-  @override
-  bool shouldRepaint(covariant _BookStackPainter old) =>
-      old.primary != primary ||
-      old.surface != surface ||
-      old.onSurface != onSurface;
-}
 
 class _BottomCtas extends StatelessWidget {
   const _BottomCtas({

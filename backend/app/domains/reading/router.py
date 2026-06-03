@@ -36,10 +36,14 @@ from app.domains.reading.schemas import (
     HeatmapResponse,
     ManualSessionRequest,
     MonthlyHoursPublic,
+    ReadingRecapResponse,
     ReadingSessionPublic,
     ReadingSpeedStatsPublic,
     ReadingStatsResponse,
     ReadingYearStatsPublic,
+    RecapBook,
+    RecapCard,
+    RecapCardType,
     SessionCompletionResponse,
     StartSessionRequest,
 )
@@ -305,12 +309,10 @@ async def get_reading_stats(
             audio=stats.format_breakdown.audio,
         ),
         monthly_hours=[
-            MonthlyHoursPublic(month=m.month, hours=m.hours)
-            for m in stats.monthly_hours
+            MonthlyHoursPublic(month=m.month, hours=m.hours) for m in stats.monthly_hours
         ],
         genre_breakdown=[
-            GenreBreakdownPublic(genre=g.genre, count=g.count)
-            for g in stats.genre_breakdown
+            GenreBreakdownPublic(genre=g.genre, count=g.count) for g in stats.genre_breakdown
         ],
         avg_completion_days=stats.avg_completion_days,
     )
@@ -322,6 +324,61 @@ async def get_reading_stats(
             response.model_dump_json(),
             ex=_STATS_CACHE_TTL,
         )
+    except Exception:
+        logger.warning("Redis write failed for %s", cache_key)
+
+    return response
+
+
+@me_router.get("/me/reading-recap", response_model=ReadingRecapResponse)
+async def get_reading_recap(
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ReadingService, Depends(get_reading_service)],
+    redis: Annotated[aioredis.Redis, Depends(get_redis)],
+    period: Annotated[str, Query(description="YYYY-H1 / YYYY-H2 / YYYY")] = "",
+) -> ReadingRecapResponse:
+    """Reading recap cards for the authenticated user.
+
+    Results are cached in Redis for 24 hours
+    (key: ``reading_recap:{user_id}:{period}``).
+    ``period`` defaults to the current calendar year when omitted.
+    """
+    effective_period = period.strip() or str(datetime.now(tz=UTC).year)
+
+    cache_key = f"reading_recap:{user_id}:{effective_period}"
+    try:
+        cached = await redis.get(cache_key)
+        if cached is not None:
+            return ReadingRecapResponse.model_validate(json.loads(cached))
+    except Exception:
+        logger.warning("Redis read failed for %s — falling through to DB", cache_key)
+
+    try:
+        recap = await service.get_reading_recap(
+            user_id=UUID(user_id),
+            period=effective_period,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    response = ReadingRecapResponse(
+        period=recap.period,
+        cards=[
+            RecapCard(
+                card_type=RecapCardType(c.card_type),
+                book=RecapBook(
+                    title=c.title,
+                    cover_url=c.cover_url,
+                    author=c.author,
+                ),
+                stat_value=c.stat_value,
+            )
+            for c in recap.cards
+        ],
+    )
+
+    try:
+        await redis.set(cache_key, response.model_dump_json(), ex=_STATS_CACHE_TTL)
     except Exception:
         logger.warning("Redis write failed for %s", cache_key)
 

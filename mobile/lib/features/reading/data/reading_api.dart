@@ -76,4 +76,10 @@ abstract class ReadingApi {
   Future<ReadingYearStatsDto> getYearStats({
     @Query('year') required int year,
   });
+
+  @GET('/reading/recap')
+  Future<ReadingRecapDto> getRecap({
+    @Query('year') required int year,
+    @Query('half') required int half,
+  });
 }

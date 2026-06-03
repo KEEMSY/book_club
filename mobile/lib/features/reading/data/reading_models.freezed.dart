@@ -5884,4 +5884,826 @@ class __$ReadingYearStatsDtoCopyWithImpl<$Res>
   }
 }
 
+/// @nodoc
+mixin _$RecapBookDto {
+  String get bookId;
+  String get title;
+  String get author;
+  String? get coverUrl;
+  int get readSeconds;
+
+  /// Create a copy of RecapBookDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $RecapBookDtoCopyWith<RecapBookDto> get copyWith =>
+      _$RecapBookDtoCopyWithImpl<RecapBookDto>(
+          this as RecapBookDto, _$identity);
+
+  /// Serializes this RecapBookDto to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is RecapBookDto &&
+            (identical(other.bookId, bookId) || other.bookId == bookId) &&
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.author, author) || other.author == author) &&
+            (identical(other.coverUrl, coverUrl) ||
+                other.coverUrl == coverUrl) &&
+            (identical(other.readSeconds, readSeconds) ||
+                other.readSeconds == readSeconds));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, bookId, title, author, coverUrl, readSeconds);
+
+  @override
+  String toString() {
+    return 'RecapBookDto(bookId: $bookId, title: $title, author: $author, coverUrl: $coverUrl, readSeconds: $readSeconds)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $RecapBookDtoCopyWith<$Res> {
+  factory $RecapBookDtoCopyWith(
+          RecapBookDto value, $Res Function(RecapBookDto) _then) =
+      _$RecapBookDtoCopyWithImpl;
+  @useResult
+  $Res call(
+      {String bookId,
+      String title,
+      String author,
+      String? coverUrl,
+      int readSeconds});
+}
+
+/// @nodoc
+class _$RecapBookDtoCopyWithImpl<$Res> implements $RecapBookDtoCopyWith<$Res> {
+  _$RecapBookDtoCopyWithImpl(this._self, this._then);
+
+  final RecapBookDto _self;
+  final $Res Function(RecapBookDto) _then;
+
+  /// Create a copy of RecapBookDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? bookId = null,
+    Object? title = null,
+    Object? author = null,
+    Object? coverUrl = freezed,
+    Object? readSeconds = null,
+  }) {
+    return _then(_self.copyWith(
+      bookId: null == bookId
+          ? _self.bookId
+          : bookId // ignore: cast_nullable_to_non_nullable
+              as String,
+      title: null == title
+          ? _self.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      author: null == author
+          ? _self.author
+          : author // ignore: cast_nullable_to_non_nullable
+              as String,
+      coverUrl: freezed == coverUrl
+          ? _self.coverUrl
+          : coverUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      readSeconds: null == readSeconds
+          ? _self.readSeconds
+          : readSeconds // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [RecapBookDto].
+extension RecapBookDtoPatterns on RecapBookDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_RecapBookDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _RecapBookDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_RecapBookDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _RecapBookDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_RecapBookDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _RecapBookDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String bookId, String title, String author,
+            String? coverUrl, int readSeconds)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _RecapBookDto() when $default != null:
+        return $default(_that.bookId, _that.title, _that.author, _that.coverUrl,
+            _that.readSeconds);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String bookId, String title, String author,
+            String? coverUrl, int readSeconds)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _RecapBookDto():
+        return $default(_that.bookId, _that.title, _that.author, _that.coverUrl,
+            _that.readSeconds);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String bookId, String title, String author,
+            String? coverUrl, int readSeconds)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _RecapBookDto() when $default != null:
+        return $default(_that.bookId, _that.title, _that.author, _that.coverUrl,
+            _that.readSeconds);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _RecapBookDto extends RecapBookDto {
+  const _RecapBookDto(
+      {required this.bookId,
+      required this.title,
+      required this.author,
+      this.coverUrl,
+      required this.readSeconds})
+      : super._();
+  factory _RecapBookDto.fromJson(Map<String, dynamic> json) =>
+      _$RecapBookDtoFromJson(json);
+
+  @override
+  final String bookId;
+  @override
+  final String title;
+  @override
+  final String author;
+  @override
+  final String? coverUrl;
+  @override
+  final int readSeconds;
+
+  /// Create a copy of RecapBookDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$RecapBookDtoCopyWith<_RecapBookDto> get copyWith =>
+      __$RecapBookDtoCopyWithImpl<_RecapBookDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$RecapBookDtoToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _RecapBookDto &&
+            (identical(other.bookId, bookId) || other.bookId == bookId) &&
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.author, author) || other.author == author) &&
+            (identical(other.coverUrl, coverUrl) ||
+                other.coverUrl == coverUrl) &&
+            (identical(other.readSeconds, readSeconds) ||
+                other.readSeconds == readSeconds));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, bookId, title, author, coverUrl, readSeconds);
+
+  @override
+  String toString() {
+    return 'RecapBookDto(bookId: $bookId, title: $title, author: $author, coverUrl: $coverUrl, readSeconds: $readSeconds)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$RecapBookDtoCopyWith<$Res>
+    implements $RecapBookDtoCopyWith<$Res> {
+  factory _$RecapBookDtoCopyWith(
+          _RecapBookDto value, $Res Function(_RecapBookDto) _then) =
+      __$RecapBookDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String bookId,
+      String title,
+      String author,
+      String? coverUrl,
+      int readSeconds});
+}
+
+/// @nodoc
+class __$RecapBookDtoCopyWithImpl<$Res>
+    implements _$RecapBookDtoCopyWith<$Res> {
+  __$RecapBookDtoCopyWithImpl(this._self, this._then);
+
+  final _RecapBookDto _self;
+  final $Res Function(_RecapBookDto) _then;
+
+  /// Create a copy of RecapBookDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? bookId = null,
+    Object? title = null,
+    Object? author = null,
+    Object? coverUrl = freezed,
+    Object? readSeconds = null,
+  }) {
+    return _then(_RecapBookDto(
+      bookId: null == bookId
+          ? _self.bookId
+          : bookId // ignore: cast_nullable_to_non_nullable
+              as String,
+      title: null == title
+          ? _self.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      author: null == author
+          ? _self.author
+          : author // ignore: cast_nullable_to_non_nullable
+              as String,
+      coverUrl: freezed == coverUrl
+          ? _self.coverUrl
+          : coverUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      readSeconds: null == readSeconds
+          ? _self.readSeconds
+          : readSeconds // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$ReadingRecapDto {
+  int get year;
+  int get half;
+  int get totalBooks;
+  int get totalSeconds;
+  int get longestStreakDays;
+  List<RecapBookDto> get topBooks;
+
+  /// Create a copy of ReadingRecapDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $ReadingRecapDtoCopyWith<ReadingRecapDto> get copyWith =>
+      _$ReadingRecapDtoCopyWithImpl<ReadingRecapDto>(
+          this as ReadingRecapDto, _$identity);
+
+  /// Serializes this ReadingRecapDto to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is ReadingRecapDto &&
+            (identical(other.year, year) || other.year == year) &&
+            (identical(other.half, half) || other.half == half) &&
+            (identical(other.totalBooks, totalBooks) ||
+                other.totalBooks == totalBooks) &&
+            (identical(other.totalSeconds, totalSeconds) ||
+                other.totalSeconds == totalSeconds) &&
+            (identical(other.longestStreakDays, longestStreakDays) ||
+                other.longestStreakDays == longestStreakDays) &&
+            const DeepCollectionEquality().equals(other.topBooks, topBooks));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      year,
+      half,
+      totalBooks,
+      totalSeconds,
+      longestStreakDays,
+      const DeepCollectionEquality().hash(topBooks));
+
+  @override
+  String toString() {
+    return 'ReadingRecapDto(year: $year, half: $half, totalBooks: $totalBooks, totalSeconds: $totalSeconds, longestStreakDays: $longestStreakDays, topBooks: $topBooks)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $ReadingRecapDtoCopyWith<$Res> {
+  factory $ReadingRecapDtoCopyWith(
+          ReadingRecapDto value, $Res Function(ReadingRecapDto) _then) =
+      _$ReadingRecapDtoCopyWithImpl;
+  @useResult
+  $Res call(
+      {int year,
+      int half,
+      int totalBooks,
+      int totalSeconds,
+      int longestStreakDays,
+      List<RecapBookDto> topBooks});
+}
+
+/// @nodoc
+class _$ReadingRecapDtoCopyWithImpl<$Res>
+    implements $ReadingRecapDtoCopyWith<$Res> {
+  _$ReadingRecapDtoCopyWithImpl(this._self, this._then);
+
+  final ReadingRecapDto _self;
+  final $Res Function(ReadingRecapDto) _then;
+
+  /// Create a copy of ReadingRecapDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? year = null,
+    Object? half = null,
+    Object? totalBooks = null,
+    Object? totalSeconds = null,
+    Object? longestStreakDays = null,
+    Object? topBooks = null,
+  }) {
+    return _then(_self.copyWith(
+      year: null == year
+          ? _self.year
+          : year // ignore: cast_nullable_to_non_nullable
+              as int,
+      half: null == half
+          ? _self.half
+          : half // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalBooks: null == totalBooks
+          ? _self.totalBooks
+          : totalBooks // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalSeconds: null == totalSeconds
+          ? _self.totalSeconds
+          : totalSeconds // ignore: cast_nullable_to_non_nullable
+              as int,
+      longestStreakDays: null == longestStreakDays
+          ? _self.longestStreakDays
+          : longestStreakDays // ignore: cast_nullable_to_non_nullable
+              as int,
+      topBooks: null == topBooks
+          ? _self.topBooks
+          : topBooks // ignore: cast_nullable_to_non_nullable
+              as List<RecapBookDto>,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [ReadingRecapDto].
+extension ReadingRecapDtoPatterns on ReadingRecapDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_ReadingRecapDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ReadingRecapDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_ReadingRecapDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ReadingRecapDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_ReadingRecapDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ReadingRecapDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(int year, int half, int totalBooks, int totalSeconds,
+            int longestStreakDays, List<RecapBookDto> topBooks)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ReadingRecapDto() when $default != null:
+        return $default(_that.year, _that.half, _that.totalBooks,
+            _that.totalSeconds, _that.longestStreakDays, _that.topBooks);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(int year, int half, int totalBooks, int totalSeconds,
+            int longestStreakDays, List<RecapBookDto> topBooks)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ReadingRecapDto():
+        return $default(_that.year, _that.half, _that.totalBooks,
+            _that.totalSeconds, _that.longestStreakDays, _that.topBooks);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(int year, int half, int totalBooks, int totalSeconds,
+            int longestStreakDays, List<RecapBookDto> topBooks)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ReadingRecapDto() when $default != null:
+        return $default(_that.year, _that.half, _that.totalBooks,
+            _that.totalSeconds, _that.longestStreakDays, _that.topBooks);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _ReadingRecapDto extends ReadingRecapDto {
+  const _ReadingRecapDto(
+      {required this.year,
+      required this.half,
+      required this.totalBooks,
+      required this.totalSeconds,
+      required this.longestStreakDays,
+      final List<RecapBookDto> topBooks = const <RecapBookDto>[]})
+      : _topBooks = topBooks,
+        super._();
+  factory _ReadingRecapDto.fromJson(Map<String, dynamic> json) =>
+      _$ReadingRecapDtoFromJson(json);
+
+  @override
+  final int year;
+  @override
+  final int half;
+  @override
+  final int totalBooks;
+  @override
+  final int totalSeconds;
+  @override
+  final int longestStreakDays;
+  final List<RecapBookDto> _topBooks;
+  @override
+  @JsonKey()
+  List<RecapBookDto> get topBooks {
+    if (_topBooks is EqualUnmodifiableListView) return _topBooks;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_topBooks);
+  }
+
+  /// Create a copy of ReadingRecapDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$ReadingRecapDtoCopyWith<_ReadingRecapDto> get copyWith =>
+      __$ReadingRecapDtoCopyWithImpl<_ReadingRecapDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$ReadingRecapDtoToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _ReadingRecapDto &&
+            (identical(other.year, year) || other.year == year) &&
+            (identical(other.half, half) || other.half == half) &&
+            (identical(other.totalBooks, totalBooks) ||
+                other.totalBooks == totalBooks) &&
+            (identical(other.totalSeconds, totalSeconds) ||
+                other.totalSeconds == totalSeconds) &&
+            (identical(other.longestStreakDays, longestStreakDays) ||
+                other.longestStreakDays == longestStreakDays) &&
+            const DeepCollectionEquality().equals(other._topBooks, _topBooks));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      year,
+      half,
+      totalBooks,
+      totalSeconds,
+      longestStreakDays,
+      const DeepCollectionEquality().hash(_topBooks));
+
+  @override
+  String toString() {
+    return 'ReadingRecapDto(year: $year, half: $half, totalBooks: $totalBooks, totalSeconds: $totalSeconds, longestStreakDays: $longestStreakDays, topBooks: $topBooks)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$ReadingRecapDtoCopyWith<$Res>
+    implements $ReadingRecapDtoCopyWith<$Res> {
+  factory _$ReadingRecapDtoCopyWith(
+          _ReadingRecapDto value, $Res Function(_ReadingRecapDto) _then) =
+      __$ReadingRecapDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {int year,
+      int half,
+      int totalBooks,
+      int totalSeconds,
+      int longestStreakDays,
+      List<RecapBookDto> topBooks});
+}
+
+/// @nodoc
+class __$ReadingRecapDtoCopyWithImpl<$Res>
+    implements _$ReadingRecapDtoCopyWith<$Res> {
+  __$ReadingRecapDtoCopyWithImpl(this._self, this._then);
+
+  final _ReadingRecapDto _self;
+  final $Res Function(_ReadingRecapDto) _then;
+
+  /// Create a copy of ReadingRecapDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? year = null,
+    Object? half = null,
+    Object? totalBooks = null,
+    Object? totalSeconds = null,
+    Object? longestStreakDays = null,
+    Object? topBooks = null,
+  }) {
+    return _then(_ReadingRecapDto(
+      year: null == year
+          ? _self.year
+          : year // ignore: cast_nullable_to_non_nullable
+              as int,
+      half: null == half
+          ? _self.half
+          : half // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalBooks: null == totalBooks
+          ? _self.totalBooks
+          : totalBooks // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalSeconds: null == totalSeconds
+          ? _self.totalSeconds
+          : totalSeconds // ignore: cast_nullable_to_non_nullable
+              as int,
+      longestStreakDays: null == longestStreakDays
+          ? _self.longestStreakDays
+          : longestStreakDays // ignore: cast_nullable_to_non_nullable
+              as int,
+      topBooks: null == topBooks
+          ? _self._topBooks
+          : topBooks // ignore: cast_nullable_to_non_nullable
+              as List<RecapBookDto>,
+    ));
+  }
+}
+
 // dart format on

@@ -235,6 +235,25 @@ class ReadingStats:
     avg_completion_days: float | None
 
 
+@dataclass(frozen=True, slots=True)
+class RecapCardData:
+    """Service-shape for one recap card, before formatting stat_value."""
+
+    card_type: str  # matches RecapCardType values
+    title: str
+    cover_url: str | None
+    author: str
+    stat_value: str
+
+
+@dataclass(frozen=True, slots=True)
+class ReadingRecap:
+    """Service-shape result for the reading recap endpoint."""
+
+    period: str
+    cards: list[RecapCardData]
+
+
 class ReadingBookQueryPort(Protocol):
     """Cross-domain view into the Book domain's UserBook table.
 

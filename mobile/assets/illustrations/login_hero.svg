@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 320" fill="none">
+  <!-- 배경 원형 -->
+  <circle cx="140" cy="160" r="130" fill="#FFF5EE" opacity="0.6"/>
+  <!-- 책 스택 3권 -->
+  <rect x="70" y="180" width="140" height="24" rx="4" fill="#E8B4B8"/>
+  <rect x="60" y="158" width="120" height="24" rx="4" fill="#C8D8E8"/>
+  <rect x="80" y="136" width="100" height="24" rx="4" fill="#B5D5C5"/>
+  <!-- 작은 책 위 -->
+  <rect x="100" y="116" width="80" height="22" rx="4" fill="#F5E6D3"/>
+  <!-- 식물 잎 -->
+  <path d="M195 170 C210 150 220 130 205 110 C195 125 185 145 195 170Z" fill="#B5D5C5" opacity="0.8"/>
+  <path d="M210 175 C230 160 235 135 215 118 C205 135 200 158 210 175Z" fill="#A8C8A0" opacity="0.7"/>
+  <!-- 별 장식 -->
+  <circle cx="80" cy="100" r="4" fill="#E8B4B8"/>
+  <circle cx="200" cy="90" r="3" fill="#C8D8E8"/>
+  <circle cx="230" cy="130" r="2.5" fill="#F5E6D3"/>
+  <!-- 하트 -->
+  <path d="M155 95 C155 92 158 90 160 92 C162 90 165 92 165 95 C165 100 160 104 160 104 C160 104 155 100 155 95Z" fill="#E8B4B8"/>
+</svg>
