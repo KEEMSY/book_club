@@ -9,7 +9,6 @@ import 'package:book_club/features/notification/data/notification_repository.dar
 import 'package:book_club/features/reading/application/grade_notifier.dart';
 import 'package:book_club/features/reading/application/grade_state.dart';
 import 'package:book_club/features/reading/application/reading_providers.dart';
-import 'package:book_club/features/reading/data/reading_repository.dart';
 import 'package:book_club/features/reading/presentation/dashboard_screen.dart';
 import 'package:book_club/features/reading/presentation/widgets/grade_badge.dart';
 import 'package:flutter/material.dart';
@@ -43,6 +42,47 @@ class _FakeNotificationRepository implements NotificationRepository {
   Future<WeeklyReportResponse?> getWeeklyReport(String weekDate) async => null;
 }
 
+/// Test-only AuthNotifier that skips the rehydrate RPC and pins state to
+/// an Authenticated user so DashboardScreen can render a greeting nickname.
+class _StubAuthNotifier extends AuthNotifier {
+  _StubAuthNotifier(this._initial);
+
+  final AuthState _initial;
+
+  @override
+  AuthState build() {
+    Future.microtask(() => state = _initial);
+    return _initial;
+  }
+
+  @override
+  Future<void> bootstrap() async {
+    // no-op — the test pins state via build().
+  }
+}
+
+/// Test-only GradeNotifier that pins the state and no-ops on load/refresh so
+/// the post-frame `load()` call in `DashboardScreen.initState` cannot flip
+/// the state back to Loading → Loaded.
+class _StubGradeNotifier extends GradeNotifier {
+  _StubGradeNotifier(this._initial);
+
+  final GradeState _initial;
+
+  @override
+  GradeState build() => _initial;
+
+  @override
+  Future<void> load({bool force = false}) async {
+    // no-op — the test pins state via build().
+  }
+
+  @override
+  Future<void> refresh() async {
+    // no-op
+  }
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   setUpAll(() {
@@ -70,27 +110,25 @@ void main() {
 
     final bookRepo = FakeBookRepository();
 
+    final pinnedUser = AuthUser(
+      id: 'u1',
+      nickname: '수민',
+      provider: AuthProvider.kakao,
+      createdAt: DateTime(2026, 4, 20),
+    );
+
     await tester.pumpWidget(
       ProviderScope(
         overrides: <Override>[
           readingRepositoryProvider
-              .overrideWithValue(readingRepo as ReadingRepository),
+              .overrideWithValue(readingRepo),
           bookRepositoryProvider.overrideWithValue(bookRepo),
           // Force the auth state to Authenticated so the greeting can render
           // the user's nickname without actually running the auth bootstrap.
           authRepositoryProvider
               .overrideWithValue(auth_fakes.buildRepository()),
           authNotifierProvider.overrideWith(
-            (ref) => _StubAuthNotifier(
-              AuthState.authenticated(
-                AuthUser(
-                  id: 'u1',
-                  nickname: '수민',
-                  provider: AuthProvider.kakao,
-                  createdAt: DateTime(2026, 4, 20),
-                ),
-              ),
-            ),
+            () => _StubAuthNotifier(AuthState.authenticated(pinnedUser)),
           ),
           notificationRepositoryProvider
               .overrideWithValue(const _FakeNotificationRepository()),
@@ -188,30 +226,27 @@ Future<void> _pumpDashboard(
     ..heatmapQueue = <dynamic>[].cast()
     ..gradeResult = buildGradeSummary();
 
+  final pinnedUser = AuthUser(
+    id: 'u1',
+    nickname: '수민',
+    provider: AuthProvider.kakao,
+    createdAt: DateTime(2026, 4, 20),
+  );
+
   await tester.pumpWidget(
     ProviderScope(
       overrides: <Override>[
         readingRepositoryProvider
-            .overrideWithValue(readingRepo as ReadingRepository),
+            .overrideWithValue(readingRepo),
         bookRepositoryProvider.overrideWithValue(FakeBookRepository()),
         authRepositoryProvider.overrideWithValue(auth_fakes.buildRepository()),
         authNotifierProvider.overrideWith(
-          (ref) => _StubAuthNotifier(
-            AuthState.authenticated(
-              AuthUser(
-                id: 'u1',
-                nickname: '수민',
-                provider: AuthProvider.kakao,
-                createdAt: DateTime(2026, 4, 20),
-              ),
-            ),
+          () => _StubAuthNotifier(
+            AuthState.authenticated(pinnedUser),
           ),
         ),
         gradeNotifierProvider.overrideWith(
-          (ref) => _StubGradeNotifier(
-            ref.watch(readingRepositoryProvider),
-            gradeState,
-          ),
+          () => _StubGradeNotifier(gradeState),
         ),
         notificationRepositoryProvider
             .overrideWithValue(const _FakeNotificationRepository()),
@@ -222,37 +257,4 @@ Future<void> _pumpDashboard(
       ),
     ),
   );
-}
-
-/// Test-only GradeNotifier that pins the state and no-ops on load/refresh so
-/// the post-frame `load()` call in `DashboardScreen.initState` cannot flip
-/// the state back to Loading → Loaded.
-class _StubGradeNotifier extends GradeNotifier {
-  _StubGradeNotifier(super.repository, GradeState initial) {
-    state = initial;
-  }
-
-  @override
-  Future<void> load({bool force = false}) async {
-    // no-op — the test pins state via the constructor.
-  }
-
-  @override
-  Future<void> refresh() async {
-    // no-op
-  }
-}
-
-/// Test-only AuthNotifier that skips the rehydrate RPC — tests pin the
-/// state directly so the DashboardScreen can read nickname without a real
-/// login flow.
-class _StubAuthNotifier extends AuthNotifier {
-  _StubAuthNotifier(AuthState initial) : super(auth_fakes.buildRepository()) {
-    state = initial;
-  }
-
-  @override
-  Future<void> bootstrap() async {
-    // no-op
-  }
 }

@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../data/feed_repository.dart';
 import '../domain/post.dart';
@@ -6,25 +6,29 @@ import '../domain/reaction_type.dart';
 import 'book_feed_state.dart';
 import 'feed_providers.dart';
 
+part 'book_feed_notifier.g.dart';
+
 /// Notifier for the per-book feed list.
 ///
 /// Cursor pagination on `created_at DESC`: the first page hits without
 /// a cursor; subsequent pages pass the previous response's `next_cursor`.
 /// `loadMore` is a no-op once the server returns `next_cursor: null`.
-class BookFeedNotifier extends StateNotifier<BookFeedState> {
-  BookFeedNotifier(this._repository, this.bookId)
-      : super(const BookFeedState.initial());
-
-  final FeedRepository _repository;
-  final String bookId;
+@riverpod
+class BookFeedNotifier extends _$BookFeedNotifier {
   int _requestSeq = 0;
+
+  @override
+  BookFeedState build(String bookId) {
+    return const BookFeedState.initial();
+  }
 
   /// Loads the first page. Triggered by the screen's mount frame.
   Future<void> load() async {
     state = const BookFeedState.loading();
     final int seq = ++_requestSeq;
     try {
-      final PostPage page = await _repository.listPosts(bookId: bookId);
+      final PostPage page =
+          await ref.read(feedRepositoryProvider).listPosts(bookId: bookId);
       if (seq != _requestSeq) return;
       state = BookFeedState.loaded(
         items: page.items,
@@ -41,7 +45,8 @@ class BookFeedNotifier extends StateNotifier<BookFeedState> {
   Future<void> refresh() async {
     final int seq = ++_requestSeq;
     try {
-      final PostPage page = await _repository.listPosts(bookId: bookId);
+      final PostPage page =
+          await ref.read(feedRepositoryProvider).listPosts(bookId: bookId);
       if (seq != _requestSeq) return;
       state = BookFeedState.loaded(
         items: page.items,
@@ -62,10 +67,10 @@ class BookFeedNotifier extends StateNotifier<BookFeedState> {
     state = snapshot.copyWith(isLoadingMore: true);
     final int seq = ++_requestSeq;
     try {
-      final PostPage page = await _repository.listPosts(
-        bookId: bookId,
-        cursor: snapshot.nextCursor,
-      );
+      final PostPage page = await ref.read(feedRepositoryProvider).listPosts(
+            bookId: bookId,
+            cursor: snapshot.nextCursor,
+          );
       if (seq != _requestSeq) return;
       state = BookFeedState.loaded(
         items: <Post>[...snapshot.items, ...page.items],
@@ -137,13 +142,3 @@ class BookFeedNotifier extends StateNotifier<BookFeedState> {
     state = snapshot.copyWith(items: next);
   }
 }
-
-/// Family keyed by `bookId` so each book detail screen owns its own feed
-/// state. autoDispose so leaving the screen frees the cache.
-final bookFeedNotifierProvider = StateNotifierProvider.autoDispose
-    .family<BookFeedNotifier, BookFeedState, String>((ref, bookId) {
-  // Keep alive as long as something is listening; auto-disposes when the
-  // book detail unmounts. ref.keepAlive is intentionally NOT called — we
-  // want the cache to drop on screen exit so re-entry shows fresh data.
-  return BookFeedNotifier(ref.watch(feedRepositoryProvider), bookId);
-});

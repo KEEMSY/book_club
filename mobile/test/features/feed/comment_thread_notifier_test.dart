@@ -1,7 +1,9 @@
 import 'package:book_club/features/feed/application/comment_thread_notifier.dart';
 import 'package:book_club/features/feed/application/comment_thread_state.dart';
+import 'package:book_club/features/feed/application/feed_providers.dart';
 import 'package:book_club/features/feed/data/feed_repository.dart';
 import 'package:book_club/features/feed/domain/comment.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'fakes.dart';
@@ -10,10 +12,14 @@ void main() {
   group('CommentThreadNotifier', () {
     test('load empty thread surfaces empty Loaded state', () async {
       final repo = FakeFeedRepository();
-      final notifier = CommentThreadNotifier(repo, 'post-1');
+      final c = ProviderContainer(overrides: [
+        feedRepositoryProvider.overrideWithValue(repo),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(commentThreadNotifierProvider('post-1').notifier);
       await notifier.load();
-      expect(notifier.state, isA<CommentThreadLoaded>());
-      expect((notifier.state as CommentThreadLoaded).items, isEmpty);
+      expect(c.read(commentThreadNotifierProvider('post-1')), isA<CommentThreadLoaded>());
+      expect((c.read(commentThreadNotifierProvider('post-1')) as CommentThreadLoaded).items, isEmpty);
     });
 
     test('postComment appends to the items list', () async {
@@ -25,13 +31,17 @@ void main() {
           ),
         )
         ..createCommentResult = buildComment(id: 'c2');
-      final notifier = CommentThreadNotifier(repo, 'post-1');
+      final c = ProviderContainer(overrides: [
+        feedRepositoryProvider.overrideWithValue(repo),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(commentThreadNotifierProvider('post-1').notifier);
       await notifier.load();
-      expect((notifier.state as CommentThreadLoaded).items, hasLength(1));
+      expect((c.read(commentThreadNotifierProvider('post-1')) as CommentThreadLoaded).items, hasLength(1));
 
       final created = await notifier.postComment(content: '재밌어요');
       expect(created, isNotNull);
-      final loaded = notifier.state as CommentThreadLoaded;
+      final loaded = c.read(commentThreadNotifierProvider('post-1')) as CommentThreadLoaded;
       expect(loaded.items, hasLength(2));
       expect(loaded.items.last.id, 'c2');
       expect(loaded.postError, isNull);
@@ -45,7 +55,11 @@ void main() {
           message: '답글의 답글은 작성할 수 없어요',
           statusCode: 409,
         );
-      final notifier = CommentThreadNotifier(repo, 'post-1');
+      final c = ProviderContainer(overrides: [
+        feedRepositoryProvider.overrideWithValue(repo),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(commentThreadNotifierProvider('post-1').notifier);
       await notifier.load();
 
       final result = await notifier.postComment(
@@ -53,7 +67,7 @@ void main() {
         parentId: 'c1',
       );
       expect(result, isNull);
-      final loaded = notifier.state as CommentThreadLoaded;
+      final loaded = c.read(commentThreadNotifierProvider('post-1')) as CommentThreadLoaded;
       expect(loaded.postError, '답글은 한 번까지만 달 수 있어요.');
     });
 
@@ -69,12 +83,16 @@ void main() {
             nextCursor: null,
           ),
         );
-      final notifier = CommentThreadNotifier(repo, 'post-1');
+      final c = ProviderContainer(overrides: [
+        feedRepositoryProvider.overrideWithValue(repo),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(commentThreadNotifierProvider('post-1').notifier);
       await notifier.load();
 
       final ok = await notifier.deleteComment('root-1');
       expect(ok, isTrue);
-      final loaded = notifier.state as CommentThreadLoaded;
+      final loaded = c.read(commentThreadNotifierProvider('post-1')) as CommentThreadLoaded;
       expect(loaded.items.map((c) => c.id), <String>['root-2']);
     });
 
@@ -85,13 +103,17 @@ void main() {
           code: 'NETWORK_ERROR',
           message: '네트워크 오류',
         );
-      final notifier = CommentThreadNotifier(repo, 'post-1');
+      final c = ProviderContainer(overrides: [
+        feedRepositoryProvider.overrideWithValue(repo),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(commentThreadNotifierProvider('post-1').notifier);
       await notifier.load();
       await notifier.postComment(content: 'hi');
-      expect((notifier.state as CommentThreadLoaded).postError, isNotNull);
+      expect((c.read(commentThreadNotifierProvider('post-1')) as CommentThreadLoaded).postError, isNotNull);
 
       notifier.clearPostError();
-      expect((notifier.state as CommentThreadLoaded).postError, isNull);
+      expect((c.read(commentThreadNotifierProvider('post-1')) as CommentThreadLoaded).postError, isNull);
     });
 
     test('loadMore appends and stops at null cursor', () async {
@@ -106,10 +128,14 @@ void main() {
             nextCursor: null,
           ),
         ]);
-      final notifier = CommentThreadNotifier(repo, 'post-1');
+      final c = ProviderContainer(overrides: [
+        feedRepositoryProvider.overrideWithValue(repo),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(commentThreadNotifierProvider('post-1').notifier);
       await notifier.load();
       await notifier.loadMore();
-      final loaded = notifier.state as CommentThreadLoaded;
+      final loaded = c.read(commentThreadNotifierProvider('post-1')) as CommentThreadLoaded;
       expect(loaded.items.map((c) => c.id), <String>['c1', 'c2']);
       expect(loaded.nextCursor, isNull);
     });

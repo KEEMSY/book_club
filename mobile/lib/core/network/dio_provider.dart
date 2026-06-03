@@ -2,12 +2,14 @@ import 'dart:io' show Platform;
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../storage/secure_storage.dart';
 import 'auth_interceptor.dart';
 import 'error_interceptor.dart';
 import 'refresh_interceptor.dart';
+
+part 'dio_provider.g.dart';
 
 /// Base URL for the Book Club API.
 ///
@@ -42,8 +44,8 @@ String currentEnvLabel() => resolveApiBaseUrl();
 /// the auth feature registers a listener in [attachAuthSessionBridge] (in
 /// `application/auth_providers.dart` adjacent bridge) — but for M1 we keep
 /// it simple: the RefreshInterceptor calls [sessionExpiredSignalProvider]'s
-/// `notify()` method which toggles a `StateProvider&lt;int&gt;` counter that
-/// the `authNotifierProvider` watches.
+/// `notify()` method which toggles a counter that the `authNotifierProvider`
+/// watches.
 class SessionExpiredSignal {
   SessionExpiredSignal(this._onExpired);
 
@@ -56,10 +58,17 @@ class SessionExpiredSignal {
 /// The auth feature reads this through a Provider and forces the notifier
 /// to [AuthState.unauthenticated]. Kept here so core/network stays free of
 /// direct auth-feature imports.
-final sessionExpiredBroadcastProvider = StateProvider<int>((ref) => 0);
+@riverpod
+class SessionExpiredBroadcast extends _$SessionExpiredBroadcast {
+  @override
+  int build() => 0;
 
-final dioProvider = Provider<Dio>((ref) {
-  final dio = Dio(
+  void increment() => state += 1;
+}
+
+@riverpod
+Dio dio(DioRef ref) {
+  final instance = Dio(
     BaseOptions(
       baseUrl: resolveApiBaseUrl(),
       connectTimeout: const Duration(seconds: 10),
@@ -79,18 +88,18 @@ final dioProvider = Provider<Dio>((ref) {
   //   2. RefreshInterceptor catches 401s on the inbound response and retries.
   //   3. ErrorInterceptor maps leftover DioException -> AppException so the
   //      UI layer sees typed failures.
-  dio.interceptors.add(AuthInterceptor(storage));
-  dio.interceptors.add(
+  instance.interceptors.add(AuthInterceptor(storage));
+  instance.interceptors.add(
     RefreshInterceptor(
-      dio: dio,
+      dio: instance,
       storage: storage,
       onSessionExpired: () {
         // Bump the broadcast counter — listeners (auth_providers.dart)
         // react by forcing Unauthenticated state.
-        ref.read(sessionExpiredBroadcastProvider.notifier).state += 1;
+        ref.read(sessionExpiredBroadcastProvider.notifier).increment();
       },
     ),
   );
-  dio.interceptors.add(ErrorInterceptor());
-  return dio;
-});
+  instance.interceptors.add(ErrorInterceptor());
+  return instance;
+}

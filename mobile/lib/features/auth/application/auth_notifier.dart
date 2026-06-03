@@ -1,12 +1,16 @@
 import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/network/dio_provider.dart';
 import '../data/auth_repository.dart';
 import '../data/social_login_port.dart';
 import '../domain/auth_state.dart';
 import '../domain/auth_user.dart';
+import 'auth_providers.dart';
+
+part 'auth_notifier.g.dart';
 
 /// Holds the [AuthState] sealed union and orchestrates the three public
 /// flows (kakao login · apple login · logout · account delete).
@@ -14,10 +18,28 @@ import '../domain/auth_user.dart';
 /// State transitions are kept unidirectional — only [_setState] writes to
 /// the underlying `state` so any future debug/logging hook can be attached
 /// in one place. Token persistence is delegated to [AuthRepository].
-class AuthNotifier extends StateNotifier<AuthState> {
-  AuthNotifier(this._repository) : super(const AuthState.initial());
+@riverpod
+class AuthNotifier extends _$AuthNotifier {
+  AuthRepository get _repository => ref.read(authRepositoryProvider);
 
-  final AuthRepository _repository;
+  @override
+  AuthState build() {
+    // Bridge the refresh-interceptor's session-expired broadcast into an
+    // explicit logout. This stays here (not in core/) so the dio provider
+    // does not depend on feature code.
+    ref.listen<int>(sessionExpiredBroadcastProvider, (previous, next) {
+      if (previous != null && next > previous) {
+        logout();
+      }
+    });
+
+    // Kick off rehydration once the first listener subscribes. The router gate
+    // is the first listener, so this happens on app start before any route
+    // resolves against the gate's current-state snapshot.
+    Future.microtask(bootstrap);
+
+    return const AuthState.initial();
+  }
 
   /// Rehydrates the session on app start. The router gate waits for
   /// [AuthState] to leave [AuthInitial] before performing any redirects.
@@ -93,8 +115,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   void _setState(AuthState next) {
-    if (mounted) {
-      state = next;
-    }
+    state = next;
   }
 }

@@ -7,6 +7,7 @@ import 'package:book_club/features/reading/domain/grade_summary.dart';
 import 'package:book_club/features/reading/domain/heatmap_day.dart';
 import 'package:book_club/features/reading/domain/reading_goal.dart';
 import 'package:book_club/features/reading/domain/reading_session.dart';
+import 'package:book_club/features/reading/domain/reading_year_stats.dart';
 
 /// Fake [ReadingRepository] that lets reading-feature tests queue
 /// deterministic responses per endpoint.
@@ -179,6 +180,24 @@ class FakeReadingRepository implements ReadingRepository {
       totalSeconds: 0,
       sessions: [],
     );
+  }
+
+  ReadingYearStats? yearStatsResult;
+  Object? yearStatsError;
+
+  @override
+  Future<ReadingYearStats> getYearStats(int year) async {
+    if (yearStatsError != null) throw yearStatsError!;
+    return yearStatsResult ??
+        ReadingYearStats(
+          year: year,
+          yearBooks: 0,
+          yearSeconds: 0,
+          totalBooks: 0,
+          totalSeconds: 0,
+          streakDays: 0,
+          longestStreak: 0,
+        );
   }
 }
 

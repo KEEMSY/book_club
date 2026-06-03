@@ -2,6 +2,7 @@ import 'package:book_club/features/book/data/book_models.dart'
     show DiscoverResponseDto;
 import 'package:book_club/features/book/data/book_repository.dart';
 import 'package:book_club/features/book/domain/book.dart';
+import 'package:book_club/features/book/domain/book_review.dart';
 import 'package:book_club/features/book/domain/book_status.dart';
 import 'package:book_club/features/book/domain/user_book.dart';
 
@@ -163,6 +164,15 @@ class FakeBookRepository implements BookRepository {
   Future<DiscoverResponseDto> getDiscover() async {
     if (discoverError != null) throw discoverError!;
     return discoverResult ?? const DiscoverResponseDto(sections: []);
+  }
+
+  List<BookReview>? getBookReviewsResult;
+  Object? getBookReviewsError;
+
+  @override
+  Future<List<BookReview>> getBookReviews(String bookId, {int limit = 20}) async {
+    if (getBookReviewsError != null) throw getBookReviewsError!;
+    return getBookReviewsResult ?? const <BookReview>[];
   }
 }
 

@@ -1,7 +1,9 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../data/notification_repository.dart';
 import 'notification_state.dart';
+
+part 'notification_notifier.g.dart';
 
 /// Manages the notification list with cursor-based pagination.
 ///
@@ -10,15 +12,19 @@ import 'notification_state.dart';
 /// [loadMore] appends the next page only when [NotificationState.hasMore].
 /// [markRead] optimistically patches the local item to avoid a full reload
 /// that would scroll-jump the user.
-class NotificationNotifier extends StateNotifier<NotificationState> {
-  NotificationNotifier(this._repository) : super(const NotificationState());
-
-  final NotificationRepository _repository;
+@riverpod
+class NotificationNotifier extends _$NotificationNotifier {
+  @override
+  NotificationState build() {
+    return const NotificationState();
+  }
 
   Future<void> load() async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-      final resp = await _repository.getNotifications(limit: 20);
+      final resp = await ref
+          .read(notificationRepositoryProvider)
+          .getNotifications(limit: 20);
       state = NotificationState(
         items: resp.items,
         nextCursor: resp.nextCursor,
@@ -36,10 +42,12 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
     }
     state = state.copyWith(isLoading: true);
     try {
-      final resp = await _repository.getNotifications(
-        cursor: state.nextCursor,
-        limit: 20,
-      );
+      final resp = await ref
+          .read(notificationRepositoryProvider)
+          .getNotifications(
+            cursor: state.nextCursor,
+            limit: 20,
+          );
       state = state.copyWith(
         items: [...state.items, ...resp.items],
         nextCursor: resp.nextCursor,
@@ -67,7 +75,7 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
       unreadCount: state.unreadCount > 0 ? state.unreadCount - 1 : 0,
     );
     try {
-      await _repository.markRead(id);
+      await ref.read(notificationRepositoryProvider).markRead(id);
     } on NotificationRepositoryException {
       // Silent — optimistic state is good enough for UX continuity.
     }
@@ -77,15 +85,11 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
   /// [NotificationBell] without triggering a full list reload.
   Future<void> refreshUnreadCount() async {
     try {
-      final count = await _repository.getUnreadCount();
+      final count =
+          await ref.read(notificationRepositoryProvider).getUnreadCount();
       state = state.copyWith(unreadCount: count);
     } on NotificationRepositoryException {
       // Badge failure is non-critical — keep the stale value shown.
     }
   }
 }
-
-final notificationNotifierProvider =
-    StateNotifierProvider<NotificationNotifier, NotificationState>((ref) {
-  return NotificationNotifier(ref.watch(notificationRepositoryProvider));
-});

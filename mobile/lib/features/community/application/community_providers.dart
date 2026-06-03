@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/network/dio_provider.dart';
 import '../../feed/domain/post.dart';
@@ -6,6 +6,8 @@ import '../../feed/domain/reaction_type.dart';
 import '../../social/domain/user_summary.dart';
 import '../data/community_api.dart';
 import '../data/community_repository.dart';
+
+part 'community_providers.g.dart';
 
 final communityApiProvider = Provider<CommunityApi>((ref) {
   return CommunityApi(ref.watch(dioProvider));
@@ -64,12 +66,17 @@ class FeedState {
   }
 }
 
-class _FeedNotifier extends StateNotifier<FeedState> {
-  _FeedNotifier(this._load) : super(const FeedState.initial()) {
-    fetchFirst();
-  }
+// ---------------------------------------------------------------------------
+// Following feed
+// ---------------------------------------------------------------------------
 
-  final Future<PostPage> Function({String? cursor}) _load;
+@riverpod
+class FollowingFeed extends _$FollowingFeed {
+  @override
+  FeedState build() {
+    Future.microtask(fetchFirst);
+    return const FeedState.initial();
+  }
 
   Future<void> fetchFirst() async {
     if (state.isLoading) return;
@@ -80,7 +87,8 @@ class _FeedNotifier extends StateNotifier<FeedState> {
       clearError: true,
     );
     try {
-      final page = await _load(cursor: null);
+      final page =
+          await ref.read(communityRepositoryProvider).getFollowingFeed();
       state = state.copyWith(
         posts: page.items,
         nextCursor: page.nextCursor,
@@ -95,7 +103,9 @@ class _FeedNotifier extends StateNotifier<FeedState> {
     if (state.isLoading || !state.hasMore) return;
     state = state.copyWith(isLoading: true, clearError: true);
     try {
-      final page = await _load(cursor: state.nextCursor);
+      final page = await ref
+          .read(communityRepositoryProvider)
+          .getFollowingFeed(cursor: state.nextCursor);
       state = state.copyWith(
         posts: [...state.posts, ...page.items],
         nextCursor: page.nextCursor,
@@ -128,42 +138,222 @@ class _FeedNotifier extends StateNotifier<FeedState> {
   }
 }
 
-final followingFeedProvider =
-    StateNotifierProvider.autoDispose<_FeedNotifier, FeedState>((ref) {
-  final repo = ref.watch(communityRepositoryProvider);
-  return _FeedNotifier(
-    ({String? cursor}) => repo.getFollowingFeed(cursor: cursor),
-  );
-});
+// ---------------------------------------------------------------------------
+// User posts feed — keyed by userId
+// ---------------------------------------------------------------------------
 
-/// User posts feed — key is the target user's ID string.
-final userPostsFeedProvider =
-    StateNotifierProvider.autoDispose.family<_FeedNotifier, FeedState, String>(
-  (ref, userId) {
-    final repo = ref.watch(communityRepositoryProvider);
-    return _FeedNotifier(
-      ({String? cursor}) => repo.getUserPosts(userId, cursor: cursor),
+@riverpod
+class UserPostsFeed extends _$UserPostsFeed {
+  @override
+  FeedState build(String userId) {
+    Future.microtask(fetchFirst);
+    return const FeedState.initial();
+  }
+
+  Future<void> fetchFirst() async {
+    if (state.isLoading) return;
+    state = state.copyWith(
+      posts: const <Post>[],
+      clearCursor: true,
+      isLoading: true,
+      clearError: true,
     );
-  },
-);
+    try {
+      final page =
+          await ref.read(communityRepositoryProvider).getUserPosts(userId);
+      state = state.copyWith(
+        posts: page.items,
+        nextCursor: page.nextCursor,
+        isLoading: false,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e);
+    }
+  }
 
-/// Explore feed — key is sort string ("latest" | "popular").
-final exploreFeedProvider =
-    StateNotifierProvider.autoDispose.family<_FeedNotifier, FeedState, String>(
-  (ref, sort) {
-    final repo = ref.watch(communityRepositoryProvider);
-    return _FeedNotifier(
-      ({String? cursor}) => repo.getExploreFeed(sort: sort, cursor: cursor),
+  Future<void> fetchMore() async {
+    if (state.isLoading || !state.hasMore) return;
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      final page = await ref
+          .read(communityRepositoryProvider)
+          .getUserPosts(userId, cursor: state.nextCursor);
+      state = state.copyWith(
+        posts: [...state.posts, ...page.items],
+        nextCursor: page.nextCursor,
+        isLoading: false,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e);
+    }
+  }
+
+  void applyReactionResult({
+    required String postId,
+    required ReactionType reactionType,
+    required ReactionToggleState toggleState,
+    required Map<ReactionType, int> counts,
+  }) {
+    final List<Post> next = <Post>[
+      for (final Post p in state.posts)
+        if (p.id == postId)
+          p.copyWith(
+            reactions: counts,
+            myReactions: toggleState == ReactionToggleState.added
+                ? <ReactionType>{...p.myReactions, reactionType}
+                : (Set<ReactionType>.of(p.myReactions)..remove(reactionType)),
+          )
+        else
+          p,
+    ];
+    state = state.copyWith(posts: next);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Explore feed — keyed by sort string ("latest" | "popular")
+// ---------------------------------------------------------------------------
+
+@riverpod
+class ExploreFeed extends _$ExploreFeed {
+  @override
+  FeedState build(String sort) {
+    Future.microtask(fetchFirst);
+    return const FeedState.initial();
+  }
+
+  Future<void> fetchFirst() async {
+    if (state.isLoading) return;
+    state = state.copyWith(
+      posts: const <Post>[],
+      clearCursor: true,
+      isLoading: true,
+      clearError: true,
     );
-  },
-);
+    try {
+      final page = await ref
+          .read(communityRepositoryProvider)
+          .getExploreFeed(sort: sort);
+      state = state.copyWith(
+        posts: page.items,
+        nextCursor: page.nextCursor,
+        isLoading: false,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e);
+    }
+  }
 
-/// Highlight-only feed (community "인용" tab).
-final highlightFeedProvider =
-    StateNotifierProvider.autoDispose<_FeedNotifier, FeedState>((ref) {
-  final repo = ref.watch(communityRepositoryProvider);
-  return _FeedNotifier(
-    ({String? cursor}) => repo.getExploreFeed(
-        sort: 'latest', postType: 'highlight', cursor: cursor),
-  );
-});
+  Future<void> fetchMore() async {
+    if (state.isLoading || !state.hasMore) return;
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      final page = await ref
+          .read(communityRepositoryProvider)
+          .getExploreFeed(sort: sort, cursor: state.nextCursor);
+      state = state.copyWith(
+        posts: [...state.posts, ...page.items],
+        nextCursor: page.nextCursor,
+        isLoading: false,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e);
+    }
+  }
+
+  void applyReactionResult({
+    required String postId,
+    required ReactionType reactionType,
+    required ReactionToggleState toggleState,
+    required Map<ReactionType, int> counts,
+  }) {
+    final List<Post> next = <Post>[
+      for (final Post p in state.posts)
+        if (p.id == postId)
+          p.copyWith(
+            reactions: counts,
+            myReactions: toggleState == ReactionToggleState.added
+                ? <ReactionType>{...p.myReactions, reactionType}
+                : (Set<ReactionType>.of(p.myReactions)..remove(reactionType)),
+          )
+        else
+          p,
+    ];
+    state = state.copyWith(posts: next);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Highlight-only feed (community "인용" tab)
+// ---------------------------------------------------------------------------
+
+@riverpod
+class HighlightFeed extends _$HighlightFeed {
+  @override
+  FeedState build() {
+    Future.microtask(fetchFirst);
+    return const FeedState.initial();
+  }
+
+  Future<void> fetchFirst() async {
+    if (state.isLoading) return;
+    state = state.copyWith(
+      posts: const <Post>[],
+      clearCursor: true,
+      isLoading: true,
+      clearError: true,
+    );
+    try {
+      final page = await ref
+          .read(communityRepositoryProvider)
+          .getExploreFeed(sort: 'latest', postType: 'highlight');
+      state = state.copyWith(
+        posts: page.items,
+        nextCursor: page.nextCursor,
+        isLoading: false,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e);
+    }
+  }
+
+  Future<void> fetchMore() async {
+    if (state.isLoading || !state.hasMore) return;
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      final page = await ref.read(communityRepositoryProvider).getExploreFeed(
+            sort: 'latest',
+            postType: 'highlight',
+            cursor: state.nextCursor,
+          );
+      state = state.copyWith(
+        posts: [...state.posts, ...page.items],
+        nextCursor: page.nextCursor,
+        isLoading: false,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e);
+    }
+  }
+
+  void applyReactionResult({
+    required String postId,
+    required ReactionType reactionType,
+    required ReactionToggleState toggleState,
+    required Map<ReactionType, int> counts,
+  }) {
+    final List<Post> next = <Post>[
+      for (final Post p in state.posts)
+        if (p.id == postId)
+          p.copyWith(
+            reactions: counts,
+            myReactions: toggleState == ReactionToggleState.added
+                ? <ReactionType>{...p.myReactions, reactionType}
+                : (Set<ReactionType>.of(p.myReactions)..remove(reactionType)),
+          )
+        else
+          p,
+    ];
+    state = state.copyWith(posts: next);
+  }
+}

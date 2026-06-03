@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
-import '../../auth/application/auth_providers.dart';
+import '../../auth/application/auth_notifier.dart';
 import '../../auth/domain/auth_state.dart';
 import '../application/book_feed_notifier.dart';
 import '../application/comment_thread_notifier.dart';

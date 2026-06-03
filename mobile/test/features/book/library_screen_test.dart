@@ -36,8 +36,7 @@ void main() {
       overrides: <Override>[
         bookRepositoryProvider.overrideWithValue(repo),
         authRepositoryProvider.overrideWithValue(authRepo),
-        authNotifierProvider
-            .overrideWith((ref) => AuthNotifier(authRepo)..bootstrap()),
+        authNotifierProvider.overrideWith(() => AuthNotifier()),
       ],
       child: MaterialApp(
         theme: AppTheme.light,

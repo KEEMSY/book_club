@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../data/feed_repository.dart';
 import '../data/image_uploader.dart';
@@ -6,6 +6,8 @@ import '../domain/post.dart';
 import '../domain/post_type.dart';
 import 'feed_providers.dart';
 import 'post_compose_state.dart';
+
+part 'post_compose_notifier.g.dart';
 
 /// Drives the compose screen state machine.
 ///
@@ -15,15 +17,15 @@ import 'post_compose_state.dart';
 /// re-tap "공유" without losing what they typed. Maximum image attachments
 /// is 4 — backend rejects anything more with `IMAGE_LIMIT_EXCEEDED`, but we
 /// also cap on the client to avoid wasting the failing presign step.
-class PostComposeNotifier extends StateNotifier<PostComposeState> {
-  PostComposeNotifier(this._repository, this.bookId)
-      : super(const PostComposeState.editing());
-
-  final FeedRepository _repository;
-  final String bookId;
-
+@riverpod
+class PostComposeNotifier extends _$PostComposeNotifier {
   static const int maxImages = 4;
   static const int maxContentLength = 2000;
+
+  @override
+  PostComposeState build(String bookId) {
+    return const PostComposeState.editing();
+  }
 
   void changeType(PostType type) {
     final PostComposeState snapshot = state;
@@ -120,6 +122,7 @@ class PostComposeNotifier extends StateNotifier<PostComposeState> {
       return null;
     }
 
+    final repo = ref.read(feedRepositoryProvider);
     final List<String> uploadedKeys = <String>[];
     for (int i = 0; i < images.length; i++) {
       state = PostComposeState.uploading(
@@ -129,7 +132,7 @@ class PostComposeNotifier extends StateNotifier<PostComposeState> {
         uploadedCount: i,
       );
       try {
-        final String key = await _repository.uploadImage(images[i]);
+        final String key = await repo.uploadImage(images[i]);
         uploadedKeys.add(key);
       } on ImageUploadException catch (e) {
         state = PostComposeState.failure(
@@ -149,7 +152,7 @@ class PostComposeNotifier extends StateNotifier<PostComposeState> {
       images: images,
     );
     try {
-      final Post created = await _repository.createPost(
+      final Post created = await repo.createPost(
         bookId: bookId,
         postType: postType,
         content: trimmed,
@@ -169,10 +172,3 @@ class PostComposeNotifier extends StateNotifier<PostComposeState> {
     }
   }
 }
-
-/// Family keyed by bookId so multiple book detail screens cannot stomp on
-/// each other's compose state.
-final postComposeNotifierProvider = StateNotifierProvider.autoDispose
-    .family<PostComposeNotifier, PostComposeState, String>((ref, bookId) {
-  return PostComposeNotifier(ref.watch(feedRepositoryProvider), bookId);
-});

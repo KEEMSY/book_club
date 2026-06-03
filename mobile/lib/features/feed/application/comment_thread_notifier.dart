@@ -1,9 +1,11 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../data/feed_repository.dart';
 import '../domain/comment.dart';
 import 'comment_thread_state.dart';
 import 'feed_providers.dart';
+
+part 'comment_thread_notifier.g.dart';
 
 /// Drives the comments sheet — paginated comment list (ASC) plus an inline
 /// composer state machine.
@@ -13,19 +15,21 @@ import 'feed_providers.dart';
 /// at render time; the backend rejects depth-2+ writes with 409
 /// `COMMENT_DEPTH_EXCEEDED`. This notifier surfaces that code through
 /// [CommentThreadLoaded.postError] so the composer can render an inline hint.
-class CommentThreadNotifier extends StateNotifier<CommentThreadState> {
-  CommentThreadNotifier(this._repository, this.postId)
-      : super(const CommentThreadState.initial());
-
-  final FeedRepository _repository;
-  final String postId;
+@riverpod
+class CommentThreadNotifier extends _$CommentThreadNotifier {
   int _requestSeq = 0;
+
+  @override
+  CommentThreadState build(String postId) {
+    return const CommentThreadState.initial();
+  }
 
   Future<void> load() async {
     state = const CommentThreadState.loading();
     final int seq = ++_requestSeq;
     try {
-      final CommentPage page = await _repository.listComments(postId: postId);
+      final CommentPage page =
+          await ref.read(feedRepositoryProvider).listComments(postId: postId);
       if (seq != _requestSeq) return;
       state = CommentThreadState.loaded(
         items: page.items,
@@ -44,10 +48,10 @@ class CommentThreadNotifier extends StateNotifier<CommentThreadState> {
     state = snapshot.copyWith(isLoadingMore: true);
     final int seq = ++_requestSeq;
     try {
-      final CommentPage page = await _repository.listComments(
-        postId: postId,
-        cursor: snapshot.nextCursor,
-      );
+      final CommentPage page = await ref.read(feedRepositoryProvider).listComments(
+            postId: postId,
+            cursor: snapshot.nextCursor,
+          );
       if (seq != _requestSeq) return;
       state = CommentThreadState.loaded(
         items: <Comment>[...snapshot.items, ...page.items],
@@ -74,11 +78,11 @@ class CommentThreadNotifier extends StateNotifier<CommentThreadState> {
     }
     state = snapshot.copyWith(isPosting: true, postError: null);
     try {
-      final Comment created = await _repository.createComment(
-        postId: postId,
-        content: trimmed,
-        parentId: parentId,
-      );
+      final Comment created = await ref.read(feedRepositoryProvider).createComment(
+            postId: postId,
+            content: trimmed,
+            parentId: parentId,
+          );
       // ASC order, so a freshly written comment goes at the end.
       state = snapshot.copyWith(
         items: <Comment>[...snapshot.items, created],
@@ -102,7 +106,7 @@ class CommentThreadNotifier extends StateNotifier<CommentThreadState> {
     final CommentThreadState snapshot = state;
     if (snapshot is! CommentThreadLoaded) return false;
     try {
-      await _repository.deleteComment(commentId);
+      await ref.read(feedRepositoryProvider).deleteComment(commentId);
     } on FeedRepositoryException catch (e) {
       state = snapshot.copyWith(postError: e.message);
       return false;
@@ -131,8 +135,3 @@ class CommentThreadNotifier extends StateNotifier<CommentThreadState> {
     }
   }
 }
-
-final commentThreadNotifierProvider = StateNotifierProvider.autoDispose
-    .family<CommentThreadNotifier, CommentThreadState, String>((ref, postId) {
-  return CommentThreadNotifier(ref.watch(feedRepositoryProvider), postId);
-});

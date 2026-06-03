@@ -13,6 +13,14 @@
 
 ## Phase 전환 리뷰 기록
 
+### Phase 5 전환 리뷰 (2026-06-03)
+
+- 리뷰 문서: `docs/plans/2026-06-03-phase5.md`
+- **편입 (M20)**: Riverpod 3.0 마이그레이션, discovery TypedDict, FCM HTTP v1, retrofit/freezed 업그레이드, DevLoginButton 교체
+- **편입 (M21)**: (discovery) ML 기반 추천 고도화 → 협업 필터링 / (reading) 독서 통계 탭 강화
+- **편입 (M22)**: (social) 연말 독서 회고 카드 + SNS 공유 / (social) 서재 SNS 캡처 최적화 / (profile) 배지 핀 고급 UI / (mobile/login) 에디토리얼 SVG 일러스트
+- **보류 (Phase 6)**: (club) 그룹 채팅 / 실시간 알림 — WebSocket 인프라 선행 필요
+
 ### Phase 4 완료 (2026-05-01)
 
 - M16 (탐색 탭·책 추천), M17 (독서 그룹), M18 (프로필 강화), M19 (QA·스토어 준비) 전부 완료.
@@ -73,3 +81,11 @@
 - [x] (mobile/design) 다크 모드 완성 — 전체 위젯을 Theme.colorScheme 로 마이그레이션하고 ThemeMode.light 고정 해제. jan-dee bucket 은 alphaBlend 로 양쪽 캔버스에서 opacity ladder 유지, 브랜드 고정(Kakao/Apple/plusMagenta) 은 그대로 — 맥락: 사용자 Chrome 테스트 피드백 (2026-04-23 완료)
 - [x] (mobile/reading) 목표 화면 재구성 — "올해의 독서 여정" 단일 흐름으로 재구성 완료 (commit `81eb4c5`, 2026-04-25)
 - [x] (mobile/login) 로그인 화면 중앙 illustration — SVG 에셋 대신 `_BookStackPainter` CustomPainter(3권 책 쌓기)로 M15에서 구현. 테마 색상 반응형, 다크 모드 대응
+
+### 2026-06-03 (경쟁 분석·기술 감사 결과)
+
+- [ ] (social) 연말/상반기 독서 회고 카드 (4종) + SNS 공유 — 맥락: 밀리의서재 연말 회고 바이럴 루프 분석, Phase 5 M22 편입 (2026-06-03)
+- [ ] (social) 서재 SNS 캡처 최적화 — 전용 캡처 버튼 + 정사각형/세로형 레이아웃 + Book Club 워터마크 — 맥락: 북적북적 인스타그램 해시태그 8만6천 건 사례 분석, Phase 5 M22 편입 (2026-06-03)
+- [ ] (reading) 독서 통계 탭 강화 — 평균 속도·포맷 비중·장르 분포·누적 시간 시각화 — 맥락: StoryGraph 핵심 차별점 분석, Phase 5 M21 편입 (2026-06-03)
+- [ ] (club) 그룹 채팅 / 실시간 메시지 — 맥락: Phase 4 잔여, WebSocket 인프라 선행 필요, Phase 6 보류 (2026-06-03)
+- [ ] (discovery) 딥러닝 추천 (딥 협업 필터링 / 콘텐츠 기반 임베딩) — 맥락: Phase 5 ML 추천은 경량 협업 필터링으로 시작, 활성 사용자 1만 이상 확보 후 검토 (2026-06-03)

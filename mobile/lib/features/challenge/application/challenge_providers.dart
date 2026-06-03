@@ -1,9 +1,11 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/network/dio_provider.dart';
 import '../data/challenge_api.dart';
 import '../data/challenge_models.dart';
 import '../data/challenge_repository.dart';
+
+part 'challenge_providers.g.dart';
 
 final challengeApiProvider = Provider<ChallengeApi>((ref) {
   return ChallengeApi(ref.watch(dioProvider));
@@ -84,23 +86,22 @@ final myBadgesProvider =
 // Join / leave action notifier
 // ---------------------------------------------------------------------------
 
-class JoinNotifier extends StateNotifier<AsyncValue<void>> {
-  JoinNotifier(this._repo) : super(const AsyncValue.data(null));
-
-  final ChallengeRepository _repo;
+@riverpod
+class JoinNotifier extends _$JoinNotifier {
+  @override
+  AsyncValue<void> build() => const AsyncValue.data(null);
 
   Future<void> join(String challengeId) async {
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() => _repo.joinChallenge(challengeId));
+    state = await AsyncValue.guard(
+      () => ref.read(challengeRepositoryProvider).joinChallenge(challengeId),
+    );
   }
 
   Future<void> leave(String challengeId) async {
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() => _repo.leaveChallenge(challengeId));
+    state = await AsyncValue.guard(
+      () => ref.read(challengeRepositoryProvider).leaveChallenge(challengeId),
+    );
   }
 }
-
-final joinNotifierProvider =
-    StateNotifierProvider.autoDispose<JoinNotifier, AsyncValue<void>>((ref) {
-  return JoinNotifier(ref.watch(challengeRepositoryProvider));
-});

@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../data/book_repository.dart';
 import '../domain/book_status.dart';
@@ -6,23 +6,25 @@ import '../domain/user_book.dart';
 import 'book_providers.dart';
 import 'library_state.dart';
 
+part 'library_notifier.g.dart';
+
 /// Holds a `Map<BookStatus, LibraryListState>` so switching status tabs
 /// preserves previously-loaded pages (Airbnb-style "sticky tabs" feel).
 ///
 /// Each status has its own cursor; loading more on the `reading` tab does
 /// not touch the `completed` cache and vice-versa. Refresh is explicit via
 /// [refresh] so accidental re-fetch on tab pump does not hit the API.
-class LibraryNotifier extends StateNotifier<Map<BookStatus, LibraryListState>> {
-  LibraryNotifier(this._repository) : super(_initialMap());
-
-  final BookRepository _repository;
-
-  static Map<BookStatus, LibraryListState> _initialMap() {
+@riverpod
+class LibraryNotifier extends _$LibraryNotifier {
+  @override
+  Map<BookStatus, LibraryListState> build() {
     return <BookStatus, LibraryListState>{
       for (final BookStatus status in BookStatus.values)
         status: const LibraryListState.initial(),
     };
   }
+
+  BookRepository get _repository => ref.read(bookRepositoryProvider);
 
   /// Called by the segment tab when the user taps a status. If the tab has
   /// never been loaded we fire a first-page fetch; otherwise we leave the
@@ -143,8 +145,3 @@ class LibraryNotifier extends StateNotifier<Map<BookStatus, LibraryListState>> {
     };
   }
 }
-
-final libraryNotifierProvider =
-    StateNotifierProvider<LibraryNotifier, Map<BookStatus, LibraryListState>>(
-  (ref) => LibraryNotifier(ref.watch(bookRepositoryProvider)),
-);

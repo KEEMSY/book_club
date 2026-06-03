@@ -1,9 +1,11 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../data/reading_repository.dart';
 import '../domain/heatmap_day.dart';
 import 'heatmap_state.dart';
 import 'reading_providers.dart';
+
+part 'heatmap_notifier.g.dart';
 
 /// Manages the heatmap fetch for a specific [year].
 ///
@@ -15,26 +17,26 @@ import 'reading_providers.dart';
 /// Date range:
 ///   * Current year: Jan 1 → today (live window, re-fetched on invalidate).
 ///   * Past year:    Jan 1 → Dec 31 (static; re-fetched only when forced).
-class HeatmapNotifier extends StateNotifier<HeatmapState> {
-  HeatmapNotifier(this._repository, this._year)
-      : super(const HeatmapState.initial());
-
-  final ReadingRepository _repository;
-  final int _year;
+@riverpod
+class HeatmapNotifier extends _$HeatmapNotifier {
+  @override
+  HeatmapState build(int year) {
+    return const HeatmapState.initial();
+  }
 
   Future<void> load({bool force = false}) async {
     final DateTime now = DateTime.now();
     final DateTime from;
     final DateTime to;
 
-    if (_year == now.year) {
+    if (year == now.year) {
       // GitHub-style rolling window: trailing 365 days ending today.
       to = DateTime(now.year, now.month, now.day);
       from = to.subtract(const Duration(days: 364));
     } else {
       // Full calendar year for past years.
-      from = DateTime(_year, 1, 1);
-      to = DateTime(_year, 12, 31);
+      from = DateTime(year, 1, 1);
+      to = DateTime(year, 12, 31);
     }
 
     if (!force && state is HeatmapLoaded) {
@@ -43,9 +45,10 @@ class HeatmapNotifier extends StateNotifier<HeatmapState> {
     }
 
     state = const HeatmapState.loading();
+    final repo = ref.read(readingRepositoryProvider);
     try {
       final List<HeatmapDay> days =
-          await _repository.getHeatmap(from: from, to: to);
+          await repo.getHeatmap(from: from, to: to);
       state = HeatmapState.loaded(days: days, from: from, to: to);
     } on ReadingRepositoryException catch (e) {
       state = HeatmapState.error(code: e.code, message: e.message);
@@ -54,8 +57,3 @@ class HeatmapNotifier extends StateNotifier<HeatmapState> {
 
   Future<void> invalidate() => load(force: true);
 }
-
-final heatmapNotifierProvider =
-    StateNotifierProvider.family<HeatmapNotifier, HeatmapState, int>(
-  (ref, year) => HeatmapNotifier(ref.watch(readingRepositoryProvider), year),
-);

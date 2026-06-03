@@ -1,19 +1,25 @@
 import 'dart:convert';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../domain/dashboard_prefs.dart';
+
+part 'dashboard_prefs_notifier.g.dart';
 
 /// Persists and restores which dashboard sections the user wants visible.
 ///
 /// State is loaded once at construction from SharedPreferences; subsequent
 /// calls to [update] write through so the choice survives cold restarts.
-class DashboardPrefsNotifier extends StateNotifier<DashboardPrefs> {
+@riverpod
+class DashboardPrefsNotifier extends _$DashboardPrefsNotifier {
   static const _key = 'dashboard_prefs';
 
-  DashboardPrefsNotifier() : super(const DashboardPrefs()) {
-    _load();
+  @override
+  DashboardPrefs build() {
+    // Kick an async load; state starts at defaults until it resolves.
+    Future.microtask(_load);
+    return const DashboardPrefs();
   }
 
   Future<void> _load() async {
@@ -35,8 +41,3 @@ class DashboardPrefsNotifier extends StateNotifier<DashboardPrefs> {
     await prefs.setString(_key, jsonEncode(newPrefs.toJson()));
   }
 }
-
-final dashboardPrefsProvider =
-    StateNotifierProvider<DashboardPrefsNotifier, DashboardPrefs>(
-  (ref) => DashboardPrefsNotifier(),
-);

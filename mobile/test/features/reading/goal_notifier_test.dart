@@ -1,6 +1,8 @@
 import 'package:book_club/features/reading/application/goal_notifier.dart';
 import 'package:book_club/features/reading/application/goal_state.dart';
+import 'package:book_club/features/reading/application/reading_providers.dart';
 import 'package:book_club/features/reading/domain/goal_period.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'fakes.dart';
@@ -18,11 +20,15 @@ void main() {
           ),
         ].cast();
 
-      final notifier = GoalNotifier(repo);
+      final c = ProviderContainer(overrides: [
+        readingRepositoryProvider.overrideWithValue(repo),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(goalNotifierProvider.notifier);
       await notifier.load();
 
-      expect(notifier.state, isA<GoalLoaded>());
-      final loaded = notifier.state as GoalLoaded;
+      expect(c.read(goalNotifierProvider), isA<GoalLoaded>());
+      final loaded = c.read(goalNotifierProvider) as GoalLoaded;
       expect(loaded.items, hasLength(1));
       expect(loaded.items.first.goal.period, GoalPeriod.weekly);
     });
@@ -33,7 +39,11 @@ void main() {
         ..createGoalResult =
             buildGoal(period: GoalPeriod.monthly, targetBooks: 4);
 
-      final notifier = GoalNotifier(repo);
+      final c = ProviderContainer(overrides: [
+        readingRepositoryProvider.overrideWithValue(repo),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(goalNotifierProvider.notifier);
       final result = await notifier.createGoal(
         period: GoalPeriod.monthly,
         targetBooks: 4,
@@ -51,7 +61,11 @@ void main() {
         ..goalsResult = <dynamic>[
           buildGoalProgress(goal: buildGoal(period: GoalPeriod.weekly)),
         ].cast();
-      final notifier = GoalNotifier(repo);
+      final c = ProviderContainer(overrides: [
+        readingRepositoryProvider.overrideWithValue(repo),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(goalNotifierProvider.notifier);
       await notifier.load();
 
       expect(notifier.progressFor(GoalPeriod.weekly), isNotNull);
@@ -69,7 +83,11 @@ void main() {
       final repo = FakeReadingRepository()
         ..createGoalResult = buildGoal(period: GoalPeriod.weekly);
 
-      final notifier = GoalNotifier(repo);
+      final c = ProviderContainer(overrides: [
+        readingRepositoryProvider.overrideWithValue(repo),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(goalNotifierProvider.notifier);
       await notifier.createJourney(
         yearlyBooks: 52,
         dailyMinutes: 30,
@@ -98,7 +116,7 @@ void main() {
 
       // load(force: true) follows the three creates and lands a GoalLoaded.
       expect(repo.currentGoalsCalls, greaterThan(0));
-      expect(notifier.state, isA<GoalLoaded>());
+      expect(c.read(goalNotifierProvider), isA<GoalLoaded>());
     });
   });
 }

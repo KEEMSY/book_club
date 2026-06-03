@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_theme.dart';
 
+/// DEBUG-ONLY widget. Guarded by [kDebugMode] in LoginScreen.
+/// Remove once /auth/dev-login is removed from the backend or staging
+/// credentials are provisioned for all developers.
+///
 /// Dev-only CTA surfaced while Kakao/Apple credentials are still being
 /// provisioned. Styled as an Airbnb-toned outlined button (Rausch border,
 /// Rausch label, pill-ish 12pt radius) so it reads as an intentional
 /// placeholder and not a debug affordance we forgot to remove.
-///
-/// Pair with the [TODO] in [LoginScreen]: uncomment the real social buttons
-/// and delete this widget once the backend `/auth/dev-login` 404s in
-/// staging/prod.
 class DevLoginButton extends StatelessWidget {
   const DevLoginButton({
     super.key,

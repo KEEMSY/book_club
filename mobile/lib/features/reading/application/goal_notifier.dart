@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../data/reading_repository.dart';
 import '../domain/goal_period.dart';
@@ -7,13 +7,17 @@ import 'goal_state.dart';
 import 'reading_journey_inputs.dart';
 import 'reading_providers.dart';
 
+part 'goal_notifier.g.dart';
+
 /// Tracks the active goals (weekly · monthly · yearly). Backend returns one
 /// active goal per period via `GET /reading/goals/current`; we refresh after
 /// every `createGoal()` so the UI reflects the newly-created entry.
-class GoalNotifier extends StateNotifier<GoalState> {
-  GoalNotifier(this._repository) : super(const GoalState.initial());
-
-  final ReadingRepository _repository;
+@riverpod
+class GoalNotifier extends _$GoalNotifier {
+  @override
+  GoalState build() {
+    return const GoalState.initial();
+  }
 
   Future<void> load({bool force = false}) async {
     if (!force && state is GoalLoaded) {
@@ -33,7 +37,8 @@ class GoalNotifier extends StateNotifier<GoalState> {
     required int targetBooks,
     required int targetSeconds,
   }) async {
-    final goal = await _repository.createGoal(
+    final repo = ref.read(readingRepositoryProvider);
+    final goal = await repo.createGoal(
       period: period,
       targetBooks: targetBooks,
       targetSeconds: targetSeconds,
@@ -52,6 +57,7 @@ class GoalNotifier extends StateNotifier<GoalState> {
     required int dailyMinutes, // 15..240
     required int weeklyDays, // 3..7
   }) async {
+    final repo = ref.read(readingRepositoryProvider);
     final ReadingJourneyTargets targets = ReadingJourneyTargets.derive(
       yearlyBooks: yearlyBooks,
       dailyMinutes: dailyMinutes,
@@ -59,17 +65,17 @@ class GoalNotifier extends StateNotifier<GoalState> {
     );
 
     await Future.wait<ReadingGoal>(<Future<ReadingGoal>>[
-      _repository.createGoal(
+      repo.createGoal(
         period: GoalPeriod.weekly,
         targetBooks: targets.weeklyBooks,
         targetSeconds: targets.weeklySeconds,
       ),
-      _repository.createGoal(
+      repo.createGoal(
         period: GoalPeriod.monthly,
         targetBooks: targets.monthlyBooks,
         targetSeconds: targets.monthlySeconds,
       ),
-      _repository.createGoal(
+      repo.createGoal(
         period: GoalPeriod.yearly,
         targetBooks: targets.yearlyBooks,
         targetSeconds: targets.yearlySeconds,
@@ -89,15 +95,12 @@ class GoalNotifier extends StateNotifier<GoalState> {
   }
 
   Future<void> _refresh() async {
+    final repo = ref.read(readingRepositoryProvider);
     try {
-      final items = await _repository.getCurrentGoals();
+      final items = await repo.getCurrentGoals();
       state = GoalState.loaded(items: items);
     } on ReadingRepositoryException catch (e) {
       state = GoalState.error(code: e.code, message: e.message);
     }
   }
 }
-
-final goalNotifierProvider = StateNotifierProvider<GoalNotifier, GoalState>(
-  (ref) => GoalNotifier(ref.watch(readingRepositoryProvider)),
-);

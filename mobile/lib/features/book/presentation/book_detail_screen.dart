@@ -117,8 +117,9 @@ class BookDetailScreen extends ConsumerWidget {
                 _ => (null, null),
               };
               if (pendingTab != null) {
-                ref.read(libraryPendingTabProvider.notifier).state =
-                    BookStatus.fromWire(pendingTab);
+                ref
+                    .read(libraryPendingTabProvider.notifier)
+                    .set(BookStatus.fromWire(pendingTab));
               }
               final String uri =
                   id != null ? '/library?highlight=$id' : '/library';

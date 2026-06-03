@@ -1,8 +1,10 @@
+import 'package:book_club/features/book/application/book_providers.dart';
 import 'package:book_club/features/book/application/library_notifier.dart';
 import 'package:book_club/features/book/application/library_state.dart';
 import 'package:book_club/features/book/data/book_repository.dart';
 import 'package:book_club/features/book/domain/book_status.dart';
 import 'package:book_club/features/book/domain/user_book.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'fakes.dart';
@@ -18,12 +20,16 @@ void main() {
             nextCursor: null,
           ),
         );
-      final notifier = LibraryNotifier(repo);
+      final c = ProviderContainer(overrides: [
+        bookRepositoryProvider.overrideWithValue(repo),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(libraryNotifierProvider.notifier);
 
       await notifier.ensureLoaded(BookStatus.reading);
       expect(repo.libraryCalls.length, 1);
       expect(repo.libraryCalls.single.status, BookStatus.reading);
-      expect(notifier.state[BookStatus.reading], isA<LibraryListLoaded>());
+      expect(c.read(libraryNotifierProvider)[BookStatus.reading], isA<LibraryListLoaded>());
 
       // Second ensureLoaded should be a cache hit.
       await notifier.ensureLoaded(BookStatus.reading);
@@ -33,7 +39,11 @@ void main() {
     test('status filter passes the right wire value', () async {
       final repo = FakeBookRepository()
         ..libraryQueue.add(const LibraryPage(items: <UserBook>[]));
-      final notifier = LibraryNotifier(repo);
+      final c = ProviderContainer(overrides: [
+        bookRepositoryProvider.overrideWithValue(repo),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(libraryNotifierProvider.notifier);
 
       await notifier.ensureLoaded(BookStatus.completed);
 
@@ -52,12 +62,16 @@ void main() {
             nextCursor: null,
           ),
         ]);
-      final notifier = LibraryNotifier(repo);
+      final c = ProviderContainer(overrides: [
+        bookRepositoryProvider.overrideWithValue(repo),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(libraryNotifierProvider.notifier);
 
       await notifier.ensureLoaded(BookStatus.reading);
       await notifier.loadMore(BookStatus.reading);
 
-      final loaded = notifier.state[BookStatus.reading] as LibraryListLoaded;
+      final loaded = c.read(libraryNotifierProvider)[BookStatus.reading] as LibraryListLoaded;
       expect(loaded.items.map((u) => u.id), <String>['ub1', 'ub2']);
       expect(loaded.nextCursor, isNull);
       expect(repo.libraryCalls.length, 2);
@@ -75,7 +89,11 @@ void main() {
             nextCursor: null,
           ),
         );
-      final notifier = LibraryNotifier(repo);
+      final c = ProviderContainer(overrides: [
+        bookRepositoryProvider.overrideWithValue(repo),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(libraryNotifierProvider.notifier);
       await notifier.ensureLoaded(BookStatus.reading);
 
       final updated = buildUserBook(
@@ -86,7 +104,7 @@ void main() {
       );
       notifier.upsert(updated);
 
-      final loaded = notifier.state[BookStatus.reading] as LibraryListLoaded;
+      final loaded = c.read(libraryNotifierProvider)[BookStatus.reading] as LibraryListLoaded;
       expect(loaded.items.single.oneLineReview, '좋았다');
       expect(loaded.items.single.rating, 5);
     });
@@ -102,7 +120,11 @@ void main() {
           ),
         )
         ..libraryQueue.add(const LibraryPage(items: <UserBook>[]));
-      final notifier = LibraryNotifier(repo);
+      final c = ProviderContainer(overrides: [
+        bookRepositoryProvider.overrideWithValue(repo),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(libraryNotifierProvider.notifier);
       await notifier.ensureLoaded(BookStatus.reading);
       await notifier.ensureLoaded(BookStatus.completed);
 
@@ -114,9 +136,9 @@ void main() {
       notifier.upsert(updated);
 
       final readingTab =
-          notifier.state[BookStatus.reading] as LibraryListLoaded;
+          c.read(libraryNotifierProvider)[BookStatus.reading] as LibraryListLoaded;
       final completedTab =
-          notifier.state[BookStatus.completed] as LibraryListLoaded;
+          c.read(libraryNotifierProvider)[BookStatus.completed] as LibraryListLoaded;
       expect(readingTab.items, isEmpty);
       expect(completedTab.items.map((u) => u.id), <String>['ub1']);
     });

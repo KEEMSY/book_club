@@ -12,8 +12,8 @@ class DashboardSettingsSheet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final DashboardPrefs prefs = ref.watch(dashboardPrefsProvider);
-    final notifier = ref.read(dashboardPrefsProvider.notifier);
+    final DashboardPrefs prefs = ref.watch(dashboardPrefsNotifierProvider);
+    final notifier = ref.read(dashboardPrefsNotifierProvider.notifier);
 
     return SafeArea(
       child: Padding(

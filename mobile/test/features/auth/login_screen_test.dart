@@ -1,5 +1,6 @@
 import 'package:book_club/core/storage/secure_storage.dart';
 import 'package:book_club/core/theme/app_theme.dart';
+import 'package:book_club/features/auth/application/auth_notifier.dart';
 import 'package:book_club/features/auth/application/auth_providers.dart';
 import 'package:book_club/features/auth/data/auth_api.dart';
 import 'package:book_club/features/auth/data/auth_repository.dart';

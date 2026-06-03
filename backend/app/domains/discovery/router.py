@@ -19,4 +19,6 @@ async def get_recommendations(
     service: Annotated[DiscoveryService, Depends(get_discovery_service)],
 ) -> RecommendationResponse:
     items = await service.get_recommendations(UUID(user_id))
-    return RecommendationResponse(items=[RecommendedBookPublic(**item) for item in items])
+    return RecommendationResponse(
+        items=[RecommendedBookPublic(**item) for item in items]  # type: ignore[arg-type]
+    )

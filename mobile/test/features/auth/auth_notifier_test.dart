@@ -1,7 +1,9 @@
 import 'package:book_club/features/auth/application/auth_notifier.dart';
+import 'package:book_club/features/auth/application/auth_providers.dart';
 import 'package:book_club/features/auth/data/auth_repository.dart';
 import 'package:book_club/features/auth/data/social_login_port.dart';
 import 'package:book_club/features/auth/domain/auth_state.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'fakes.dart';
@@ -9,10 +11,13 @@ import 'fakes.dart';
 void main() {
   group('AuthNotifier', () {
     test('bootstrap emits Unauthenticated when no session exists', () async {
-      final AuthNotifier notifier =
-          AuthNotifier(buildRepository(api: FakeAuthApi()));
+      final c = ProviderContainer(overrides: [
+        authRepositoryProvider.overrideWithValue(buildRepository(api: FakeAuthApi())),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(authNotifierProvider.notifier);
       await notifier.bootstrap();
-      expect(notifier.state, isA<Unauthenticated>());
+      expect(c.read(authNotifierProvider), isA<Unauthenticated>());
     });
 
     test('bootstrap rehydrates into Authenticated when /me succeeds', () async {
@@ -21,13 +26,17 @@ void main() {
       await storage.saveRefreshToken('existing-refresh');
 
       final api = FakeAuthApi(meResponse: buildUserDto(nickname: '수민'));
-      final AuthNotifier notifier = AuthNotifier(
-        buildRepository(api: api, storage: storage),
-      );
+      final c = ProviderContainer(overrides: [
+        authRepositoryProvider.overrideWithValue(
+          buildRepository(api: api, storage: storage),
+        ),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(authNotifierProvider.notifier);
       await notifier.bootstrap();
 
-      expect(notifier.state, isA<Authenticated>());
-      final Authenticated authed = notifier.state as Authenticated;
+      expect(c.read(authNotifierProvider), isA<Authenticated>());
+      final Authenticated authed = c.read(authNotifierProvider) as Authenticated;
       expect(authed.user.nickname, '수민');
       expect(api.getMeCalls, 1);
     });
@@ -44,13 +53,17 @@ void main() {
       final social = FakeSocialLoginPort(
         kakaoResult: const SocialLoginResult(accessToken: 'kakao-sdk-token'),
       );
-      final notifier = AuthNotifier(
-        buildRepository(api: api, storage: storage, social: social),
-      );
+      final c = ProviderContainer(overrides: [
+        authRepositoryProvider.overrideWithValue(
+          buildRepository(api: api, storage: storage, social: social),
+        ),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(authNotifierProvider.notifier);
 
       await notifier.loginWithKakao();
 
-      expect(notifier.state, isA<Authenticated>());
+      expect(c.read(authNotifierProvider), isA<Authenticated>());
       expect(await storage.readAccessToken(), 'new-access');
       expect(await storage.readRefreshToken(), 'new-refresh');
       expect(social.kakaoCalls, 1);
@@ -63,11 +76,15 @@ void main() {
       final social = FakeSocialLoginPort(
         kakaoError: const SocialLoginCancelled(),
       );
-      final notifier = AuthNotifier(buildRepository(social: social));
+      final c = ProviderContainer(overrides: [
+        authRepositoryProvider.overrideWithValue(buildRepository(social: social)),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(authNotifierProvider.notifier);
 
       await notifier.loginWithKakao();
 
-      expect(notifier.state, isA<Unauthenticated>());
+      expect(c.read(authNotifierProvider), isA<Unauthenticated>());
     });
 
     test('loginWithKakao surfaces the backend error code on 4xx failure',
@@ -81,14 +98,18 @@ void main() {
       final social = FakeSocialLoginPort(
         kakaoResult: const SocialLoginResult(accessToken: 'kakao-sdk-token'),
       );
-      final notifier = AuthNotifier(
-        buildRepository(api: api, social: social),
-      );
+      final c = ProviderContainer(overrides: [
+        authRepositoryProvider.overrideWithValue(
+          buildRepository(api: api, social: social),
+        ),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(authNotifierProvider.notifier);
 
       await notifier.loginWithKakao();
 
-      expect(notifier.state, isA<AuthFailure>());
-      final failure = notifier.state as AuthFailure;
+      expect(c.read(authNotifierProvider), isA<AuthFailure>());
+      final failure = c.read(authNotifierProvider) as AuthFailure;
       expect(failure.code, 'KAKAO_USER_INFO_FAILED');
     });
 
@@ -102,14 +123,18 @@ void main() {
           isNewUser: true,
         ),
       );
-      final notifier = AuthNotifier(
-        buildRepository(api: api, storage: storage),
-      );
+      final c = ProviderContainer(overrides: [
+        authRepositoryProvider.overrideWithValue(
+          buildRepository(api: api, storage: storage),
+        ),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(authNotifierProvider.notifier);
 
       await notifier.loginDev();
 
-      expect(notifier.state, isA<Authenticated>());
-      final Authenticated authed = notifier.state as Authenticated;
+      expect(c.read(authNotifierProvider), isA<Authenticated>());
+      final Authenticated authed = c.read(authNotifierProvider) as Authenticated;
       expect(authed.user.nickname, '개발자');
       expect(await storage.readAccessToken(), 'dev-access');
       expect(await storage.readRefreshToken(), 'dev-refresh');
@@ -126,13 +151,17 @@ void main() {
       final social = FakeSocialLoginPort(
         appleResult: const SocialLoginResult(identityToken: 'apple-id-jwt'),
       );
-      final notifier = AuthNotifier(
-        buildRepository(api: api, social: social),
-      );
+      final c = ProviderContainer(overrides: [
+        authRepositoryProvider.overrideWithValue(
+          buildRepository(api: api, social: social),
+        ),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(authNotifierProvider.notifier);
 
       await notifier.loginWithApple();
 
-      expect(notifier.state, isA<Authenticated>());
+      expect(c.read(authNotifierProvider), isA<Authenticated>());
       expect(social.appleCalls, 1);
     });
 
@@ -140,11 +169,15 @@ void main() {
       final storage = InMemorySecureStorage();
       await storage.saveAccessToken('a');
       await storage.saveRefreshToken('r');
-      final notifier = AuthNotifier(buildRepository(storage: storage));
+      final c = ProviderContainer(overrides: [
+        authRepositoryProvider.overrideWithValue(buildRepository(storage: storage)),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(authNotifierProvider.notifier);
 
       await notifier.logout();
 
-      expect(notifier.state, isA<Unauthenticated>());
+      expect(c.read(authNotifierProvider), isA<Unauthenticated>());
       expect(await storage.readAccessToken(), isNull);
       expect(await storage.readRefreshToken(), isNull);
     });

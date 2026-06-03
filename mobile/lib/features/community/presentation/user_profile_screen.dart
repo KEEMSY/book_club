@@ -7,7 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/grade_theme.dart';
-import '../../auth/application/auth_providers.dart';
+import '../../auth/application/auth_notifier.dart';
 import '../../feed/presentation/comments_sheet.dart';
 import '../../feed/presentation/widgets/post_card.dart';
 import '../../reading/presentation/widgets/grade_badge.dart';

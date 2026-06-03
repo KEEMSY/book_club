@@ -32,12 +32,12 @@ class _AppShellState extends ConsumerState<AppShell> {
 
   void _switchToCommunity() {
     _lastPersonalIndex = widget.navigationShell.currentIndex.clamp(0, 2);
-    ref.read(appModeProvider.notifier).state = AppMode.community;
+    ref.read(appModeNotifierProvider.notifier).setMode(AppMode.community);
     widget.navigationShell.goBranch(3, initialLocation: false);
   }
 
   void _switchToPersonal() {
-    ref.read(appModeProvider.notifier).state = AppMode.personal;
+    ref.read(appModeNotifierProvider.notifier).setMode(AppMode.personal);
     widget.navigationShell.goBranch(_lastPersonalIndex, initialLocation: false);
   }
 
@@ -52,7 +52,7 @@ class _AppShellState extends ConsumerState<AppShell> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final Color accent = ref.watch(gradePrimaryProvider);
-    final AppMode mode = ref.watch(appModeProvider);
+    final AppMode mode = ref.watch(appModeNotifierProvider);
     final int tabIndex = widget.navigationShell.currentIndex.clamp(0, 2);
 
     return Scaffold(

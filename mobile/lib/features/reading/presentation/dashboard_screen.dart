@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../auth/application/auth_providers.dart';
+import '../../auth/application/auth_notifier.dart';
 import '../../book/presentation/widgets/book_cover.dart';
 import '../data/reading_models.dart'
     show DailySessionDto, DailySessionsResponseDto;
@@ -99,7 +99,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     ref.listen<AuthState>(authNotifierProvider, (_, next) {
       if (next is Authenticated) _tryStartLoads();
     });
-    final DashboardPrefs prefs = ref.watch(dashboardPrefsProvider);
+    final DashboardPrefs prefs = ref.watch(dashboardPrefsNotifierProvider);
     final String? nickname =
         authState is Authenticated ? authState.user.nickname : null;
     final String? userId =

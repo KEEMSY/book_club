@@ -1,8 +1,10 @@
+import 'package:book_club/features/feed/application/feed_providers.dart';
 import 'package:book_club/features/feed/application/post_compose_notifier.dart';
 import 'package:book_club/features/feed/application/post_compose_state.dart';
 import 'package:book_club/features/feed/data/feed_repository.dart';
 import 'package:book_club/features/feed/data/image_uploader.dart';
 import 'package:book_club/features/feed/domain/post_type.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'fakes.dart';
@@ -15,15 +17,19 @@ void main() {
         ..uploadKeyQueue.addAll(<String>['k1', 'k2'])
         ..createPostResult = buildPost(id: 'created');
 
-      final notifier = PostComposeNotifier(repo, 'book-1');
+      final c = ProviderContainer(overrides: [
+        feedRepositoryProvider.overrideWithValue(repo),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(postComposeNotifierProvider('book-1').notifier);
       notifier.changeContent('정말 좋았어요');
       notifier.addImage(buildPickedImage());
       notifier.addImage(buildPickedImage(contentType: 'image/png'));
-      expect(notifier.state, isA<PostComposeEditing>());
+      expect(c.read(postComposeNotifierProvider('book-1')), isA<PostComposeEditing>());
 
       final created = await notifier.submit();
       expect(created, isNotNull);
-      expect(notifier.state, isA<PostComposeSuccess>());
+      expect(c.read(postComposeNotifierProvider('book-1')), isA<PostComposeSuccess>());
       expect(repo.uploadCalls, hasLength(2));
       expect(repo.createPostCalls.single.imageKeys, <String>['k1', 'k2']);
       expect(repo.createPostCalls.single.content, '정말 좋았어요');
@@ -31,14 +37,18 @@ void main() {
 
     test('submit fails on empty content', () async {
       final repo = FakeFeedRepository();
-      final notifier = PostComposeNotifier(repo, 'book-1');
+      final c = ProviderContainer(overrides: [
+        feedRepositoryProvider.overrideWithValue(repo),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(postComposeNotifierProvider('book-1').notifier);
       notifier.changeContent('   ');
 
       final result = await notifier.submit();
       expect(result, isNull);
-      expect(notifier.state, isA<PostComposeFailure>());
+      expect(c.read(postComposeNotifierProvider('book-1')), isA<PostComposeFailure>());
       expect(
-        (notifier.state as PostComposeFailure).code,
+        (c.read(postComposeNotifierProvider('book-1')) as PostComposeFailure).code,
         'POST_CONTENT_REQUIRED',
       );
       expect(repo.createPostCalls, isEmpty);
@@ -53,14 +63,18 @@ void main() {
           ),
         );
 
-      final notifier = PostComposeNotifier(repo, 'book-1');
+      final c = ProviderContainer(overrides: [
+        feedRepositoryProvider.overrideWithValue(repo),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(postComposeNotifierProvider('book-1').notifier);
       notifier.changeContent('내용');
       notifier.addImage(buildPickedImage());
 
       final result = await notifier.submit();
       expect(result, isNull);
-      expect(notifier.state, isA<PostComposeFailure>());
-      final failure = notifier.state as PostComposeFailure;
+      expect(c.read(postComposeNotifierProvider('book-1')), isA<PostComposeFailure>());
+      final failure = c.read(postComposeNotifierProvider('book-1')) as PostComposeFailure;
       expect(failure.code, 'UPLOAD_FAILED');
       expect(failure.content, '내용');
       expect(failure.images, hasLength(1));
@@ -74,39 +88,55 @@ void main() {
           message: '내용을 입력해주세요.',
         );
 
-      final notifier = PostComposeNotifier(repo, 'book-1');
+      final c = ProviderContainer(overrides: [
+        feedRepositoryProvider.overrideWithValue(repo),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(postComposeNotifierProvider('book-1').notifier);
       notifier.changeContent('내용');
       final result = await notifier.submit();
       expect(result, isNull);
-      expect(notifier.state, isA<PostComposeFailure>());
+      expect(c.read(postComposeNotifierProvider('book-1')), isA<PostComposeFailure>());
     });
 
     test('addImage caps at 4 attachments', () async {
       final repo = FakeFeedRepository();
-      final notifier = PostComposeNotifier(repo, 'book-1');
+      final c = ProviderContainer(overrides: [
+        feedRepositoryProvider.overrideWithValue(repo),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(postComposeNotifierProvider('book-1').notifier);
       for (int i = 0; i < 4; i++) {
         expect(notifier.addImage(buildPickedImage()), isTrue);
       }
       expect(notifier.addImage(buildPickedImage()), isFalse);
-      final editing = notifier.state as PostComposeEditing;
+      final editing = c.read(postComposeNotifierProvider('book-1')) as PostComposeEditing;
       expect(editing.images, hasLength(4));
     });
 
     test('changeType updates the post type', () async {
       final repo = FakeFeedRepository();
-      final notifier = PostComposeNotifier(repo, 'book-1');
+      final c = ProviderContainer(overrides: [
+        feedRepositoryProvider.overrideWithValue(repo),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(postComposeNotifierProvider('book-1').notifier);
       notifier.changeType(PostType.discussion);
-      final editing = notifier.state as PostComposeEditing;
+      final editing = c.read(postComposeNotifierProvider('book-1')) as PostComposeEditing;
       expect(editing.postType, PostType.discussion);
     });
 
     test('removeImage drops the targeted attachment', () async {
       final repo = FakeFeedRepository();
-      final notifier = PostComposeNotifier(repo, 'book-1');
+      final c = ProviderContainer(overrides: [
+        feedRepositoryProvider.overrideWithValue(repo),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(postComposeNotifierProvider('book-1').notifier);
       notifier.addImage(buildPickedImage(contentType: 'image/jpeg'));
       notifier.addImage(buildPickedImage(contentType: 'image/png'));
       notifier.removeImage(0);
-      final editing = notifier.state as PostComposeEditing;
+      final editing = c.read(postComposeNotifierProvider('book-1')) as PostComposeEditing;
       expect(editing.images, hasLength(1));
       expect(editing.images.single.contentType, 'image/png');
     });

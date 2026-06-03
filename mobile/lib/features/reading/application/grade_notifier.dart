@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../data/reading_repository.dart';
 import '../domain/grade_summary.dart';
@@ -6,12 +6,16 @@ import '../domain/reading_goal.dart';
 import 'grade_state.dart';
 import 'reading_providers.dart';
 
+part 'grade_notifier.g.dart';
+
 /// Holds the current `GradeSummary` plus a `recentGradeUp` flag the
 /// dashboard toasts the user about once on the next `/home` render.
-class GradeNotifier extends StateNotifier<GradeState> {
-  GradeNotifier(this._repository) : super(const GradeState.initial());
-
-  final ReadingRepository _repository;
+@Riverpod(keepAlive: true)
+class GradeNotifier extends _$GradeNotifier {
+  @override
+  GradeState build() {
+    return const GradeState.initial();
+  }
 
   Future<void> load({bool force = false}) async {
     if (!force && state is GradeLoaded) {
@@ -55,8 +59,9 @@ class GradeNotifier extends StateNotifier<GradeState> {
   }
 
   Future<void> _refresh() async {
+    final repo = ref.read(readingRepositoryProvider);
     try {
-      final summary = await _repository.getGrade();
+      final summary = await repo.getGrade();
       state = GradeState.loaded(
         summary: summary,
         recentGradeUp: switch (state) {
@@ -69,8 +74,3 @@ class GradeNotifier extends StateNotifier<GradeState> {
     }
   }
 }
-
-final gradeNotifierProvider =
-    StateNotifierProvider<GradeNotifier, GradeState>((ref) {
-  return GradeNotifier(ref.watch(readingRepositoryProvider));
-});

@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../data/book_repository.dart';
 import '../domain/book.dart';
@@ -7,19 +7,25 @@ import '../domain/user_book.dart';
 import 'book_detail_state.dart';
 import 'book_providers.dart';
 
+part 'book_detail_notifier.g.dart';
+
 /// Detail screen notifier:
 ///   * loads a book by id,
 ///   * tracks the add-to-library CTA state,
 ///   * translates 409 BOOK_ALREADY_IN_LIBRARY into a LibraryCtaDuplicate
 ///     so the screen can render the "서재에서 보기" affordance.
-class BookDetailNotifier extends StateNotifier<BookDetailState> {
-  BookDetailNotifier(this._repository, this.bookId)
-      : super(const BookDetailState.loading()) {
-    load();
+///
+/// Keyed by book id so each detail screen owns its own state. `autoDispose`
+/// so leaving the screen resets CTA state for the next visit.
+@Riverpod(keepAlive: false)
+class BookDetailNotifier extends _$BookDetailNotifier {
+  @override
+  BookDetailState build(String bookId) {
+    Future.microtask(load);
+    return const BookDetailState.loading();
   }
 
-  final BookRepository _repository;
-  final String bookId;
+  BookRepository get _repository => ref.read(bookRepositoryProvider);
 
   Future<void> load() async {
     state = const BookDetailState.loading();
@@ -65,10 +71,3 @@ class BookDetailNotifier extends StateNotifier<BookDetailState> {
     }
   }
 }
-
-/// Keyed by book id so each detail screen owns its own state. `autoDispose`
-/// so leaving the screen resets CTA state for the next visit.
-final bookDetailNotifierProvider = StateNotifierProvider.autoDispose
-    .family<BookDetailNotifier, BookDetailState, String>((ref, bookId) {
-  return BookDetailNotifier(ref.watch(bookRepositoryProvider), bookId);
-});

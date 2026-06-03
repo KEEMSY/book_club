@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/storage/secure_storage.dart';
 import '../data/reading_repository.dart';
@@ -11,6 +11,8 @@ import '../data/reading_repository.dart';
 import '../domain/reading_goal.dart';
 import 'reading_providers.dart';
 import 'timer_state.dart';
+
+part 'timer_notifier.g.dart';
 
 /// After this wall-clock gap the session auto-ends at `backgroundEnteredAt +
 /// 30min`, matching the iOS background-execution risk documented in the
@@ -67,28 +69,32 @@ const String kTimerSecureStorageKey = 'reading.active_session';
 /// Orchestrates the timer state machine. Owns the wall-clock tick stream so
 /// the TimerScreen can stay declarative (it only watches [TimerState] and
 /// the separate [timerElapsedProvider] for the seconds-updating clock).
-class TimerNotifier extends StateNotifier<TimerState> {
-  TimerNotifier({
-    required ReadingRepository repository,
-    required SecureStorage storage,
-    DateTime Function()? clock,
-    String Function()? devicePlatform,
-  })  : _repository = repository,
-        _storage = storage,
-        _clock = clock ?? DateTime.now,
-        _devicePlatform = devicePlatform ?? _defaultDevicePlatform,
-        super(const TimerState.idle());
+/// Overridable wall-clock used by [TimerNotifier]. Tests inject a manual clock
+/// via `timerClockProvider.overrideWith((_) => manualClock.now)`.
+@riverpod
+DateTime Function() timerClock(TimerClockRef ref) => DateTime.now;
 
-  final ReadingRepository _repository;
-  final SecureStorage _storage;
-  final DateTime Function() _clock;
-  final String Function() _devicePlatform;
+@Riverpod(keepAlive: true)
+class TimerNotifier extends _$TimerNotifier {
+  late ReadingRepository _repository;
+  late SecureStorage _storage;
+  late DateTime Function() _clock;
+  late String Function() _devicePlatform;
 
   static String _defaultDevicePlatform() {
     if (kIsWeb) return 'web';
     if (Platform.isIOS) return 'ios';
     if (Platform.isAndroid) return 'aos';
     return 'web';
+  }
+
+  @override
+  TimerState build() {
+    _repository = ref.watch(readingRepositoryProvider);
+    _storage = ref.watch(secureStorageProvider);
+    _clock = ref.watch(timerClockProvider);
+    _devicePlatform = _defaultDevicePlatform;
+    return const TimerState.idle();
   }
 
   /// Re-hydrates an active session from secure storage on app launch. No-op
@@ -436,20 +442,12 @@ class SessionAutoEndResult {
   final Duration gap;
 }
 
-final timerNotifierProvider =
-    StateNotifierProvider<TimerNotifier, TimerState>((ref) {
-  return TimerNotifier(
-    repository: ref.watch(readingRepositoryProvider),
-    storage: ref.watch(secureStorageProvider),
-  );
-});
-
 /// Ticks once a second whenever the timer is running/paused, so the screen
 /// can rebuild its HH:MM:SS string. Consumers watch this provider alongside
 /// [timerNotifierProvider] and recompute `elapsedAt(DateTime.now())`.
 final timerTickProvider = StreamProvider<DateTime>((ref) {
-  final state = ref.watch(timerNotifierProvider);
-  if (state is TimerRunning) {
+  final timerState = ref.watch(timerNotifierProvider);
+  if (timerState is TimerRunning) {
     return Stream<DateTime>.periodic(
       const Duration(seconds: 1),
       (_) => DateTime.now(),

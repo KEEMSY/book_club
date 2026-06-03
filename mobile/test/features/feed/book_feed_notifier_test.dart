@@ -1,8 +1,10 @@
 import 'package:book_club/features/feed/application/book_feed_notifier.dart';
 import 'package:book_club/features/feed/application/book_feed_state.dart';
+import 'package:book_club/features/feed/application/feed_providers.dart';
 import 'package:book_club/features/feed/data/feed_repository.dart';
 import 'package:book_club/features/feed/domain/post.dart';
 import 'package:book_club/features/feed/domain/reaction_type.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'fakes.dart';
@@ -14,14 +16,18 @@ void main() {
         ..postPagesQueue.add(
           PostPage(items: <Post>[buildPost(id: 'p1')], nextCursor: null),
         );
-      final notifier = BookFeedNotifier(repo, 'book-1');
+      final c = ProviderContainer(overrides: [
+        feedRepositoryProvider.overrideWithValue(repo),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(bookFeedNotifierProvider('book-1').notifier);
 
-      expect(notifier.state, isA<BookFeedInitial>());
+      expect(c.read(bookFeedNotifierProvider('book-1')), isA<BookFeedInitial>());
       final future = notifier.load();
-      expect(notifier.state, isA<BookFeedLoading>());
+      expect(c.read(bookFeedNotifierProvider('book-1')), isA<BookFeedLoading>());
       await future;
-      expect(notifier.state, isA<BookFeedLoaded>());
-      final loaded = notifier.state as BookFeedLoaded;
+      expect(c.read(bookFeedNotifierProvider('book-1')), isA<BookFeedLoaded>());
+      final loaded = c.read(bookFeedNotifierProvider('book-1')) as BookFeedLoaded;
       expect(loaded.items, hasLength(1));
       expect(loaded.nextCursor, isNull);
     });
@@ -39,11 +45,15 @@ void main() {
             nextCursor: null,
           ),
         ]);
-      final notifier = BookFeedNotifier(repo, 'book-1');
+      final c = ProviderContainer(overrides: [
+        feedRepositoryProvider.overrideWithValue(repo),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(bookFeedNotifierProvider('book-1').notifier);
       await notifier.load();
-      expect((notifier.state as BookFeedLoaded).items, hasLength(1));
+      expect((c.read(bookFeedNotifierProvider('book-1')) as BookFeedLoaded).items, hasLength(1));
       await notifier.loadMore();
-      final loaded = notifier.state as BookFeedLoaded;
+      final loaded = c.read(bookFeedNotifierProvider('book-1')) as BookFeedLoaded;
       expect(loaded.items.map((p) => p.id), <String>['p1', 'p2']);
       expect(loaded.nextCursor, isNull);
 
@@ -61,10 +71,14 @@ void main() {
             message: '잠시 후 다시 시도해주세요.',
           ),
         );
-      final notifier = BookFeedNotifier(repo, 'book-1');
+      final c = ProviderContainer(overrides: [
+        feedRepositoryProvider.overrideWithValue(repo),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(bookFeedNotifierProvider('book-1').notifier);
       await notifier.load();
-      expect(notifier.state, isA<BookFeedError>());
-      expect((notifier.state as BookFeedError).code, 'UPSTREAM_UNAVAILABLE');
+      expect(c.read(bookFeedNotifierProvider('book-1')), isA<BookFeedError>());
+      expect((c.read(bookFeedNotifierProvider('book-1')) as BookFeedError).code, 'UPSTREAM_UNAVAILABLE');
     });
 
     test('prependPost inserts at the top of the loaded list', () async {
@@ -72,11 +86,15 @@ void main() {
         ..postPagesQueue.add(
           PostPage(items: <Post>[buildPost(id: 'old')], nextCursor: null),
         );
-      final notifier = BookFeedNotifier(repo, 'book-1');
+      final c = ProviderContainer(overrides: [
+        feedRepositoryProvider.overrideWithValue(repo),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(bookFeedNotifierProvider('book-1').notifier);
       await notifier.load();
 
       notifier.prependPost(buildPost(id: 'new'));
-      final loaded = notifier.state as BookFeedLoaded;
+      final loaded = c.read(bookFeedNotifierProvider('book-1')) as BookFeedLoaded;
       expect(loaded.items.first.id, 'new');
       expect(loaded.items.last.id, 'old');
     });
@@ -95,7 +113,11 @@ void main() {
             nextCursor: null,
           ),
         );
-      final notifier = BookFeedNotifier(repo, 'book-1');
+      final c = ProviderContainer(overrides: [
+        feedRepositoryProvider.overrideWithValue(repo),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(bookFeedNotifierProvider('book-1').notifier);
       await notifier.load();
 
       notifier.applyReactionResult(
@@ -105,7 +127,7 @@ void main() {
         counts: <ReactionType, int>{ReactionType.idea: 1},
       );
 
-      final loaded = notifier.state as BookFeedLoaded;
+      final loaded = c.read(bookFeedNotifierProvider('book-1')) as BookFeedLoaded;
       expect(loaded.items.single.myReactions, contains(ReactionType.idea));
       expect(loaded.items.single.reactions[ReactionType.idea], 1);
 
@@ -115,7 +137,7 @@ void main() {
         toggleState: ReactionToggleState.removed,
         counts: <ReactionType, int>{ReactionType.idea: 0},
       );
-      final after = notifier.state as BookFeedLoaded;
+      final after = c.read(bookFeedNotifierProvider('book-1')) as BookFeedLoaded;
       expect(after.items.single.myReactions, isEmpty);
     });
 
@@ -130,15 +152,19 @@ void main() {
             nextCursor: null,
           ),
         );
-      final notifier = BookFeedNotifier(repo, 'book-1');
+      final c = ProviderContainer(overrides: [
+        feedRepositoryProvider.overrideWithValue(repo),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(bookFeedNotifierProvider('book-1').notifier);
       await notifier.load();
       notifier.incrementCommentCount('p1');
-      final loaded = notifier.state as BookFeedLoaded;
+      final loaded = c.read(bookFeedNotifierProvider('book-1')) as BookFeedLoaded;
       expect(loaded.items[0].commentCount, 1);
       expect(loaded.items[1].commentCount, 5);
 
       notifier.incrementCommentCount('p2', -2);
-      final next = notifier.state as BookFeedLoaded;
+      final next = c.read(bookFeedNotifierProvider('book-1')) as BookFeedLoaded;
       expect(next.items[1].commentCount, 3);
     });
   });

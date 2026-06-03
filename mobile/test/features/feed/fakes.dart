@@ -199,6 +199,23 @@ class FakeFeedRepository implements FeedRepository {
     if (uploadKeyQueue.isNotEmpty) return uploadKeyQueue.removeAt(0);
     return 'uploaded-${uploadCalls.length}';
   }
+
+  @override
+  Future<Highlight> updateHighlight({
+    required String userBookId,
+    required String highlightId,
+    required String quoteText,
+    int? pageNumber,
+    String? noteText,
+  }) async {
+    return Highlight(
+      id: highlightId,
+      userBookId: userBookId,
+      quoteText: quoteText,
+      pageNumber: pageNumber,
+      createdAt: DateTime.utc(2026, 4, 30, 12),
+    );
+  }
 }
 
 PostAuthor buildAuthor({

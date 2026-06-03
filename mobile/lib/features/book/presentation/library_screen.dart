@@ -120,7 +120,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
   Widget build(BuildContext context) {
     ref.listen<BookStatus?>(libraryPendingTabProvider, (_, next) {
       if (next == null) return;
-      ref.read(libraryPendingTabProvider.notifier).state = null;
+      ref.read(libraryPendingTabProvider.notifier).set(null);
       final idx = _tabIndexFor(next);
       _tab.animateTo(idx);
       _loadTab(idx);

@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
-import '../application/auth_providers.dart';
+import '../application/auth_notifier.dart';
 import '../domain/auth_state.dart';
 import 'widgets/apple_login_button.dart';
 import 'widgets/dev_login_button.dart';
@@ -39,9 +39,11 @@ class LoginScreen extends ConsumerWidget {
     // state and shows a single-line apology with the backend's message.
     final String? failureMessage = auth is AuthFailure ? auth.message : null;
 
-    // Dev-mode flag: show DevLoginButton in addition to social buttons so local
-    // dev flows remain usable without Kakao credentials.
+    // Dev-mode flag: show DevLoginButton only in debug builds so the button is
+    // compiled out entirely in release. kDebugMode is a compile-time constant,
+    // so tree-shaking removes the branch in --release mode.
     const bool isDevMode =
+        kDebugMode &&
         bool.fromEnvironment('SHOW_DEV_LOGIN', defaultValue: true);
     final bool showApple = !kIsWeb && Platform.isIOS;
 
@@ -333,7 +335,7 @@ class _BottomCtas extends StatelessWidget {
             SizedBox(height: spacing.sm),
             AppleLoginButton(onPressed: onApple, isLoading: isBusy),
           ],
-          if (showDevLogin) ...<Widget>[
+          if (kDebugMode && showDevLogin) ...<Widget>[
             SizedBox(height: spacing.sm),
             DevLoginButton(onPressed: onDevLogin, isLoading: isBusy),
             SizedBox(height: spacing.xs),

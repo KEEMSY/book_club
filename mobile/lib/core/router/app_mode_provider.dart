@@ -1,4 +1,6 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'app_mode_provider.g.dart';
 
 enum AppMode { personal, community }
 
@@ -6,4 +8,10 @@ enum AppMode { personal, community }
 ///
 /// Persists only for the current session — no disk storage needed because
 /// the app always opens in personal mode on cold start.
-final appModeProvider = StateProvider<AppMode>((ref) => AppMode.personal);
+@riverpod
+class AppModeNotifier extends _$AppModeNotifier {
+  @override
+  AppMode build() => AppMode.personal;
+
+  void setMode(AppMode mode) => state = mode;
+}
