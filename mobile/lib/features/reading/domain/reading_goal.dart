@@ -8,7 +8,7 @@ part 'reading_goal.freezed.dart';
 /// boundaries of the period (local) so the D-N countdown on the Goals screen
 /// lines up with the user's clock rather than the server's.
 @freezed
-class ReadingGoal with _$ReadingGoal {
+abstract class ReadingGoal with _$ReadingGoal {
   const factory ReadingGoal({
     required String id,
     required GoalPeriod period,
@@ -23,7 +23,7 @@ class ReadingGoal with _$ReadingGoal {
 /// averaged ratio in `[0, 1]` — we clamp on the UI side to keep the progress
 /// bar from overshooting when the backend's rounding nudges above 1.0.
 @freezed
-class GoalProgress with _$GoalProgress {
+abstract class GoalProgress with _$GoalProgress {
   const factory GoalProgress({
     required ReadingGoal goal,
     required int booksDone,
@@ -34,7 +34,7 @@ class GoalProgress with _$GoalProgress {
 
 /// Post-completion celebration payload surfaced by `POST /reading/sessions/{id}/end`.
 @freezed
-class SessionCompletion with _$SessionCompletion {
+abstract class SessionCompletion with _$SessionCompletion {
   const factory SessionCompletion({
     required String sessionId,
     required String userBookId,

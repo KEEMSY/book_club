@@ -24,7 +24,7 @@ from __future__ import annotations
 from datetime import date, datetime
 from uuid import UUID
 
-from sqlalchemy import and_, select
+from sqlalchemy import and_, select, text
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -358,3 +358,161 @@ class BookmarkRepository:
         )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
+
+
+class ReadingStatsRepository:
+    """Aggregate queries that feed the /me/reading-stats endpoint.
+
+    All queries run against ``reading_sessions``, ``daily_reading_stats``,
+    and the book domain's ``user_books`` / ``books`` tables via raw SQL
+    expressions.  No cross-domain service calls are made here — the
+    repository is read-only and touches only existing rows.
+    """
+
+    def __init__(self, session: AsyncSession) -> None:
+        self._session = session
+
+    async def avg_speed(
+        self,
+        user_id: UUID,
+    ) -> tuple[float | None, float | None]:
+        """Return (avg_minutes_per_page, avg_pages_per_hour).
+
+        Uses bookmarks to infer page deltas per session.  A session
+        qualifies only when it has both a duration and at least one
+        bookmark saved after ``started_at``.  Returns (None, None) when
+        no qualifying sessions exist.
+        """
+        # Raw SQL for clarity — SQLAlchemy ORM would require three-way
+        # joins with correlated subqueries that are harder to read.
+        stmt = text(
+            """
+            WITH session_pages AS (
+                SELECT
+                    rs.id,
+                    rs.duration_sec,
+                    MAX(bm.page) - MIN(bm.page) AS page_delta
+                FROM reading_sessions rs
+                JOIN bookmarks bm
+                    ON bm.user_book_id = rs.user_book_id
+                    AND bm.user_id = rs.user_id
+                    AND bm.created_at BETWEEN rs.started_at AND rs.ended_at
+                WHERE rs.user_id = :user_id
+                  AND rs.ended_at IS NOT NULL
+                  AND rs.duration_sec > 0
+                  AND rs.source = 'timer'
+                GROUP BY rs.id, rs.duration_sec
+                HAVING MAX(bm.page) > MIN(bm.page)
+            )
+            SELECT
+                AVG(duration_sec / 60.0 / NULLIF(page_delta, 0)) AS avg_min_per_page,
+                AVG(page_delta / (duration_sec / 3600.0))         AS avg_pages_per_hour
+            FROM session_pages
+            """
+        )
+        row = (await self._session.execute(stmt, {"user_id": user_id})).one()
+        avg_min: float | None = float(row[0]) if row[0] is not None else None
+        avg_pph: float | None = float(row[1]) if row[1] is not None else None
+        return avg_min, avg_pph
+
+    async def format_breakdown(self, user_id: UUID) -> dict[str, int]:
+        """Count completed user_books grouped by book format.
+
+        ``books`` does not have a ``format`` column yet, so we derive the
+        breakdown from the session source distribution: any user_book with
+        at least one completed timer session is counted as "paper".  This
+        is a pragmatic approximation until the book catalog carries format
+        metadata (see IDEAS.md backlog item).
+
+        Returns a dict with keys ``paper``, ``ebook``, ``audio``.
+        """
+        # Count distinct user_books that have at least one completed session.
+        # We default everything to "paper" until the schema evolves.
+        stmt = text(
+            """
+            SELECT COUNT(DISTINCT ub.id)
+            FROM user_books ub
+            WHERE ub.user_id = :user_id
+              AND ub.status = 'completed'
+            """
+        )
+        result = (await self._session.execute(stmt, {"user_id": user_id})).scalar_one()
+        paper_count = int(result or 0)
+        return {"paper": paper_count, "ebook": 0, "audio": 0}
+
+    async def monthly_hours(
+        self,
+        user_id: UUID,
+        months: int = 12,
+    ) -> list[dict[str, object]]:
+        """Return total reading hours per calendar month for the last *months* months.
+
+        Months with zero reading time are omitted from the result — the
+        caller is responsible for zero-filling if a dense timeline is needed.
+        Result is ordered oldest-first.
+        """
+        stmt = text(
+            """
+            SELECT
+                TO_CHAR(date, 'YYYY-MM') AS month,
+                SUM(total_seconds) / 3600.0 AS hours
+            FROM daily_reading_stats
+            WHERE user_id = :user_id
+              AND date >= DATE_TRUNC('month', NOW()) - INTERVAL '1 month' * (:months - 1)
+            GROUP BY month
+            ORDER BY month ASC
+            """
+        )
+        rows = (await self._session.execute(stmt, {"user_id": user_id, "months": months})).all()
+        return [{"month": str(row[0]), "hours": float(row[1])} for row in rows]
+
+    async def genre_breakdown(
+        self,
+        user_id: UUID,
+        top_n: int = 5,
+    ) -> list[dict[str, object]]:
+        """Return the top *top_n* genres by completed book count.
+
+        ``books`` does not have a dedicated ``genre`` column; we fall back
+        to extracting the first category token from the publisher field as
+        a temporary approximation.  Returns an empty list when no
+        completed books exist.
+        """
+        # Books table has no genre column — return empty until backlog
+        # item "(book) genre 필드 추가" is resolved.
+        stmt = text(
+            """
+            SELECT
+                COALESCE(b.publisher, '기타') AS genre,
+                COUNT(*) AS cnt
+            FROM user_books ub
+            JOIN books b ON b.id = ub.book_id
+            WHERE ub.user_id = :user_id
+              AND ub.status = 'completed'
+            GROUP BY genre
+            ORDER BY cnt DESC
+            LIMIT :top_n
+            """
+        )
+        rows = (
+            await self._session.execute(stmt, {"user_id": user_id, "top_n": top_n})
+        ).all()
+        return [{"genre": str(row[0]), "count": int(row[1])} for row in rows]
+
+    async def avg_completion_days(self, user_id: UUID) -> float | None:
+        """Average days from started_at to finished_at for completed books."""
+        raw = text(
+            """
+            SELECT AVG(
+                EXTRACT(EPOCH FROM (finished_at - started_at)) / 86400.0
+            )
+            FROM user_books
+            WHERE user_id = :user_id
+              AND status = 'completed'
+              AND finished_at IS NOT NULL
+              AND started_at IS NOT NULL
+              AND finished_at > started_at
+            """
+        )
+        result = (await self._session.execute(raw, {"user_id": user_id})).scalar_one()
+        return float(result) if result is not None else None

@@ -6,8 +6,7 @@ part of 'book_models.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$BookDtoImpl _$$BookDtoImplFromJson(Map<String, dynamic> json) =>
-    _$BookDtoImpl(
+_BookDto _$BookDtoFromJson(Map<String, dynamic> json) => _BookDto(
       id: json['id'] as String,
       isbn13: json['isbn13'] as String,
       title: json['title'] as String,
@@ -17,8 +16,7 @@ _$BookDtoImpl _$$BookDtoImplFromJson(Map<String, dynamic> json) =>
       description: json['description'] as String?,
     );
 
-Map<String, dynamic> _$$BookDtoImplToJson(_$BookDtoImpl instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$BookDtoToJson(_BookDto instance) => <String, dynamic>{
       'id': instance.id,
       'isbn13': instance.isbn13,
       'title': instance.title,
@@ -28,8 +26,7 @@ Map<String, dynamic> _$$BookDtoImplToJson(_$BookDtoImpl instance) =>
       'description': instance.description,
     };
 
-_$UserBookDtoImpl _$$UserBookDtoImplFromJson(Map<String, dynamic> json) =>
-    _$UserBookDtoImpl(
+_UserBookDto _$UserBookDtoFromJson(Map<String, dynamic> json) => _UserBookDto(
       id: json['id'] as String,
       book: BookDto.fromJson(json['book'] as Map<String, dynamic>),
       status: json['status'] as String,
@@ -43,7 +40,7 @@ _$UserBookDtoImpl _$$UserBookDtoImplFromJson(Map<String, dynamic> json) =>
       oneLineReview: json['one_line_review'] as String?,
     );
 
-Map<String, dynamic> _$$UserBookDtoImplToJson(_$UserBookDtoImpl instance) =>
+Map<String, dynamic> _$UserBookDtoToJson(_UserBookDto instance) =>
     <String, dynamic>{
       'id': instance.id,
       'book': instance.book.toJson(),
@@ -54,9 +51,8 @@ Map<String, dynamic> _$$UserBookDtoImplToJson(_$UserBookDtoImpl instance) =>
       'one_line_review': instance.oneLineReview,
     };
 
-_$BookSearchResponseImpl _$$BookSearchResponseImplFromJson(
-        Map<String, dynamic> json) =>
-    _$BookSearchResponseImpl(
+_BookSearchResponse _$BookSearchResponseFromJson(Map<String, dynamic> json) =>
+    _BookSearchResponse(
       items: (json['items'] as List<dynamic>)
           .map((e) => BookDto.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -65,8 +61,7 @@ _$BookSearchResponseImpl _$$BookSearchResponseImplFromJson(
       hasMore: json['has_more'] as bool,
     );
 
-Map<String, dynamic> _$$BookSearchResponseImplToJson(
-        _$BookSearchResponseImpl instance) =>
+Map<String, dynamic> _$BookSearchResponseToJson(_BookSearchResponse instance) =>
     <String, dynamic>{
       'items': instance.items.map((e) => e.toJson()).toList(),
       'page': instance.page,
@@ -74,50 +69,46 @@ Map<String, dynamic> _$$BookSearchResponseImplToJson(
       'has_more': instance.hasMore,
     };
 
-_$LibraryPageDtoImpl _$$LibraryPageDtoImplFromJson(Map<String, dynamic> json) =>
-    _$LibraryPageDtoImpl(
+_LibraryPageDto _$LibraryPageDtoFromJson(Map<String, dynamic> json) =>
+    _LibraryPageDto(
       items: (json['items'] as List<dynamic>)
           .map((e) => UserBookDto.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextCursor: json['next_cursor'] as String?,
     );
 
-Map<String, dynamic> _$$LibraryPageDtoImplToJson(
-        _$LibraryPageDtoImpl instance) =>
+Map<String, dynamic> _$LibraryPageDtoToJson(_LibraryPageDto instance) =>
     <String, dynamic>{
       'items': instance.items.map((e) => e.toJson()).toList(),
       'next_cursor': instance.nextCursor,
     };
 
-_$AddToLibraryRequestImpl _$$AddToLibraryRequestImplFromJson(
-        Map<String, dynamic> json) =>
-    _$AddToLibraryRequestImpl(
+_AddToLibraryRequest _$AddToLibraryRequestFromJson(Map<String, dynamic> json) =>
+    _AddToLibraryRequest(
       bookId: json['book_id'] as String,
       status: json['status'] as String? ?? 'reading',
     );
 
-Map<String, dynamic> _$$AddToLibraryRequestImplToJson(
-        _$AddToLibraryRequestImpl instance) =>
+Map<String, dynamic> _$AddToLibraryRequestToJson(
+        _AddToLibraryRequest instance) =>
     <String, dynamic>{
       'book_id': instance.bookId,
       'status': instance.status,
     };
 
-_$UpdateStatusRequestImpl _$$UpdateStatusRequestImplFromJson(
-        Map<String, dynamic> json) =>
-    _$UpdateStatusRequestImpl(
+_UpdateStatusRequest _$UpdateStatusRequestFromJson(Map<String, dynamic> json) =>
+    _UpdateStatusRequest(
       status: json['status'] as String,
     );
 
-Map<String, dynamic> _$$UpdateStatusRequestImplToJson(
-        _$UpdateStatusRequestImpl instance) =>
+Map<String, dynamic> _$UpdateStatusRequestToJson(
+        _UpdateStatusRequest instance) =>
     <String, dynamic>{
       'status': instance.status,
     };
 
-_$DiscoverSectionDtoImpl _$$DiscoverSectionDtoImplFromJson(
-        Map<String, dynamic> json) =>
-    _$DiscoverSectionDtoImpl(
+_DiscoverSectionDto _$DiscoverSectionDtoFromJson(Map<String, dynamic> json) =>
+    _DiscoverSectionDto(
       id: json['id'] as String,
       title: json['title'] as String,
       books: (json['books'] as List<dynamic>)
@@ -125,44 +116,41 @@ _$DiscoverSectionDtoImpl _$$DiscoverSectionDtoImplFromJson(
           .toList(),
     );
 
-Map<String, dynamic> _$$DiscoverSectionDtoImplToJson(
-        _$DiscoverSectionDtoImpl instance) =>
+Map<String, dynamic> _$DiscoverSectionDtoToJson(_DiscoverSectionDto instance) =>
     <String, dynamic>{
       'id': instance.id,
       'title': instance.title,
       'books': instance.books.map((e) => e.toJson()).toList(),
     };
 
-_$DiscoverResponseDtoImpl _$$DiscoverResponseDtoImplFromJson(
-        Map<String, dynamic> json) =>
-    _$DiscoverResponseDtoImpl(
+_DiscoverResponseDto _$DiscoverResponseDtoFromJson(Map<String, dynamic> json) =>
+    _DiscoverResponseDto(
       sections: (json['sections'] as List<dynamic>)
           .map((e) => DiscoverSectionDto.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
-Map<String, dynamic> _$$DiscoverResponseDtoImplToJson(
-        _$DiscoverResponseDtoImpl instance) =>
+Map<String, dynamic> _$DiscoverResponseDtoToJson(
+        _DiscoverResponseDto instance) =>
     <String, dynamic>{
       'sections': instance.sections.map((e) => e.toJson()).toList(),
     };
 
-_$SubmitReviewRequestImpl _$$SubmitReviewRequestImplFromJson(
-        Map<String, dynamic> json) =>
-    _$SubmitReviewRequestImpl(
+_SubmitReviewRequest _$SubmitReviewRequestFromJson(Map<String, dynamic> json) =>
+    _SubmitReviewRequest(
       rating: (json['rating'] as num).toInt(),
       oneLineReview: json['one_line_review'] as String?,
     );
 
-Map<String, dynamic> _$$SubmitReviewRequestImplToJson(
-        _$SubmitReviewRequestImpl instance) =>
+Map<String, dynamic> _$SubmitReviewRequestToJson(
+        _SubmitReviewRequest instance) =>
     <String, dynamic>{
       'rating': instance.rating,
       'one_line_review': instance.oneLineReview,
     };
 
-_$BookReviewDtoImpl _$$BookReviewDtoImplFromJson(Map<String, dynamic> json) =>
-    _$BookReviewDtoImpl(
+_BookReviewDto _$BookReviewDtoFromJson(Map<String, dynamic> json) =>
+    _BookReviewDto(
       userBookId: json['user_book_id'] as String,
       rating: (json['rating'] as num).toInt(),
       oneLineReview: json['one_line_review'] as String?,
@@ -171,7 +159,7 @@ _$BookReviewDtoImpl _$$BookReviewDtoImplFromJson(Map<String, dynamic> json) =>
       reviewedAt: DateTime.parse(json['reviewed_at'] as String),
     );
 
-Map<String, dynamic> _$$BookReviewDtoImplToJson(_$BookReviewDtoImpl instance) =>
+Map<String, dynamic> _$BookReviewDtoToJson(_BookReviewDto instance) =>
     <String, dynamic>{
       'user_book_id': instance.userBookId,
       'rating': instance.rating,
@@ -181,16 +169,16 @@ Map<String, dynamic> _$$BookReviewDtoImplToJson(_$BookReviewDtoImpl instance) =>
       'reviewed_at': instance.reviewedAt.toIso8601String(),
     };
 
-_$BookReviewsResponseDtoImpl _$$BookReviewsResponseDtoImplFromJson(
+_BookReviewsResponseDto _$BookReviewsResponseDtoFromJson(
         Map<String, dynamic> json) =>
-    _$BookReviewsResponseDtoImpl(
+    _BookReviewsResponseDto(
       items: (json['items'] as List<dynamic>)
           .map((e) => BookReviewDto.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
-Map<String, dynamic> _$$BookReviewsResponseDtoImplToJson(
-        _$BookReviewsResponseDtoImpl instance) =>
+Map<String, dynamic> _$BookReviewsResponseDtoToJson(
+        _BookReviewsResponseDto instance) =>
     <String, dynamic>{
       'items': instance.items.map((e) => e.toJson()).toList(),
     };

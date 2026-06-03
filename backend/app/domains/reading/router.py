@@ -7,12 +7,16 @@ handler registered in ``app.core.exceptions`` (CLAUDE.md §3.1).
 
 from __future__ import annotations
 
+import json
+import logging
 from datetime import UTC, date, datetime
 from typing import Annotated
 from uuid import UUID
 
+import redis.asyncio as aioredis
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
+from app.core.cache import get_redis
 from app.core.deps import get_current_user_id
 from app.domains.reading.models import GoalPeriod
 from app.domains.reading.providers import get_reading_service
@@ -23,20 +27,32 @@ from app.domains.reading.schemas import (
     DailySessionPublic,
     DailySessionsResponse,
     EndSessionRequest,
+    FormatBreakdownPublic,
+    GenreBreakdownPublic,
     GoalProgressPublic,
     GoalPublic,
     GradeSummaryPublic,
     HeatmapDayPublic,
     HeatmapResponse,
     ManualSessionRequest,
+    MonthlyHoursPublic,
     ReadingSessionPublic,
+    ReadingSpeedStatsPublic,
+    ReadingStatsResponse,
     ReadingYearStatsPublic,
     SessionCompletionResponse,
     StartSessionRequest,
 )
 from app.domains.reading.service import ReadingService
 
+logger = logging.getLogger(__name__)
+
+_STATS_CACHE_TTL = 60 * 60 * 24  # 24 hours
+
 router = APIRouter(prefix="/reading", tags=["reading"])
+
+# Separate router for /me/* endpoints that must not carry the /reading prefix.
+me_router = APIRouter(tags=["reading"])
 
 
 @router.post(
@@ -251,3 +267,62 @@ async def get_latest_bookmark(
     if bookmark is None:
         return None
     return BookmarkPublic.model_validate(bookmark)
+
+
+@me_router.get("/me/reading-stats", response_model=ReadingStatsResponse)
+async def get_reading_stats(
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ReadingService, Depends(get_reading_service)],
+    redis: Annotated[aioredis.Redis, Depends(get_redis)],
+) -> ReadingStatsResponse:
+    """Aggregate reading statistics for the authenticated user.
+
+    Results are cached in Redis for 24 hours (key: ``reading_stats:{user_id}``).
+    The cache is a JSON-serialised ``ReadingStatsResponse``; a Redis failure
+    falls through to a live DB query so the endpoint stays available.
+    """
+    cache_key = f"reading_stats:{user_id}"
+
+    # Try cache first; swallow Redis errors so a Redis outage doesn't
+    # take down the endpoint.
+    try:
+        cached = await redis.get(cache_key)
+        if cached is not None:
+            return ReadingStatsResponse.model_validate(json.loads(cached))
+    except Exception:
+        logger.warning("Redis read failed for %s — falling through to DB", cache_key)
+
+    stats = await service.get_reading_stats(user_id=UUID(user_id))
+
+    response = ReadingStatsResponse(
+        speed=ReadingSpeedStatsPublic(
+            avg_minutes_per_page=stats.speed.avg_minutes_per_page,
+            avg_pages_per_hour=stats.speed.avg_pages_per_hour,
+        ),
+        format_breakdown=FormatBreakdownPublic(
+            paper=stats.format_breakdown.paper,
+            ebook=stats.format_breakdown.ebook,
+            audio=stats.format_breakdown.audio,
+        ),
+        monthly_hours=[
+            MonthlyHoursPublic(month=m.month, hours=m.hours)
+            for m in stats.monthly_hours
+        ],
+        genre_breakdown=[
+            GenreBreakdownPublic(genre=g.genre, count=g.count)
+            for g in stats.genre_breakdown
+        ],
+        avg_completion_days=stats.avg_completion_days,
+    )
+
+    # Write to cache; swallow failures for the same resilience reason.
+    try:
+        await redis.set(
+            cache_key,
+            response.model_dump_json(),
+            ex=_STATS_CACHE_TTL,
+        )
+    except Exception:
+        logger.warning("Redis write failed for %s", cache_key)
+
+    return response

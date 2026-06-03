@@ -55,7 +55,6 @@ completed-book count, recomputes grade + streak, and emits a derived
 
 from __future__ import annotations
 
-import asyncio
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
@@ -71,17 +70,22 @@ from app.domains.reading.models import Bookmark, Goal, GoalPeriod, ReadingSessio
 from app.domains.reading.ports import (
     DailySessionInfo,
     DailyStatRepositoryPort,
+    FormatBreakdown,
+    GenreBreakdown,
     GoalProgress,
     GoalRepositoryPort,
     GradeSummary,
     GradeThreshold,
     HeatmapDay,
+    MonthlyHours,
     ReadingBookQueryPort,
     ReadingSessionRepositoryPort,
+    ReadingSpeedStats,
+    ReadingStats,
     SessionCompletion,
     UserGradeRepositoryPort,
 )
-from app.domains.reading.repository import BookmarkRepository
+from app.domains.reading.repository import BookmarkRepository, ReadingStatsRepository
 from app.domains.reading.streak_policy import update_streak
 from app.shared.event_bus import EventBus
 
@@ -118,6 +122,7 @@ class ReadingService:
     bus: EventBus
     stage_event: StageEventFn
     bookmark_repo: BookmarkRepository
+    stats_repo: ReadingStatsRepository
 
     async def start_session(
         self,
@@ -412,6 +417,40 @@ class ReadingService:
         if not owned:
             raise NotFoundError("user_book not found", code="USER_BOOK_NOT_FOUND")
         return await self.bookmark_repo.get_latest(user_book_id=user_book_id)
+
+    async def get_reading_stats(self, *, user_id: UUID) -> ReadingStats:
+        """Aggregate reading statistics for the /me/reading-stats endpoint.
+
+        All queries are sequential on the shared AsyncSession — parallel
+        gather on a single SQLAlchemy async session causes connection drops
+        (same constraint as ``get_year_stats``).
+        """
+        avg_min, avg_pph = await self.stats_repo.avg_speed(user_id)
+        fmt = await self.stats_repo.format_breakdown(user_id)
+        monthly = await self.stats_repo.monthly_hours(user_id)
+        genres = await self.stats_repo.genre_breakdown(user_id)
+        avg_days = await self.stats_repo.avg_completion_days(user_id)
+
+        return ReadingStats(
+            speed=ReadingSpeedStats(
+                avg_minutes_per_page=avg_min,
+                avg_pages_per_hour=avg_pph,
+            ),
+            format_breakdown=FormatBreakdown(
+                paper=fmt.get("paper", 0),
+                ebook=fmt.get("ebook", 0),
+                audio=fmt.get("audio", 0),
+            ),
+            monthly_hours=[
+                MonthlyHours(month=str(m["month"]), hours=float(m["hours"]))
+                for m in monthly
+            ],
+            genre_breakdown=[
+                GenreBreakdown(genre=str(g["genre"]), count=int(g["count"]))
+                for g in genres
+            ],
+            avg_completion_days=avg_days,
+        )
 
     # ------------------------------------------------------------------
     # Internal helpers

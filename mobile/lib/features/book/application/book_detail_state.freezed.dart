@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,173 +9,46 @@ part of 'book_detail_state.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$BookDetailState {
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() loading,
-    required TResult Function(Book book, LibraryCtaState libraryState) loaded,
-    required TResult Function(String code, String message) error,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? loading,
-    TResult? Function(Book book, LibraryCtaState libraryState)? loaded,
-    TResult? Function(String code, String message)? error,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? loading,
-    TResult Function(Book book, LibraryCtaState libraryState)? loaded,
-    TResult Function(String code, String message)? error,
-    required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(BookDetailLoading value) loading,
-    required TResult Function(BookDetailLoaded value) loaded,
-    required TResult Function(BookDetailError value) error,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(BookDetailLoading value)? loading,
-    TResult? Function(BookDetailLoaded value)? loaded,
-    TResult? Function(BookDetailError value)? error,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(BookDetailLoading value)? loading,
-    TResult Function(BookDetailLoaded value)? loaded,
-    TResult Function(BookDetailError value)? error,
-    required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $BookDetailStateCopyWith<$Res> {
-  factory $BookDetailStateCopyWith(
-          BookDetailState value, $Res Function(BookDetailState) then) =
-      _$BookDetailStateCopyWithImpl<$Res, BookDetailState>;
-}
-
-/// @nodoc
-class _$BookDetailStateCopyWithImpl<$Res, $Val extends BookDetailState>
-    implements $BookDetailStateCopyWith<$Res> {
-  _$BookDetailStateCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of BookDetailState
-  /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-abstract class _$$BookDetailLoadingImplCopyWith<$Res> {
-  factory _$$BookDetailLoadingImplCopyWith(_$BookDetailLoadingImpl value,
-          $Res Function(_$BookDetailLoadingImpl) then) =
-      __$$BookDetailLoadingImplCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$$BookDetailLoadingImplCopyWithImpl<$Res>
-    extends _$BookDetailStateCopyWithImpl<$Res, _$BookDetailLoadingImpl>
-    implements _$$BookDetailLoadingImplCopyWith<$Res> {
-  __$$BookDetailLoadingImplCopyWithImpl(_$BookDetailLoadingImpl _value,
-      $Res Function(_$BookDetailLoadingImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of BookDetailState
-  /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-
-class _$BookDetailLoadingImpl implements BookDetailLoading {
-  const _$BookDetailLoadingImpl();
-
-  @override
-  String toString() {
-    return 'BookDetailState.loading()';
-  }
-
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$BookDetailLoadingImpl);
+        (other.runtimeType == runtimeType && other is BookDetailState);
   }
 
   @override
   int get hashCode => runtimeType.hashCode;
 
   @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() loading,
-    required TResult Function(Book book, LibraryCtaState libraryState) loaded,
-    required TResult Function(String code, String message) error,
-  }) {
-    return loading();
+  String toString() {
+    return 'BookDetailState()';
   }
+}
 
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? loading,
-    TResult? Function(Book book, LibraryCtaState libraryState)? loaded,
-    TResult? Function(String code, String message)? error,
-  }) {
-    return loading?.call();
-  }
+/// @nodoc
+class $BookDetailStateCopyWith<$Res> {
+  $BookDetailStateCopyWith(
+      BookDetailState _, $Res Function(BookDetailState) __);
+}
 
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? loading,
-    TResult Function(Book book, LibraryCtaState libraryState)? loaded,
-    TResult Function(String code, String message)? error,
-    required TResult orElse(),
-  }) {
-    if (loading != null) {
-      return loading();
-    }
-    return orElse();
-  }
+/// Adds pattern-matching-related methods to [BookDetailState].
+extension BookDetailStatePatterns on BookDetailState {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
 
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(BookDetailLoading value) loading,
-    required TResult Function(BookDetailLoaded value) loaded,
-    required TResult Function(BookDetailError value) error,
-  }) {
-    return loading(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(BookDetailLoading value)? loading,
-    TResult? Function(BookDetailLoaded value)? loaded,
-    TResult? Function(BookDetailError value)? error,
-  }) {
-    return loading?.call(this);
-  }
-
-  @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(BookDetailLoading value)? loading,
@@ -183,22 +56,236 @@ class _$BookDetailLoadingImpl implements BookDetailLoading {
     TResult Function(BookDetailError value)? error,
     required TResult orElse(),
   }) {
-    if (loading != null) {
-      return loading(this);
+    final _that = this;
+    switch (_that) {
+      case BookDetailLoading() when loading != null:
+        return loading(_that);
+      case BookDetailLoaded() when loaded != null:
+        return loaded(_that);
+      case BookDetailError() when error != null:
+        return error(_that);
+      case _:
+        return orElse();
     }
-    return orElse();
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(BookDetailLoading value) loading,
+    required TResult Function(BookDetailLoaded value) loaded,
+    required TResult Function(BookDetailError value) error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case BookDetailLoading():
+        return loading(_that);
+      case BookDetailLoaded():
+        return loaded(_that);
+      case BookDetailError():
+        return error(_that);
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(BookDetailLoading value)? loading,
+    TResult? Function(BookDetailLoaded value)? loaded,
+    TResult? Function(BookDetailError value)? error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case BookDetailLoading() when loading != null:
+        return loading(_that);
+      case BookDetailLoaded() when loaded != null:
+        return loaded(_that);
+      case BookDetailError() when error != null:
+        return error(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? loading,
+    TResult Function(Book book, LibraryCtaState libraryState)? loaded,
+    TResult Function(String code, String message)? error,
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case BookDetailLoading() when loading != null:
+        return loading();
+      case BookDetailLoaded() when loaded != null:
+        return loaded(_that.book, _that.libraryState);
+      case BookDetailError() when error != null:
+        return error(_that.code, _that.message);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() loading,
+    required TResult Function(Book book, LibraryCtaState libraryState) loaded,
+    required TResult Function(String code, String message) error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case BookDetailLoading():
+        return loading();
+      case BookDetailLoaded():
+        return loaded(_that.book, _that.libraryState);
+      case BookDetailError():
+        return error(_that.code, _that.message);
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? loading,
+    TResult? Function(Book book, LibraryCtaState libraryState)? loaded,
+    TResult? Function(String code, String message)? error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case BookDetailLoading() when loading != null:
+        return loading();
+      case BookDetailLoaded() when loaded != null:
+        return loaded(_that.book, _that.libraryState);
+      case BookDetailError() when error != null:
+        return error(_that.code, _that.message);
+      case _:
+        return null;
+    }
   }
 }
 
-abstract class BookDetailLoading implements BookDetailState {
-  const factory BookDetailLoading() = _$BookDetailLoadingImpl;
+/// @nodoc
+
+class BookDetailLoading implements BookDetailState {
+  const BookDetailLoading();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is BookDetailLoading);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'BookDetailState.loading()';
+  }
 }
 
 /// @nodoc
-abstract class _$$BookDetailLoadedImplCopyWith<$Res> {
-  factory _$$BookDetailLoadedImplCopyWith(_$BookDetailLoadedImpl value,
-          $Res Function(_$BookDetailLoadedImpl) then) =
-      __$$BookDetailLoadedImplCopyWithImpl<$Res>;
+
+class BookDetailLoaded implements BookDetailState {
+  const BookDetailLoaded(
+      {required this.book, this.libraryState = const LibraryCtaIdle()});
+
+  final Book book;
+  @JsonKey()
+  final LibraryCtaState libraryState;
+
+  /// Create a copy of BookDetailState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $BookDetailLoadedCopyWith<BookDetailLoaded> get copyWith =>
+      _$BookDetailLoadedCopyWithImpl<BookDetailLoaded>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is BookDetailLoaded &&
+            (identical(other.book, book) || other.book == book) &&
+            (identical(other.libraryState, libraryState) ||
+                other.libraryState == libraryState));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, book, libraryState);
+
+  @override
+  String toString() {
+    return 'BookDetailState.loaded(book: $book, libraryState: $libraryState)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $BookDetailLoadedCopyWith<$Res>
+    implements $BookDetailStateCopyWith<$Res> {
+  factory $BookDetailLoadedCopyWith(
+          BookDetailLoaded value, $Res Function(BookDetailLoaded) _then) =
+      _$BookDetailLoadedCopyWithImpl;
   @useResult
   $Res call({Book book, LibraryCtaState libraryState});
 
@@ -207,28 +294,27 @@ abstract class _$$BookDetailLoadedImplCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$$BookDetailLoadedImplCopyWithImpl<$Res>
-    extends _$BookDetailStateCopyWithImpl<$Res, _$BookDetailLoadedImpl>
-    implements _$$BookDetailLoadedImplCopyWith<$Res> {
-  __$$BookDetailLoadedImplCopyWithImpl(_$BookDetailLoadedImpl _value,
-      $Res Function(_$BookDetailLoadedImpl) _then)
-      : super(_value, _then);
+class _$BookDetailLoadedCopyWithImpl<$Res>
+    implements $BookDetailLoadedCopyWith<$Res> {
+  _$BookDetailLoadedCopyWithImpl(this._self, this._then);
+
+  final BookDetailLoaded _self;
+  final $Res Function(BookDetailLoaded) _then;
 
   /// Create a copy of BookDetailState
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
-  @override
   $Res call({
     Object? book = null,
     Object? libraryState = null,
   }) {
-    return _then(_$BookDetailLoadedImpl(
+    return _then(BookDetailLoaded(
       book: null == book
-          ? _value.book
+          ? _self.book
           : book // ignore: cast_nullable_to_non_nullable
               as Book,
       libraryState: null == libraryState
-          ? _value.libraryState
+          ? _self.libraryState
           : libraryState // ignore: cast_nullable_to_non_nullable
               as LibraryCtaState,
     ));
@@ -239,8 +325,8 @@ class __$$BookDetailLoadedImplCopyWithImpl<$Res>
   @override
   @pragma('vm:prefer-inline')
   $BookCopyWith<$Res> get book {
-    return $BookCopyWith<$Res>(_value.book, (value) {
-      return _then(_value.copyWith(book: value));
+    return $BookCopyWith<$Res>(_self.book, (value) {
+      return _then(_self.copyWith(book: value));
     });
   }
 
@@ -249,193 +335,32 @@ class __$$BookDetailLoadedImplCopyWithImpl<$Res>
   @override
   @pragma('vm:prefer-inline')
   $LibraryCtaStateCopyWith<$Res> get libraryState {
-    return $LibraryCtaStateCopyWith<$Res>(_value.libraryState, (value) {
-      return _then(_value.copyWith(libraryState: value));
+    return $LibraryCtaStateCopyWith<$Res>(_self.libraryState, (value) {
+      return _then(_self.copyWith(libraryState: value));
     });
   }
 }
 
 /// @nodoc
 
-class _$BookDetailLoadedImpl implements BookDetailLoaded {
-  const _$BookDetailLoadedImpl(
-      {required this.book, this.libraryState = const LibraryCtaIdle()});
+class BookDetailError implements BookDetailState {
+  const BookDetailError({required this.code, required this.message});
 
-  @override
-  final Book book;
-  @override
-  @JsonKey()
-  final LibraryCtaState libraryState;
-
-  @override
-  String toString() {
-    return 'BookDetailState.loaded(book: $book, libraryState: $libraryState)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$BookDetailLoadedImpl &&
-            (identical(other.book, book) || other.book == book) &&
-            (identical(other.libraryState, libraryState) ||
-                other.libraryState == libraryState));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, book, libraryState);
-
-  /// Create a copy of BookDetailState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$BookDetailLoadedImplCopyWith<_$BookDetailLoadedImpl> get copyWith =>
-      __$$BookDetailLoadedImplCopyWithImpl<_$BookDetailLoadedImpl>(
-          this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() loading,
-    required TResult Function(Book book, LibraryCtaState libraryState) loaded,
-    required TResult Function(String code, String message) error,
-  }) {
-    return loaded(book, libraryState);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? loading,
-    TResult? Function(Book book, LibraryCtaState libraryState)? loaded,
-    TResult? Function(String code, String message)? error,
-  }) {
-    return loaded?.call(book, libraryState);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? loading,
-    TResult Function(Book book, LibraryCtaState libraryState)? loaded,
-    TResult Function(String code, String message)? error,
-    required TResult orElse(),
-  }) {
-    if (loaded != null) {
-      return loaded(book, libraryState);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(BookDetailLoading value) loading,
-    required TResult Function(BookDetailLoaded value) loaded,
-    required TResult Function(BookDetailError value) error,
-  }) {
-    return loaded(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(BookDetailLoading value)? loading,
-    TResult? Function(BookDetailLoaded value)? loaded,
-    TResult? Function(BookDetailError value)? error,
-  }) {
-    return loaded?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(BookDetailLoading value)? loading,
-    TResult Function(BookDetailLoaded value)? loaded,
-    TResult Function(BookDetailError value)? error,
-    required TResult orElse(),
-  }) {
-    if (loaded != null) {
-      return loaded(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class BookDetailLoaded implements BookDetailState {
-  const factory BookDetailLoaded(
-      {required final Book book,
-      final LibraryCtaState libraryState}) = _$BookDetailLoadedImpl;
-
-  Book get book;
-  LibraryCtaState get libraryState;
-
-  /// Create a copy of BookDetailState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$BookDetailLoadedImplCopyWith<_$BookDetailLoadedImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class _$$BookDetailErrorImplCopyWith<$Res> {
-  factory _$$BookDetailErrorImplCopyWith(_$BookDetailErrorImpl value,
-          $Res Function(_$BookDetailErrorImpl) then) =
-      __$$BookDetailErrorImplCopyWithImpl<$Res>;
-  @useResult
-  $Res call({String code, String message});
-}
-
-/// @nodoc
-class __$$BookDetailErrorImplCopyWithImpl<$Res>
-    extends _$BookDetailStateCopyWithImpl<$Res, _$BookDetailErrorImpl>
-    implements _$$BookDetailErrorImplCopyWith<$Res> {
-  __$$BookDetailErrorImplCopyWithImpl(
-      _$BookDetailErrorImpl _value, $Res Function(_$BookDetailErrorImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of BookDetailState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? code = null,
-    Object? message = null,
-  }) {
-    return _then(_$BookDetailErrorImpl(
-      code: null == code
-          ? _value.code
-          : code // ignore: cast_nullable_to_non_nullable
-              as String,
-      message: null == message
-          ? _value.message
-          : message // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
-  }
-}
-
-/// @nodoc
-
-class _$BookDetailErrorImpl implements BookDetailError {
-  const _$BookDetailErrorImpl({required this.code, required this.message});
-
-  @override
   final String code;
-  @override
   final String message;
 
-  @override
-  String toString() {
-    return 'BookDetailState.error(code: $code, message: $message)';
-  }
+  /// Create a copy of BookDetailState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $BookDetailErrorCopyWith<BookDetailError> get copyWith =>
+      _$BookDetailErrorCopyWithImpl<BookDetailError>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$BookDetailErrorImpl &&
+            other is BookDetailError &&
             (identical(other.code, code) || other.code == code) &&
             (identical(other.message, message) || other.message == message));
   }
@@ -443,147 +368,87 @@ class _$BookDetailErrorImpl implements BookDetailError {
   @override
   int get hashCode => Object.hash(runtimeType, code, message);
 
-  /// Create a copy of BookDetailState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$BookDetailErrorImplCopyWith<_$BookDetailErrorImpl> get copyWith =>
-      __$$BookDetailErrorImplCopyWithImpl<_$BookDetailErrorImpl>(
-          this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() loading,
-    required TResult Function(Book book, LibraryCtaState libraryState) loaded,
-    required TResult Function(String code, String message) error,
-  }) {
-    return error(code, message);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? loading,
-    TResult? Function(Book book, LibraryCtaState libraryState)? loaded,
-    TResult? Function(String code, String message)? error,
-  }) {
-    return error?.call(code, message);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? loading,
-    TResult Function(Book book, LibraryCtaState libraryState)? loaded,
-    TResult Function(String code, String message)? error,
-    required TResult orElse(),
-  }) {
-    if (error != null) {
-      return error(code, message);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(BookDetailLoading value) loading,
-    required TResult Function(BookDetailLoaded value) loaded,
-    required TResult Function(BookDetailError value) error,
-  }) {
-    return error(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(BookDetailLoading value)? loading,
-    TResult? Function(BookDetailLoaded value)? loaded,
-    TResult? Function(BookDetailError value)? error,
-  }) {
-    return error?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(BookDetailLoading value)? loading,
-    TResult Function(BookDetailLoaded value)? loaded,
-    TResult Function(BookDetailError value)? error,
-    required TResult orElse(),
-  }) {
-    if (error != null) {
-      return error(this);
-    }
-    return orElse();
+  String toString() {
+    return 'BookDetailState.error(code: $code, message: $message)';
   }
 }
 
-abstract class BookDetailError implements BookDetailState {
-  const factory BookDetailError(
-      {required final String code,
-      required final String message}) = _$BookDetailErrorImpl;
+/// @nodoc
+abstract mixin class $BookDetailErrorCopyWith<$Res>
+    implements $BookDetailStateCopyWith<$Res> {
+  factory $BookDetailErrorCopyWith(
+          BookDetailError value, $Res Function(BookDetailError) _then) =
+      _$BookDetailErrorCopyWithImpl;
+  @useResult
+  $Res call({String code, String message});
+}
 
-  String get code;
-  String get message;
+/// @nodoc
+class _$BookDetailErrorCopyWithImpl<$Res>
+    implements $BookDetailErrorCopyWith<$Res> {
+  _$BookDetailErrorCopyWithImpl(this._self, this._then);
+
+  final BookDetailError _self;
+  final $Res Function(BookDetailError) _then;
 
   /// Create a copy of BookDetailState
   /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$BookDetailErrorImplCopyWith<_$BookDetailErrorImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? code = null,
+    Object? message = null,
+  }) {
+    return _then(BookDetailError(
+      code: null == code
+          ? _self.code
+          : code // ignore: cast_nullable_to_non_nullable
+              as String,
+      message: null == message
+          ? _self.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
 }
 
 /// @nodoc
 mixin _$LibraryCtaState {
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() idle,
-    required TResult Function() adding,
-    required TResult Function(UserBook userBook) added,
-    required TResult Function(String? duplicateUserBookId) duplicate,
-    required TResult Function(String code, String message) error,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? idle,
-    TResult? Function()? adding,
-    TResult? Function(UserBook userBook)? added,
-    TResult? Function(String? duplicateUserBookId)? duplicate,
-    TResult? Function(String code, String message)? error,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? idle,
-    TResult Function()? adding,
-    TResult Function(UserBook userBook)? added,
-    TResult Function(String? duplicateUserBookId)? duplicate,
-    TResult Function(String code, String message)? error,
-    required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(LibraryCtaIdle value) idle,
-    required TResult Function(LibraryCtaAdding value) adding,
-    required TResult Function(LibraryCtaAdded value) added,
-    required TResult Function(LibraryCtaDuplicate value) duplicate,
-    required TResult Function(LibraryCtaError value) error,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(LibraryCtaIdle value)? idle,
-    TResult? Function(LibraryCtaAdding value)? adding,
-    TResult? Function(LibraryCtaAdded value)? added,
-    TResult? Function(LibraryCtaDuplicate value)? duplicate,
-    TResult? Function(LibraryCtaError value)? error,
-  }) =>
-      throw _privateConstructorUsedError;
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is LibraryCtaState);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'LibraryCtaState()';
+  }
+}
+
+/// @nodoc
+class $LibraryCtaStateCopyWith<$Res> {
+  $LibraryCtaStateCopyWith(
+      LibraryCtaState _, $Res Function(LibraryCtaState) __);
+}
+
+/// Adds pattern-matching-related methods to [LibraryCtaState].
+extension LibraryCtaStatePatterns on LibraryCtaState {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(LibraryCtaIdle value)? idle,
@@ -592,282 +457,287 @@ mixin _$LibraryCtaState {
     TResult Function(LibraryCtaDuplicate value)? duplicate,
     TResult Function(LibraryCtaError value)? error,
     required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
+  }) {
+    final _that = this;
+    switch (_that) {
+      case LibraryCtaIdle() when idle != null:
+        return idle(_that);
+      case LibraryCtaAdding() when adding != null:
+        return adding(_that);
+      case LibraryCtaAdded() when added != null:
+        return added(_that);
+      case LibraryCtaDuplicate() when duplicate != null:
+        return duplicate(_that);
+      case LibraryCtaError() when error != null:
+        return error(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(LibraryCtaIdle value) idle,
+    required TResult Function(LibraryCtaAdding value) adding,
+    required TResult Function(LibraryCtaAdded value) added,
+    required TResult Function(LibraryCtaDuplicate value) duplicate,
+    required TResult Function(LibraryCtaError value) error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case LibraryCtaIdle():
+        return idle(_that);
+      case LibraryCtaAdding():
+        return adding(_that);
+      case LibraryCtaAdded():
+        return added(_that);
+      case LibraryCtaDuplicate():
+        return duplicate(_that);
+      case LibraryCtaError():
+        return error(_that);
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(LibraryCtaIdle value)? idle,
+    TResult? Function(LibraryCtaAdding value)? adding,
+    TResult? Function(LibraryCtaAdded value)? added,
+    TResult? Function(LibraryCtaDuplicate value)? duplicate,
+    TResult? Function(LibraryCtaError value)? error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case LibraryCtaIdle() when idle != null:
+        return idle(_that);
+      case LibraryCtaAdding() when adding != null:
+        return adding(_that);
+      case LibraryCtaAdded() when added != null:
+        return added(_that);
+      case LibraryCtaDuplicate() when duplicate != null:
+        return duplicate(_that);
+      case LibraryCtaError() when error != null:
+        return error(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? idle,
+    TResult Function()? adding,
+    TResult Function(UserBook userBook)? added,
+    TResult Function(String? duplicateUserBookId)? duplicate,
+    TResult Function(String code, String message)? error,
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case LibraryCtaIdle() when idle != null:
+        return idle();
+      case LibraryCtaAdding() when adding != null:
+        return adding();
+      case LibraryCtaAdded() when added != null:
+        return added(_that.userBook);
+      case LibraryCtaDuplicate() when duplicate != null:
+        return duplicate(_that.duplicateUserBookId);
+      case LibraryCtaError() when error != null:
+        return error(_that.code, _that.message);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() idle,
+    required TResult Function() adding,
+    required TResult Function(UserBook userBook) added,
+    required TResult Function(String? duplicateUserBookId) duplicate,
+    required TResult Function(String code, String message) error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case LibraryCtaIdle():
+        return idle();
+      case LibraryCtaAdding():
+        return adding();
+      case LibraryCtaAdded():
+        return added(_that.userBook);
+      case LibraryCtaDuplicate():
+        return duplicate(_that.duplicateUserBookId);
+      case LibraryCtaError():
+        return error(_that.code, _that.message);
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? idle,
+    TResult? Function()? adding,
+    TResult? Function(UserBook userBook)? added,
+    TResult? Function(String? duplicateUserBookId)? duplicate,
+    TResult? Function(String code, String message)? error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case LibraryCtaIdle() when idle != null:
+        return idle();
+      case LibraryCtaAdding() when adding != null:
+        return adding();
+      case LibraryCtaAdded() when added != null:
+        return added(_that.userBook);
+      case LibraryCtaDuplicate() when duplicate != null:
+        return duplicate(_that.duplicateUserBookId);
+      case LibraryCtaError() when error != null:
+        return error(_that.code, _that.message);
+      case _:
+        return null;
+    }
+  }
 }
 
 /// @nodoc
-abstract class $LibraryCtaStateCopyWith<$Res> {
-  factory $LibraryCtaStateCopyWith(
-          LibraryCtaState value, $Res Function(LibraryCtaState) then) =
-      _$LibraryCtaStateCopyWithImpl<$Res, LibraryCtaState>;
-}
 
-/// @nodoc
-class _$LibraryCtaStateCopyWithImpl<$Res, $Val extends LibraryCtaState>
-    implements $LibraryCtaStateCopyWith<$Res> {
-  _$LibraryCtaStateCopyWithImpl(this._value, this._then);
+class LibraryCtaIdle implements LibraryCtaState {
+  const LibraryCtaIdle();
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is LibraryCtaIdle);
+  }
 
-  /// Create a copy of LibraryCtaState
-  /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-abstract class _$$LibraryCtaIdleImplCopyWith<$Res> {
-  factory _$$LibraryCtaIdleImplCopyWith(_$LibraryCtaIdleImpl value,
-          $Res Function(_$LibraryCtaIdleImpl) then) =
-      __$$LibraryCtaIdleImplCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$$LibraryCtaIdleImplCopyWithImpl<$Res>
-    extends _$LibraryCtaStateCopyWithImpl<$Res, _$LibraryCtaIdleImpl>
-    implements _$$LibraryCtaIdleImplCopyWith<$Res> {
-  __$$LibraryCtaIdleImplCopyWithImpl(
-      _$LibraryCtaIdleImpl _value, $Res Function(_$LibraryCtaIdleImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of LibraryCtaState
-  /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-
-class _$LibraryCtaIdleImpl implements LibraryCtaIdle {
-  const _$LibraryCtaIdleImpl();
+  @override
+  int get hashCode => runtimeType.hashCode;
 
   @override
   String toString() {
     return 'LibraryCtaState.idle()';
   }
+}
+
+/// @nodoc
+
+class LibraryCtaAdding implements LibraryCtaState {
+  const LibraryCtaAdding();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$LibraryCtaIdleImpl);
+        (other.runtimeType == runtimeType && other is LibraryCtaAdding);
   }
 
   @override
   int get hashCode => runtimeType.hashCode;
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() idle,
-    required TResult Function() adding,
-    required TResult Function(UserBook userBook) added,
-    required TResult Function(String? duplicateUserBookId) duplicate,
-    required TResult Function(String code, String message) error,
-  }) {
-    return idle();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? idle,
-    TResult? Function()? adding,
-    TResult? Function(UserBook userBook)? added,
-    TResult? Function(String? duplicateUserBookId)? duplicate,
-    TResult? Function(String code, String message)? error,
-  }) {
-    return idle?.call();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? idle,
-    TResult Function()? adding,
-    TResult Function(UserBook userBook)? added,
-    TResult Function(String? duplicateUserBookId)? duplicate,
-    TResult Function(String code, String message)? error,
-    required TResult orElse(),
-  }) {
-    if (idle != null) {
-      return idle();
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(LibraryCtaIdle value) idle,
-    required TResult Function(LibraryCtaAdding value) adding,
-    required TResult Function(LibraryCtaAdded value) added,
-    required TResult Function(LibraryCtaDuplicate value) duplicate,
-    required TResult Function(LibraryCtaError value) error,
-  }) {
-    return idle(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(LibraryCtaIdle value)? idle,
-    TResult? Function(LibraryCtaAdding value)? adding,
-    TResult? Function(LibraryCtaAdded value)? added,
-    TResult? Function(LibraryCtaDuplicate value)? duplicate,
-    TResult? Function(LibraryCtaError value)? error,
-  }) {
-    return idle?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(LibraryCtaIdle value)? idle,
-    TResult Function(LibraryCtaAdding value)? adding,
-    TResult Function(LibraryCtaAdded value)? added,
-    TResult Function(LibraryCtaDuplicate value)? duplicate,
-    TResult Function(LibraryCtaError value)? error,
-    required TResult orElse(),
-  }) {
-    if (idle != null) {
-      return idle(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class LibraryCtaIdle implements LibraryCtaState {
-  const factory LibraryCtaIdle() = _$LibraryCtaIdleImpl;
-}
-
-/// @nodoc
-abstract class _$$LibraryCtaAddingImplCopyWith<$Res> {
-  factory _$$LibraryCtaAddingImplCopyWith(_$LibraryCtaAddingImpl value,
-          $Res Function(_$LibraryCtaAddingImpl) then) =
-      __$$LibraryCtaAddingImplCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$$LibraryCtaAddingImplCopyWithImpl<$Res>
-    extends _$LibraryCtaStateCopyWithImpl<$Res, _$LibraryCtaAddingImpl>
-    implements _$$LibraryCtaAddingImplCopyWith<$Res> {
-  __$$LibraryCtaAddingImplCopyWithImpl(_$LibraryCtaAddingImpl _value,
-      $Res Function(_$LibraryCtaAddingImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of LibraryCtaState
-  /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-
-class _$LibraryCtaAddingImpl implements LibraryCtaAdding {
-  const _$LibraryCtaAddingImpl();
 
   @override
   String toString() {
     return 'LibraryCtaState.adding()';
   }
+}
+
+/// @nodoc
+
+class LibraryCtaAdded implements LibraryCtaState {
+  const LibraryCtaAdded({required this.userBook});
+
+  final UserBook userBook;
+
+  /// Create a copy of LibraryCtaState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $LibraryCtaAddedCopyWith<LibraryCtaAdded> get copyWith =>
+      _$LibraryCtaAddedCopyWithImpl<LibraryCtaAdded>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$LibraryCtaAddingImpl);
+        (other.runtimeType == runtimeType &&
+            other is LibraryCtaAdded &&
+            (identical(other.userBook, userBook) ||
+                other.userBook == userBook));
   }
 
   @override
-  int get hashCode => runtimeType.hashCode;
+  int get hashCode => Object.hash(runtimeType, userBook);
 
   @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() idle,
-    required TResult Function() adding,
-    required TResult Function(UserBook userBook) added,
-    required TResult Function(String? duplicateUserBookId) duplicate,
-    required TResult Function(String code, String message) error,
-  }) {
-    return adding();
+  String toString() {
+    return 'LibraryCtaState.added(userBook: $userBook)';
   }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? idle,
-    TResult? Function()? adding,
-    TResult? Function(UserBook userBook)? added,
-    TResult? Function(String? duplicateUserBookId)? duplicate,
-    TResult? Function(String code, String message)? error,
-  }) {
-    return adding?.call();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? idle,
-    TResult Function()? adding,
-    TResult Function(UserBook userBook)? added,
-    TResult Function(String? duplicateUserBookId)? duplicate,
-    TResult Function(String code, String message)? error,
-    required TResult orElse(),
-  }) {
-    if (adding != null) {
-      return adding();
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(LibraryCtaIdle value) idle,
-    required TResult Function(LibraryCtaAdding value) adding,
-    required TResult Function(LibraryCtaAdded value) added,
-    required TResult Function(LibraryCtaDuplicate value) duplicate,
-    required TResult Function(LibraryCtaError value) error,
-  }) {
-    return adding(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(LibraryCtaIdle value)? idle,
-    TResult? Function(LibraryCtaAdding value)? adding,
-    TResult? Function(LibraryCtaAdded value)? added,
-    TResult? Function(LibraryCtaDuplicate value)? duplicate,
-    TResult? Function(LibraryCtaError value)? error,
-  }) {
-    return adding?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(LibraryCtaIdle value)? idle,
-    TResult Function(LibraryCtaAdding value)? adding,
-    TResult Function(LibraryCtaAdded value)? added,
-    TResult Function(LibraryCtaDuplicate value)? duplicate,
-    TResult Function(LibraryCtaError value)? error,
-    required TResult orElse(),
-  }) {
-    if (adding != null) {
-      return adding(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class LibraryCtaAdding implements LibraryCtaState {
-  const factory LibraryCtaAdding() = _$LibraryCtaAddingImpl;
 }
 
 /// @nodoc
-abstract class _$$LibraryCtaAddedImplCopyWith<$Res> {
-  factory _$$LibraryCtaAddedImplCopyWith(_$LibraryCtaAddedImpl value,
-          $Res Function(_$LibraryCtaAddedImpl) then) =
-      __$$LibraryCtaAddedImplCopyWithImpl<$Res>;
+abstract mixin class $LibraryCtaAddedCopyWith<$Res>
+    implements $LibraryCtaStateCopyWith<$Res> {
+  factory $LibraryCtaAddedCopyWith(
+          LibraryCtaAdded value, $Res Function(LibraryCtaAdded) _then) =
+      _$LibraryCtaAddedCopyWithImpl;
   @useResult
   $Res call({UserBook userBook});
 
@@ -875,23 +745,22 @@ abstract class _$$LibraryCtaAddedImplCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$$LibraryCtaAddedImplCopyWithImpl<$Res>
-    extends _$LibraryCtaStateCopyWithImpl<$Res, _$LibraryCtaAddedImpl>
-    implements _$$LibraryCtaAddedImplCopyWith<$Res> {
-  __$$LibraryCtaAddedImplCopyWithImpl(
-      _$LibraryCtaAddedImpl _value, $Res Function(_$LibraryCtaAddedImpl) _then)
-      : super(_value, _then);
+class _$LibraryCtaAddedCopyWithImpl<$Res>
+    implements $LibraryCtaAddedCopyWith<$Res> {
+  _$LibraryCtaAddedCopyWithImpl(this._self, this._then);
+
+  final LibraryCtaAdded _self;
+  final $Res Function(LibraryCtaAdded) _then;
 
   /// Create a copy of LibraryCtaState
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
-  @override
   $Res call({
     Object? userBook = null,
   }) {
-    return _then(_$LibraryCtaAddedImpl(
+    return _then(LibraryCtaAdded(
       userBook: null == userBook
-          ? _value.userBook
+          ? _self.userBook
           : userBook // ignore: cast_nullable_to_non_nullable
               as UserBook,
     ));
@@ -902,167 +771,71 @@ class __$$LibraryCtaAddedImplCopyWithImpl<$Res>
   @override
   @pragma('vm:prefer-inline')
   $UserBookCopyWith<$Res> get userBook {
-    return $UserBookCopyWith<$Res>(_value.userBook, (value) {
-      return _then(_value.copyWith(userBook: value));
+    return $UserBookCopyWith<$Res>(_self.userBook, (value) {
+      return _then(_self.copyWith(userBook: value));
     });
   }
 }
 
 /// @nodoc
 
-class _$LibraryCtaAddedImpl implements LibraryCtaAdded {
-  const _$LibraryCtaAddedImpl({required this.userBook});
+class LibraryCtaDuplicate implements LibraryCtaState {
+  const LibraryCtaDuplicate({this.duplicateUserBookId});
 
-  @override
-  final UserBook userBook;
+  final String? duplicateUserBookId;
 
-  @override
-  String toString() {
-    return 'LibraryCtaState.added(userBook: $userBook)';
-  }
+  /// Create a copy of LibraryCtaState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $LibraryCtaDuplicateCopyWith<LibraryCtaDuplicate> get copyWith =>
+      _$LibraryCtaDuplicateCopyWithImpl<LibraryCtaDuplicate>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$LibraryCtaAddedImpl &&
-            (identical(other.userBook, userBook) ||
-                other.userBook == userBook));
+            other is LibraryCtaDuplicate &&
+            (identical(other.duplicateUserBookId, duplicateUserBookId) ||
+                other.duplicateUserBookId == duplicateUserBookId));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, userBook);
-
-  /// Create a copy of LibraryCtaState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$LibraryCtaAddedImplCopyWith<_$LibraryCtaAddedImpl> get copyWith =>
-      __$$LibraryCtaAddedImplCopyWithImpl<_$LibraryCtaAddedImpl>(
-          this, _$identity);
+  int get hashCode => Object.hash(runtimeType, duplicateUserBookId);
 
   @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() idle,
-    required TResult Function() adding,
-    required TResult Function(UserBook userBook) added,
-    required TResult Function(String? duplicateUserBookId) duplicate,
-    required TResult Function(String code, String message) error,
-  }) {
-    return added(userBook);
+  String toString() {
+    return 'LibraryCtaState.duplicate(duplicateUserBookId: $duplicateUserBookId)';
   }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? idle,
-    TResult? Function()? adding,
-    TResult? Function(UserBook userBook)? added,
-    TResult? Function(String? duplicateUserBookId)? duplicate,
-    TResult? Function(String code, String message)? error,
-  }) {
-    return added?.call(userBook);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? idle,
-    TResult Function()? adding,
-    TResult Function(UserBook userBook)? added,
-    TResult Function(String? duplicateUserBookId)? duplicate,
-    TResult Function(String code, String message)? error,
-    required TResult orElse(),
-  }) {
-    if (added != null) {
-      return added(userBook);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(LibraryCtaIdle value) idle,
-    required TResult Function(LibraryCtaAdding value) adding,
-    required TResult Function(LibraryCtaAdded value) added,
-    required TResult Function(LibraryCtaDuplicate value) duplicate,
-    required TResult Function(LibraryCtaError value) error,
-  }) {
-    return added(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(LibraryCtaIdle value)? idle,
-    TResult? Function(LibraryCtaAdding value)? adding,
-    TResult? Function(LibraryCtaAdded value)? added,
-    TResult? Function(LibraryCtaDuplicate value)? duplicate,
-    TResult? Function(LibraryCtaError value)? error,
-  }) {
-    return added?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(LibraryCtaIdle value)? idle,
-    TResult Function(LibraryCtaAdding value)? adding,
-    TResult Function(LibraryCtaAdded value)? added,
-    TResult Function(LibraryCtaDuplicate value)? duplicate,
-    TResult Function(LibraryCtaError value)? error,
-    required TResult orElse(),
-  }) {
-    if (added != null) {
-      return added(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class LibraryCtaAdded implements LibraryCtaState {
-  const factory LibraryCtaAdded({required final UserBook userBook}) =
-      _$LibraryCtaAddedImpl;
-
-  UserBook get userBook;
-
-  /// Create a copy of LibraryCtaState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$LibraryCtaAddedImplCopyWith<_$LibraryCtaAddedImpl> get copyWith =>
-      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$$LibraryCtaDuplicateImplCopyWith<$Res> {
-  factory _$$LibraryCtaDuplicateImplCopyWith(_$LibraryCtaDuplicateImpl value,
-          $Res Function(_$LibraryCtaDuplicateImpl) then) =
-      __$$LibraryCtaDuplicateImplCopyWithImpl<$Res>;
+abstract mixin class $LibraryCtaDuplicateCopyWith<$Res>
+    implements $LibraryCtaStateCopyWith<$Res> {
+  factory $LibraryCtaDuplicateCopyWith(
+          LibraryCtaDuplicate value, $Res Function(LibraryCtaDuplicate) _then) =
+      _$LibraryCtaDuplicateCopyWithImpl;
   @useResult
   $Res call({String? duplicateUserBookId});
 }
 
 /// @nodoc
-class __$$LibraryCtaDuplicateImplCopyWithImpl<$Res>
-    extends _$LibraryCtaStateCopyWithImpl<$Res, _$LibraryCtaDuplicateImpl>
-    implements _$$LibraryCtaDuplicateImplCopyWith<$Res> {
-  __$$LibraryCtaDuplicateImplCopyWithImpl(_$LibraryCtaDuplicateImpl _value,
-      $Res Function(_$LibraryCtaDuplicateImpl) _then)
-      : super(_value, _then);
+class _$LibraryCtaDuplicateCopyWithImpl<$Res>
+    implements $LibraryCtaDuplicateCopyWith<$Res> {
+  _$LibraryCtaDuplicateCopyWithImpl(this._self, this._then);
+
+  final LibraryCtaDuplicate _self;
+  final $Res Function(LibraryCtaDuplicate) _then;
 
   /// Create a copy of LibraryCtaState
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
-  @override
   $Res call({
     Object? duplicateUserBookId = freezed,
   }) {
-    return _then(_$LibraryCtaDuplicateImpl(
+    return _then(LibraryCtaDuplicate(
       duplicateUserBookId: freezed == duplicateUserBookId
-          ? _value.duplicateUserBookId
+          ? _self.duplicateUserBookId
           : duplicateUserBookId // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
@@ -1071,190 +844,24 @@ class __$$LibraryCtaDuplicateImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$LibraryCtaDuplicateImpl implements LibraryCtaDuplicate {
-  const _$LibraryCtaDuplicateImpl({this.duplicateUserBookId});
+class LibraryCtaError implements LibraryCtaState {
+  const LibraryCtaError({required this.code, required this.message});
 
-  @override
-  final String? duplicateUserBookId;
-
-  @override
-  String toString() {
-    return 'LibraryCtaState.duplicate(duplicateUserBookId: $duplicateUserBookId)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$LibraryCtaDuplicateImpl &&
-            (identical(other.duplicateUserBookId, duplicateUserBookId) ||
-                other.duplicateUserBookId == duplicateUserBookId));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, duplicateUserBookId);
-
-  /// Create a copy of LibraryCtaState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$LibraryCtaDuplicateImplCopyWith<_$LibraryCtaDuplicateImpl> get copyWith =>
-      __$$LibraryCtaDuplicateImplCopyWithImpl<_$LibraryCtaDuplicateImpl>(
-          this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() idle,
-    required TResult Function() adding,
-    required TResult Function(UserBook userBook) added,
-    required TResult Function(String? duplicateUserBookId) duplicate,
-    required TResult Function(String code, String message) error,
-  }) {
-    return duplicate(duplicateUserBookId);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? idle,
-    TResult? Function()? adding,
-    TResult? Function(UserBook userBook)? added,
-    TResult? Function(String? duplicateUserBookId)? duplicate,
-    TResult? Function(String code, String message)? error,
-  }) {
-    return duplicate?.call(duplicateUserBookId);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? idle,
-    TResult Function()? adding,
-    TResult Function(UserBook userBook)? added,
-    TResult Function(String? duplicateUserBookId)? duplicate,
-    TResult Function(String code, String message)? error,
-    required TResult orElse(),
-  }) {
-    if (duplicate != null) {
-      return duplicate(duplicateUserBookId);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(LibraryCtaIdle value) idle,
-    required TResult Function(LibraryCtaAdding value) adding,
-    required TResult Function(LibraryCtaAdded value) added,
-    required TResult Function(LibraryCtaDuplicate value) duplicate,
-    required TResult Function(LibraryCtaError value) error,
-  }) {
-    return duplicate(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(LibraryCtaIdle value)? idle,
-    TResult? Function(LibraryCtaAdding value)? adding,
-    TResult? Function(LibraryCtaAdded value)? added,
-    TResult? Function(LibraryCtaDuplicate value)? duplicate,
-    TResult? Function(LibraryCtaError value)? error,
-  }) {
-    return duplicate?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(LibraryCtaIdle value)? idle,
-    TResult Function(LibraryCtaAdding value)? adding,
-    TResult Function(LibraryCtaAdded value)? added,
-    TResult Function(LibraryCtaDuplicate value)? duplicate,
-    TResult Function(LibraryCtaError value)? error,
-    required TResult orElse(),
-  }) {
-    if (duplicate != null) {
-      return duplicate(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class LibraryCtaDuplicate implements LibraryCtaState {
-  const factory LibraryCtaDuplicate({final String? duplicateUserBookId}) =
-      _$LibraryCtaDuplicateImpl;
-
-  String? get duplicateUserBookId;
-
-  /// Create a copy of LibraryCtaState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$LibraryCtaDuplicateImplCopyWith<_$LibraryCtaDuplicateImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class _$$LibraryCtaErrorImplCopyWith<$Res> {
-  factory _$$LibraryCtaErrorImplCopyWith(_$LibraryCtaErrorImpl value,
-          $Res Function(_$LibraryCtaErrorImpl) then) =
-      __$$LibraryCtaErrorImplCopyWithImpl<$Res>;
-  @useResult
-  $Res call({String code, String message});
-}
-
-/// @nodoc
-class __$$LibraryCtaErrorImplCopyWithImpl<$Res>
-    extends _$LibraryCtaStateCopyWithImpl<$Res, _$LibraryCtaErrorImpl>
-    implements _$$LibraryCtaErrorImplCopyWith<$Res> {
-  __$$LibraryCtaErrorImplCopyWithImpl(
-      _$LibraryCtaErrorImpl _value, $Res Function(_$LibraryCtaErrorImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of LibraryCtaState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? code = null,
-    Object? message = null,
-  }) {
-    return _then(_$LibraryCtaErrorImpl(
-      code: null == code
-          ? _value.code
-          : code // ignore: cast_nullable_to_non_nullable
-              as String,
-      message: null == message
-          ? _value.message
-          : message // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
-  }
-}
-
-/// @nodoc
-
-class _$LibraryCtaErrorImpl implements LibraryCtaError {
-  const _$LibraryCtaErrorImpl({required this.code, required this.message});
-
-  @override
   final String code;
-  @override
   final String message;
 
-  @override
-  String toString() {
-    return 'LibraryCtaState.error(code: $code, message: $message)';
-  }
+  /// Create a copy of LibraryCtaState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $LibraryCtaErrorCopyWith<LibraryCtaError> get copyWith =>
+      _$LibraryCtaErrorCopyWithImpl<LibraryCtaError>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$LibraryCtaErrorImpl &&
+            other is LibraryCtaError &&
             (identical(other.code, code) || other.code == code) &&
             (identical(other.message, message) || other.message == message));
   }
@@ -1262,107 +869,48 @@ class _$LibraryCtaErrorImpl implements LibraryCtaError {
   @override
   int get hashCode => Object.hash(runtimeType, code, message);
 
+  @override
+  String toString() {
+    return 'LibraryCtaState.error(code: $code, message: $message)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $LibraryCtaErrorCopyWith<$Res>
+    implements $LibraryCtaStateCopyWith<$Res> {
+  factory $LibraryCtaErrorCopyWith(
+          LibraryCtaError value, $Res Function(LibraryCtaError) _then) =
+      _$LibraryCtaErrorCopyWithImpl;
+  @useResult
+  $Res call({String code, String message});
+}
+
+/// @nodoc
+class _$LibraryCtaErrorCopyWithImpl<$Res>
+    implements $LibraryCtaErrorCopyWith<$Res> {
+  _$LibraryCtaErrorCopyWithImpl(this._self, this._then);
+
+  final LibraryCtaError _self;
+  final $Res Function(LibraryCtaError) _then;
+
   /// Create a copy of LibraryCtaState
   /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
   @pragma('vm:prefer-inline')
-  _$$LibraryCtaErrorImplCopyWith<_$LibraryCtaErrorImpl> get copyWith =>
-      __$$LibraryCtaErrorImplCopyWithImpl<_$LibraryCtaErrorImpl>(
-          this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() idle,
-    required TResult Function() adding,
-    required TResult Function(UserBook userBook) added,
-    required TResult Function(String? duplicateUserBookId) duplicate,
-    required TResult Function(String code, String message) error,
+  $Res call({
+    Object? code = null,
+    Object? message = null,
   }) {
-    return error(code, message);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? idle,
-    TResult? Function()? adding,
-    TResult? Function(UserBook userBook)? added,
-    TResult? Function(String? duplicateUserBookId)? duplicate,
-    TResult? Function(String code, String message)? error,
-  }) {
-    return error?.call(code, message);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? idle,
-    TResult Function()? adding,
-    TResult Function(UserBook userBook)? added,
-    TResult Function(String? duplicateUserBookId)? duplicate,
-    TResult Function(String code, String message)? error,
-    required TResult orElse(),
-  }) {
-    if (error != null) {
-      return error(code, message);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(LibraryCtaIdle value) idle,
-    required TResult Function(LibraryCtaAdding value) adding,
-    required TResult Function(LibraryCtaAdded value) added,
-    required TResult Function(LibraryCtaDuplicate value) duplicate,
-    required TResult Function(LibraryCtaError value) error,
-  }) {
-    return error(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(LibraryCtaIdle value)? idle,
-    TResult? Function(LibraryCtaAdding value)? adding,
-    TResult? Function(LibraryCtaAdded value)? added,
-    TResult? Function(LibraryCtaDuplicate value)? duplicate,
-    TResult? Function(LibraryCtaError value)? error,
-  }) {
-    return error?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(LibraryCtaIdle value)? idle,
-    TResult Function(LibraryCtaAdding value)? adding,
-    TResult Function(LibraryCtaAdded value)? added,
-    TResult Function(LibraryCtaDuplicate value)? duplicate,
-    TResult Function(LibraryCtaError value)? error,
-    required TResult orElse(),
-  }) {
-    if (error != null) {
-      return error(this);
-    }
-    return orElse();
+    return _then(LibraryCtaError(
+      code: null == code
+          ? _self.code
+          : code // ignore: cast_nullable_to_non_nullable
+              as String,
+      message: null == message
+          ? _self.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
   }
 }
 
-abstract class LibraryCtaError implements LibraryCtaState {
-  const factory LibraryCtaError(
-      {required final String code,
-      required final String message}) = _$LibraryCtaErrorImpl;
-
-  String get code;
-  String get message;
-
-  /// Create a copy of LibraryCtaState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$LibraryCtaErrorImplCopyWith<_$LibraryCtaErrorImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
+// dart format on

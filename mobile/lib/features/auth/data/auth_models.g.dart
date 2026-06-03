@@ -6,73 +6,65 @@ part of 'auth_models.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$KakaoLoginRequestImpl _$$KakaoLoginRequestImplFromJson(
-        Map<String, dynamic> json) =>
-    _$KakaoLoginRequestImpl(
+_KakaoLoginRequest _$KakaoLoginRequestFromJson(Map<String, dynamic> json) =>
+    _KakaoLoginRequest(
       accessToken: json['access_token'] as String,
     );
 
-Map<String, dynamic> _$$KakaoLoginRequestImplToJson(
-        _$KakaoLoginRequestImpl instance) =>
+Map<String, dynamic> _$KakaoLoginRequestToJson(_KakaoLoginRequest instance) =>
     <String, dynamic>{
       'access_token': instance.accessToken,
     };
 
-_$AppleLoginRequestImpl _$$AppleLoginRequestImplFromJson(
-        Map<String, dynamic> json) =>
-    _$AppleLoginRequestImpl(
+_AppleLoginRequest _$AppleLoginRequestFromJson(Map<String, dynamic> json) =>
+    _AppleLoginRequest(
       identityToken: json['identity_token'] as String,
       authorizationCode: json['authorization_code'] as String?,
     );
 
-Map<String, dynamic> _$$AppleLoginRequestImplToJson(
-        _$AppleLoginRequestImpl instance) =>
+Map<String, dynamic> _$AppleLoginRequestToJson(_AppleLoginRequest instance) =>
     <String, dynamic>{
       'identity_token': instance.identityToken,
       'authorization_code': instance.authorizationCode,
     };
 
-_$DevLoginRequestImpl _$$DevLoginRequestImplFromJson(
-        Map<String, dynamic> json) =>
-    _$DevLoginRequestImpl(
+_DevLoginRequest _$DevLoginRequestFromJson(Map<String, dynamic> json) =>
+    _DevLoginRequest(
       nickname: json['nickname'] as String? ?? '개발자',
       email: json['email'] as String?,
     );
 
-Map<String, dynamic> _$$DevLoginRequestImplToJson(
-        _$DevLoginRequestImpl instance) =>
+Map<String, dynamic> _$DevLoginRequestToJson(_DevLoginRequest instance) =>
     <String, dynamic>{
       'nickname': instance.nickname,
       'email': instance.email,
     };
 
-_$RefreshRequestImpl _$$RefreshRequestImplFromJson(Map<String, dynamic> json) =>
-    _$RefreshRequestImpl(
+_RefreshRequest _$RefreshRequestFromJson(Map<String, dynamic> json) =>
+    _RefreshRequest(
       refreshToken: json['refresh_token'] as String,
     );
 
-Map<String, dynamic> _$$RefreshRequestImplToJson(
-        _$RefreshRequestImpl instance) =>
+Map<String, dynamic> _$RefreshRequestToJson(_RefreshRequest instance) =>
     <String, dynamic>{
       'refresh_token': instance.refreshToken,
     };
 
-_$DeviceTokenRegisterRequestImpl _$$DeviceTokenRegisterRequestImplFromJson(
+_DeviceTokenRegisterRequest _$DeviceTokenRegisterRequestFromJson(
         Map<String, dynamic> json) =>
-    _$DeviceTokenRegisterRequestImpl(
+    _DeviceTokenRegisterRequest(
       token: json['token'] as String,
       platform: json['platform'] as String,
     );
 
-Map<String, dynamic> _$$DeviceTokenRegisterRequestImplToJson(
-        _$DeviceTokenRegisterRequestImpl instance) =>
+Map<String, dynamic> _$DeviceTokenRegisterRequestToJson(
+        _DeviceTokenRegisterRequest instance) =>
     <String, dynamic>{
       'token': instance.token,
       'platform': instance.platform,
     };
 
-_$AuthUserDtoImpl _$$AuthUserDtoImplFromJson(Map<String, dynamic> json) =>
-    _$AuthUserDtoImpl(
+_AuthUserDto _$AuthUserDtoFromJson(Map<String, dynamic> json) => _AuthUserDto(
       id: json['id'] as String,
       nickname: json['nickname'] as String,
       provider: json['provider'] as String,
@@ -81,7 +73,7 @@ _$AuthUserDtoImpl _$$AuthUserDtoImplFromJson(Map<String, dynamic> json) =>
       email: json['email'] as String?,
     );
 
-Map<String, dynamic> _$$AuthUserDtoImplToJson(_$AuthUserDtoImpl instance) =>
+Map<String, dynamic> _$AuthUserDtoToJson(_AuthUserDto instance) =>
     <String, dynamic>{
       'id': instance.id,
       'nickname': instance.nickname,
@@ -91,8 +83,8 @@ Map<String, dynamic> _$$AuthUserDtoImplToJson(_$AuthUserDtoImpl instance) =>
       'email': instance.email,
     };
 
-_$LoginResponseImpl _$$LoginResponseImplFromJson(Map<String, dynamic> json) =>
-    _$LoginResponseImpl(
+_LoginResponse _$LoginResponseFromJson(Map<String, dynamic> json) =>
+    _LoginResponse(
       accessToken: json['access_token'] as String,
       refreshToken: json['refresh_token'] as String,
       tokenType: json['token_type'] as String,
@@ -101,7 +93,7 @@ _$LoginResponseImpl _$$LoginResponseImplFromJson(Map<String, dynamic> json) =>
       isNewUser: json['is_new_user'] as bool,
     );
 
-Map<String, dynamic> _$$LoginResponseImplToJson(_$LoginResponseImpl instance) =>
+Map<String, dynamic> _$LoginResponseToJson(_LoginResponse instance) =>
     <String, dynamic>{
       'access_token': instance.accessToken,
       'refresh_token': instance.refreshToken,
@@ -111,17 +103,15 @@ Map<String, dynamic> _$$LoginResponseImplToJson(_$LoginResponseImpl instance) =>
       'is_new_user': instance.isNewUser,
     };
 
-_$RefreshResponseImpl _$$RefreshResponseImplFromJson(
-        Map<String, dynamic> json) =>
-    _$RefreshResponseImpl(
+_RefreshResponse _$RefreshResponseFromJson(Map<String, dynamic> json) =>
+    _RefreshResponse(
       accessToken: json['access_token'] as String,
       refreshToken: json['refresh_token'] as String,
       tokenType: json['token_type'] as String,
       expiresIn: (json['expires_in'] as num).toInt(),
     );
 
-Map<String, dynamic> _$$RefreshResponseImplToJson(
-        _$RefreshResponseImpl instance) =>
+Map<String, dynamic> _$RefreshResponseToJson(_RefreshResponse instance) =>
     <String, dynamic>{
       'access_token': instance.accessToken,
       'refresh_token': instance.refreshToken,

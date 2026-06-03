@@ -6,9 +6,8 @@ part of 'reading_models.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$ReadingSessionDtoImpl _$$ReadingSessionDtoImplFromJson(
-        Map<String, dynamic> json) =>
-    _$ReadingSessionDtoImpl(
+_ReadingSessionDto _$ReadingSessionDtoFromJson(Map<String, dynamic> json) =>
+    _ReadingSessionDto(
       id: json['id'] as String,
       userBookId: json['user_book_id'] as String,
       startedAt: DateTime.parse(json['started_at'] as String),
@@ -19,8 +18,7 @@ _$ReadingSessionDtoImpl _$$ReadingSessionDtoImplFromJson(
       durationSec: (json['duration_sec'] as num?)?.toInt(),
     );
 
-Map<String, dynamic> _$$ReadingSessionDtoImplToJson(
-        _$ReadingSessionDtoImpl instance) =>
+Map<String, dynamic> _$ReadingSessionDtoToJson(_ReadingSessionDto instance) =>
     <String, dynamic>{
       'id': instance.id,
       'user_book_id': instance.userBookId,
@@ -30,23 +28,22 @@ Map<String, dynamic> _$$ReadingSessionDtoImplToJson(
       'duration_sec': instance.durationSec,
     };
 
-_$NextGradeThresholdsDtoImpl _$$NextGradeThresholdsDtoImplFromJson(
+_NextGradeThresholdsDto _$NextGradeThresholdsDtoFromJson(
         Map<String, dynamic> json) =>
-    _$NextGradeThresholdsDtoImpl(
+    _NextGradeThresholdsDto(
       targetBooks: (json['target_books'] as num).toInt(),
       targetSeconds: (json['target_seconds'] as num).toInt(),
     );
 
-Map<String, dynamic> _$$NextGradeThresholdsDtoImplToJson(
-        _$NextGradeThresholdsDtoImpl instance) =>
+Map<String, dynamic> _$NextGradeThresholdsDtoToJson(
+        _NextGradeThresholdsDto instance) =>
     <String, dynamic>{
       'target_books': instance.targetBooks,
       'target_seconds': instance.targetSeconds,
     };
 
-_$GradeSummaryDtoImpl _$$GradeSummaryDtoImplFromJson(
-        Map<String, dynamic> json) =>
-    _$GradeSummaryDtoImpl(
+_GradeSummaryDto _$GradeSummaryDtoFromJson(Map<String, dynamic> json) =>
+    _GradeSummaryDto(
       grade: (json['grade'] as num).toInt(),
       totalBooks: (json['total_books'] as num).toInt(),
       totalSeconds: (json['total_seconds'] as num).toInt(),
@@ -59,8 +56,7 @@ _$GradeSummaryDtoImpl _$$GradeSummaryDtoImplFromJson(
       tier: (json['tier'] as num?)?.toInt() ?? 1,
     );
 
-Map<String, dynamic> _$$GradeSummaryDtoImplToJson(
-        _$GradeSummaryDtoImpl instance) =>
+Map<String, dynamic> _$GradeSummaryDtoToJson(_GradeSummaryDto instance) =>
     <String, dynamic>{
       'grade': instance.grade,
       'total_books': instance.totalBooks,
@@ -71,9 +67,9 @@ Map<String, dynamic> _$$GradeSummaryDtoImplToJson(
       'tier': instance.tier,
     };
 
-_$SessionCompletionDtoImpl _$$SessionCompletionDtoImplFromJson(
+_SessionCompletionDto _$SessionCompletionDtoFromJson(
         Map<String, dynamic> json) =>
-    _$SessionCompletionDtoImpl(
+    _SessionCompletionDto(
       session:
           ReadingSessionDto.fromJson(json['session'] as Map<String, dynamic>),
       grade: GradeSummaryDto.fromJson(json['grade'] as Map<String, dynamic>),
@@ -81,8 +77,8 @@ _$SessionCompletionDtoImpl _$$SessionCompletionDtoImplFromJson(
       gradeUp: json['grade_up'] as bool,
     );
 
-Map<String, dynamic> _$$SessionCompletionDtoImplToJson(
-        _$SessionCompletionDtoImpl instance) =>
+Map<String, dynamic> _$SessionCompletionDtoToJson(
+        _SessionCompletionDto instance) =>
     <String, dynamic>{
       'session': instance.session.toJson(),
       'grade': instance.grade.toJson(),
@@ -90,37 +86,33 @@ Map<String, dynamic> _$$SessionCompletionDtoImplToJson(
       'grade_up': instance.gradeUp,
     };
 
-_$HeatmapItemDtoImpl _$$HeatmapItemDtoImplFromJson(Map<String, dynamic> json) =>
-    _$HeatmapItemDtoImpl(
+_HeatmapItemDto _$HeatmapItemDtoFromJson(Map<String, dynamic> json) =>
+    _HeatmapItemDto(
       date: json['date'] as String,
       totalSeconds: (json['total_seconds'] as num).toInt(),
       sessionCount: (json['session_count'] as num).toInt(),
     );
 
-Map<String, dynamic> _$$HeatmapItemDtoImplToJson(
-        _$HeatmapItemDtoImpl instance) =>
+Map<String, dynamic> _$HeatmapItemDtoToJson(_HeatmapItemDto instance) =>
     <String, dynamic>{
       'date': instance.date,
       'total_seconds': instance.totalSeconds,
       'session_count': instance.sessionCount,
     };
 
-_$HeatmapResponseDtoImpl _$$HeatmapResponseDtoImplFromJson(
-        Map<String, dynamic> json) =>
-    _$HeatmapResponseDtoImpl(
+_HeatmapResponseDto _$HeatmapResponseDtoFromJson(Map<String, dynamic> json) =>
+    _HeatmapResponseDto(
       items: (json['items'] as List<dynamic>)
           .map((e) => HeatmapItemDto.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
-Map<String, dynamic> _$$HeatmapResponseDtoImplToJson(
-        _$HeatmapResponseDtoImpl instance) =>
+Map<String, dynamic> _$HeatmapResponseDtoToJson(_HeatmapResponseDto instance) =>
     <String, dynamic>{
       'items': instance.items.map((e) => e.toJson()).toList(),
     };
 
-_$GoalDtoImpl _$$GoalDtoImplFromJson(Map<String, dynamic> json) =>
-    _$GoalDtoImpl(
+_GoalDto _$GoalDtoFromJson(Map<String, dynamic> json) => _GoalDto(
       id: json['id'] as String,
       period: json['period'] as String,
       targetBooks: (json['target_books'] as num).toInt(),
@@ -129,8 +121,7 @@ _$GoalDtoImpl _$$GoalDtoImplFromJson(Map<String, dynamic> json) =>
       endDate: DateTime.parse(json['end_date'] as String),
     );
 
-Map<String, dynamic> _$$GoalDtoImplToJson(_$GoalDtoImpl instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$GoalDtoToJson(_GoalDto instance) => <String, dynamic>{
       'id': instance.id,
       'period': instance.period,
       'target_books': instance.targetBooks,
@@ -139,17 +130,15 @@ Map<String, dynamic> _$$GoalDtoImplToJson(_$GoalDtoImpl instance) =>
       'end_date': instance.endDate.toIso8601String(),
     };
 
-_$GoalProgressDtoImpl _$$GoalProgressDtoImplFromJson(
-        Map<String, dynamic> json) =>
-    _$GoalProgressDtoImpl(
+_GoalProgressDto _$GoalProgressDtoFromJson(Map<String, dynamic> json) =>
+    _GoalProgressDto(
       goal: GoalDto.fromJson(json['goal'] as Map<String, dynamic>),
       booksDone: (json['books_done'] as num).toInt(),
       secondsDone: (json['seconds_done'] as num).toInt(),
       percent: (json['percent'] as num).toDouble(),
     );
 
-Map<String, dynamic> _$$GoalProgressDtoImplToJson(
-        _$GoalProgressDtoImpl instance) =>
+Map<String, dynamic> _$GoalProgressDtoToJson(_GoalProgressDto instance) =>
     <String, dynamic>{
       'goal': instance.goal.toJson(),
       'books_done': instance.booksDone,
@@ -157,9 +146,8 @@ Map<String, dynamic> _$$GoalProgressDtoImplToJson(
       'percent': instance.percent,
     };
 
-_$DailySessionDtoImpl _$$DailySessionDtoImplFromJson(
-        Map<String, dynamic> json) =>
-    _$DailySessionDtoImpl(
+_DailySessionDto _$DailySessionDtoFromJson(Map<String, dynamic> json) =>
+    _DailySessionDto(
       sessionId: json['session_id'] as String,
       startedAt: DateTime.parse(json['started_at'] as String),
       endedAt: DateTime.parse(json['ended_at'] as String),
@@ -171,8 +159,7 @@ _$DailySessionDtoImpl _$$DailySessionDtoImplFromJson(
       bookCoverUrl: json['book_cover_url'] as String?,
     );
 
-Map<String, dynamic> _$$DailySessionDtoImplToJson(
-        _$DailySessionDtoImpl instance) =>
+Map<String, dynamic> _$DailySessionDtoToJson(_DailySessionDto instance) =>
     <String, dynamic>{
       'session_id': instance.sessionId,
       'started_at': instance.startedAt.toIso8601String(),
@@ -185,9 +172,9 @@ Map<String, dynamic> _$$DailySessionDtoImplToJson(
       'book_cover_url': instance.bookCoverUrl,
     };
 
-_$DailySessionsResponseDtoImpl _$$DailySessionsResponseDtoImplFromJson(
+_DailySessionsResponseDto _$DailySessionsResponseDtoFromJson(
         Map<String, dynamic> json) =>
-    _$DailySessionsResponseDtoImpl(
+    _DailySessionsResponseDto(
       date: json['date'] as String,
       totalSeconds: (json['total_seconds'] as num).toInt(),
       sessions: (json['sessions'] as List<dynamic>)
@@ -195,53 +182,50 @@ _$DailySessionsResponseDtoImpl _$$DailySessionsResponseDtoImplFromJson(
           .toList(),
     );
 
-Map<String, dynamic> _$$DailySessionsResponseDtoImplToJson(
-        _$DailySessionsResponseDtoImpl instance) =>
+Map<String, dynamic> _$DailySessionsResponseDtoToJson(
+        _DailySessionsResponseDto instance) =>
     <String, dynamic>{
       'date': instance.date,
       'total_seconds': instance.totalSeconds,
       'sessions': instance.sessions.map((e) => e.toJson()).toList(),
     };
 
-_$StartSessionRequestImpl _$$StartSessionRequestImplFromJson(
-        Map<String, dynamic> json) =>
-    _$StartSessionRequestImpl(
+_StartSessionRequest _$StartSessionRequestFromJson(Map<String, dynamic> json) =>
+    _StartSessionRequest(
       userBookId: json['user_book_id'] as String,
       device: json['device'] as String,
     );
 
-Map<String, dynamic> _$$StartSessionRequestImplToJson(
-        _$StartSessionRequestImpl instance) =>
+Map<String, dynamic> _$StartSessionRequestToJson(
+        _StartSessionRequest instance) =>
     <String, dynamic>{
       'user_book_id': instance.userBookId,
       'device': instance.device,
     };
 
-_$EndSessionRequestImpl _$$EndSessionRequestImplFromJson(
-        Map<String, dynamic> json) =>
-    _$EndSessionRequestImpl(
+_EndSessionRequest _$EndSessionRequestFromJson(Map<String, dynamic> json) =>
+    _EndSessionRequest(
       endedAt: DateTime.parse(json['ended_at'] as String),
       pausedMs: (json['paused_ms'] as num).toInt(),
     );
 
-Map<String, dynamic> _$$EndSessionRequestImplToJson(
-        _$EndSessionRequestImpl instance) =>
+Map<String, dynamic> _$EndSessionRequestToJson(_EndSessionRequest instance) =>
     <String, dynamic>{
       'ended_at': instance.endedAt.toIso8601String(),
       'paused_ms': instance.pausedMs,
     };
 
-_$ManualSessionRequestImpl _$$ManualSessionRequestImplFromJson(
+_ManualSessionRequest _$ManualSessionRequestFromJson(
         Map<String, dynamic> json) =>
-    _$ManualSessionRequestImpl(
+    _ManualSessionRequest(
       userBookId: json['user_book_id'] as String,
       startedAt: DateTime.parse(json['started_at'] as String),
       endedAt: DateTime.parse(json['ended_at'] as String),
       note: json['note'] as String?,
     );
 
-Map<String, dynamic> _$$ManualSessionRequestImplToJson(
-        _$ManualSessionRequestImpl instance) =>
+Map<String, dynamic> _$ManualSessionRequestToJson(
+        _ManualSessionRequest instance) =>
     <String, dynamic>{
       'user_book_id': instance.userBookId,
       'started_at': instance.startedAt.toIso8601String(),
@@ -249,25 +233,22 @@ Map<String, dynamic> _$$ManualSessionRequestImplToJson(
       'note': instance.note,
     };
 
-_$CreateGoalRequestImpl _$$CreateGoalRequestImplFromJson(
-        Map<String, dynamic> json) =>
-    _$CreateGoalRequestImpl(
+_CreateGoalRequest _$CreateGoalRequestFromJson(Map<String, dynamic> json) =>
+    _CreateGoalRequest(
       period: json['period'] as String,
       targetBooks: (json['target_books'] as num).toInt(),
       targetSeconds: (json['target_seconds'] as num).toInt(),
     );
 
-Map<String, dynamic> _$$CreateGoalRequestImplToJson(
-        _$CreateGoalRequestImpl instance) =>
+Map<String, dynamic> _$CreateGoalRequestToJson(_CreateGoalRequest instance) =>
     <String, dynamic>{
       'period': instance.period,
       'target_books': instance.targetBooks,
       'target_seconds': instance.targetSeconds,
     };
 
-_$ReadingYearStatsDtoImpl _$$ReadingYearStatsDtoImplFromJson(
-        Map<String, dynamic> json) =>
-    _$ReadingYearStatsDtoImpl(
+_ReadingYearStatsDto _$ReadingYearStatsDtoFromJson(Map<String, dynamic> json) =>
+    _ReadingYearStatsDto(
       year: (json['year'] as num).toInt(),
       yearBooks: (json['year_books'] as num).toInt(),
       yearSeconds: (json['year_seconds'] as num).toInt(),
@@ -279,8 +260,8 @@ _$ReadingYearStatsDtoImpl _$$ReadingYearStatsDtoImplFromJson(
       longestStreak: (json['longest_streak'] as num).toInt(),
     );
 
-Map<String, dynamic> _$$ReadingYearStatsDtoImplToJson(
-        _$ReadingYearStatsDtoImpl instance) =>
+Map<String, dynamic> _$ReadingYearStatsDtoToJson(
+        _ReadingYearStatsDto instance) =>
     <String, dynamic>{
       'year': instance.year,
       'year_books': instance.yearBooks,

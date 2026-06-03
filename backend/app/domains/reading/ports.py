@@ -191,6 +191,50 @@ class GoalRepositoryPort(Protocol):
     async def list_active(self, user_id: UUID, on_date: date) -> list[Goal]: ...
 
 
+@dataclass(frozen=True, slots=True)
+class ReadingSpeedStats:
+    """Average reading speed metrics."""
+
+    avg_minutes_per_page: float | None
+    avg_pages_per_hour: float | None
+
+
+@dataclass(frozen=True, slots=True)
+class FormatBreakdown:
+    """Book format distribution for a user's completed books."""
+
+    paper: int
+    ebook: int
+    audio: int
+
+
+@dataclass(frozen=True, slots=True)
+class MonthlyHours:
+    """Total reading hours for a single calendar month."""
+
+    month: str  # "YYYY-MM"
+    hours: float
+
+
+@dataclass(frozen=True, slots=True)
+class GenreBreakdown:
+    """Completed book count for a single genre."""
+
+    genre: str
+    count: int
+
+
+@dataclass(frozen=True, slots=True)
+class ReadingStats:
+    """Aggregate reading statistics returned by the stats endpoint."""
+
+    speed: ReadingSpeedStats
+    format_breakdown: FormatBreakdown
+    monthly_hours: list[MonthlyHours]
+    genre_breakdown: list[GenreBreakdown]
+    avg_completion_days: float | None
+
+
 class ReadingBookQueryPort(Protocol):
     """Cross-domain view into the Book domain's UserBook table.
 

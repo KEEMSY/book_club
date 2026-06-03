@@ -21,15 +21,15 @@ dependencies:
   go_router: ^14.6.2
 
   # Models / serialization annotations
-  freezed_annotation: ^2.4.4
+  freezed_annotation: ^3.0.0
   json_annotation: ^4.9.0
 
   # HTTP
   dio: ^5.7.0
-  # Pinned below 4.5 — retrofit 4.5+ + retrofit_generator 10.x require
-  # build ^4.0.0 which conflicts with freezed ^2.x (needs build ^2.3.1).
-  # Full upgrade path: freezed 2→3 (breaking) then retrofit + generator + custom_lint together.
-  retrofit: '>=4.4.1 <4.5.0'
+  # retrofit_generator 9.x (source_gen ^2, riverpod_generator 2.x compatible) does not
+  # handle Parser.DartMappable added in retrofit 4.9.0. Cap at ^4.8.0 until
+  # riverpod_generator migrates to 3.x which allows retrofit_generator 10.x.
+  retrofit: ^4.8.0
 
   # Secure storage (JWT)
   flutter_secure_storage: ^9.2.4
@@ -88,21 +88,20 @@ dev_dependencies:
 
   # Code generation
   build_runner: ^2.4.13
-  freezed: ^2.5.7
+  freezed: ^3.0.0
   json_serializable: ^6.9.0
-  retrofit_generator: ^9.1.5
+  retrofit_generator: ^9.7.0
   riverpod_generator: ^2.6.3
 
   # Lint plugins (Riverpod-aware)
-  # custom_lint 0.8+ / riverpod_lint 3.x / retrofit_generator 10.x all
-  # require freezed 3.x (build ^4.0.0 conflicts with freezed ^2.x build ^2.3.1).
-  # Upgrade all four together after the freezed 2→3 migration (Phase 2 task).
+  # riverpod_lint 3.x requires riverpod_generator 4.x / flutter_riverpod 3.x —
+  # upgrade together as a separate step after the Riverpod 2→3 migration.
   custom_lint: ^0.7.0
   riverpod_lint: ^2.6.3
 
 # analyzer_plugin 0.13.x fixes the Element2 namespace split that 0.12.0
 # exposed against analyzer 7.6. Remove once custom_lint/riverpod_lint include
-# a compatible version as a direct constraint (blocked on freezed 3.x migration).
+# a compatible version as a direct constraint.
 dependency_overrides:
   analyzer_plugin: ^0.13.0
 

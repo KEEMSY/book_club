@@ -11,7 +11,7 @@ part 'notification_models.g.dart';
 /// Field names are snake_case-mapped automatically via `build.yaml`
 /// `field_rename: snake`, so no `@JsonKey` annotations are needed.
 @freezed
-class NotificationDto with _$NotificationDto {
+abstract class NotificationDto with _$NotificationDto {
   const factory NotificationDto({
     required String id,
     required String ntype,
@@ -28,7 +28,7 @@ class NotificationDto with _$NotificationDto {
 
 /// Cursor-paged envelope for `GET /notifications`.
 @freezed
-class NotificationListResponse with _$NotificationListResponse {
+abstract class NotificationListResponse with _$NotificationListResponse {
   const factory NotificationListResponse({
     required List<NotificationDto> items,
     String? nextCursor,
@@ -41,7 +41,7 @@ class NotificationListResponse with _$NotificationListResponse {
 
 /// Response for `GET /notifications/unread-count`.
 @freezed
-class UnreadCountResponse with _$UnreadCountResponse {
+abstract class UnreadCountResponse with _$UnreadCountResponse {
   const factory UnreadCountResponse({
     required int unreadCount,
   }) = _UnreadCountResponse;
@@ -52,7 +52,7 @@ class UnreadCountResponse with _$UnreadCountResponse {
 
 /// Response for `GET /reports/weekly`. 404 when no report exists for the week.
 @freezed
-class WeeklyReportResponse with _$WeeklyReportResponse {
+abstract class WeeklyReportResponse with _$WeeklyReportResponse {
   const factory WeeklyReportResponse({
     required String id,
     required String weekStart,

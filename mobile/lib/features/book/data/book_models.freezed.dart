@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,217 +9,34 @@ part of 'book_models.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-BookDto _$BookDtoFromJson(Map<String, dynamic> json) {
-  return _BookDto.fromJson(json);
-}
 
 /// @nodoc
 mixin _$BookDto {
-  String get id => throw _privateConstructorUsedError;
-  String get isbn13 => throw _privateConstructorUsedError;
-  String get title => throw _privateConstructorUsedError;
-  String get author => throw _privateConstructorUsedError;
-  String get publisher => throw _privateConstructorUsedError;
-  String? get coverUrl => throw _privateConstructorUsedError;
-  String? get description => throw _privateConstructorUsedError;
-
-  /// Serializes this BookDto to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  String get id;
+  String get isbn13;
+  String get title;
+  String get author;
+  String get publisher;
+  String? get coverUrl;
+  String? get description;
 
   /// Create a copy of BookDto
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $BookDtoCopyWith<BookDto> get copyWith => throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $BookDtoCopyWith<$Res> {
-  factory $BookDtoCopyWith(BookDto value, $Res Function(BookDto) then) =
-      _$BookDtoCopyWithImpl<$Res, BookDto>;
-  @useResult
-  $Res call(
-      {String id,
-      String isbn13,
-      String title,
-      String author,
-      String publisher,
-      String? coverUrl,
-      String? description});
-}
-
-/// @nodoc
-class _$BookDtoCopyWithImpl<$Res, $Val extends BookDto>
-    implements $BookDtoCopyWith<$Res> {
-  _$BookDtoCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of BookDto
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? isbn13 = null,
-    Object? title = null,
-    Object? author = null,
-    Object? publisher = null,
-    Object? coverUrl = freezed,
-    Object? description = freezed,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      isbn13: null == isbn13
-          ? _value.isbn13
-          : isbn13 // ignore: cast_nullable_to_non_nullable
-              as String,
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      author: null == author
-          ? _value.author
-          : author // ignore: cast_nullable_to_non_nullable
-              as String,
-      publisher: null == publisher
-          ? _value.publisher
-          : publisher // ignore: cast_nullable_to_non_nullable
-              as String,
-      coverUrl: freezed == coverUrl
-          ? _value.coverUrl
-          : coverUrl // ignore: cast_nullable_to_non_nullable
-              as String?,
-      description: freezed == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ) as $Val);
-  }
-}
+  $BookDtoCopyWith<BookDto> get copyWith =>
+      _$BookDtoCopyWithImpl<BookDto>(this as BookDto, _$identity);
 
-/// @nodoc
-abstract class _$$BookDtoImplCopyWith<$Res> implements $BookDtoCopyWith<$Res> {
-  factory _$$BookDtoImplCopyWith(
-          _$BookDtoImpl value, $Res Function(_$BookDtoImpl) then) =
-      __$$BookDtoImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {String id,
-      String isbn13,
-      String title,
-      String author,
-      String publisher,
-      String? coverUrl,
-      String? description});
-}
-
-/// @nodoc
-class __$$BookDtoImplCopyWithImpl<$Res>
-    extends _$BookDtoCopyWithImpl<$Res, _$BookDtoImpl>
-    implements _$$BookDtoImplCopyWith<$Res> {
-  __$$BookDtoImplCopyWithImpl(
-      _$BookDtoImpl _value, $Res Function(_$BookDtoImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of BookDto
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? isbn13 = null,
-    Object? title = null,
-    Object? author = null,
-    Object? publisher = null,
-    Object? coverUrl = freezed,
-    Object? description = freezed,
-  }) {
-    return _then(_$BookDtoImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      isbn13: null == isbn13
-          ? _value.isbn13
-          : isbn13 // ignore: cast_nullable_to_non_nullable
-              as String,
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      author: null == author
-          ? _value.author
-          : author // ignore: cast_nullable_to_non_nullable
-              as String,
-      publisher: null == publisher
-          ? _value.publisher
-          : publisher // ignore: cast_nullable_to_non_nullable
-              as String,
-      coverUrl: freezed == coverUrl
-          ? _value.coverUrl
-          : coverUrl // ignore: cast_nullable_to_non_nullable
-              as String?,
-      description: freezed == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ));
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$BookDtoImpl extends _BookDto {
-  const _$BookDtoImpl(
-      {required this.id,
-      required this.isbn13,
-      required this.title,
-      required this.author,
-      required this.publisher,
-      this.coverUrl,
-      this.description})
-      : super._();
-
-  factory _$BookDtoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$BookDtoImplFromJson(json);
-
-  @override
-  final String id;
-  @override
-  final String isbn13;
-  @override
-  final String title;
-  @override
-  final String author;
-  @override
-  final String publisher;
-  @override
-  final String? coverUrl;
-  @override
-  final String? description;
-
-  @override
-  String toString() {
-    return 'BookDto(id: $id, isbn13: $isbn13, title: $title, author: $author, publisher: $publisher, coverUrl: $coverUrl, description: $description)';
-  }
+  /// Serializes this BookDto to a JSON map.
+  Map<String, dynamic> toJson();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$BookDtoImpl &&
+            other is BookDto &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isbn13, isbn13) || other.isbn13 == isbn13) &&
             (identical(other.title, title) || other.title == title) &&
@@ -237,282 +54,413 @@ class _$BookDtoImpl extends _BookDto {
   int get hashCode => Object.hash(
       runtimeType, id, isbn13, title, author, publisher, coverUrl, description);
 
-  /// Create a copy of BookDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$BookDtoImplCopyWith<_$BookDtoImpl> get copyWith =>
-      __$$BookDtoImplCopyWithImpl<_$BookDtoImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$BookDtoImplToJson(
-      this,
-    );
+  String toString() {
+    return 'BookDto(id: $id, isbn13: $isbn13, title: $title, author: $author, publisher: $publisher, coverUrl: $coverUrl, description: $description)';
   }
 }
 
-abstract class _BookDto extends BookDto {
-  const factory _BookDto(
-      {required final String id,
-      required final String isbn13,
-      required final String title,
-      required final String author,
-      required final String publisher,
-      final String? coverUrl,
-      final String? description}) = _$BookDtoImpl;
-  const _BookDto._() : super._();
-
-  factory _BookDto.fromJson(Map<String, dynamic> json) = _$BookDtoImpl.fromJson;
-
-  @override
-  String get id;
-  @override
-  String get isbn13;
-  @override
-  String get title;
-  @override
-  String get author;
-  @override
-  String get publisher;
-  @override
-  String? get coverUrl;
-  @override
-  String? get description;
-
-  /// Create a copy of BookDto
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$BookDtoImplCopyWith<_$BookDtoImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-UserBookDto _$UserBookDtoFromJson(Map<String, dynamic> json) {
-  return _UserBookDto.fromJson(json);
-}
-
 /// @nodoc
-mixin _$UserBookDto {
-  String get id => throw _privateConstructorUsedError;
-  BookDto get book => throw _privateConstructorUsedError;
-  String get status => throw _privateConstructorUsedError;
-  DateTime? get startedAt => throw _privateConstructorUsedError;
-  DateTime? get finishedAt => throw _privateConstructorUsedError;
-  int? get rating => throw _privateConstructorUsedError;
-  String? get oneLineReview => throw _privateConstructorUsedError;
-
-  /// Serializes this UserBookDto to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of UserBookDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $UserBookDtoCopyWith<UserBookDto> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $UserBookDtoCopyWith<$Res> {
-  factory $UserBookDtoCopyWith(
-          UserBookDto value, $Res Function(UserBookDto) then) =
-      _$UserBookDtoCopyWithImpl<$Res, UserBookDto>;
+abstract mixin class $BookDtoCopyWith<$Res> {
+  factory $BookDtoCopyWith(BookDto value, $Res Function(BookDto) _then) =
+      _$BookDtoCopyWithImpl;
   @useResult
   $Res call(
       {String id,
-      BookDto book,
-      String status,
-      DateTime? startedAt,
-      DateTime? finishedAt,
-      int? rating,
-      String? oneLineReview});
-
-  $BookDtoCopyWith<$Res> get book;
+      String isbn13,
+      String title,
+      String author,
+      String publisher,
+      String? coverUrl,
+      String? description});
 }
 
 /// @nodoc
-class _$UserBookDtoCopyWithImpl<$Res, $Val extends UserBookDto>
-    implements $UserBookDtoCopyWith<$Res> {
-  _$UserBookDtoCopyWithImpl(this._value, this._then);
+class _$BookDtoCopyWithImpl<$Res> implements $BookDtoCopyWith<$Res> {
+  _$BookDtoCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final BookDto _self;
+  final $Res Function(BookDto) _then;
 
-  /// Create a copy of UserBookDto
+  /// Create a copy of BookDto
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
     Object? id = null,
-    Object? book = null,
-    Object? status = null,
-    Object? startedAt = freezed,
-    Object? finishedAt = freezed,
-    Object? rating = freezed,
-    Object? oneLineReview = freezed,
+    Object? isbn13 = null,
+    Object? title = null,
+    Object? author = null,
+    Object? publisher = null,
+    Object? coverUrl = freezed,
+    Object? description = freezed,
   }) {
-    return _then(_value.copyWith(
+    return _then(_self.copyWith(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      book: null == book
-          ? _value.book
-          : book // ignore: cast_nullable_to_non_nullable
-              as BookDto,
-      status: null == status
-          ? _value.status
-          : status // ignore: cast_nullable_to_non_nullable
+      isbn13: null == isbn13
+          ? _self.isbn13
+          : isbn13 // ignore: cast_nullable_to_non_nullable
               as String,
-      startedAt: freezed == startedAt
-          ? _value.startedAt
-          : startedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      finishedAt: freezed == finishedAt
-          ? _value.finishedAt
-          : finishedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      rating: freezed == rating
-          ? _value.rating
-          : rating // ignore: cast_nullable_to_non_nullable
-              as int?,
-      oneLineReview: freezed == oneLineReview
-          ? _value.oneLineReview
-          : oneLineReview // ignore: cast_nullable_to_non_nullable
+      title: null == title
+          ? _self.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      author: null == author
+          ? _self.author
+          : author // ignore: cast_nullable_to_non_nullable
+              as String,
+      publisher: null == publisher
+          ? _self.publisher
+          : publisher // ignore: cast_nullable_to_non_nullable
+              as String,
+      coverUrl: freezed == coverUrl
+          ? _self.coverUrl
+          : coverUrl // ignore: cast_nullable_to_non_nullable
               as String?,
-    ) as $Val);
-  }
-
-  /// Create a copy of UserBookDto
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $BookDtoCopyWith<$Res> get book {
-    return $BookDtoCopyWith<$Res>(_value.book, (value) {
-      return _then(_value.copyWith(book: value) as $Val);
-    });
-  }
-}
-
-/// @nodoc
-abstract class _$$UserBookDtoImplCopyWith<$Res>
-    implements $UserBookDtoCopyWith<$Res> {
-  factory _$$UserBookDtoImplCopyWith(
-          _$UserBookDtoImpl value, $Res Function(_$UserBookDtoImpl) then) =
-      __$$UserBookDtoImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {String id,
-      BookDto book,
-      String status,
-      DateTime? startedAt,
-      DateTime? finishedAt,
-      int? rating,
-      String? oneLineReview});
-
-  @override
-  $BookDtoCopyWith<$Res> get book;
-}
-
-/// @nodoc
-class __$$UserBookDtoImplCopyWithImpl<$Res>
-    extends _$UserBookDtoCopyWithImpl<$Res, _$UserBookDtoImpl>
-    implements _$$UserBookDtoImplCopyWith<$Res> {
-  __$$UserBookDtoImplCopyWithImpl(
-      _$UserBookDtoImpl _value, $Res Function(_$UserBookDtoImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of UserBookDto
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? book = null,
-    Object? status = null,
-    Object? startedAt = freezed,
-    Object? finishedAt = freezed,
-    Object? rating = freezed,
-    Object? oneLineReview = freezed,
-  }) {
-    return _then(_$UserBookDtoImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      book: null == book
-          ? _value.book
-          : book // ignore: cast_nullable_to_non_nullable
-              as BookDto,
-      status: null == status
-          ? _value.status
-          : status // ignore: cast_nullable_to_non_nullable
-              as String,
-      startedAt: freezed == startedAt
-          ? _value.startedAt
-          : startedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      finishedAt: freezed == finishedAt
-          ? _value.finishedAt
-          : finishedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      rating: freezed == rating
-          ? _value.rating
-          : rating // ignore: cast_nullable_to_non_nullable
-              as int?,
-      oneLineReview: freezed == oneLineReview
-          ? _value.oneLineReview
-          : oneLineReview // ignore: cast_nullable_to_non_nullable
+      description: freezed == description
+          ? _self.description
+          : description // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [BookDto].
+extension BookDtoPatterns on BookDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_BookDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _BookDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_BookDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _BookDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_BookDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _BookDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String id, String isbn13, String title, String author,
+            String publisher, String? coverUrl, String? description)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _BookDto() when $default != null:
+        return $default(_that.id, _that.isbn13, _that.title, _that.author,
+            _that.publisher, _that.coverUrl, _that.description);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String id, String isbn13, String title, String author,
+            String publisher, String? coverUrl, String? description)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _BookDto():
+        return $default(_that.id, _that.isbn13, _that.title, _that.author,
+            _that.publisher, _that.coverUrl, _that.description);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String id, String isbn13, String title, String author,
+            String publisher, String? coverUrl, String? description)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _BookDto() when $default != null:
+        return $default(_that.id, _that.isbn13, _that.title, _that.author,
+            _that.publisher, _that.coverUrl, _that.description);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$UserBookDtoImpl extends _UserBookDto {
-  const _$UserBookDtoImpl(
+class _BookDto extends BookDto {
+  const _BookDto(
       {required this.id,
-      required this.book,
-      required this.status,
-      this.startedAt,
-      this.finishedAt,
-      this.rating,
-      this.oneLineReview})
+      required this.isbn13,
+      required this.title,
+      required this.author,
+      required this.publisher,
+      this.coverUrl,
+      this.description})
       : super._();
-
-  factory _$UserBookDtoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$UserBookDtoImplFromJson(json);
+  factory _BookDto.fromJson(Map<String, dynamic> json) =>
+      _$BookDtoFromJson(json);
 
   @override
   final String id;
   @override
-  final BookDto book;
+  final String isbn13;
   @override
-  final String status;
+  final String title;
   @override
-  final DateTime? startedAt;
+  final String author;
   @override
-  final DateTime? finishedAt;
+  final String publisher;
   @override
-  final int? rating;
+  final String? coverUrl;
   @override
-  final String? oneLineReview;
+  final String? description;
+
+  /// Create a copy of BookDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$BookDtoCopyWith<_BookDto> get copyWith =>
+      __$BookDtoCopyWithImpl<_BookDto>(this, _$identity);
 
   @override
-  String toString() {
-    return 'UserBookDto(id: $id, book: $book, status: $status, startedAt: $startedAt, finishedAt: $finishedAt, rating: $rating, oneLineReview: $oneLineReview)';
+  Map<String, dynamic> toJson() {
+    return _$BookDtoToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$UserBookDtoImpl &&
+            other is _BookDto &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.isbn13, isbn13) || other.isbn13 == isbn13) &&
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.author, author) || other.author == author) &&
+            (identical(other.publisher, publisher) ||
+                other.publisher == publisher) &&
+            (identical(other.coverUrl, coverUrl) ||
+                other.coverUrl == coverUrl) &&
+            (identical(other.description, description) ||
+                other.description == description));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, id, isbn13, title, author, publisher, coverUrl, description);
+
+  @override
+  String toString() {
+    return 'BookDto(id: $id, isbn13: $isbn13, title: $title, author: $author, publisher: $publisher, coverUrl: $coverUrl, description: $description)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$BookDtoCopyWith<$Res> implements $BookDtoCopyWith<$Res> {
+  factory _$BookDtoCopyWith(_BookDto value, $Res Function(_BookDto) _then) =
+      __$BookDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      String isbn13,
+      String title,
+      String author,
+      String publisher,
+      String? coverUrl,
+      String? description});
+}
+
+/// @nodoc
+class __$BookDtoCopyWithImpl<$Res> implements _$BookDtoCopyWith<$Res> {
+  __$BookDtoCopyWithImpl(this._self, this._then);
+
+  final _BookDto _self;
+  final $Res Function(_BookDto) _then;
+
+  /// Create a copy of BookDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? isbn13 = null,
+    Object? title = null,
+    Object? author = null,
+    Object? publisher = null,
+    Object? coverUrl = freezed,
+    Object? description = freezed,
+  }) {
+    return _then(_BookDto(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      isbn13: null == isbn13
+          ? _self.isbn13
+          : isbn13 // ignore: cast_nullable_to_non_nullable
+              as String,
+      title: null == title
+          ? _self.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      author: null == author
+          ? _self.author
+          : author // ignore: cast_nullable_to_non_nullable
+              as String,
+      publisher: null == publisher
+          ? _self.publisher
+          : publisher // ignore: cast_nullable_to_non_nullable
+              as String,
+      coverUrl: freezed == coverUrl
+          ? _self.coverUrl
+          : coverUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      description: freezed == description
+          ? _self.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$UserBookDto {
+  String get id;
+  BookDto get book;
+  String get status;
+  DateTime? get startedAt;
+  DateTime? get finishedAt;
+  int? get rating;
+  String? get oneLineReview;
+
+  /// Create a copy of UserBookDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $UserBookDtoCopyWith<UserBookDto> get copyWith =>
+      _$UserBookDtoCopyWithImpl<UserBookDto>(this as UserBookDto, _$identity);
+
+  /// Serializes this UserBookDto to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is UserBookDto &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.book, book) || other.book == book) &&
             (identical(other.status, status) || other.status == status) &&
@@ -530,148 +478,490 @@ class _$UserBookDtoImpl extends _UserBookDto {
   int get hashCode => Object.hash(runtimeType, id, book, status, startedAt,
       finishedAt, rating, oneLineReview);
 
-  /// Create a copy of UserBookDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$UserBookDtoImplCopyWith<_$UserBookDtoImpl> get copyWith =>
-      __$$UserBookDtoImplCopyWithImpl<_$UserBookDtoImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$UserBookDtoImplToJson(
-      this,
-    );
+  String toString() {
+    return 'UserBookDto(id: $id, book: $book, status: $status, startedAt: $startedAt, finishedAt: $finishedAt, rating: $rating, oneLineReview: $oneLineReview)';
   }
 }
 
-abstract class _UserBookDto extends UserBookDto {
-  const factory _UserBookDto(
-      {required final String id,
-      required final BookDto book,
-      required final String status,
-      final DateTime? startedAt,
-      final DateTime? finishedAt,
-      final int? rating,
-      final String? oneLineReview}) = _$UserBookDtoImpl;
-  const _UserBookDto._() : super._();
+/// @nodoc
+abstract mixin class $UserBookDtoCopyWith<$Res> {
+  factory $UserBookDtoCopyWith(
+          UserBookDto value, $Res Function(UserBookDto) _then) =
+      _$UserBookDtoCopyWithImpl;
+  @useResult
+  $Res call(
+      {String id,
+      BookDto book,
+      String status,
+      DateTime? startedAt,
+      DateTime? finishedAt,
+      int? rating,
+      String? oneLineReview});
 
-  factory _UserBookDto.fromJson(Map<String, dynamic> json) =
-      _$UserBookDtoImpl.fromJson;
+  $BookDtoCopyWith<$Res> get book;
+}
+
+/// @nodoc
+class _$UserBookDtoCopyWithImpl<$Res> implements $UserBookDtoCopyWith<$Res> {
+  _$UserBookDtoCopyWithImpl(this._self, this._then);
+
+  final UserBookDto _self;
+  final $Res Function(UserBookDto) _then;
+
+  /// Create a copy of UserBookDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? book = null,
+    Object? status = null,
+    Object? startedAt = freezed,
+    Object? finishedAt = freezed,
+    Object? rating = freezed,
+    Object? oneLineReview = freezed,
+  }) {
+    return _then(_self.copyWith(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      book: null == book
+          ? _self.book
+          : book // ignore: cast_nullable_to_non_nullable
+              as BookDto,
+      status: null == status
+          ? _self.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as String,
+      startedAt: freezed == startedAt
+          ? _self.startedAt
+          : startedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      finishedAt: freezed == finishedAt
+          ? _self.finishedAt
+          : finishedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      rating: freezed == rating
+          ? _self.rating
+          : rating // ignore: cast_nullable_to_non_nullable
+              as int?,
+      oneLineReview: freezed == oneLineReview
+          ? _self.oneLineReview
+          : oneLineReview // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+
+  /// Create a copy of UserBookDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $BookDtoCopyWith<$Res> get book {
+    return $BookDtoCopyWith<$Res>(_self.book, (value) {
+      return _then(_self.copyWith(book: value));
+    });
+  }
+}
+
+/// Adds pattern-matching-related methods to [UserBookDto].
+extension UserBookDtoPatterns on UserBookDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_UserBookDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _UserBookDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_UserBookDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _UserBookDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_UserBookDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _UserBookDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String id,
+            BookDto book,
+            String status,
+            DateTime? startedAt,
+            DateTime? finishedAt,
+            int? rating,
+            String? oneLineReview)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _UserBookDto() when $default != null:
+        return $default(_that.id, _that.book, _that.status, _that.startedAt,
+            _that.finishedAt, _that.rating, _that.oneLineReview);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String id,
+            BookDto book,
+            String status,
+            DateTime? startedAt,
+            DateTime? finishedAt,
+            int? rating,
+            String? oneLineReview)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _UserBookDto():
+        return $default(_that.id, _that.book, _that.status, _that.startedAt,
+            _that.finishedAt, _that.rating, _that.oneLineReview);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String id,
+            BookDto book,
+            String status,
+            DateTime? startedAt,
+            DateTime? finishedAt,
+            int? rating,
+            String? oneLineReview)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _UserBookDto() when $default != null:
+        return $default(_that.id, _that.book, _that.status, _that.startedAt,
+            _that.finishedAt, _that.rating, _that.oneLineReview);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _UserBookDto extends UserBookDto {
+  const _UserBookDto(
+      {required this.id,
+      required this.book,
+      required this.status,
+      this.startedAt,
+      this.finishedAt,
+      this.rating,
+      this.oneLineReview})
+      : super._();
+  factory _UserBookDto.fromJson(Map<String, dynamic> json) =>
+      _$UserBookDtoFromJson(json);
 
   @override
-  String get id;
+  final String id;
   @override
-  BookDto get book;
+  final BookDto book;
   @override
-  String get status;
+  final String status;
   @override
-  DateTime? get startedAt;
+  final DateTime? startedAt;
   @override
-  DateTime? get finishedAt;
+  final DateTime? finishedAt;
   @override
-  int? get rating;
+  final int? rating;
   @override
-  String? get oneLineReview;
+  final String? oneLineReview;
 
   /// Create a copy of UserBookDto
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$UserBookDtoImplCopyWith<_$UserBookDtoImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  _$UserBookDtoCopyWith<_UserBookDto> get copyWith =>
+      __$UserBookDtoCopyWithImpl<_UserBookDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$UserBookDtoToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _UserBookDto &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.book, book) || other.book == book) &&
+            (identical(other.status, status) || other.status == status) &&
+            (identical(other.startedAt, startedAt) ||
+                other.startedAt == startedAt) &&
+            (identical(other.finishedAt, finishedAt) ||
+                other.finishedAt == finishedAt) &&
+            (identical(other.rating, rating) || other.rating == rating) &&
+            (identical(other.oneLineReview, oneLineReview) ||
+                other.oneLineReview == oneLineReview));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, book, status, startedAt,
+      finishedAt, rating, oneLineReview);
+
+  @override
+  String toString() {
+    return 'UserBookDto(id: $id, book: $book, status: $status, startedAt: $startedAt, finishedAt: $finishedAt, rating: $rating, oneLineReview: $oneLineReview)';
+  }
 }
 
-BookSearchResponse _$BookSearchResponseFromJson(Map<String, dynamic> json) {
-  return _BookSearchResponse.fromJson(json);
+/// @nodoc
+abstract mixin class _$UserBookDtoCopyWith<$Res>
+    implements $UserBookDtoCopyWith<$Res> {
+  factory _$UserBookDtoCopyWith(
+          _UserBookDto value, $Res Function(_UserBookDto) _then) =
+      __$UserBookDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      BookDto book,
+      String status,
+      DateTime? startedAt,
+      DateTime? finishedAt,
+      int? rating,
+      String? oneLineReview});
+
+  @override
+  $BookDtoCopyWith<$Res> get book;
+}
+
+/// @nodoc
+class __$UserBookDtoCopyWithImpl<$Res> implements _$UserBookDtoCopyWith<$Res> {
+  __$UserBookDtoCopyWithImpl(this._self, this._then);
+
+  final _UserBookDto _self;
+  final $Res Function(_UserBookDto) _then;
+
+  /// Create a copy of UserBookDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? book = null,
+    Object? status = null,
+    Object? startedAt = freezed,
+    Object? finishedAt = freezed,
+    Object? rating = freezed,
+    Object? oneLineReview = freezed,
+  }) {
+    return _then(_UserBookDto(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      book: null == book
+          ? _self.book
+          : book // ignore: cast_nullable_to_non_nullable
+              as BookDto,
+      status: null == status
+          ? _self.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as String,
+      startedAt: freezed == startedAt
+          ? _self.startedAt
+          : startedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      finishedAt: freezed == finishedAt
+          ? _self.finishedAt
+          : finishedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      rating: freezed == rating
+          ? _self.rating
+          : rating // ignore: cast_nullable_to_non_nullable
+              as int?,
+      oneLineReview: freezed == oneLineReview
+          ? _self.oneLineReview
+          : oneLineReview // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+
+  /// Create a copy of UserBookDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $BookDtoCopyWith<$Res> get book {
+    return $BookDtoCopyWith<$Res>(_self.book, (value) {
+      return _then(_self.copyWith(book: value));
+    });
+  }
 }
 
 /// @nodoc
 mixin _$BookSearchResponse {
-  List<BookDto> get items => throw _privateConstructorUsedError;
-  int get page => throw _privateConstructorUsedError;
-  int get size => throw _privateConstructorUsedError;
-  bool get hasMore => throw _privateConstructorUsedError;
-
-  /// Serializes this BookSearchResponse to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  List<BookDto> get items;
+  int get page;
+  int get size;
+  bool get hasMore;
 
   /// Create a copy of BookSearchResponse
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $BookSearchResponseCopyWith<BookSearchResponse> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $BookSearchResponseCopyWith<$Res> {
-  factory $BookSearchResponseCopyWith(
-          BookSearchResponse value, $Res Function(BookSearchResponse) then) =
-      _$BookSearchResponseCopyWithImpl<$Res, BookSearchResponse>;
-  @useResult
-  $Res call({List<BookDto> items, int page, int size, bool hasMore});
-}
-
-/// @nodoc
-class _$BookSearchResponseCopyWithImpl<$Res, $Val extends BookSearchResponse>
-    implements $BookSearchResponseCopyWith<$Res> {
-  _$BookSearchResponseCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of BookSearchResponse
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $BookSearchResponseCopyWith<BookSearchResponse> get copyWith =>
+      _$BookSearchResponseCopyWithImpl<BookSearchResponse>(
+          this as BookSearchResponse, _$identity);
+
+  /// Serializes this BookSearchResponse to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? items = null,
-    Object? page = null,
-    Object? size = null,
-    Object? hasMore = null,
-  }) {
-    return _then(_value.copyWith(
-      items: null == items
-          ? _value.items
-          : items // ignore: cast_nullable_to_non_nullable
-              as List<BookDto>,
-      page: null == page
-          ? _value.page
-          : page // ignore: cast_nullable_to_non_nullable
-              as int,
-      size: null == size
-          ? _value.size
-          : size // ignore: cast_nullable_to_non_nullable
-              as int,
-      hasMore: null == hasMore
-          ? _value.hasMore
-          : hasMore // ignore: cast_nullable_to_non_nullable
-              as bool,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is BookSearchResponse &&
+            const DeepCollectionEquality().equals(other.items, items) &&
+            (identical(other.page, page) || other.page == page) &&
+            (identical(other.size, size) || other.size == size) &&
+            (identical(other.hasMore, hasMore) || other.hasMore == hasMore));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType,
+      const DeepCollectionEquality().hash(items), page, size, hasMore);
+
+  @override
+  String toString() {
+    return 'BookSearchResponse(items: $items, page: $page, size: $size, hasMore: $hasMore)';
   }
 }
 
 /// @nodoc
-abstract class _$$BookSearchResponseImplCopyWith<$Res>
-    implements $BookSearchResponseCopyWith<$Res> {
-  factory _$$BookSearchResponseImplCopyWith(_$BookSearchResponseImpl value,
-          $Res Function(_$BookSearchResponseImpl) then) =
-      __$$BookSearchResponseImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $BookSearchResponseCopyWith<$Res> {
+  factory $BookSearchResponseCopyWith(
+          BookSearchResponse value, $Res Function(BookSearchResponse) _then) =
+      _$BookSearchResponseCopyWithImpl;
   @useResult
   $Res call({List<BookDto> items, int page, int size, bool hasMore});
 }
 
 /// @nodoc
-class __$$BookSearchResponseImplCopyWithImpl<$Res>
-    extends _$BookSearchResponseCopyWithImpl<$Res, _$BookSearchResponseImpl>
-    implements _$$BookSearchResponseImplCopyWith<$Res> {
-  __$$BookSearchResponseImplCopyWithImpl(_$BookSearchResponseImpl _value,
-      $Res Function(_$BookSearchResponseImpl) _then)
-      : super(_value, _then);
+class _$BookSearchResponseCopyWithImpl<$Res>
+    implements $BookSearchResponseCopyWith<$Res> {
+  _$BookSearchResponseCopyWithImpl(this._self, this._then);
+
+  final BookSearchResponse _self;
+  final $Res Function(BookSearchResponse) _then;
 
   /// Create a copy of BookSearchResponse
   /// with the given fields replaced by the non-null parameter values.
@@ -683,39 +973,198 @@ class __$$BookSearchResponseImplCopyWithImpl<$Res>
     Object? size = null,
     Object? hasMore = null,
   }) {
-    return _then(_$BookSearchResponseImpl(
+    return _then(_self.copyWith(
       items: null == items
-          ? _value._items
+          ? _self.items
           : items // ignore: cast_nullable_to_non_nullable
               as List<BookDto>,
       page: null == page
-          ? _value.page
+          ? _self.page
           : page // ignore: cast_nullable_to_non_nullable
               as int,
       size: null == size
-          ? _value.size
+          ? _self.size
           : size // ignore: cast_nullable_to_non_nullable
               as int,
       hasMore: null == hasMore
-          ? _value.hasMore
+          ? _self.hasMore
           : hasMore // ignore: cast_nullable_to_non_nullable
               as bool,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [BookSearchResponse].
+extension BookSearchResponsePatterns on BookSearchResponse {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_BookSearchResponse value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _BookSearchResponse() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_BookSearchResponse value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _BookSearchResponse():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_BookSearchResponse value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _BookSearchResponse() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(List<BookDto> items, int page, int size, bool hasMore)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _BookSearchResponse() when $default != null:
+        return $default(_that.items, _that.page, _that.size, _that.hasMore);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(List<BookDto> items, int page, int size, bool hasMore)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _BookSearchResponse():
+        return $default(_that.items, _that.page, _that.size, _that.hasMore);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(List<BookDto> items, int page, int size, bool hasMore)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _BookSearchResponse() when $default != null:
+        return $default(_that.items, _that.page, _that.size, _that.hasMore);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$BookSearchResponseImpl implements _BookSearchResponse {
-  const _$BookSearchResponseImpl(
+class _BookSearchResponse implements BookSearchResponse {
+  const _BookSearchResponse(
       {required final List<BookDto> items,
       required this.page,
       required this.size,
       required this.hasMore})
       : _items = items;
-
-  factory _$BookSearchResponseImpl.fromJson(Map<String, dynamic> json) =>
-      _$$BookSearchResponseImplFromJson(json);
+  factory _BookSearchResponse.fromJson(Map<String, dynamic> json) =>
+      _$BookSearchResponseFromJson(json);
 
   final List<BookDto> _items;
   @override
@@ -732,16 +1181,26 @@ class _$BookSearchResponseImpl implements _BookSearchResponse {
   @override
   final bool hasMore;
 
+  /// Create a copy of BookSearchResponse
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'BookSearchResponse(items: $items, page: $page, size: $size, hasMore: $hasMore)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$BookSearchResponseCopyWith<_BookSearchResponse> get copyWith =>
+      __$BookSearchResponseCopyWithImpl<_BookSearchResponse>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$BookSearchResponseToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$BookSearchResponseImpl &&
+            other is _BookSearchResponse &&
             const DeepCollectionEquality().equals(other._items, _items) &&
             (identical(other.page, page) || other.page == page) &&
             (identical(other.size, size) || other.size == size) &&
@@ -753,127 +1212,115 @@ class _$BookSearchResponseImpl implements _BookSearchResponse {
   int get hashCode => Object.hash(runtimeType,
       const DeepCollectionEquality().hash(_items), page, size, hasMore);
 
-  /// Create a copy of BookSearchResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$BookSearchResponseImplCopyWith<_$BookSearchResponseImpl> get copyWith =>
-      __$$BookSearchResponseImplCopyWithImpl<_$BookSearchResponseImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$BookSearchResponseImplToJson(
-      this,
-    );
+  String toString() {
+    return 'BookSearchResponse(items: $items, page: $page, size: $size, hasMore: $hasMore)';
   }
 }
 
-abstract class _BookSearchResponse implements BookSearchResponse {
-  const factory _BookSearchResponse(
-      {required final List<BookDto> items,
-      required final int page,
-      required final int size,
-      required final bool hasMore}) = _$BookSearchResponseImpl;
+/// @nodoc
+abstract mixin class _$BookSearchResponseCopyWith<$Res>
+    implements $BookSearchResponseCopyWith<$Res> {
+  factory _$BookSearchResponseCopyWith(
+          _BookSearchResponse value, $Res Function(_BookSearchResponse) _then) =
+      __$BookSearchResponseCopyWithImpl;
+  @override
+  @useResult
+  $Res call({List<BookDto> items, int page, int size, bool hasMore});
+}
 
-  factory _BookSearchResponse.fromJson(Map<String, dynamic> json) =
-      _$BookSearchResponseImpl.fromJson;
+/// @nodoc
+class __$BookSearchResponseCopyWithImpl<$Res>
+    implements _$BookSearchResponseCopyWith<$Res> {
+  __$BookSearchResponseCopyWithImpl(this._self, this._then);
 
-  @override
-  List<BookDto> get items;
-  @override
-  int get page;
-  @override
-  int get size;
-  @override
-  bool get hasMore;
+  final _BookSearchResponse _self;
+  final $Res Function(_BookSearchResponse) _then;
 
   /// Create a copy of BookSearchResponse
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$BookSearchResponseImplCopyWith<_$BookSearchResponseImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-LibraryPageDto _$LibraryPageDtoFromJson(Map<String, dynamic> json) {
-  return _LibraryPageDto.fromJson(json);
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? items = null,
+    Object? page = null,
+    Object? size = null,
+    Object? hasMore = null,
+  }) {
+    return _then(_BookSearchResponse(
+      items: null == items
+          ? _self._items
+          : items // ignore: cast_nullable_to_non_nullable
+              as List<BookDto>,
+      page: null == page
+          ? _self.page
+          : page // ignore: cast_nullable_to_non_nullable
+              as int,
+      size: null == size
+          ? _self.size
+          : size // ignore: cast_nullable_to_non_nullable
+              as int,
+      hasMore: null == hasMore
+          ? _self.hasMore
+          : hasMore // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ));
+  }
 }
 
 /// @nodoc
 mixin _$LibraryPageDto {
-  List<UserBookDto> get items => throw _privateConstructorUsedError;
-  String? get nextCursor => throw _privateConstructorUsedError;
-
-  /// Serializes this LibraryPageDto to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  List<UserBookDto> get items;
+  String? get nextCursor;
 
   /// Create a copy of LibraryPageDto
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $LibraryPageDtoCopyWith<LibraryPageDto> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $LibraryPageDtoCopyWith<$Res> {
-  factory $LibraryPageDtoCopyWith(
-          LibraryPageDto value, $Res Function(LibraryPageDto) then) =
-      _$LibraryPageDtoCopyWithImpl<$Res, LibraryPageDto>;
-  @useResult
-  $Res call({List<UserBookDto> items, String? nextCursor});
-}
-
-/// @nodoc
-class _$LibraryPageDtoCopyWithImpl<$Res, $Val extends LibraryPageDto>
-    implements $LibraryPageDtoCopyWith<$Res> {
-  _$LibraryPageDtoCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of LibraryPageDto
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $LibraryPageDtoCopyWith<LibraryPageDto> get copyWith =>
+      _$LibraryPageDtoCopyWithImpl<LibraryPageDto>(
+          this as LibraryPageDto, _$identity);
+
+  /// Serializes this LibraryPageDto to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? items = null,
-    Object? nextCursor = freezed,
-  }) {
-    return _then(_value.copyWith(
-      items: null == items
-          ? _value.items
-          : items // ignore: cast_nullable_to_non_nullable
-              as List<UserBookDto>,
-      nextCursor: freezed == nextCursor
-          ? _value.nextCursor
-          : nextCursor // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is LibraryPageDto &&
+            const DeepCollectionEquality().equals(other.items, items) &&
+            (identical(other.nextCursor, nextCursor) ||
+                other.nextCursor == nextCursor));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, const DeepCollectionEquality().hash(items), nextCursor);
+
+  @override
+  String toString() {
+    return 'LibraryPageDto(items: $items, nextCursor: $nextCursor)';
   }
 }
 
 /// @nodoc
-abstract class _$$LibraryPageDtoImplCopyWith<$Res>
-    implements $LibraryPageDtoCopyWith<$Res> {
-  factory _$$LibraryPageDtoImplCopyWith(_$LibraryPageDtoImpl value,
-          $Res Function(_$LibraryPageDtoImpl) then) =
-      __$$LibraryPageDtoImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $LibraryPageDtoCopyWith<$Res> {
+  factory $LibraryPageDtoCopyWith(
+          LibraryPageDto value, $Res Function(LibraryPageDto) _then) =
+      _$LibraryPageDtoCopyWithImpl;
   @useResult
   $Res call({List<UserBookDto> items, String? nextCursor});
 }
 
 /// @nodoc
-class __$$LibraryPageDtoImplCopyWithImpl<$Res>
-    extends _$LibraryPageDtoCopyWithImpl<$Res, _$LibraryPageDtoImpl>
-    implements _$$LibraryPageDtoImplCopyWith<$Res> {
-  __$$LibraryPageDtoImplCopyWithImpl(
-      _$LibraryPageDtoImpl _value, $Res Function(_$LibraryPageDtoImpl) _then)
-      : super(_value, _then);
+class _$LibraryPageDtoCopyWithImpl<$Res>
+    implements $LibraryPageDtoCopyWith<$Res> {
+  _$LibraryPageDtoCopyWithImpl(this._self, this._then);
+
+  final LibraryPageDto _self;
+  final $Res Function(LibraryPageDto) _then;
 
   /// Create a copy of LibraryPageDto
   /// with the given fields replaced by the non-null parameter values.
@@ -883,28 +1330,184 @@ class __$$LibraryPageDtoImplCopyWithImpl<$Res>
     Object? items = null,
     Object? nextCursor = freezed,
   }) {
-    return _then(_$LibraryPageDtoImpl(
+    return _then(_self.copyWith(
       items: null == items
-          ? _value._items
+          ? _self.items
           : items // ignore: cast_nullable_to_non_nullable
               as List<UserBookDto>,
       nextCursor: freezed == nextCursor
-          ? _value.nextCursor
+          ? _self.nextCursor
           : nextCursor // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [LibraryPageDto].
+extension LibraryPageDtoPatterns on LibraryPageDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_LibraryPageDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _LibraryPageDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_LibraryPageDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _LibraryPageDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_LibraryPageDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _LibraryPageDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(List<UserBookDto> items, String? nextCursor)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _LibraryPageDto() when $default != null:
+        return $default(_that.items, _that.nextCursor);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(List<UserBookDto> items, String? nextCursor) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _LibraryPageDto():
+        return $default(_that.items, _that.nextCursor);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(List<UserBookDto> items, String? nextCursor)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _LibraryPageDto() when $default != null:
+        return $default(_that.items, _that.nextCursor);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$LibraryPageDtoImpl implements _LibraryPageDto {
-  const _$LibraryPageDtoImpl(
+class _LibraryPageDto implements LibraryPageDto {
+  const _LibraryPageDto(
       {required final List<UserBookDto> items, this.nextCursor})
       : _items = items;
-
-  factory _$LibraryPageDtoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$LibraryPageDtoImplFromJson(json);
+  factory _LibraryPageDto.fromJson(Map<String, dynamic> json) =>
+      _$LibraryPageDtoFromJson(json);
 
   final List<UserBookDto> _items;
   @override
@@ -917,16 +1520,26 @@ class _$LibraryPageDtoImpl implements _LibraryPageDto {
   @override
   final String? nextCursor;
 
+  /// Create a copy of LibraryPageDto
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'LibraryPageDto(items: $items, nextCursor: $nextCursor)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$LibraryPageDtoCopyWith<_LibraryPageDto> get copyWith =>
+      __$LibraryPageDtoCopyWithImpl<_LibraryPageDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$LibraryPageDtoToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$LibraryPageDtoImpl &&
+            other is _LibraryPageDto &&
             const DeepCollectionEquality().equals(other._items, _items) &&
             (identical(other.nextCursor, nextCursor) ||
                 other.nextCursor == nextCursor));
@@ -937,168 +1550,73 @@ class _$LibraryPageDtoImpl implements _LibraryPageDto {
   int get hashCode => Object.hash(
       runtimeType, const DeepCollectionEquality().hash(_items), nextCursor);
 
-  /// Create a copy of LibraryPageDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$LibraryPageDtoImplCopyWith<_$LibraryPageDtoImpl> get copyWith =>
-      __$$LibraryPageDtoImplCopyWithImpl<_$LibraryPageDtoImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$LibraryPageDtoImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _LibraryPageDto implements LibraryPageDto {
-  const factory _LibraryPageDto(
-      {required final List<UserBookDto> items,
-      final String? nextCursor}) = _$LibraryPageDtoImpl;
-
-  factory _LibraryPageDto.fromJson(Map<String, dynamic> json) =
-      _$LibraryPageDtoImpl.fromJson;
-
-  @override
-  List<UserBookDto> get items;
-  @override
-  String? get nextCursor;
-
-  /// Create a copy of LibraryPageDto
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$LibraryPageDtoImplCopyWith<_$LibraryPageDtoImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-AddToLibraryRequest _$AddToLibraryRequestFromJson(Map<String, dynamic> json) {
-  return _AddToLibraryRequest.fromJson(json);
-}
-
-/// @nodoc
-mixin _$AddToLibraryRequest {
-  String get bookId => throw _privateConstructorUsedError;
-  String get status => throw _privateConstructorUsedError;
-
-  /// Serializes this AddToLibraryRequest to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of AddToLibraryRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $AddToLibraryRequestCopyWith<AddToLibraryRequest> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $AddToLibraryRequestCopyWith<$Res> {
-  factory $AddToLibraryRequestCopyWith(
-          AddToLibraryRequest value, $Res Function(AddToLibraryRequest) then) =
-      _$AddToLibraryRequestCopyWithImpl<$Res, AddToLibraryRequest>;
-  @useResult
-  $Res call({String bookId, String status});
-}
-
-/// @nodoc
-class _$AddToLibraryRequestCopyWithImpl<$Res, $Val extends AddToLibraryRequest>
-    implements $AddToLibraryRequestCopyWith<$Res> {
-  _$AddToLibraryRequestCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of AddToLibraryRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? bookId = null,
-    Object? status = null,
-  }) {
-    return _then(_value.copyWith(
-      bookId: null == bookId
-          ? _value.bookId
-          : bookId // ignore: cast_nullable_to_non_nullable
-              as String,
-      status: null == status
-          ? _value.status
-          : status // ignore: cast_nullable_to_non_nullable
-              as String,
-    ) as $Val);
+  String toString() {
+    return 'LibraryPageDto(items: $items, nextCursor: $nextCursor)';
   }
 }
 
 /// @nodoc
-abstract class _$$AddToLibraryRequestImplCopyWith<$Res>
-    implements $AddToLibraryRequestCopyWith<$Res> {
-  factory _$$AddToLibraryRequestImplCopyWith(_$AddToLibraryRequestImpl value,
-          $Res Function(_$AddToLibraryRequestImpl) then) =
-      __$$AddToLibraryRequestImplCopyWithImpl<$Res>;
+abstract mixin class _$LibraryPageDtoCopyWith<$Res>
+    implements $LibraryPageDtoCopyWith<$Res> {
+  factory _$LibraryPageDtoCopyWith(
+          _LibraryPageDto value, $Res Function(_LibraryPageDto) _then) =
+      __$LibraryPageDtoCopyWithImpl;
   @override
   @useResult
-  $Res call({String bookId, String status});
+  $Res call({List<UserBookDto> items, String? nextCursor});
 }
 
 /// @nodoc
-class __$$AddToLibraryRequestImplCopyWithImpl<$Res>
-    extends _$AddToLibraryRequestCopyWithImpl<$Res, _$AddToLibraryRequestImpl>
-    implements _$$AddToLibraryRequestImplCopyWith<$Res> {
-  __$$AddToLibraryRequestImplCopyWithImpl(_$AddToLibraryRequestImpl _value,
-      $Res Function(_$AddToLibraryRequestImpl) _then)
-      : super(_value, _then);
+class __$LibraryPageDtoCopyWithImpl<$Res>
+    implements _$LibraryPageDtoCopyWith<$Res> {
+  __$LibraryPageDtoCopyWithImpl(this._self, this._then);
 
-  /// Create a copy of AddToLibraryRequest
+  final _LibraryPageDto _self;
+  final $Res Function(_LibraryPageDto) _then;
+
+  /// Create a copy of LibraryPageDto
   /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
   @override
+  @pragma('vm:prefer-inline')
   $Res call({
-    Object? bookId = null,
-    Object? status = null,
+    Object? items = null,
+    Object? nextCursor = freezed,
   }) {
-    return _then(_$AddToLibraryRequestImpl(
-      bookId: null == bookId
-          ? _value.bookId
-          : bookId // ignore: cast_nullable_to_non_nullable
-              as String,
-      status: null == status
-          ? _value.status
-          : status // ignore: cast_nullable_to_non_nullable
-              as String,
+    return _then(_LibraryPageDto(
+      items: null == items
+          ? _self._items
+          : items // ignore: cast_nullable_to_non_nullable
+              as List<UserBookDto>,
+      nextCursor: freezed == nextCursor
+          ? _self.nextCursor
+          : nextCursor // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
 
 /// @nodoc
-@JsonSerializable()
-class _$AddToLibraryRequestImpl implements _AddToLibraryRequest {
-  const _$AddToLibraryRequestImpl(
-      {required this.bookId, this.status = 'reading'});
+mixin _$AddToLibraryRequest {
+  String get bookId;
+  String get status;
 
-  factory _$AddToLibraryRequestImpl.fromJson(Map<String, dynamic> json) =>
-      _$$AddToLibraryRequestImplFromJson(json);
+  /// Create a copy of AddToLibraryRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $AddToLibraryRequestCopyWith<AddToLibraryRequest> get copyWith =>
+      _$AddToLibraryRequestCopyWithImpl<AddToLibraryRequest>(
+          this as AddToLibraryRequest, _$identity);
 
-  @override
-  final String bookId;
-  @override
-  @JsonKey()
-  final String status;
-
-  @override
-  String toString() {
-    return 'AddToLibraryRequest(bookId: $bookId, status: $status)';
-  }
+  /// Serializes this AddToLibraryRequest to a JSON map.
+  Map<String, dynamic> toJson();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$AddToLibraryRequestImpl &&
+            other is AddToLibraryRequest &&
             (identical(other.bookId, bookId) || other.bookId == bookId) &&
             (identical(other.status, status) || other.status == status));
   }
@@ -1107,126 +1625,289 @@ class _$AddToLibraryRequestImpl implements _AddToLibraryRequest {
   @override
   int get hashCode => Object.hash(runtimeType, bookId, status);
 
+  @override
+  String toString() {
+    return 'AddToLibraryRequest(bookId: $bookId, status: $status)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $AddToLibraryRequestCopyWith<$Res> {
+  factory $AddToLibraryRequestCopyWith(
+          AddToLibraryRequest value, $Res Function(AddToLibraryRequest) _then) =
+      _$AddToLibraryRequestCopyWithImpl;
+  @useResult
+  $Res call({String bookId, String status});
+}
+
+/// @nodoc
+class _$AddToLibraryRequestCopyWithImpl<$Res>
+    implements $AddToLibraryRequestCopyWith<$Res> {
+  _$AddToLibraryRequestCopyWithImpl(this._self, this._then);
+
+  final AddToLibraryRequest _self;
+  final $Res Function(AddToLibraryRequest) _then;
+
   /// Create a copy of AddToLibraryRequest
   /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
   @pragma('vm:prefer-inline')
-  _$$AddToLibraryRequestImplCopyWith<_$AddToLibraryRequestImpl> get copyWith =>
-      __$$AddToLibraryRequestImplCopyWithImpl<_$AddToLibraryRequestImpl>(
+  @override
+  $Res call({
+    Object? bookId = null,
+    Object? status = null,
+  }) {
+    return _then(_self.copyWith(
+      bookId: null == bookId
+          ? _self.bookId
+          : bookId // ignore: cast_nullable_to_non_nullable
+              as String,
+      status: null == status
+          ? _self.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [AddToLibraryRequest].
+extension AddToLibraryRequestPatterns on AddToLibraryRequest {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_AddToLibraryRequest value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _AddToLibraryRequest() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_AddToLibraryRequest value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _AddToLibraryRequest():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_AddToLibraryRequest value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _AddToLibraryRequest() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String bookId, String status)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _AddToLibraryRequest() when $default != null:
+        return $default(_that.bookId, _that.status);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String bookId, String status) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _AddToLibraryRequest():
+        return $default(_that.bookId, _that.status);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String bookId, String status)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _AddToLibraryRequest() when $default != null:
+        return $default(_that.bookId, _that.status);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _AddToLibraryRequest implements AddToLibraryRequest {
+  const _AddToLibraryRequest({required this.bookId, this.status = 'reading'});
+  factory _AddToLibraryRequest.fromJson(Map<String, dynamic> json) =>
+      _$AddToLibraryRequestFromJson(json);
+
+  @override
+  final String bookId;
+  @override
+  @JsonKey()
+  final String status;
+
+  /// Create a copy of AddToLibraryRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$AddToLibraryRequestCopyWith<_AddToLibraryRequest> get copyWith =>
+      __$AddToLibraryRequestCopyWithImpl<_AddToLibraryRequest>(
           this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$AddToLibraryRequestImplToJson(
+    return _$AddToLibraryRequestToJson(
       this,
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _AddToLibraryRequest &&
+            (identical(other.bookId, bookId) || other.bookId == bookId) &&
+            (identical(other.status, status) || other.status == status));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, bookId, status);
+
+  @override
+  String toString() {
+    return 'AddToLibraryRequest(bookId: $bookId, status: $status)';
+  }
 }
 
-abstract class _AddToLibraryRequest implements AddToLibraryRequest {
-  const factory _AddToLibraryRequest(
-      {required final String bookId,
-      final String status}) = _$AddToLibraryRequestImpl;
-
-  factory _AddToLibraryRequest.fromJson(Map<String, dynamic> json) =
-      _$AddToLibraryRequestImpl.fromJson;
-
+/// @nodoc
+abstract mixin class _$AddToLibraryRequestCopyWith<$Res>
+    implements $AddToLibraryRequestCopyWith<$Res> {
+  factory _$AddToLibraryRequestCopyWith(_AddToLibraryRequest value,
+          $Res Function(_AddToLibraryRequest) _then) =
+      __$AddToLibraryRequestCopyWithImpl;
   @override
-  String get bookId;
-  @override
-  String get status;
+  @useResult
+  $Res call({String bookId, String status});
+}
+
+/// @nodoc
+class __$AddToLibraryRequestCopyWithImpl<$Res>
+    implements _$AddToLibraryRequestCopyWith<$Res> {
+  __$AddToLibraryRequestCopyWithImpl(this._self, this._then);
+
+  final _AddToLibraryRequest _self;
+  final $Res Function(_AddToLibraryRequest) _then;
 
   /// Create a copy of AddToLibraryRequest
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$AddToLibraryRequestImplCopyWith<_$AddToLibraryRequestImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-UpdateStatusRequest _$UpdateStatusRequestFromJson(Map<String, dynamic> json) {
-  return _UpdateStatusRequest.fromJson(json);
-}
-
-/// @nodoc
-mixin _$UpdateStatusRequest {
-  String get status => throw _privateConstructorUsedError;
-
-  /// Serializes this UpdateStatusRequest to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of UpdateStatusRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $UpdateStatusRequestCopyWith<UpdateStatusRequest> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $UpdateStatusRequestCopyWith<$Res> {
-  factory $UpdateStatusRequestCopyWith(
-          UpdateStatusRequest value, $Res Function(UpdateStatusRequest) then) =
-      _$UpdateStatusRequestCopyWithImpl<$Res, UpdateStatusRequest>;
-  @useResult
-  $Res call({String status});
-}
-
-/// @nodoc
-class _$UpdateStatusRequestCopyWithImpl<$Res, $Val extends UpdateStatusRequest>
-    implements $UpdateStatusRequestCopyWith<$Res> {
-  _$UpdateStatusRequestCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of UpdateStatusRequest
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
-  @override
   $Res call({
+    Object? bookId = null,
     Object? status = null,
   }) {
-    return _then(_value.copyWith(
-      status: null == status
-          ? _value.status
-          : status // ignore: cast_nullable_to_non_nullable
+    return _then(_AddToLibraryRequest(
+      bookId: null == bookId
+          ? _self.bookId
+          : bookId // ignore: cast_nullable_to_non_nullable
               as String,
-    ) as $Val);
-  }
-}
-
-/// @nodoc
-abstract class _$$UpdateStatusRequestImplCopyWith<$Res>
-    implements $UpdateStatusRequestCopyWith<$Res> {
-  factory _$$UpdateStatusRequestImplCopyWith(_$UpdateStatusRequestImpl value,
-          $Res Function(_$UpdateStatusRequestImpl) then) =
-      __$$UpdateStatusRequestImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({String status});
-}
-
-/// @nodoc
-class __$$UpdateStatusRequestImplCopyWithImpl<$Res>
-    extends _$UpdateStatusRequestCopyWithImpl<$Res, _$UpdateStatusRequestImpl>
-    implements _$$UpdateStatusRequestImplCopyWith<$Res> {
-  __$$UpdateStatusRequestImplCopyWithImpl(_$UpdateStatusRequestImpl _value,
-      $Res Function(_$UpdateStatusRequestImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of UpdateStatusRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? status = null,
-  }) {
-    return _then(_$UpdateStatusRequestImpl(
       status: null == status
-          ? _value.status
+          ? _self.status
           : status // ignore: cast_nullable_to_non_nullable
               as String,
     ));
@@ -1234,26 +1915,25 @@ class __$$UpdateStatusRequestImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-@JsonSerializable()
-class _$UpdateStatusRequestImpl implements _UpdateStatusRequest {
-  const _$UpdateStatusRequestImpl({required this.status});
+mixin _$UpdateStatusRequest {
+  String get status;
 
-  factory _$UpdateStatusRequestImpl.fromJson(Map<String, dynamic> json) =>
-      _$$UpdateStatusRequestImplFromJson(json);
+  /// Create a copy of UpdateStatusRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $UpdateStatusRequestCopyWith<UpdateStatusRequest> get copyWith =>
+      _$UpdateStatusRequestCopyWithImpl<UpdateStatusRequest>(
+          this as UpdateStatusRequest, _$identity);
 
-  @override
-  final String status;
-
-  @override
-  String toString() {
-    return 'UpdateStatusRequest(status: $status)';
-  }
+  /// Serializes this UpdateStatusRequest to a JSON map.
+  Map<String, dynamic> toJson();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$UpdateStatusRequestImpl &&
+            other is UpdateStatusRequest &&
             (identical(other.status, status) || other.status == status));
   }
 
@@ -1261,124 +1941,335 @@ class _$UpdateStatusRequestImpl implements _UpdateStatusRequest {
   @override
   int get hashCode => Object.hash(runtimeType, status);
 
+  @override
+  String toString() {
+    return 'UpdateStatusRequest(status: $status)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $UpdateStatusRequestCopyWith<$Res> {
+  factory $UpdateStatusRequestCopyWith(
+          UpdateStatusRequest value, $Res Function(UpdateStatusRequest) _then) =
+      _$UpdateStatusRequestCopyWithImpl;
+  @useResult
+  $Res call({String status});
+}
+
+/// @nodoc
+class _$UpdateStatusRequestCopyWithImpl<$Res>
+    implements $UpdateStatusRequestCopyWith<$Res> {
+  _$UpdateStatusRequestCopyWithImpl(this._self, this._then);
+
+  final UpdateStatusRequest _self;
+  final $Res Function(UpdateStatusRequest) _then;
+
   /// Create a copy of UpdateStatusRequest
   /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
   @pragma('vm:prefer-inline')
-  _$$UpdateStatusRequestImplCopyWith<_$UpdateStatusRequestImpl> get copyWith =>
-      __$$UpdateStatusRequestImplCopyWithImpl<_$UpdateStatusRequestImpl>(
+  @override
+  $Res call({
+    Object? status = null,
+  }) {
+    return _then(_self.copyWith(
+      status: null == status
+          ? _self.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [UpdateStatusRequest].
+extension UpdateStatusRequestPatterns on UpdateStatusRequest {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_UpdateStatusRequest value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _UpdateStatusRequest() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_UpdateStatusRequest value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _UpdateStatusRequest():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_UpdateStatusRequest value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _UpdateStatusRequest() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String status)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _UpdateStatusRequest() when $default != null:
+        return $default(_that.status);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String status) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _UpdateStatusRequest():
+        return $default(_that.status);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String status)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _UpdateStatusRequest() when $default != null:
+        return $default(_that.status);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _UpdateStatusRequest implements UpdateStatusRequest {
+  const _UpdateStatusRequest({required this.status});
+  factory _UpdateStatusRequest.fromJson(Map<String, dynamic> json) =>
+      _$UpdateStatusRequestFromJson(json);
+
+  @override
+  final String status;
+
+  /// Create a copy of UpdateStatusRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$UpdateStatusRequestCopyWith<_UpdateStatusRequest> get copyWith =>
+      __$UpdateStatusRequestCopyWithImpl<_UpdateStatusRequest>(
           this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$UpdateStatusRequestImplToJson(
+    return _$UpdateStatusRequestToJson(
       this,
     );
   }
-}
-
-abstract class _UpdateStatusRequest implements UpdateStatusRequest {
-  const factory _UpdateStatusRequest({required final String status}) =
-      _$UpdateStatusRequestImpl;
-
-  factory _UpdateStatusRequest.fromJson(Map<String, dynamic> json) =
-      _$UpdateStatusRequestImpl.fromJson;
 
   @override
-  String get status;
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _UpdateStatusRequest &&
+            (identical(other.status, status) || other.status == status));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, status);
+
+  @override
+  String toString() {
+    return 'UpdateStatusRequest(status: $status)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$UpdateStatusRequestCopyWith<$Res>
+    implements $UpdateStatusRequestCopyWith<$Res> {
+  factory _$UpdateStatusRequestCopyWith(_UpdateStatusRequest value,
+          $Res Function(_UpdateStatusRequest) _then) =
+      __$UpdateStatusRequestCopyWithImpl;
+  @override
+  @useResult
+  $Res call({String status});
+}
+
+/// @nodoc
+class __$UpdateStatusRequestCopyWithImpl<$Res>
+    implements _$UpdateStatusRequestCopyWith<$Res> {
+  __$UpdateStatusRequestCopyWithImpl(this._self, this._then);
+
+  final _UpdateStatusRequest _self;
+  final $Res Function(_UpdateStatusRequest) _then;
 
   /// Create a copy of UpdateStatusRequest
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$UpdateStatusRequestImplCopyWith<_$UpdateStatusRequestImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-DiscoverSectionDto _$DiscoverSectionDtoFromJson(Map<String, dynamic> json) {
-  return _DiscoverSectionDto.fromJson(json);
-}
-
-/// @nodoc
-mixin _$DiscoverSectionDto {
-  String get id => throw _privateConstructorUsedError;
-  String get title => throw _privateConstructorUsedError;
-  List<BookDto> get books => throw _privateConstructorUsedError;
-
-  /// Serializes this DiscoverSectionDto to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of DiscoverSectionDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $DiscoverSectionDtoCopyWith<DiscoverSectionDto> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $DiscoverSectionDtoCopyWith<$Res> {
-  factory $DiscoverSectionDtoCopyWith(
-          DiscoverSectionDto value, $Res Function(DiscoverSectionDto) then) =
-      _$DiscoverSectionDtoCopyWithImpl<$Res, DiscoverSectionDto>;
-  @useResult
-  $Res call({String id, String title, List<BookDto> books});
-}
-
-/// @nodoc
-class _$DiscoverSectionDtoCopyWithImpl<$Res, $Val extends DiscoverSectionDto>
-    implements $DiscoverSectionDtoCopyWith<$Res> {
-  _$DiscoverSectionDtoCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of DiscoverSectionDto
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
-  @override
   $Res call({
-    Object? id = null,
-    Object? title = null,
-    Object? books = null,
+    Object? status = null,
   }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
+    return _then(_UpdateStatusRequest(
+      status: null == status
+          ? _self.status
+          : status // ignore: cast_nullable_to_non_nullable
               as String,
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      books: null == books
-          ? _value.books
-          : books // ignore: cast_nullable_to_non_nullable
-              as List<BookDto>,
-    ) as $Val);
+    ));
   }
 }
 
 /// @nodoc
-abstract class _$$DiscoverSectionDtoImplCopyWith<$Res>
-    implements $DiscoverSectionDtoCopyWith<$Res> {
-  factory _$$DiscoverSectionDtoImplCopyWith(_$DiscoverSectionDtoImpl value,
-          $Res Function(_$DiscoverSectionDtoImpl) then) =
-      __$$DiscoverSectionDtoImplCopyWithImpl<$Res>;
+mixin _$DiscoverSectionDto {
+  String get id;
+  String get title;
+  List<BookDto> get books;
+
+  /// Create a copy of DiscoverSectionDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $DiscoverSectionDtoCopyWith<DiscoverSectionDto> get copyWith =>
+      _$DiscoverSectionDtoCopyWithImpl<DiscoverSectionDto>(
+          this as DiscoverSectionDto, _$identity);
+
+  /// Serializes this DiscoverSectionDto to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is DiscoverSectionDto &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.title, title) || other.title == title) &&
+            const DeepCollectionEquality().equals(other.books, books));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, id, title, const DeepCollectionEquality().hash(books));
+
+  @override
+  String toString() {
+    return 'DiscoverSectionDto(id: $id, title: $title, books: $books)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $DiscoverSectionDtoCopyWith<$Res> {
+  factory $DiscoverSectionDtoCopyWith(
+          DiscoverSectionDto value, $Res Function(DiscoverSectionDto) _then) =
+      _$DiscoverSectionDtoCopyWithImpl;
   @useResult
   $Res call({String id, String title, List<BookDto> books});
 }
 
 /// @nodoc
-class __$$DiscoverSectionDtoImplCopyWithImpl<$Res>
-    extends _$DiscoverSectionDtoCopyWithImpl<$Res, _$DiscoverSectionDtoImpl>
-    implements _$$DiscoverSectionDtoImplCopyWith<$Res> {
-  __$$DiscoverSectionDtoImplCopyWithImpl(_$DiscoverSectionDtoImpl _value,
-      $Res Function(_$DiscoverSectionDtoImpl) _then)
-      : super(_value, _then);
+class _$DiscoverSectionDtoCopyWithImpl<$Res>
+    implements $DiscoverSectionDtoCopyWith<$Res> {
+  _$DiscoverSectionDtoCopyWithImpl(this._self, this._then);
+
+  final DiscoverSectionDto _self;
+  final $Res Function(DiscoverSectionDto) _then;
 
   /// Create a copy of DiscoverSectionDto
   /// with the given fields replaced by the non-null parameter values.
@@ -1389,34 +2280,190 @@ class __$$DiscoverSectionDtoImplCopyWithImpl<$Res>
     Object? title = null,
     Object? books = null,
   }) {
-    return _then(_$DiscoverSectionDtoImpl(
+    return _then(_self.copyWith(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
       title: null == title
-          ? _value.title
+          ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
       books: null == books
-          ? _value._books
+          ? _self.books
           : books // ignore: cast_nullable_to_non_nullable
               as List<BookDto>,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [DiscoverSectionDto].
+extension DiscoverSectionDtoPatterns on DiscoverSectionDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_DiscoverSectionDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _DiscoverSectionDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_DiscoverSectionDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _DiscoverSectionDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_DiscoverSectionDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _DiscoverSectionDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String id, String title, List<BookDto> books)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _DiscoverSectionDto() when $default != null:
+        return $default(_that.id, _that.title, _that.books);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String id, String title, List<BookDto> books) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _DiscoverSectionDto():
+        return $default(_that.id, _that.title, _that.books);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String id, String title, List<BookDto> books)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _DiscoverSectionDto() when $default != null:
+        return $default(_that.id, _that.title, _that.books);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$DiscoverSectionDtoImpl implements _DiscoverSectionDto {
-  const _$DiscoverSectionDtoImpl(
+class _DiscoverSectionDto implements DiscoverSectionDto {
+  const _DiscoverSectionDto(
       {required this.id,
       required this.title,
       required final List<BookDto> books})
       : _books = books;
-
-  factory _$DiscoverSectionDtoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$DiscoverSectionDtoImplFromJson(json);
+  factory _DiscoverSectionDto.fromJson(Map<String, dynamic> json) =>
+      _$DiscoverSectionDtoFromJson(json);
 
   @override
   final String id;
@@ -1430,16 +2477,26 @@ class _$DiscoverSectionDtoImpl implements _DiscoverSectionDto {
     return EqualUnmodifiableListView(_books);
   }
 
+  /// Create a copy of DiscoverSectionDto
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'DiscoverSectionDto(id: $id, title: $title, books: $books)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$DiscoverSectionDtoCopyWith<_DiscoverSectionDto> get copyWith =>
+      __$DiscoverSectionDtoCopyWithImpl<_DiscoverSectionDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$DiscoverSectionDtoToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$DiscoverSectionDtoImpl &&
+            other is _DiscoverSectionDto &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.title, title) || other.title == title) &&
             const DeepCollectionEquality().equals(other._books, _books));
@@ -1450,118 +2507,107 @@ class _$DiscoverSectionDtoImpl implements _DiscoverSectionDto {
   int get hashCode => Object.hash(
       runtimeType, id, title, const DeepCollectionEquality().hash(_books));
 
-  /// Create a copy of DiscoverSectionDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$DiscoverSectionDtoImplCopyWith<_$DiscoverSectionDtoImpl> get copyWith =>
-      __$$DiscoverSectionDtoImplCopyWithImpl<_$DiscoverSectionDtoImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$DiscoverSectionDtoImplToJson(
-      this,
-    );
+  String toString() {
+    return 'DiscoverSectionDto(id: $id, title: $title, books: $books)';
   }
 }
 
-abstract class _DiscoverSectionDto implements DiscoverSectionDto {
-  const factory _DiscoverSectionDto(
-      {required final String id,
-      required final String title,
-      required final List<BookDto> books}) = _$DiscoverSectionDtoImpl;
+/// @nodoc
+abstract mixin class _$DiscoverSectionDtoCopyWith<$Res>
+    implements $DiscoverSectionDtoCopyWith<$Res> {
+  factory _$DiscoverSectionDtoCopyWith(
+          _DiscoverSectionDto value, $Res Function(_DiscoverSectionDto) _then) =
+      __$DiscoverSectionDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call({String id, String title, List<BookDto> books});
+}
 
-  factory _DiscoverSectionDto.fromJson(Map<String, dynamic> json) =
-      _$DiscoverSectionDtoImpl.fromJson;
+/// @nodoc
+class __$DiscoverSectionDtoCopyWithImpl<$Res>
+    implements _$DiscoverSectionDtoCopyWith<$Res> {
+  __$DiscoverSectionDtoCopyWithImpl(this._self, this._then);
 
-  @override
-  String get id;
-  @override
-  String get title;
-  @override
-  List<BookDto> get books;
+  final _DiscoverSectionDto _self;
+  final $Res Function(_DiscoverSectionDto) _then;
 
   /// Create a copy of DiscoverSectionDto
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$DiscoverSectionDtoImplCopyWith<_$DiscoverSectionDtoImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-DiscoverResponseDto _$DiscoverResponseDtoFromJson(Map<String, dynamic> json) {
-  return _DiscoverResponseDto.fromJson(json);
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? title = null,
+    Object? books = null,
+  }) {
+    return _then(_DiscoverSectionDto(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      title: null == title
+          ? _self.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      books: null == books
+          ? _self._books
+          : books // ignore: cast_nullable_to_non_nullable
+              as List<BookDto>,
+    ));
+  }
 }
 
 /// @nodoc
 mixin _$DiscoverResponseDto {
-  List<DiscoverSectionDto> get sections => throw _privateConstructorUsedError;
-
-  /// Serializes this DiscoverResponseDto to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  List<DiscoverSectionDto> get sections;
 
   /// Create a copy of DiscoverResponseDto
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $DiscoverResponseDtoCopyWith<DiscoverResponseDto> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $DiscoverResponseDtoCopyWith<$Res> {
-  factory $DiscoverResponseDtoCopyWith(
-          DiscoverResponseDto value, $Res Function(DiscoverResponseDto) then) =
-      _$DiscoverResponseDtoCopyWithImpl<$Res, DiscoverResponseDto>;
-  @useResult
-  $Res call({List<DiscoverSectionDto> sections});
-}
-
-/// @nodoc
-class _$DiscoverResponseDtoCopyWithImpl<$Res, $Val extends DiscoverResponseDto>
-    implements $DiscoverResponseDtoCopyWith<$Res> {
-  _$DiscoverResponseDtoCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of DiscoverResponseDto
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $DiscoverResponseDtoCopyWith<DiscoverResponseDto> get copyWith =>
+      _$DiscoverResponseDtoCopyWithImpl<DiscoverResponseDto>(
+          this as DiscoverResponseDto, _$identity);
+
+  /// Serializes this DiscoverResponseDto to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? sections = null,
-  }) {
-    return _then(_value.copyWith(
-      sections: null == sections
-          ? _value.sections
-          : sections // ignore: cast_nullable_to_non_nullable
-              as List<DiscoverSectionDto>,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is DiscoverResponseDto &&
+            const DeepCollectionEquality().equals(other.sections, sections));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(sections));
+
+  @override
+  String toString() {
+    return 'DiscoverResponseDto(sections: $sections)';
   }
 }
 
 /// @nodoc
-abstract class _$$DiscoverResponseDtoImplCopyWith<$Res>
-    implements $DiscoverResponseDtoCopyWith<$Res> {
-  factory _$$DiscoverResponseDtoImplCopyWith(_$DiscoverResponseDtoImpl value,
-          $Res Function(_$DiscoverResponseDtoImpl) then) =
-      __$$DiscoverResponseDtoImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $DiscoverResponseDtoCopyWith<$Res> {
+  factory $DiscoverResponseDtoCopyWith(
+          DiscoverResponseDto value, $Res Function(DiscoverResponseDto) _then) =
+      _$DiscoverResponseDtoCopyWithImpl;
   @useResult
   $Res call({List<DiscoverSectionDto> sections});
 }
 
 /// @nodoc
-class __$$DiscoverResponseDtoImplCopyWithImpl<$Res>
-    extends _$DiscoverResponseDtoCopyWithImpl<$Res, _$DiscoverResponseDtoImpl>
-    implements _$$DiscoverResponseDtoImplCopyWith<$Res> {
-  __$$DiscoverResponseDtoImplCopyWithImpl(_$DiscoverResponseDtoImpl _value,
-      $Res Function(_$DiscoverResponseDtoImpl) _then)
-      : super(_value, _then);
+class _$DiscoverResponseDtoCopyWithImpl<$Res>
+    implements $DiscoverResponseDtoCopyWith<$Res> {
+  _$DiscoverResponseDtoCopyWithImpl(this._self, this._then);
+
+  final DiscoverResponseDto _self;
+  final $Res Function(DiscoverResponseDto) _then;
 
   /// Create a copy of DiscoverResponseDto
   /// with the given fields replaced by the non-null parameter values.
@@ -1570,24 +2616,179 @@ class __$$DiscoverResponseDtoImplCopyWithImpl<$Res>
   $Res call({
     Object? sections = null,
   }) {
-    return _then(_$DiscoverResponseDtoImpl(
+    return _then(_self.copyWith(
       sections: null == sections
-          ? _value._sections
+          ? _self.sections
           : sections // ignore: cast_nullable_to_non_nullable
               as List<DiscoverSectionDto>,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [DiscoverResponseDto].
+extension DiscoverResponseDtoPatterns on DiscoverResponseDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_DiscoverResponseDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _DiscoverResponseDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_DiscoverResponseDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _DiscoverResponseDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_DiscoverResponseDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _DiscoverResponseDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(List<DiscoverSectionDto> sections)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _DiscoverResponseDto() when $default != null:
+        return $default(_that.sections);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(List<DiscoverSectionDto> sections) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _DiscoverResponseDto():
+        return $default(_that.sections);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(List<DiscoverSectionDto> sections)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _DiscoverResponseDto() when $default != null:
+        return $default(_that.sections);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$DiscoverResponseDtoImpl implements _DiscoverResponseDto {
-  const _$DiscoverResponseDtoImpl(
-      {required final List<DiscoverSectionDto> sections})
+class _DiscoverResponseDto implements DiscoverResponseDto {
+  const _DiscoverResponseDto({required final List<DiscoverSectionDto> sections})
       : _sections = sections;
-
-  factory _$DiscoverResponseDtoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$DiscoverResponseDtoImplFromJson(json);
+  factory _DiscoverResponseDto.fromJson(Map<String, dynamic> json) =>
+      _$DiscoverResponseDtoFromJson(json);
 
   final List<DiscoverSectionDto> _sections;
   @override
@@ -1597,16 +2798,27 @@ class _$DiscoverResponseDtoImpl implements _DiscoverResponseDto {
     return EqualUnmodifiableListView(_sections);
   }
 
+  /// Create a copy of DiscoverResponseDto
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'DiscoverResponseDto(sections: $sections)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$DiscoverResponseDtoCopyWith<_DiscoverResponseDto> get copyWith =>
+      __$DiscoverResponseDtoCopyWithImpl<_DiscoverResponseDto>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$DiscoverResponseDtoToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$DiscoverResponseDtoImpl &&
+            other is _DiscoverResponseDto &&
             const DeepCollectionEquality().equals(other._sections, _sections));
   }
 
@@ -1615,164 +2827,68 @@ class _$DiscoverResponseDtoImpl implements _DiscoverResponseDto {
   int get hashCode =>
       Object.hash(runtimeType, const DeepCollectionEquality().hash(_sections));
 
-  /// Create a copy of DiscoverResponseDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$DiscoverResponseDtoImplCopyWith<_$DiscoverResponseDtoImpl> get copyWith =>
-      __$$DiscoverResponseDtoImplCopyWithImpl<_$DiscoverResponseDtoImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$DiscoverResponseDtoImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _DiscoverResponseDto implements DiscoverResponseDto {
-  const factory _DiscoverResponseDto(
-          {required final List<DiscoverSectionDto> sections}) =
-      _$DiscoverResponseDtoImpl;
-
-  factory _DiscoverResponseDto.fromJson(Map<String, dynamic> json) =
-      _$DiscoverResponseDtoImpl.fromJson;
-
-  @override
-  List<DiscoverSectionDto> get sections;
-
-  /// Create a copy of DiscoverResponseDto
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$DiscoverResponseDtoImplCopyWith<_$DiscoverResponseDtoImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-SubmitReviewRequest _$SubmitReviewRequestFromJson(Map<String, dynamic> json) {
-  return _SubmitReviewRequest.fromJson(json);
-}
-
-/// @nodoc
-mixin _$SubmitReviewRequest {
-  int get rating => throw _privateConstructorUsedError;
-  String? get oneLineReview => throw _privateConstructorUsedError;
-
-  /// Serializes this SubmitReviewRequest to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of SubmitReviewRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $SubmitReviewRequestCopyWith<SubmitReviewRequest> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $SubmitReviewRequestCopyWith<$Res> {
-  factory $SubmitReviewRequestCopyWith(
-          SubmitReviewRequest value, $Res Function(SubmitReviewRequest) then) =
-      _$SubmitReviewRequestCopyWithImpl<$Res, SubmitReviewRequest>;
-  @useResult
-  $Res call({int rating, String? oneLineReview});
-}
-
-/// @nodoc
-class _$SubmitReviewRequestCopyWithImpl<$Res, $Val extends SubmitReviewRequest>
-    implements $SubmitReviewRequestCopyWith<$Res> {
-  _$SubmitReviewRequestCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of SubmitReviewRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? rating = null,
-    Object? oneLineReview = freezed,
-  }) {
-    return _then(_value.copyWith(
-      rating: null == rating
-          ? _value.rating
-          : rating // ignore: cast_nullable_to_non_nullable
-              as int,
-      oneLineReview: freezed == oneLineReview
-          ? _value.oneLineReview
-          : oneLineReview // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ) as $Val);
+  String toString() {
+    return 'DiscoverResponseDto(sections: $sections)';
   }
 }
 
 /// @nodoc
-abstract class _$$SubmitReviewRequestImplCopyWith<$Res>
-    implements $SubmitReviewRequestCopyWith<$Res> {
-  factory _$$SubmitReviewRequestImplCopyWith(_$SubmitReviewRequestImpl value,
-          $Res Function(_$SubmitReviewRequestImpl) then) =
-      __$$SubmitReviewRequestImplCopyWithImpl<$Res>;
+abstract mixin class _$DiscoverResponseDtoCopyWith<$Res>
+    implements $DiscoverResponseDtoCopyWith<$Res> {
+  factory _$DiscoverResponseDtoCopyWith(_DiscoverResponseDto value,
+          $Res Function(_DiscoverResponseDto) _then) =
+      __$DiscoverResponseDtoCopyWithImpl;
   @override
   @useResult
-  $Res call({int rating, String? oneLineReview});
+  $Res call({List<DiscoverSectionDto> sections});
 }
 
 /// @nodoc
-class __$$SubmitReviewRequestImplCopyWithImpl<$Res>
-    extends _$SubmitReviewRequestCopyWithImpl<$Res, _$SubmitReviewRequestImpl>
-    implements _$$SubmitReviewRequestImplCopyWith<$Res> {
-  __$$SubmitReviewRequestImplCopyWithImpl(_$SubmitReviewRequestImpl _value,
-      $Res Function(_$SubmitReviewRequestImpl) _then)
-      : super(_value, _then);
+class __$DiscoverResponseDtoCopyWithImpl<$Res>
+    implements _$DiscoverResponseDtoCopyWith<$Res> {
+  __$DiscoverResponseDtoCopyWithImpl(this._self, this._then);
 
-  /// Create a copy of SubmitReviewRequest
+  final _DiscoverResponseDto _self;
+  final $Res Function(_DiscoverResponseDto) _then;
+
+  /// Create a copy of DiscoverResponseDto
   /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
   @override
+  @pragma('vm:prefer-inline')
   $Res call({
-    Object? rating = null,
-    Object? oneLineReview = freezed,
+    Object? sections = null,
   }) {
-    return _then(_$SubmitReviewRequestImpl(
-      rating: null == rating
-          ? _value.rating
-          : rating // ignore: cast_nullable_to_non_nullable
-              as int,
-      oneLineReview: freezed == oneLineReview
-          ? _value.oneLineReview
-          : oneLineReview // ignore: cast_nullable_to_non_nullable
-              as String?,
+    return _then(_DiscoverResponseDto(
+      sections: null == sections
+          ? _self._sections
+          : sections // ignore: cast_nullable_to_non_nullable
+              as List<DiscoverSectionDto>,
     ));
   }
 }
 
 /// @nodoc
-@JsonSerializable()
-class _$SubmitReviewRequestImpl implements _SubmitReviewRequest {
-  const _$SubmitReviewRequestImpl({required this.rating, this.oneLineReview});
+mixin _$SubmitReviewRequest {
+  int get rating;
+  String? get oneLineReview;
 
-  factory _$SubmitReviewRequestImpl.fromJson(Map<String, dynamic> json) =>
-      _$$SubmitReviewRequestImplFromJson(json);
+  /// Create a copy of SubmitReviewRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $SubmitReviewRequestCopyWith<SubmitReviewRequest> get copyWith =>
+      _$SubmitReviewRequestCopyWithImpl<SubmitReviewRequest>(
+          this as SubmitReviewRequest, _$identity);
 
-  @override
-  final int rating;
-  @override
-  final String? oneLineReview;
-
-  @override
-  String toString() {
-    return 'SubmitReviewRequest(rating: $rating, oneLineReview: $oneLineReview)';
-  }
+  /// Serializes this SubmitReviewRequest to a JSON map.
+  Map<String, dynamic> toJson();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$SubmitReviewRequestImpl &&
+            other is SubmitReviewRequest &&
             (identical(other.rating, rating) || other.rating == rating) &&
             (identical(other.oneLineReview, oneLineReview) ||
                 other.oneLineReview == oneLineReview));
@@ -1782,237 +2898,320 @@ class _$SubmitReviewRequestImpl implements _SubmitReviewRequest {
   @override
   int get hashCode => Object.hash(runtimeType, rating, oneLineReview);
 
-  /// Create a copy of SubmitReviewRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$SubmitReviewRequestImplCopyWith<_$SubmitReviewRequestImpl> get copyWith =>
-      __$$SubmitReviewRequestImplCopyWithImpl<_$SubmitReviewRequestImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$SubmitReviewRequestImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _SubmitReviewRequest implements SubmitReviewRequest {
-  const factory _SubmitReviewRequest(
-      {required final int rating,
-      final String? oneLineReview}) = _$SubmitReviewRequestImpl;
-
-  factory _SubmitReviewRequest.fromJson(Map<String, dynamic> json) =
-      _$SubmitReviewRequestImpl.fromJson;
-
-  @override
-  int get rating;
-  @override
-  String? get oneLineReview;
-
-  /// Create a copy of SubmitReviewRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$SubmitReviewRequestImplCopyWith<_$SubmitReviewRequestImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-BookReviewDto _$BookReviewDtoFromJson(Map<String, dynamic> json) {
-  return _BookReviewDto.fromJson(json);
-}
-
-/// @nodoc
-mixin _$BookReviewDto {
-  String get userBookId => throw _privateConstructorUsedError;
-  int get rating => throw _privateConstructorUsedError;
-  String? get oneLineReview => throw _privateConstructorUsedError;
-  String get authorNickname => throw _privateConstructorUsedError;
-  String? get authorProfileImageUrl => throw _privateConstructorUsedError;
-  DateTime get reviewedAt => throw _privateConstructorUsedError;
-
-  /// Serializes this BookReviewDto to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of BookReviewDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $BookReviewDtoCopyWith<BookReviewDto> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $BookReviewDtoCopyWith<$Res> {
-  factory $BookReviewDtoCopyWith(
-          BookReviewDto value, $Res Function(BookReviewDto) then) =
-      _$BookReviewDtoCopyWithImpl<$Res, BookReviewDto>;
-  @useResult
-  $Res call(
-      {String userBookId,
-      int rating,
-      String? oneLineReview,
-      String authorNickname,
-      String? authorProfileImageUrl,
-      DateTime reviewedAt});
-}
-
-/// @nodoc
-class _$BookReviewDtoCopyWithImpl<$Res, $Val extends BookReviewDto>
-    implements $BookReviewDtoCopyWith<$Res> {
-  _$BookReviewDtoCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of BookReviewDto
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? userBookId = null,
-    Object? rating = null,
-    Object? oneLineReview = freezed,
-    Object? authorNickname = null,
-    Object? authorProfileImageUrl = freezed,
-    Object? reviewedAt = null,
-  }) {
-    return _then(_value.copyWith(
-      userBookId: null == userBookId
-          ? _value.userBookId
-          : userBookId // ignore: cast_nullable_to_non_nullable
-              as String,
-      rating: null == rating
-          ? _value.rating
-          : rating // ignore: cast_nullable_to_non_nullable
-              as int,
-      oneLineReview: freezed == oneLineReview
-          ? _value.oneLineReview
-          : oneLineReview // ignore: cast_nullable_to_non_nullable
-              as String?,
-      authorNickname: null == authorNickname
-          ? _value.authorNickname
-          : authorNickname // ignore: cast_nullable_to_non_nullable
-              as String,
-      authorProfileImageUrl: freezed == authorProfileImageUrl
-          ? _value.authorProfileImageUrl
-          : authorProfileImageUrl // ignore: cast_nullable_to_non_nullable
-              as String?,
-      reviewedAt: null == reviewedAt
-          ? _value.reviewedAt
-          : reviewedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-    ) as $Val);
+  String toString() {
+    return 'SubmitReviewRequest(rating: $rating, oneLineReview: $oneLineReview)';
   }
 }
 
 /// @nodoc
-abstract class _$$BookReviewDtoImplCopyWith<$Res>
-    implements $BookReviewDtoCopyWith<$Res> {
-  factory _$$BookReviewDtoImplCopyWith(
-          _$BookReviewDtoImpl value, $Res Function(_$BookReviewDtoImpl) then) =
-      __$$BookReviewDtoImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $SubmitReviewRequestCopyWith<$Res> {
+  factory $SubmitReviewRequestCopyWith(
+          SubmitReviewRequest value, $Res Function(SubmitReviewRequest) _then) =
+      _$SubmitReviewRequestCopyWithImpl;
   @useResult
-  $Res call(
-      {String userBookId,
-      int rating,
-      String? oneLineReview,
-      String authorNickname,
-      String? authorProfileImageUrl,
-      DateTime reviewedAt});
+  $Res call({int rating, String? oneLineReview});
 }
 
 /// @nodoc
-class __$$BookReviewDtoImplCopyWithImpl<$Res>
-    extends _$BookReviewDtoCopyWithImpl<$Res, _$BookReviewDtoImpl>
-    implements _$$BookReviewDtoImplCopyWith<$Res> {
-  __$$BookReviewDtoImplCopyWithImpl(
-      _$BookReviewDtoImpl _value, $Res Function(_$BookReviewDtoImpl) _then)
-      : super(_value, _then);
+class _$SubmitReviewRequestCopyWithImpl<$Res>
+    implements $SubmitReviewRequestCopyWith<$Res> {
+  _$SubmitReviewRequestCopyWithImpl(this._self, this._then);
 
-  /// Create a copy of BookReviewDto
+  final SubmitReviewRequest _self;
+  final $Res Function(SubmitReviewRequest) _then;
+
+  /// Create a copy of SubmitReviewRequest
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? userBookId = null,
     Object? rating = null,
     Object? oneLineReview = freezed,
-    Object? authorNickname = null,
-    Object? authorProfileImageUrl = freezed,
-    Object? reviewedAt = null,
   }) {
-    return _then(_$BookReviewDtoImpl(
-      userBookId: null == userBookId
-          ? _value.userBookId
-          : userBookId // ignore: cast_nullable_to_non_nullable
-              as String,
+    return _then(_self.copyWith(
       rating: null == rating
-          ? _value.rating
+          ? _self.rating
           : rating // ignore: cast_nullable_to_non_nullable
               as int,
       oneLineReview: freezed == oneLineReview
-          ? _value.oneLineReview
+          ? _self.oneLineReview
           : oneLineReview // ignore: cast_nullable_to_non_nullable
               as String?,
-      authorNickname: null == authorNickname
-          ? _value.authorNickname
-          : authorNickname // ignore: cast_nullable_to_non_nullable
-              as String,
-      authorProfileImageUrl: freezed == authorProfileImageUrl
-          ? _value.authorProfileImageUrl
-          : authorProfileImageUrl // ignore: cast_nullable_to_non_nullable
-              as String?,
-      reviewedAt: null == reviewedAt
-          ? _value.reviewedAt
-          : reviewedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
     ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [SubmitReviewRequest].
+extension SubmitReviewRequestPatterns on SubmitReviewRequest {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_SubmitReviewRequest value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SubmitReviewRequest() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_SubmitReviewRequest value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SubmitReviewRequest():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_SubmitReviewRequest value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SubmitReviewRequest() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(int rating, String? oneLineReview)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SubmitReviewRequest() when $default != null:
+        return $default(_that.rating, _that.oneLineReview);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(int rating, String? oneLineReview) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SubmitReviewRequest():
+        return $default(_that.rating, _that.oneLineReview);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(int rating, String? oneLineReview)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SubmitReviewRequest() when $default != null:
+        return $default(_that.rating, _that.oneLineReview);
+      case _:
+        return null;
+    }
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$BookReviewDtoImpl extends _BookReviewDto {
-  const _$BookReviewDtoImpl(
-      {required this.userBookId,
-      required this.rating,
-      this.oneLineReview,
-      required this.authorNickname,
-      this.authorProfileImageUrl,
-      required this.reviewedAt})
-      : super._();
+class _SubmitReviewRequest implements SubmitReviewRequest {
+  const _SubmitReviewRequest({required this.rating, this.oneLineReview});
+  factory _SubmitReviewRequest.fromJson(Map<String, dynamic> json) =>
+      _$SubmitReviewRequestFromJson(json);
 
-  factory _$BookReviewDtoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$BookReviewDtoImplFromJson(json);
-
-  @override
-  final String userBookId;
   @override
   final int rating;
   @override
   final String? oneLineReview;
+
+  /// Create a copy of SubmitReviewRequest
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  final String authorNickname;
-  @override
-  final String? authorProfileImageUrl;
-  @override
-  final DateTime reviewedAt;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$SubmitReviewRequestCopyWith<_SubmitReviewRequest> get copyWith =>
+      __$SubmitReviewRequestCopyWithImpl<_SubmitReviewRequest>(
+          this, _$identity);
 
   @override
-  String toString() {
-    return 'BookReviewDto(userBookId: $userBookId, rating: $rating, oneLineReview: $oneLineReview, authorNickname: $authorNickname, authorProfileImageUrl: $authorProfileImageUrl, reviewedAt: $reviewedAt)';
+  Map<String, dynamic> toJson() {
+    return _$SubmitReviewRequestToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$BookReviewDtoImpl &&
+            other is _SubmitReviewRequest &&
+            (identical(other.rating, rating) || other.rating == rating) &&
+            (identical(other.oneLineReview, oneLineReview) ||
+                other.oneLineReview == oneLineReview));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, rating, oneLineReview);
+
+  @override
+  String toString() {
+    return 'SubmitReviewRequest(rating: $rating, oneLineReview: $oneLineReview)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$SubmitReviewRequestCopyWith<$Res>
+    implements $SubmitReviewRequestCopyWith<$Res> {
+  factory _$SubmitReviewRequestCopyWith(_SubmitReviewRequest value,
+          $Res Function(_SubmitReviewRequest) _then) =
+      __$SubmitReviewRequestCopyWithImpl;
+  @override
+  @useResult
+  $Res call({int rating, String? oneLineReview});
+}
+
+/// @nodoc
+class __$SubmitReviewRequestCopyWithImpl<$Res>
+    implements _$SubmitReviewRequestCopyWith<$Res> {
+  __$SubmitReviewRequestCopyWithImpl(this._self, this._then);
+
+  final _SubmitReviewRequest _self;
+  final $Res Function(_SubmitReviewRequest) _then;
+
+  /// Create a copy of SubmitReviewRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? rating = null,
+    Object? oneLineReview = freezed,
+  }) {
+    return _then(_SubmitReviewRequest(
+      rating: null == rating
+          ? _self.rating
+          : rating // ignore: cast_nullable_to_non_nullable
+              as int,
+      oneLineReview: freezed == oneLineReview
+          ? _self.oneLineReview
+          : oneLineReview // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$BookReviewDto {
+  String get userBookId;
+  int get rating;
+  String? get oneLineReview;
+  String get authorNickname;
+  String? get authorProfileImageUrl;
+  DateTime get reviewedAt;
+
+  /// Create a copy of BookReviewDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $BookReviewDtoCopyWith<BookReviewDto> get copyWith =>
+      _$BookReviewDtoCopyWithImpl<BookReviewDto>(
+          this as BookReviewDto, _$identity);
+
+  /// Serializes this BookReviewDto to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is BookReviewDto &&
             (identical(other.userBookId, userBookId) ||
                 other.userBookId == userBookId) &&
             (identical(other.rating, rating) || other.rating == rating) &&
@@ -2031,132 +3230,459 @@ class _$BookReviewDtoImpl extends _BookReviewDto {
   int get hashCode => Object.hash(runtimeType, userBookId, rating,
       oneLineReview, authorNickname, authorProfileImageUrl, reviewedAt);
 
-  /// Create a copy of BookReviewDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$BookReviewDtoImplCopyWith<_$BookReviewDtoImpl> get copyWith =>
-      __$$BookReviewDtoImplCopyWithImpl<_$BookReviewDtoImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$BookReviewDtoImplToJson(
-      this,
-    );
+  String toString() {
+    return 'BookReviewDto(userBookId: $userBookId, rating: $rating, oneLineReview: $oneLineReview, authorNickname: $authorNickname, authorProfileImageUrl: $authorProfileImageUrl, reviewedAt: $reviewedAt)';
   }
 }
 
-abstract class _BookReviewDto extends BookReviewDto {
-  const factory _BookReviewDto(
-      {required final String userBookId,
-      required final int rating,
-      final String? oneLineReview,
-      required final String authorNickname,
-      final String? authorProfileImageUrl,
-      required final DateTime reviewedAt}) = _$BookReviewDtoImpl;
-  const _BookReviewDto._() : super._();
+/// @nodoc
+abstract mixin class $BookReviewDtoCopyWith<$Res> {
+  factory $BookReviewDtoCopyWith(
+          BookReviewDto value, $Res Function(BookReviewDto) _then) =
+      _$BookReviewDtoCopyWithImpl;
+  @useResult
+  $Res call(
+      {String userBookId,
+      int rating,
+      String? oneLineReview,
+      String authorNickname,
+      String? authorProfileImageUrl,
+      DateTime reviewedAt});
+}
 
-  factory _BookReviewDto.fromJson(Map<String, dynamic> json) =
-      _$BookReviewDtoImpl.fromJson;
+/// @nodoc
+class _$BookReviewDtoCopyWithImpl<$Res>
+    implements $BookReviewDtoCopyWith<$Res> {
+  _$BookReviewDtoCopyWithImpl(this._self, this._then);
+
+  final BookReviewDto _self;
+  final $Res Function(BookReviewDto) _then;
+
+  /// Create a copy of BookReviewDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? userBookId = null,
+    Object? rating = null,
+    Object? oneLineReview = freezed,
+    Object? authorNickname = null,
+    Object? authorProfileImageUrl = freezed,
+    Object? reviewedAt = null,
+  }) {
+    return _then(_self.copyWith(
+      userBookId: null == userBookId
+          ? _self.userBookId
+          : userBookId // ignore: cast_nullable_to_non_nullable
+              as String,
+      rating: null == rating
+          ? _self.rating
+          : rating // ignore: cast_nullable_to_non_nullable
+              as int,
+      oneLineReview: freezed == oneLineReview
+          ? _self.oneLineReview
+          : oneLineReview // ignore: cast_nullable_to_non_nullable
+              as String?,
+      authorNickname: null == authorNickname
+          ? _self.authorNickname
+          : authorNickname // ignore: cast_nullable_to_non_nullable
+              as String,
+      authorProfileImageUrl: freezed == authorProfileImageUrl
+          ? _self.authorProfileImageUrl
+          : authorProfileImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      reviewedAt: null == reviewedAt
+          ? _self.reviewedAt
+          : reviewedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [BookReviewDto].
+extension BookReviewDtoPatterns on BookReviewDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_BookReviewDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _BookReviewDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_BookReviewDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _BookReviewDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_BookReviewDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _BookReviewDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String userBookId,
+            int rating,
+            String? oneLineReview,
+            String authorNickname,
+            String? authorProfileImageUrl,
+            DateTime reviewedAt)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _BookReviewDto() when $default != null:
+        return $default(
+            _that.userBookId,
+            _that.rating,
+            _that.oneLineReview,
+            _that.authorNickname,
+            _that.authorProfileImageUrl,
+            _that.reviewedAt);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String userBookId,
+            int rating,
+            String? oneLineReview,
+            String authorNickname,
+            String? authorProfileImageUrl,
+            DateTime reviewedAt)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _BookReviewDto():
+        return $default(
+            _that.userBookId,
+            _that.rating,
+            _that.oneLineReview,
+            _that.authorNickname,
+            _that.authorProfileImageUrl,
+            _that.reviewedAt);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String userBookId,
+            int rating,
+            String? oneLineReview,
+            String authorNickname,
+            String? authorProfileImageUrl,
+            DateTime reviewedAt)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _BookReviewDto() when $default != null:
+        return $default(
+            _that.userBookId,
+            _that.rating,
+            _that.oneLineReview,
+            _that.authorNickname,
+            _that.authorProfileImageUrl,
+            _that.reviewedAt);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _BookReviewDto extends BookReviewDto {
+  const _BookReviewDto(
+      {required this.userBookId,
+      required this.rating,
+      this.oneLineReview,
+      required this.authorNickname,
+      this.authorProfileImageUrl,
+      required this.reviewedAt})
+      : super._();
+  factory _BookReviewDto.fromJson(Map<String, dynamic> json) =>
+      _$BookReviewDtoFromJson(json);
 
   @override
-  String get userBookId;
+  final String userBookId;
   @override
-  int get rating;
+  final int rating;
   @override
-  String? get oneLineReview;
+  final String? oneLineReview;
   @override
-  String get authorNickname;
+  final String authorNickname;
   @override
-  String? get authorProfileImageUrl;
+  final String? authorProfileImageUrl;
   @override
-  DateTime get reviewedAt;
+  final DateTime reviewedAt;
 
   /// Create a copy of BookReviewDto
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$BookReviewDtoImplCopyWith<_$BookReviewDtoImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  _$BookReviewDtoCopyWith<_BookReviewDto> get copyWith =>
+      __$BookReviewDtoCopyWithImpl<_BookReviewDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$BookReviewDtoToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _BookReviewDto &&
+            (identical(other.userBookId, userBookId) ||
+                other.userBookId == userBookId) &&
+            (identical(other.rating, rating) || other.rating == rating) &&
+            (identical(other.oneLineReview, oneLineReview) ||
+                other.oneLineReview == oneLineReview) &&
+            (identical(other.authorNickname, authorNickname) ||
+                other.authorNickname == authorNickname) &&
+            (identical(other.authorProfileImageUrl, authorProfileImageUrl) ||
+                other.authorProfileImageUrl == authorProfileImageUrl) &&
+            (identical(other.reviewedAt, reviewedAt) ||
+                other.reviewedAt == reviewedAt));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, userBookId, rating,
+      oneLineReview, authorNickname, authorProfileImageUrl, reviewedAt);
+
+  @override
+  String toString() {
+    return 'BookReviewDto(userBookId: $userBookId, rating: $rating, oneLineReview: $oneLineReview, authorNickname: $authorNickname, authorProfileImageUrl: $authorProfileImageUrl, reviewedAt: $reviewedAt)';
+  }
 }
 
-BookReviewsResponseDto _$BookReviewsResponseDtoFromJson(
-    Map<String, dynamic> json) {
-  return _BookReviewsResponseDto.fromJson(json);
+/// @nodoc
+abstract mixin class _$BookReviewDtoCopyWith<$Res>
+    implements $BookReviewDtoCopyWith<$Res> {
+  factory _$BookReviewDtoCopyWith(
+          _BookReviewDto value, $Res Function(_BookReviewDto) _then) =
+      __$BookReviewDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String userBookId,
+      int rating,
+      String? oneLineReview,
+      String authorNickname,
+      String? authorProfileImageUrl,
+      DateTime reviewedAt});
+}
+
+/// @nodoc
+class __$BookReviewDtoCopyWithImpl<$Res>
+    implements _$BookReviewDtoCopyWith<$Res> {
+  __$BookReviewDtoCopyWithImpl(this._self, this._then);
+
+  final _BookReviewDto _self;
+  final $Res Function(_BookReviewDto) _then;
+
+  /// Create a copy of BookReviewDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? userBookId = null,
+    Object? rating = null,
+    Object? oneLineReview = freezed,
+    Object? authorNickname = null,
+    Object? authorProfileImageUrl = freezed,
+    Object? reviewedAt = null,
+  }) {
+    return _then(_BookReviewDto(
+      userBookId: null == userBookId
+          ? _self.userBookId
+          : userBookId // ignore: cast_nullable_to_non_nullable
+              as String,
+      rating: null == rating
+          ? _self.rating
+          : rating // ignore: cast_nullable_to_non_nullable
+              as int,
+      oneLineReview: freezed == oneLineReview
+          ? _self.oneLineReview
+          : oneLineReview // ignore: cast_nullable_to_non_nullable
+              as String?,
+      authorNickname: null == authorNickname
+          ? _self.authorNickname
+          : authorNickname // ignore: cast_nullable_to_non_nullable
+              as String,
+      authorProfileImageUrl: freezed == authorProfileImageUrl
+          ? _self.authorProfileImageUrl
+          : authorProfileImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      reviewedAt: null == reviewedAt
+          ? _self.reviewedAt
+          : reviewedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
 }
 
 /// @nodoc
 mixin _$BookReviewsResponseDto {
-  List<BookReviewDto> get items => throw _privateConstructorUsedError;
-
-  /// Serializes this BookReviewsResponseDto to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  List<BookReviewDto> get items;
 
   /// Create a copy of BookReviewsResponseDto
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $BookReviewsResponseDtoCopyWith<BookReviewsResponseDto> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $BookReviewsResponseDtoCopyWith<$Res> {
-  factory $BookReviewsResponseDtoCopyWith(BookReviewsResponseDto value,
-          $Res Function(BookReviewsResponseDto) then) =
-      _$BookReviewsResponseDtoCopyWithImpl<$Res, BookReviewsResponseDto>;
-  @useResult
-  $Res call({List<BookReviewDto> items});
-}
-
-/// @nodoc
-class _$BookReviewsResponseDtoCopyWithImpl<$Res,
-        $Val extends BookReviewsResponseDto>
-    implements $BookReviewsResponseDtoCopyWith<$Res> {
-  _$BookReviewsResponseDtoCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of BookReviewsResponseDto
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $BookReviewsResponseDtoCopyWith<BookReviewsResponseDto> get copyWith =>
+      _$BookReviewsResponseDtoCopyWithImpl<BookReviewsResponseDto>(
+          this as BookReviewsResponseDto, _$identity);
+
+  /// Serializes this BookReviewsResponseDto to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? items = null,
-  }) {
-    return _then(_value.copyWith(
-      items: null == items
-          ? _value.items
-          : items // ignore: cast_nullable_to_non_nullable
-              as List<BookReviewDto>,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is BookReviewsResponseDto &&
+            const DeepCollectionEquality().equals(other.items, items));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(items));
+
+  @override
+  String toString() {
+    return 'BookReviewsResponseDto(items: $items)';
   }
 }
 
 /// @nodoc
-abstract class _$$BookReviewsResponseDtoImplCopyWith<$Res>
-    implements $BookReviewsResponseDtoCopyWith<$Res> {
-  factory _$$BookReviewsResponseDtoImplCopyWith(
-          _$BookReviewsResponseDtoImpl value,
-          $Res Function(_$BookReviewsResponseDtoImpl) then) =
-      __$$BookReviewsResponseDtoImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $BookReviewsResponseDtoCopyWith<$Res> {
+  factory $BookReviewsResponseDtoCopyWith(BookReviewsResponseDto value,
+          $Res Function(BookReviewsResponseDto) _then) =
+      _$BookReviewsResponseDtoCopyWithImpl;
   @useResult
   $Res call({List<BookReviewDto> items});
 }
 
 /// @nodoc
-class __$$BookReviewsResponseDtoImplCopyWithImpl<$Res>
-    extends _$BookReviewsResponseDtoCopyWithImpl<$Res,
-        _$BookReviewsResponseDtoImpl>
-    implements _$$BookReviewsResponseDtoImplCopyWith<$Res> {
-  __$$BookReviewsResponseDtoImplCopyWithImpl(
-      _$BookReviewsResponseDtoImpl _value,
-      $Res Function(_$BookReviewsResponseDtoImpl) _then)
-      : super(_value, _then);
+class _$BookReviewsResponseDtoCopyWithImpl<$Res>
+    implements $BookReviewsResponseDtoCopyWith<$Res> {
+  _$BookReviewsResponseDtoCopyWithImpl(this._self, this._then);
+
+  final BookReviewsResponseDto _self;
+  final $Res Function(BookReviewsResponseDto) _then;
 
   /// Create a copy of BookReviewsResponseDto
   /// with the given fields replaced by the non-null parameter values.
@@ -2165,23 +3691,179 @@ class __$$BookReviewsResponseDtoImplCopyWithImpl<$Res>
   $Res call({
     Object? items = null,
   }) {
-    return _then(_$BookReviewsResponseDtoImpl(
+    return _then(_self.copyWith(
       items: null == items
-          ? _value._items
+          ? _self.items
           : items // ignore: cast_nullable_to_non_nullable
               as List<BookReviewDto>,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [BookReviewsResponseDto].
+extension BookReviewsResponseDtoPatterns on BookReviewsResponseDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_BookReviewsResponseDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _BookReviewsResponseDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_BookReviewsResponseDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _BookReviewsResponseDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_BookReviewsResponseDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _BookReviewsResponseDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(List<BookReviewDto> items)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _BookReviewsResponseDto() when $default != null:
+        return $default(_that.items);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(List<BookReviewDto> items) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _BookReviewsResponseDto():
+        return $default(_that.items);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(List<BookReviewDto> items)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _BookReviewsResponseDto() when $default != null:
+        return $default(_that.items);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$BookReviewsResponseDtoImpl implements _BookReviewsResponseDto {
-  const _$BookReviewsResponseDtoImpl({required final List<BookReviewDto> items})
+class _BookReviewsResponseDto implements BookReviewsResponseDto {
+  const _BookReviewsResponseDto({required final List<BookReviewDto> items})
       : _items = items;
-
-  factory _$BookReviewsResponseDtoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$BookReviewsResponseDtoImplFromJson(json);
+  factory _BookReviewsResponseDto.fromJson(Map<String, dynamic> json) =>
+      _$BookReviewsResponseDtoFromJson(json);
 
   final List<BookReviewDto> _items;
   @override
@@ -2191,16 +3873,27 @@ class _$BookReviewsResponseDtoImpl implements _BookReviewsResponseDto {
     return EqualUnmodifiableListView(_items);
   }
 
+  /// Create a copy of BookReviewsResponseDto
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'BookReviewsResponseDto(items: $items)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$BookReviewsResponseDtoCopyWith<_BookReviewsResponseDto> get copyWith =>
+      __$BookReviewsResponseDtoCopyWithImpl<_BookReviewsResponseDto>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$BookReviewsResponseDtoToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$BookReviewsResponseDtoImpl &&
+            other is _BookReviewsResponseDto &&
             const DeepCollectionEquality().equals(other._items, _items));
   }
 
@@ -2209,38 +3902,45 @@ class _$BookReviewsResponseDtoImpl implements _BookReviewsResponseDto {
   int get hashCode =>
       Object.hash(runtimeType, const DeepCollectionEquality().hash(_items));
 
-  /// Create a copy of BookReviewsResponseDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$BookReviewsResponseDtoImplCopyWith<_$BookReviewsResponseDtoImpl>
-      get copyWith => __$$BookReviewsResponseDtoImplCopyWithImpl<
-          _$BookReviewsResponseDtoImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$BookReviewsResponseDtoImplToJson(
-      this,
-    );
+  String toString() {
+    return 'BookReviewsResponseDto(items: $items)';
   }
 }
 
-abstract class _BookReviewsResponseDto implements BookReviewsResponseDto {
-  const factory _BookReviewsResponseDto(
-          {required final List<BookReviewDto> items}) =
-      _$BookReviewsResponseDtoImpl;
-
-  factory _BookReviewsResponseDto.fromJson(Map<String, dynamic> json) =
-      _$BookReviewsResponseDtoImpl.fromJson;
-
+/// @nodoc
+abstract mixin class _$BookReviewsResponseDtoCopyWith<$Res>
+    implements $BookReviewsResponseDtoCopyWith<$Res> {
+  factory _$BookReviewsResponseDtoCopyWith(_BookReviewsResponseDto value,
+          $Res Function(_BookReviewsResponseDto) _then) =
+      __$BookReviewsResponseDtoCopyWithImpl;
   @override
-  List<BookReviewDto> get items;
+  @useResult
+  $Res call({List<BookReviewDto> items});
+}
+
+/// @nodoc
+class __$BookReviewsResponseDtoCopyWithImpl<$Res>
+    implements _$BookReviewsResponseDtoCopyWith<$Res> {
+  __$BookReviewsResponseDtoCopyWithImpl(this._self, this._then);
+
+  final _BookReviewsResponseDto _self;
+  final $Res Function(_BookReviewsResponseDto) _then;
 
   /// Create a copy of BookReviewsResponseDto
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$BookReviewsResponseDtoImplCopyWith<_$BookReviewsResponseDtoImpl>
-      get copyWith => throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? items = null,
+  }) {
+    return _then(_BookReviewsResponseDto(
+      items: null == items
+          ? _self._items
+          : items // ignore: cast_nullable_to_non_nullable
+              as List<BookReviewDto>,
+    ));
+  }
 }
+
+// dart format on

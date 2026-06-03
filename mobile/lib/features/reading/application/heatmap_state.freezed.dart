@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,56 +9,45 @@ part of 'heatmap_state.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$HeatmapState {
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() loading,
-    required TResult Function(List<HeatmapDay> days, DateTime from, DateTime to)
-        loaded,
-    required TResult Function(String code, String message) error,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
-    TResult? Function()? loading,
-    TResult? Function(List<HeatmapDay> days, DateTime from, DateTime to)?
-        loaded,
-    TResult? Function(String code, String message)? error,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? loading,
-    TResult Function(List<HeatmapDay> days, DateTime from, DateTime to)? loaded,
-    TResult Function(String code, String message)? error,
-    required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(HeatmapInitial value) initial,
-    required TResult Function(HeatmapLoading value) loading,
-    required TResult Function(HeatmapLoaded value) loaded,
-    required TResult Function(HeatmapError value) error,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(HeatmapInitial value)? initial,
-    TResult? Function(HeatmapLoading value)? loading,
-    TResult? Function(HeatmapLoaded value)? loaded,
-    TResult? Function(HeatmapError value)? error,
-  }) =>
-      throw _privateConstructorUsedError;
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is HeatmapState);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'HeatmapState()';
+  }
+}
+
+/// @nodoc
+class $HeatmapStateCopyWith<$Res> {
+  $HeatmapStateCopyWith(HeatmapState _, $Res Function(HeatmapState) __);
+}
+
+/// Adds pattern-matching-related methods to [HeatmapState].
+extension HeatmapStatePatterns on HeatmapState {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(HeatmapInitial value)? initial,
@@ -66,344 +55,265 @@ mixin _$HeatmapState {
     TResult Function(HeatmapLoaded value)? loaded,
     TResult Function(HeatmapError value)? error,
     required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
+  }) {
+    final _that = this;
+    switch (_that) {
+      case HeatmapInitial() when initial != null:
+        return initial(_that);
+      case HeatmapLoading() when loading != null:
+        return loading(_that);
+      case HeatmapLoaded() when loaded != null:
+        return loaded(_that);
+      case HeatmapError() when error != null:
+        return error(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(HeatmapInitial value) initial,
+    required TResult Function(HeatmapLoading value) loading,
+    required TResult Function(HeatmapLoaded value) loaded,
+    required TResult Function(HeatmapError value) error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case HeatmapInitial():
+        return initial(_that);
+      case HeatmapLoading():
+        return loading(_that);
+      case HeatmapLoaded():
+        return loaded(_that);
+      case HeatmapError():
+        return error(_that);
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(HeatmapInitial value)? initial,
+    TResult? Function(HeatmapLoading value)? loading,
+    TResult? Function(HeatmapLoaded value)? loaded,
+    TResult? Function(HeatmapError value)? error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case HeatmapInitial() when initial != null:
+        return initial(_that);
+      case HeatmapLoading() when loading != null:
+        return loading(_that);
+      case HeatmapLoaded() when loaded != null:
+        return loaded(_that);
+      case HeatmapError() when error != null:
+        return error(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initial,
+    TResult Function()? loading,
+    TResult Function(List<HeatmapDay> days, DateTime from, DateTime to)? loaded,
+    TResult Function(String code, String message)? error,
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case HeatmapInitial() when initial != null:
+        return initial();
+      case HeatmapLoading() when loading != null:
+        return loading();
+      case HeatmapLoaded() when loaded != null:
+        return loaded(_that.days, _that.from, _that.to);
+      case HeatmapError() when error != null:
+        return error(_that.code, _that.message);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initial,
+    required TResult Function() loading,
+    required TResult Function(List<HeatmapDay> days, DateTime from, DateTime to)
+        loaded,
+    required TResult Function(String code, String message) error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case HeatmapInitial():
+        return initial();
+      case HeatmapLoading():
+        return loading();
+      case HeatmapLoaded():
+        return loaded(_that.days, _that.from, _that.to);
+      case HeatmapError():
+        return error(_that.code, _that.message);
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? initial,
+    TResult? Function()? loading,
+    TResult? Function(List<HeatmapDay> days, DateTime from, DateTime to)?
+        loaded,
+    TResult? Function(String code, String message)? error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case HeatmapInitial() when initial != null:
+        return initial();
+      case HeatmapLoading() when loading != null:
+        return loading();
+      case HeatmapLoaded() when loaded != null:
+        return loaded(_that.days, _that.from, _that.to);
+      case HeatmapError() when error != null:
+        return error(_that.code, _that.message);
+      case _:
+        return null;
+    }
+  }
 }
 
 /// @nodoc
-abstract class $HeatmapStateCopyWith<$Res> {
-  factory $HeatmapStateCopyWith(
-          HeatmapState value, $Res Function(HeatmapState) then) =
-      _$HeatmapStateCopyWithImpl<$Res, HeatmapState>;
-}
 
-/// @nodoc
-class _$HeatmapStateCopyWithImpl<$Res, $Val extends HeatmapState>
-    implements $HeatmapStateCopyWith<$Res> {
-  _$HeatmapStateCopyWithImpl(this._value, this._then);
+class HeatmapInitial implements HeatmapState {
+  const HeatmapInitial();
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is HeatmapInitial);
+  }
 
-  /// Create a copy of HeatmapState
-  /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-abstract class _$$HeatmapInitialImplCopyWith<$Res> {
-  factory _$$HeatmapInitialImplCopyWith(_$HeatmapInitialImpl value,
-          $Res Function(_$HeatmapInitialImpl) then) =
-      __$$HeatmapInitialImplCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$$HeatmapInitialImplCopyWithImpl<$Res>
-    extends _$HeatmapStateCopyWithImpl<$Res, _$HeatmapInitialImpl>
-    implements _$$HeatmapInitialImplCopyWith<$Res> {
-  __$$HeatmapInitialImplCopyWithImpl(
-      _$HeatmapInitialImpl _value, $Res Function(_$HeatmapInitialImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of HeatmapState
-  /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-
-class _$HeatmapInitialImpl implements HeatmapInitial {
-  const _$HeatmapInitialImpl();
+  @override
+  int get hashCode => runtimeType.hashCode;
 
   @override
   String toString() {
     return 'HeatmapState.initial()';
   }
+}
+
+/// @nodoc
+
+class HeatmapLoading implements HeatmapState {
+  const HeatmapLoading();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$HeatmapInitialImpl);
+        (other.runtimeType == runtimeType && other is HeatmapLoading);
   }
 
   @override
   int get hashCode => runtimeType.hashCode;
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() loading,
-    required TResult Function(List<HeatmapDay> days, DateTime from, DateTime to)
-        loaded,
-    required TResult Function(String code, String message) error,
-  }) {
-    return initial();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
-    TResult? Function()? loading,
-    TResult? Function(List<HeatmapDay> days, DateTime from, DateTime to)?
-        loaded,
-    TResult? Function(String code, String message)? error,
-  }) {
-    return initial?.call();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? loading,
-    TResult Function(List<HeatmapDay> days, DateTime from, DateTime to)? loaded,
-    TResult Function(String code, String message)? error,
-    required TResult orElse(),
-  }) {
-    if (initial != null) {
-      return initial();
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(HeatmapInitial value) initial,
-    required TResult Function(HeatmapLoading value) loading,
-    required TResult Function(HeatmapLoaded value) loaded,
-    required TResult Function(HeatmapError value) error,
-  }) {
-    return initial(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(HeatmapInitial value)? initial,
-    TResult? Function(HeatmapLoading value)? loading,
-    TResult? Function(HeatmapLoaded value)? loaded,
-    TResult? Function(HeatmapError value)? error,
-  }) {
-    return initial?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(HeatmapInitial value)? initial,
-    TResult Function(HeatmapLoading value)? loading,
-    TResult Function(HeatmapLoaded value)? loaded,
-    TResult Function(HeatmapError value)? error,
-    required TResult orElse(),
-  }) {
-    if (initial != null) {
-      return initial(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class HeatmapInitial implements HeatmapState {
-  const factory HeatmapInitial() = _$HeatmapInitialImpl;
-}
-
-/// @nodoc
-abstract class _$$HeatmapLoadingImplCopyWith<$Res> {
-  factory _$$HeatmapLoadingImplCopyWith(_$HeatmapLoadingImpl value,
-          $Res Function(_$HeatmapLoadingImpl) then) =
-      __$$HeatmapLoadingImplCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$$HeatmapLoadingImplCopyWithImpl<$Res>
-    extends _$HeatmapStateCopyWithImpl<$Res, _$HeatmapLoadingImpl>
-    implements _$$HeatmapLoadingImplCopyWith<$Res> {
-  __$$HeatmapLoadingImplCopyWithImpl(
-      _$HeatmapLoadingImpl _value, $Res Function(_$HeatmapLoadingImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of HeatmapState
-  /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-
-class _$HeatmapLoadingImpl implements HeatmapLoading {
-  const _$HeatmapLoadingImpl();
 
   @override
   String toString() {
     return 'HeatmapState.loading()';
   }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$HeatmapLoadingImpl);
-  }
-
-  @override
-  int get hashCode => runtimeType.hashCode;
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() loading,
-    required TResult Function(List<HeatmapDay> days, DateTime from, DateTime to)
-        loaded,
-    required TResult Function(String code, String message) error,
-  }) {
-    return loading();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
-    TResult? Function()? loading,
-    TResult? Function(List<HeatmapDay> days, DateTime from, DateTime to)?
-        loaded,
-    TResult? Function(String code, String message)? error,
-  }) {
-    return loading?.call();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? loading,
-    TResult Function(List<HeatmapDay> days, DateTime from, DateTime to)? loaded,
-    TResult Function(String code, String message)? error,
-    required TResult orElse(),
-  }) {
-    if (loading != null) {
-      return loading();
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(HeatmapInitial value) initial,
-    required TResult Function(HeatmapLoading value) loading,
-    required TResult Function(HeatmapLoaded value) loaded,
-    required TResult Function(HeatmapError value) error,
-  }) {
-    return loading(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(HeatmapInitial value)? initial,
-    TResult? Function(HeatmapLoading value)? loading,
-    TResult? Function(HeatmapLoaded value)? loaded,
-    TResult? Function(HeatmapError value)? error,
-  }) {
-    return loading?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(HeatmapInitial value)? initial,
-    TResult Function(HeatmapLoading value)? loading,
-    TResult Function(HeatmapLoaded value)? loaded,
-    TResult Function(HeatmapError value)? error,
-    required TResult orElse(),
-  }) {
-    if (loading != null) {
-      return loading(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class HeatmapLoading implements HeatmapState {
-  const factory HeatmapLoading() = _$HeatmapLoadingImpl;
-}
-
-/// @nodoc
-abstract class _$$HeatmapLoadedImplCopyWith<$Res> {
-  factory _$$HeatmapLoadedImplCopyWith(
-          _$HeatmapLoadedImpl value, $Res Function(_$HeatmapLoadedImpl) then) =
-      __$$HeatmapLoadedImplCopyWithImpl<$Res>;
-  @useResult
-  $Res call({List<HeatmapDay> days, DateTime from, DateTime to});
-}
-
-/// @nodoc
-class __$$HeatmapLoadedImplCopyWithImpl<$Res>
-    extends _$HeatmapStateCopyWithImpl<$Res, _$HeatmapLoadedImpl>
-    implements _$$HeatmapLoadedImplCopyWith<$Res> {
-  __$$HeatmapLoadedImplCopyWithImpl(
-      _$HeatmapLoadedImpl _value, $Res Function(_$HeatmapLoadedImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of HeatmapState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? days = null,
-    Object? from = null,
-    Object? to = null,
-  }) {
-    return _then(_$HeatmapLoadedImpl(
-      days: null == days
-          ? _value._days
-          : days // ignore: cast_nullable_to_non_nullable
-              as List<HeatmapDay>,
-      from: null == from
-          ? _value.from
-          : from // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      to: null == to
-          ? _value.to
-          : to // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-    ));
-  }
 }
 
 /// @nodoc
 
-class _$HeatmapLoadedImpl implements HeatmapLoaded {
-  const _$HeatmapLoadedImpl(
+class HeatmapLoaded implements HeatmapState {
+  const HeatmapLoaded(
       {required final List<HeatmapDay> days,
       required this.from,
       required this.to})
       : _days = days;
 
   final List<HeatmapDay> _days;
-  @override
   List<HeatmapDay> get days {
     if (_days is EqualUnmodifiableListView) return _days;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_days);
   }
 
-  @override
   final DateTime from;
-  @override
   final DateTime to;
 
-  @override
-  String toString() {
-    return 'HeatmapState.loaded(days: $days, from: $from, to: $to)';
-  }
+  /// Create a copy of HeatmapState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $HeatmapLoadedCopyWith<HeatmapLoaded> get copyWith =>
+      _$HeatmapLoadedCopyWithImpl<HeatmapLoaded>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$HeatmapLoadedImpl &&
+            other is HeatmapLoaded &&
             const DeepCollectionEquality().equals(other._days, _days) &&
             (identical(other.from, from) || other.from == from) &&
             (identical(other.to, to) || other.to == to));
@@ -413,166 +323,75 @@ class _$HeatmapLoadedImpl implements HeatmapLoaded {
   int get hashCode => Object.hash(
       runtimeType, const DeepCollectionEquality().hash(_days), from, to);
 
-  /// Create a copy of HeatmapState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$HeatmapLoadedImplCopyWith<_$HeatmapLoadedImpl> get copyWith =>
-      __$$HeatmapLoadedImplCopyWithImpl<_$HeatmapLoadedImpl>(this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() loading,
-    required TResult Function(List<HeatmapDay> days, DateTime from, DateTime to)
-        loaded,
-    required TResult Function(String code, String message) error,
-  }) {
-    return loaded(days, from, to);
+  String toString() {
+    return 'HeatmapState.loaded(days: $days, from: $from, to: $to)';
   }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
-    TResult? Function()? loading,
-    TResult? Function(List<HeatmapDay> days, DateTime from, DateTime to)?
-        loaded,
-    TResult? Function(String code, String message)? error,
-  }) {
-    return loaded?.call(days, from, to);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? loading,
-    TResult Function(List<HeatmapDay> days, DateTime from, DateTime to)? loaded,
-    TResult Function(String code, String message)? error,
-    required TResult orElse(),
-  }) {
-    if (loaded != null) {
-      return loaded(days, from, to);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(HeatmapInitial value) initial,
-    required TResult Function(HeatmapLoading value) loading,
-    required TResult Function(HeatmapLoaded value) loaded,
-    required TResult Function(HeatmapError value) error,
-  }) {
-    return loaded(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(HeatmapInitial value)? initial,
-    TResult? Function(HeatmapLoading value)? loading,
-    TResult? Function(HeatmapLoaded value)? loaded,
-    TResult? Function(HeatmapError value)? error,
-  }) {
-    return loaded?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(HeatmapInitial value)? initial,
-    TResult Function(HeatmapLoading value)? loading,
-    TResult Function(HeatmapLoaded value)? loaded,
-    TResult Function(HeatmapError value)? error,
-    required TResult orElse(),
-  }) {
-    if (loaded != null) {
-      return loaded(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class HeatmapLoaded implements HeatmapState {
-  const factory HeatmapLoaded(
-      {required final List<HeatmapDay> days,
-      required final DateTime from,
-      required final DateTime to}) = _$HeatmapLoadedImpl;
-
-  List<HeatmapDay> get days;
-  DateTime get from;
-  DateTime get to;
-
-  /// Create a copy of HeatmapState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$HeatmapLoadedImplCopyWith<_$HeatmapLoadedImpl> get copyWith =>
-      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$$HeatmapErrorImplCopyWith<$Res> {
-  factory _$$HeatmapErrorImplCopyWith(
-          _$HeatmapErrorImpl value, $Res Function(_$HeatmapErrorImpl) then) =
-      __$$HeatmapErrorImplCopyWithImpl<$Res>;
+abstract mixin class $HeatmapLoadedCopyWith<$Res>
+    implements $HeatmapStateCopyWith<$Res> {
+  factory $HeatmapLoadedCopyWith(
+          HeatmapLoaded value, $Res Function(HeatmapLoaded) _then) =
+      _$HeatmapLoadedCopyWithImpl;
   @useResult
-  $Res call({String code, String message});
+  $Res call({List<HeatmapDay> days, DateTime from, DateTime to});
 }
 
 /// @nodoc
-class __$$HeatmapErrorImplCopyWithImpl<$Res>
-    extends _$HeatmapStateCopyWithImpl<$Res, _$HeatmapErrorImpl>
-    implements _$$HeatmapErrorImplCopyWith<$Res> {
-  __$$HeatmapErrorImplCopyWithImpl(
-      _$HeatmapErrorImpl _value, $Res Function(_$HeatmapErrorImpl) _then)
-      : super(_value, _then);
+class _$HeatmapLoadedCopyWithImpl<$Res>
+    implements $HeatmapLoadedCopyWith<$Res> {
+  _$HeatmapLoadedCopyWithImpl(this._self, this._then);
+
+  final HeatmapLoaded _self;
+  final $Res Function(HeatmapLoaded) _then;
 
   /// Create a copy of HeatmapState
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
-  @override
   $Res call({
-    Object? code = null,
-    Object? message = null,
+    Object? days = null,
+    Object? from = null,
+    Object? to = null,
   }) {
-    return _then(_$HeatmapErrorImpl(
-      code: null == code
-          ? _value.code
-          : code // ignore: cast_nullable_to_non_nullable
-              as String,
-      message: null == message
-          ? _value.message
-          : message // ignore: cast_nullable_to_non_nullable
-              as String,
+    return _then(HeatmapLoaded(
+      days: null == days
+          ? _self._days
+          : days // ignore: cast_nullable_to_non_nullable
+              as List<HeatmapDay>,
+      from: null == from
+          ? _self.from
+          : from // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      to: null == to
+          ? _self.to
+          : to // ignore: cast_nullable_to_non_nullable
+              as DateTime,
     ));
   }
 }
 
 /// @nodoc
 
-class _$HeatmapErrorImpl implements HeatmapError {
-  const _$HeatmapErrorImpl({required this.code, required this.message});
+class HeatmapError implements HeatmapState {
+  const HeatmapError({required this.code, required this.message});
 
-  @override
   final String code;
-  @override
   final String message;
 
-  @override
-  String toString() {
-    return 'HeatmapState.error(code: $code, message: $message)';
-  }
+  /// Create a copy of HeatmapState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $HeatmapErrorCopyWith<HeatmapError> get copyWith =>
+      _$HeatmapErrorCopyWithImpl<HeatmapError>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$HeatmapErrorImpl &&
+            other is HeatmapError &&
             (identical(other.code, code) || other.code == code) &&
             (identical(other.message, message) || other.message == message));
   }
@@ -580,102 +399,47 @@ class _$HeatmapErrorImpl implements HeatmapError {
   @override
   int get hashCode => Object.hash(runtimeType, code, message);
 
+  @override
+  String toString() {
+    return 'HeatmapState.error(code: $code, message: $message)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $HeatmapErrorCopyWith<$Res>
+    implements $HeatmapStateCopyWith<$Res> {
+  factory $HeatmapErrorCopyWith(
+          HeatmapError value, $Res Function(HeatmapError) _then) =
+      _$HeatmapErrorCopyWithImpl;
+  @useResult
+  $Res call({String code, String message});
+}
+
+/// @nodoc
+class _$HeatmapErrorCopyWithImpl<$Res> implements $HeatmapErrorCopyWith<$Res> {
+  _$HeatmapErrorCopyWithImpl(this._self, this._then);
+
+  final HeatmapError _self;
+  final $Res Function(HeatmapError) _then;
+
   /// Create a copy of HeatmapState
   /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
   @pragma('vm:prefer-inline')
-  _$$HeatmapErrorImplCopyWith<_$HeatmapErrorImpl> get copyWith =>
-      __$$HeatmapErrorImplCopyWithImpl<_$HeatmapErrorImpl>(this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() loading,
-    required TResult Function(List<HeatmapDay> days, DateTime from, DateTime to)
-        loaded,
-    required TResult Function(String code, String message) error,
+  $Res call({
+    Object? code = null,
+    Object? message = null,
   }) {
-    return error(code, message);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
-    TResult? Function()? loading,
-    TResult? Function(List<HeatmapDay> days, DateTime from, DateTime to)?
-        loaded,
-    TResult? Function(String code, String message)? error,
-  }) {
-    return error?.call(code, message);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? loading,
-    TResult Function(List<HeatmapDay> days, DateTime from, DateTime to)? loaded,
-    TResult Function(String code, String message)? error,
-    required TResult orElse(),
-  }) {
-    if (error != null) {
-      return error(code, message);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(HeatmapInitial value) initial,
-    required TResult Function(HeatmapLoading value) loading,
-    required TResult Function(HeatmapLoaded value) loaded,
-    required TResult Function(HeatmapError value) error,
-  }) {
-    return error(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(HeatmapInitial value)? initial,
-    TResult? Function(HeatmapLoading value)? loading,
-    TResult? Function(HeatmapLoaded value)? loaded,
-    TResult? Function(HeatmapError value)? error,
-  }) {
-    return error?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(HeatmapInitial value)? initial,
-    TResult Function(HeatmapLoading value)? loading,
-    TResult Function(HeatmapLoaded value)? loaded,
-    TResult Function(HeatmapError value)? error,
-    required TResult orElse(),
-  }) {
-    if (error != null) {
-      return error(this);
-    }
-    return orElse();
+    return _then(HeatmapError(
+      code: null == code
+          ? _self.code
+          : code // ignore: cast_nullable_to_non_nullable
+              as String,
+      message: null == message
+          ? _self.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
   }
 }
 
-abstract class HeatmapError implements HeatmapState {
-  const factory HeatmapError(
-      {required final String code,
-      required final String message}) = _$HeatmapErrorImpl;
-
-  String get code;
-  String get message;
-
-  /// Create a copy of HeatmapState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$HeatmapErrorImplCopyWith<_$HeatmapErrorImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
+// dart format on

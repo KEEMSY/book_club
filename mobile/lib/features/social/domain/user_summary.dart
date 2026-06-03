@@ -5,7 +5,7 @@ part 'user_summary.g.dart';
 
 /// Reading statistics and grade info bundled with a user profile.
 @freezed
-class GradeStats with _$GradeStats {
+abstract class GradeStats with _$GradeStats {
   const factory GradeStats({
     required int grade,
     required int tier,
@@ -20,7 +20,7 @@ class GradeStats with _$GradeStats {
 
 /// Minimal badge entry for profile showcase.
 @freezed
-class BadgeSummary with _$BadgeSummary {
+abstract class BadgeSummary with _$BadgeSummary {
   const factory BadgeSummary({
     required String id,
     required String name,
@@ -35,7 +35,7 @@ class BadgeSummary with _$BadgeSummary {
 
 /// Single highlight shown on a user's profile (recent highlights section).
 @freezed
-class HighlightSummary with _$HighlightSummary {
+abstract class HighlightSummary with _$HighlightSummary {
   const factory HighlightSummary({
     required String id,
     required String quoteText,
@@ -52,7 +52,7 @@ class HighlightSummary with _$HighlightSummary {
 /// Used in follower/following lists so the UI can render avatar + follow chip
 /// without fetching the full [UserProfile].
 @freezed
-class UserSummary with _$UserSummary {
+abstract class UserSummary with _$UserSummary {
   const factory UserSummary({
     required String id,
     required String nickname,
@@ -67,7 +67,7 @@ class UserSummary with _$UserSummary {
 
 /// Cursor-paged envelope for social list endpoints.
 @freezed
-class UserSummaryPage with _$UserSummaryPage {
+abstract class UserSummaryPage with _$UserSummaryPage {
   const factory UserSummaryPage({
     required List<UserSummary> items,
     String? nextCursor,
@@ -82,7 +82,7 @@ class UserSummaryPage with _$UserSummaryPage {
 /// [isMe] lets the profile screen swap the follow button for "프로필 편집"
 /// without an extra auth check in the UI layer.
 @freezed
-class UserProfile with _$UserProfile {
+abstract class UserProfile with _$UserProfile {
   const factory UserProfile({
     required String id,
     required String nickname,

@@ -14,7 +14,7 @@ part 'feed_models.g.dart';
 /// `CommentPublic`. Kept as its own DTO so both domain models can share the
 /// same JSON parser without duplicating field-rename annotations.
 @freezed
-class PostAuthorDto with _$PostAuthorDto {
+abstract class PostAuthorDto with _$PostAuthorDto {
   const PostAuthorDto._();
 
   const factory PostAuthorDto({
@@ -37,7 +37,7 @@ class PostAuthorDto with _$PostAuthorDto {
 /// because backend keys are wire enum values; conversion to typed
 /// [ReactionType] keys happens inside [PostDto.toDomain].
 @freezed
-class PostDto with _$PostDto {
+abstract class PostDto with _$PostDto {
   const PostDto._();
 
   const factory PostDto({
@@ -84,7 +84,7 @@ class PostDto with _$PostDto {
 
 /// Envelope for `GET /books/{book_id}/posts` cursor paging.
 @freezed
-class PostPageDto with _$PostPageDto {
+abstract class PostPageDto with _$PostPageDto {
   const factory PostPageDto({
     required List<PostDto> items,
     String? nextCursor,
@@ -97,7 +97,7 @@ class PostPageDto with _$PostPageDto {
 /// Body for `POST /books/{book_id}/posts`. [bookId] is duplicated in the body
 /// per the M4 contract (also in the path) — backend validates equality.
 @freezed
-class CreatePostRequest with _$CreatePostRequest {
+abstract class CreatePostRequest with _$CreatePostRequest {
   const factory CreatePostRequest({
     required String bookId,
     required String postType,
@@ -112,7 +112,7 @@ class CreatePostRequest with _$CreatePostRequest {
 /// Body for `POST /uploads/presign-image`. Only the content type is sent;
 /// the server picks the bucket key + signed URL.
 @freezed
-class PresignImageRequest with _$PresignImageRequest {
+abstract class PresignImageRequest with _$PresignImageRequest {
   const factory PresignImageRequest({
     required String contentType,
   }) = _PresignImageRequest;
@@ -125,7 +125,7 @@ class PresignImageRequest with _$PresignImageRequest {
 /// client must echo on the subsequent PUT (R2 signs both the URL and the
 /// `Content-Type` header).
 @freezed
-class PresignImageResponse with _$PresignImageResponse {
+abstract class PresignImageResponse with _$PresignImageResponse {
   const factory PresignImageResponse({
     required String url,
     required String key,
@@ -139,7 +139,7 @@ class PresignImageResponse with _$PresignImageResponse {
 
 /// Body for `POST /posts/{id}/reactions`.
 @freezed
-class ReactionRequest with _$ReactionRequest {
+abstract class ReactionRequest with _$ReactionRequest {
   const factory ReactionRequest({
     required String reactionType,
   }) = _ReactionRequest;
@@ -152,7 +152,7 @@ class ReactionRequest with _$ReactionRequest {
 /// reaction type the post currently has — zero counts may be omitted by the
 /// server, so the repository fills missing keys with 0 before returning.
 @freezed
-class ReactionResponse with _$ReactionResponse {
+abstract class ReactionResponse with _$ReactionResponse {
   const ReactionResponse._();
 
   const factory ReactionResponse({
@@ -177,7 +177,7 @@ class ReactionResponse with _$ReactionResponse {
 
 /// Mirror of `CommentPublic`.
 @freezed
-class CommentDto with _$CommentDto {
+abstract class CommentDto with _$CommentDto {
   const CommentDto._();
 
   const factory CommentDto({
@@ -202,7 +202,7 @@ class CommentDto with _$CommentDto {
 
 /// Envelope for `GET /posts/{id}/comments`.
 @freezed
-class CommentPageDto with _$CommentPageDto {
+abstract class CommentPageDto with _$CommentPageDto {
   const factory CommentPageDto({
     required List<CommentDto> items,
     String? nextCursor,
@@ -214,7 +214,7 @@ class CommentPageDto with _$CommentPageDto {
 
 /// Body for `POST /posts/{id}/comments`.
 @freezed
-class CreateCommentRequest with _$CreateCommentRequest {
+abstract class CreateCommentRequest with _$CreateCommentRequest {
   const factory CreateCommentRequest({
     String? parentId,
     required String content,
@@ -226,7 +226,7 @@ class CreateCommentRequest with _$CreateCommentRequest {
 
 /// Mirror of `HighlightPublic` from the backend.
 @freezed
-class HighlightDto with _$HighlightDto {
+abstract class HighlightDto with _$HighlightDto {
   const HighlightDto._();
 
   const factory HighlightDto({
@@ -253,7 +253,7 @@ class HighlightDto with _$HighlightDto {
 
 /// Paginated list response for highlights.
 @freezed
-class HighlightPageDto with _$HighlightPageDto {
+abstract class HighlightPageDto with _$HighlightPageDto {
   const HighlightPageDto._();
 
   const factory HighlightPageDto({
@@ -272,7 +272,7 @@ class HighlightPageDto with _$HighlightPageDto {
 
 /// Body for `POST /me/library/{user_book_id}/highlights`.
 @freezed
-class CreateHighlightRequest with _$CreateHighlightRequest {
+abstract class CreateHighlightRequest with _$CreateHighlightRequest {
   const factory CreateHighlightRequest({
     required String quoteText,
     int? pageNumber,
@@ -285,7 +285,7 @@ class CreateHighlightRequest with _$CreateHighlightRequest {
 
 /// Mirror of `BookHighlightGroupPublic` from `GET /me/highlights`.
 @freezed
-class BookHighlightGroupDto with _$BookHighlightGroupDto {
+abstract class BookHighlightGroupDto with _$BookHighlightGroupDto {
   const BookHighlightGroupDto._();
 
   const factory BookHighlightGroupDto({
@@ -302,7 +302,7 @@ class BookHighlightGroupDto with _$BookHighlightGroupDto {
 
 /// Envelope for `GET /me/highlights`.
 @freezed
-class AllHighlightsResponseDto with _$AllHighlightsResponseDto {
+abstract class AllHighlightsResponseDto with _$AllHighlightsResponseDto {
   const factory AllHighlightsResponseDto({
     required List<BookHighlightGroupDto> groups,
   }) = _AllHighlightsResponseDto;

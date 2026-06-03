@@ -13,7 +13,7 @@ part 'reading_models.g.dart';
 /// Mirror of backend `ReadingSessionPublic`. Timer-completed sessions include
 /// `ended_at` and `duration_sec`; in-flight sessions leave both null.
 @freezed
-class ReadingSessionDto with _$ReadingSessionDto {
+abstract class ReadingSessionDto with _$ReadingSessionDto {
   const ReadingSessionDto._();
 
   const factory ReadingSessionDto({
@@ -42,7 +42,7 @@ class ReadingSessionDto with _$ReadingSessionDto {
 
 /// Mirror of backend `NextGradeThresholdsPublic`.
 @freezed
-class NextGradeThresholdsDto with _$NextGradeThresholdsDto {
+abstract class NextGradeThresholdsDto with _$NextGradeThresholdsDto {
   const NextGradeThresholdsDto._();
 
   const factory NextGradeThresholdsDto({
@@ -65,7 +65,7 @@ class NextGradeThresholdsDto with _$NextGradeThresholdsDto {
 ///
 /// [tier] defaults to 1 for API responses that predate the tier field.
 @freezed
-class GradeSummaryDto with _$GradeSummaryDto {
+abstract class GradeSummaryDto with _$GradeSummaryDto {
   const GradeSummaryDto._();
 
   const factory GradeSummaryDto({
@@ -96,7 +96,7 @@ class GradeSummaryDto with _$GradeSummaryDto {
 
 /// Mirror of `POST /reading/sessions/{id}/end` response.
 @freezed
-class SessionCompletionDto with _$SessionCompletionDto {
+abstract class SessionCompletionDto with _$SessionCompletionDto {
   const SessionCompletionDto._();
 
   const factory SessionCompletionDto({
@@ -125,7 +125,7 @@ class SessionCompletionDto with _$SessionCompletionDto {
 
 /// Single day cell in the heatmap response. Date ships as `YYYY-MM-DD`.
 @freezed
-class HeatmapItemDto with _$HeatmapItemDto {
+abstract class HeatmapItemDto with _$HeatmapItemDto {
   const HeatmapItemDto._();
 
   const factory HeatmapItemDto({
@@ -149,7 +149,7 @@ class HeatmapItemDto with _$HeatmapItemDto {
 
 /// Envelope for `GET /reading/heatmap`.
 @freezed
-class HeatmapResponseDto with _$HeatmapResponseDto {
+abstract class HeatmapResponseDto with _$HeatmapResponseDto {
   const factory HeatmapResponseDto({
     required List<HeatmapItemDto> items,
   }) = _HeatmapResponseDto;
@@ -160,7 +160,7 @@ class HeatmapResponseDto with _$HeatmapResponseDto {
 
 /// Mirror of backend `GoalPublic`.
 @freezed
-class GoalDto with _$GoalDto {
+abstract class GoalDto with _$GoalDto {
   const GoalDto._();
 
   const factory GoalDto({
@@ -189,7 +189,7 @@ class GoalDto with _$GoalDto {
 
 /// Mirror of backend `GoalProgressPublic`.
 @freezed
-class GoalProgressDto with _$GoalProgressDto {
+abstract class GoalProgressDto with _$GoalProgressDto {
   const GoalProgressDto._();
 
   const factory GoalProgressDto({
@@ -214,7 +214,7 @@ class GoalProgressDto with _$GoalProgressDto {
 
 /// Mirror of a single session row in `GET /reading/sessions/daily` response.
 @freezed
-class DailySessionDto with _$DailySessionDto {
+abstract class DailySessionDto with _$DailySessionDto {
   const factory DailySessionDto({
     required String sessionId,
     required DateTime startedAt,
@@ -233,7 +233,7 @@ class DailySessionDto with _$DailySessionDto {
 
 /// Envelope for `GET /reading/sessions/daily`.
 @freezed
-class DailySessionsResponseDto with _$DailySessionsResponseDto {
+abstract class DailySessionsResponseDto with _$DailySessionsResponseDto {
   const factory DailySessionsResponseDto({
     required String date,
     required int totalSeconds,
@@ -248,7 +248,7 @@ class DailySessionsResponseDto with _$DailySessionsResponseDto {
 
 /// Body for `POST /reading/sessions/start`.
 @freezed
-class StartSessionRequest with _$StartSessionRequest {
+abstract class StartSessionRequest with _$StartSessionRequest {
   const factory StartSessionRequest({
     required String userBookId,
     required String device,
@@ -261,7 +261,7 @@ class StartSessionRequest with _$StartSessionRequest {
 /// Body for `POST /reading/sessions/{id}/end`. [pausedMs] is the client's
 /// locally-tracked paused-total and is not re-verified on the server.
 @freezed
-class EndSessionRequest with _$EndSessionRequest {
+abstract class EndSessionRequest with _$EndSessionRequest {
   const factory EndSessionRequest({
     required DateTime endedAt,
     required int pausedMs,
@@ -274,7 +274,7 @@ class EndSessionRequest with _$EndSessionRequest {
 /// Body for `POST /reading/sessions/manual`. Backend enforces duration in
 /// `[60, 14400]` seconds and note length `<=200`.
 @freezed
-class ManualSessionRequest with _$ManualSessionRequest {
+abstract class ManualSessionRequest with _$ManualSessionRequest {
   const factory ManualSessionRequest({
     required String userBookId,
     required DateTime startedAt,
@@ -288,7 +288,7 @@ class ManualSessionRequest with _$ManualSessionRequest {
 
 /// Body for `POST /reading/goals`.
 @freezed
-class CreateGoalRequest with _$CreateGoalRequest {
+abstract class CreateGoalRequest with _$CreateGoalRequest {
   const factory CreateGoalRequest({
     required String period,
     required int targetBooks,
@@ -301,7 +301,7 @@ class CreateGoalRequest with _$CreateGoalRequest {
 
 /// Mirror of `GET /reading/stats` response.
 @freezed
-class ReadingYearStatsDto with _$ReadingYearStatsDto {
+abstract class ReadingYearStatsDto with _$ReadingYearStatsDto {
   const ReadingYearStatsDto._();
 
   const factory ReadingYearStatsDto({

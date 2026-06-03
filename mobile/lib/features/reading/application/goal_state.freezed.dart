@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,54 +9,45 @@ part of 'goal_state.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$GoalState {
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() loading,
-    required TResult Function(List<GoalProgress> items) loaded,
-    required TResult Function(String code, String message) error,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
-    TResult? Function()? loading,
-    TResult? Function(List<GoalProgress> items)? loaded,
-    TResult? Function(String code, String message)? error,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? loading,
-    TResult Function(List<GoalProgress> items)? loaded,
-    TResult Function(String code, String message)? error,
-    required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(GoalInitial value) initial,
-    required TResult Function(GoalLoading value) loading,
-    required TResult Function(GoalLoaded value) loaded,
-    required TResult Function(GoalError value) error,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(GoalInitial value)? initial,
-    TResult? Function(GoalLoading value)? loading,
-    TResult? Function(GoalLoaded value)? loaded,
-    TResult? Function(GoalError value)? error,
-  }) =>
-      throw _privateConstructorUsedError;
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is GoalState);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'GoalState()';
+  }
+}
+
+/// @nodoc
+class $GoalStateCopyWith<$Res> {
+  $GoalStateCopyWith(GoalState _, $Res Function(GoalState) __);
+}
+
+/// Adds pattern-matching-related methods to [GoalState].
+extension GoalStatePatterns on GoalState {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(GoalInitial value)? initial,
@@ -64,291 +55,295 @@ mixin _$GoalState {
     TResult Function(GoalLoaded value)? loaded,
     TResult Function(GoalError value)? error,
     required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
+  }) {
+    final _that = this;
+    switch (_that) {
+      case GoalInitial() when initial != null:
+        return initial(_that);
+      case GoalLoading() when loading != null:
+        return loading(_that);
+      case GoalLoaded() when loaded != null:
+        return loaded(_that);
+      case GoalError() when error != null:
+        return error(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(GoalInitial value) initial,
+    required TResult Function(GoalLoading value) loading,
+    required TResult Function(GoalLoaded value) loaded,
+    required TResult Function(GoalError value) error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case GoalInitial():
+        return initial(_that);
+      case GoalLoading():
+        return loading(_that);
+      case GoalLoaded():
+        return loaded(_that);
+      case GoalError():
+        return error(_that);
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(GoalInitial value)? initial,
+    TResult? Function(GoalLoading value)? loading,
+    TResult? Function(GoalLoaded value)? loaded,
+    TResult? Function(GoalError value)? error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case GoalInitial() when initial != null:
+        return initial(_that);
+      case GoalLoading() when loading != null:
+        return loading(_that);
+      case GoalLoaded() when loaded != null:
+        return loaded(_that);
+      case GoalError() when error != null:
+        return error(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initial,
+    TResult Function()? loading,
+    TResult Function(List<GoalProgress> items)? loaded,
+    TResult Function(String code, String message)? error,
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case GoalInitial() when initial != null:
+        return initial();
+      case GoalLoading() when loading != null:
+        return loading();
+      case GoalLoaded() when loaded != null:
+        return loaded(_that.items);
+      case GoalError() when error != null:
+        return error(_that.code, _that.message);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initial,
+    required TResult Function() loading,
+    required TResult Function(List<GoalProgress> items) loaded,
+    required TResult Function(String code, String message) error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case GoalInitial():
+        return initial();
+      case GoalLoading():
+        return loading();
+      case GoalLoaded():
+        return loaded(_that.items);
+      case GoalError():
+        return error(_that.code, _that.message);
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? initial,
+    TResult? Function()? loading,
+    TResult? Function(List<GoalProgress> items)? loaded,
+    TResult? Function(String code, String message)? error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case GoalInitial() when initial != null:
+        return initial();
+      case GoalLoading() when loading != null:
+        return loading();
+      case GoalLoaded() when loaded != null:
+        return loaded(_that.items);
+      case GoalError() when error != null:
+        return error(_that.code, _that.message);
+      case _:
+        return null;
+    }
+  }
 }
 
 /// @nodoc
-abstract class $GoalStateCopyWith<$Res> {
-  factory $GoalStateCopyWith(GoalState value, $Res Function(GoalState) then) =
-      _$GoalStateCopyWithImpl<$Res, GoalState>;
-}
 
-/// @nodoc
-class _$GoalStateCopyWithImpl<$Res, $Val extends GoalState>
-    implements $GoalStateCopyWith<$Res> {
-  _$GoalStateCopyWithImpl(this._value, this._then);
+class GoalInitial implements GoalState {
+  const GoalInitial();
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is GoalInitial);
+  }
 
-  /// Create a copy of GoalState
-  /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-abstract class _$$GoalInitialImplCopyWith<$Res> {
-  factory _$$GoalInitialImplCopyWith(
-          _$GoalInitialImpl value, $Res Function(_$GoalInitialImpl) then) =
-      __$$GoalInitialImplCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$$GoalInitialImplCopyWithImpl<$Res>
-    extends _$GoalStateCopyWithImpl<$Res, _$GoalInitialImpl>
-    implements _$$GoalInitialImplCopyWith<$Res> {
-  __$$GoalInitialImplCopyWithImpl(
-      _$GoalInitialImpl _value, $Res Function(_$GoalInitialImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of GoalState
-  /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-
-class _$GoalInitialImpl implements GoalInitial {
-  const _$GoalInitialImpl();
+  @override
+  int get hashCode => runtimeType.hashCode;
 
   @override
   String toString() {
     return 'GoalState.initial()';
   }
+}
+
+/// @nodoc
+
+class GoalLoading implements GoalState {
+  const GoalLoading();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$GoalInitialImpl);
+        (other.runtimeType == runtimeType && other is GoalLoading);
   }
 
   @override
   int get hashCode => runtimeType.hashCode;
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() loading,
-    required TResult Function(List<GoalProgress> items) loaded,
-    required TResult Function(String code, String message) error,
-  }) {
-    return initial();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
-    TResult? Function()? loading,
-    TResult? Function(List<GoalProgress> items)? loaded,
-    TResult? Function(String code, String message)? error,
-  }) {
-    return initial?.call();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? loading,
-    TResult Function(List<GoalProgress> items)? loaded,
-    TResult Function(String code, String message)? error,
-    required TResult orElse(),
-  }) {
-    if (initial != null) {
-      return initial();
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(GoalInitial value) initial,
-    required TResult Function(GoalLoading value) loading,
-    required TResult Function(GoalLoaded value) loaded,
-    required TResult Function(GoalError value) error,
-  }) {
-    return initial(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(GoalInitial value)? initial,
-    TResult? Function(GoalLoading value)? loading,
-    TResult? Function(GoalLoaded value)? loaded,
-    TResult? Function(GoalError value)? error,
-  }) {
-    return initial?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(GoalInitial value)? initial,
-    TResult Function(GoalLoading value)? loading,
-    TResult Function(GoalLoaded value)? loaded,
-    TResult Function(GoalError value)? error,
-    required TResult orElse(),
-  }) {
-    if (initial != null) {
-      return initial(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class GoalInitial implements GoalState {
-  const factory GoalInitial() = _$GoalInitialImpl;
-}
-
-/// @nodoc
-abstract class _$$GoalLoadingImplCopyWith<$Res> {
-  factory _$$GoalLoadingImplCopyWith(
-          _$GoalLoadingImpl value, $Res Function(_$GoalLoadingImpl) then) =
-      __$$GoalLoadingImplCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$$GoalLoadingImplCopyWithImpl<$Res>
-    extends _$GoalStateCopyWithImpl<$Res, _$GoalLoadingImpl>
-    implements _$$GoalLoadingImplCopyWith<$Res> {
-  __$$GoalLoadingImplCopyWithImpl(
-      _$GoalLoadingImpl _value, $Res Function(_$GoalLoadingImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of GoalState
-  /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-
-class _$GoalLoadingImpl implements GoalLoading {
-  const _$GoalLoadingImpl();
 
   @override
   String toString() {
     return 'GoalState.loading()';
   }
+}
+
+/// @nodoc
+
+class GoalLoaded implements GoalState {
+  const GoalLoaded({required final List<GoalProgress> items}) : _items = items;
+
+  final List<GoalProgress> _items;
+  List<GoalProgress> get items {
+    if (_items is EqualUnmodifiableListView) return _items;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_items);
+  }
+
+  /// Create a copy of GoalState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $GoalLoadedCopyWith<GoalLoaded> get copyWith =>
+      _$GoalLoadedCopyWithImpl<GoalLoaded>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$GoalLoadingImpl);
+        (other.runtimeType == runtimeType &&
+            other is GoalLoaded &&
+            const DeepCollectionEquality().equals(other._items, _items));
   }
 
   @override
-  int get hashCode => runtimeType.hashCode;
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(_items));
 
   @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() loading,
-    required TResult Function(List<GoalProgress> items) loaded,
-    required TResult Function(String code, String message) error,
-  }) {
-    return loading();
+  String toString() {
+    return 'GoalState.loaded(items: $items)';
   }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
-    TResult? Function()? loading,
-    TResult? Function(List<GoalProgress> items)? loaded,
-    TResult? Function(String code, String message)? error,
-  }) {
-    return loading?.call();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? loading,
-    TResult Function(List<GoalProgress> items)? loaded,
-    TResult Function(String code, String message)? error,
-    required TResult orElse(),
-  }) {
-    if (loading != null) {
-      return loading();
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(GoalInitial value) initial,
-    required TResult Function(GoalLoading value) loading,
-    required TResult Function(GoalLoaded value) loaded,
-    required TResult Function(GoalError value) error,
-  }) {
-    return loading(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(GoalInitial value)? initial,
-    TResult? Function(GoalLoading value)? loading,
-    TResult? Function(GoalLoaded value)? loaded,
-    TResult? Function(GoalError value)? error,
-  }) {
-    return loading?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(GoalInitial value)? initial,
-    TResult Function(GoalLoading value)? loading,
-    TResult Function(GoalLoaded value)? loaded,
-    TResult Function(GoalError value)? error,
-    required TResult orElse(),
-  }) {
-    if (loading != null) {
-      return loading(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class GoalLoading implements GoalState {
-  const factory GoalLoading() = _$GoalLoadingImpl;
 }
 
 /// @nodoc
-abstract class _$$GoalLoadedImplCopyWith<$Res> {
-  factory _$$GoalLoadedImplCopyWith(
-          _$GoalLoadedImpl value, $Res Function(_$GoalLoadedImpl) then) =
-      __$$GoalLoadedImplCopyWithImpl<$Res>;
+abstract mixin class $GoalLoadedCopyWith<$Res>
+    implements $GoalStateCopyWith<$Res> {
+  factory $GoalLoadedCopyWith(
+          GoalLoaded value, $Res Function(GoalLoaded) _then) =
+      _$GoalLoadedCopyWithImpl;
   @useResult
   $Res call({List<GoalProgress> items});
 }
 
 /// @nodoc
-class __$$GoalLoadedImplCopyWithImpl<$Res>
-    extends _$GoalStateCopyWithImpl<$Res, _$GoalLoadedImpl>
-    implements _$$GoalLoadedImplCopyWith<$Res> {
-  __$$GoalLoadedImplCopyWithImpl(
-      _$GoalLoadedImpl _value, $Res Function(_$GoalLoadedImpl) _then)
-      : super(_value, _then);
+class _$GoalLoadedCopyWithImpl<$Res> implements $GoalLoadedCopyWith<$Res> {
+  _$GoalLoadedCopyWithImpl(this._self, this._then);
+
+  final GoalLoaded _self;
+  final $Res Function(GoalLoaded) _then;
 
   /// Create a copy of GoalState
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
-  @override
   $Res call({
     Object? items = null,
   }) {
-    return _then(_$GoalLoadedImpl(
+    return _then(GoalLoaded(
       items: null == items
-          ? _value._items
+          ? _self._items
           : items // ignore: cast_nullable_to_non_nullable
               as List<GoalProgress>,
     ));
@@ -357,189 +352,24 @@ class __$$GoalLoadedImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$GoalLoadedImpl implements GoalLoaded {
-  const _$GoalLoadedImpl({required final List<GoalProgress> items})
-      : _items = items;
+class GoalError implements GoalState {
+  const GoalError({required this.code, required this.message});
 
-  final List<GoalProgress> _items;
-  @override
-  List<GoalProgress> get items {
-    if (_items is EqualUnmodifiableListView) return _items;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_items);
-  }
-
-  @override
-  String toString() {
-    return 'GoalState.loaded(items: $items)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$GoalLoadedImpl &&
-            const DeepCollectionEquality().equals(other._items, _items));
-  }
-
-  @override
-  int get hashCode =>
-      Object.hash(runtimeType, const DeepCollectionEquality().hash(_items));
-
-  /// Create a copy of GoalState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$GoalLoadedImplCopyWith<_$GoalLoadedImpl> get copyWith =>
-      __$$GoalLoadedImplCopyWithImpl<_$GoalLoadedImpl>(this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() loading,
-    required TResult Function(List<GoalProgress> items) loaded,
-    required TResult Function(String code, String message) error,
-  }) {
-    return loaded(items);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
-    TResult? Function()? loading,
-    TResult? Function(List<GoalProgress> items)? loaded,
-    TResult? Function(String code, String message)? error,
-  }) {
-    return loaded?.call(items);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? loading,
-    TResult Function(List<GoalProgress> items)? loaded,
-    TResult Function(String code, String message)? error,
-    required TResult orElse(),
-  }) {
-    if (loaded != null) {
-      return loaded(items);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(GoalInitial value) initial,
-    required TResult Function(GoalLoading value) loading,
-    required TResult Function(GoalLoaded value) loaded,
-    required TResult Function(GoalError value) error,
-  }) {
-    return loaded(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(GoalInitial value)? initial,
-    TResult? Function(GoalLoading value)? loading,
-    TResult? Function(GoalLoaded value)? loaded,
-    TResult? Function(GoalError value)? error,
-  }) {
-    return loaded?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(GoalInitial value)? initial,
-    TResult Function(GoalLoading value)? loading,
-    TResult Function(GoalLoaded value)? loaded,
-    TResult Function(GoalError value)? error,
-    required TResult orElse(),
-  }) {
-    if (loaded != null) {
-      return loaded(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class GoalLoaded implements GoalState {
-  const factory GoalLoaded({required final List<GoalProgress> items}) =
-      _$GoalLoadedImpl;
-
-  List<GoalProgress> get items;
-
-  /// Create a copy of GoalState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$GoalLoadedImplCopyWith<_$GoalLoadedImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class _$$GoalErrorImplCopyWith<$Res> {
-  factory _$$GoalErrorImplCopyWith(
-          _$GoalErrorImpl value, $Res Function(_$GoalErrorImpl) then) =
-      __$$GoalErrorImplCopyWithImpl<$Res>;
-  @useResult
-  $Res call({String code, String message});
-}
-
-/// @nodoc
-class __$$GoalErrorImplCopyWithImpl<$Res>
-    extends _$GoalStateCopyWithImpl<$Res, _$GoalErrorImpl>
-    implements _$$GoalErrorImplCopyWith<$Res> {
-  __$$GoalErrorImplCopyWithImpl(
-      _$GoalErrorImpl _value, $Res Function(_$GoalErrorImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of GoalState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? code = null,
-    Object? message = null,
-  }) {
-    return _then(_$GoalErrorImpl(
-      code: null == code
-          ? _value.code
-          : code // ignore: cast_nullable_to_non_nullable
-              as String,
-      message: null == message
-          ? _value.message
-          : message // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
-  }
-}
-
-/// @nodoc
-
-class _$GoalErrorImpl implements GoalError {
-  const _$GoalErrorImpl({required this.code, required this.message});
-
-  @override
   final String code;
-  @override
   final String message;
 
-  @override
-  String toString() {
-    return 'GoalState.error(code: $code, message: $message)';
-  }
+  /// Create a copy of GoalState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $GoalErrorCopyWith<GoalError> get copyWith =>
+      _$GoalErrorCopyWithImpl<GoalError>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$GoalErrorImpl &&
+            other is GoalError &&
             (identical(other.code, code) || other.code == code) &&
             (identical(other.message, message) || other.message == message));
   }
@@ -547,100 +377,46 @@ class _$GoalErrorImpl implements GoalError {
   @override
   int get hashCode => Object.hash(runtimeType, code, message);
 
+  @override
+  String toString() {
+    return 'GoalState.error(code: $code, message: $message)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $GoalErrorCopyWith<$Res>
+    implements $GoalStateCopyWith<$Res> {
+  factory $GoalErrorCopyWith(GoalError value, $Res Function(GoalError) _then) =
+      _$GoalErrorCopyWithImpl;
+  @useResult
+  $Res call({String code, String message});
+}
+
+/// @nodoc
+class _$GoalErrorCopyWithImpl<$Res> implements $GoalErrorCopyWith<$Res> {
+  _$GoalErrorCopyWithImpl(this._self, this._then);
+
+  final GoalError _self;
+  final $Res Function(GoalError) _then;
+
   /// Create a copy of GoalState
   /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
   @pragma('vm:prefer-inline')
-  _$$GoalErrorImplCopyWith<_$GoalErrorImpl> get copyWith =>
-      __$$GoalErrorImplCopyWithImpl<_$GoalErrorImpl>(this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() loading,
-    required TResult Function(List<GoalProgress> items) loaded,
-    required TResult Function(String code, String message) error,
+  $Res call({
+    Object? code = null,
+    Object? message = null,
   }) {
-    return error(code, message);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
-    TResult? Function()? loading,
-    TResult? Function(List<GoalProgress> items)? loaded,
-    TResult? Function(String code, String message)? error,
-  }) {
-    return error?.call(code, message);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? loading,
-    TResult Function(List<GoalProgress> items)? loaded,
-    TResult Function(String code, String message)? error,
-    required TResult orElse(),
-  }) {
-    if (error != null) {
-      return error(code, message);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(GoalInitial value) initial,
-    required TResult Function(GoalLoading value) loading,
-    required TResult Function(GoalLoaded value) loaded,
-    required TResult Function(GoalError value) error,
-  }) {
-    return error(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(GoalInitial value)? initial,
-    TResult? Function(GoalLoading value)? loading,
-    TResult? Function(GoalLoaded value)? loaded,
-    TResult? Function(GoalError value)? error,
-  }) {
-    return error?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(GoalInitial value)? initial,
-    TResult Function(GoalLoading value)? loading,
-    TResult Function(GoalLoaded value)? loaded,
-    TResult Function(GoalError value)? error,
-    required TResult orElse(),
-  }) {
-    if (error != null) {
-      return error(this);
-    }
-    return orElse();
+    return _then(GoalError(
+      code: null == code
+          ? _self.code
+          : code // ignore: cast_nullable_to_non_nullable
+              as String,
+      message: null == message
+          ? _self.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
   }
 }
 
-abstract class GoalError implements GoalState {
-  const factory GoalError(
-      {required final String code,
-      required final String message}) = _$GoalErrorImpl;
-
-  String get code;
-  String get message;
-
-  /// Create a copy of GoalState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$GoalErrorImplCopyWith<_$GoalErrorImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
+// dart format on

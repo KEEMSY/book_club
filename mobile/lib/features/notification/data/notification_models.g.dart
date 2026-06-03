@@ -6,9 +6,8 @@ part of 'notification_models.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$NotificationDtoImpl _$$NotificationDtoImplFromJson(
-        Map<String, dynamic> json) =>
-    _$NotificationDtoImpl(
+_NotificationDto _$NotificationDtoFromJson(Map<String, dynamic> json) =>
+    _NotificationDto(
       id: json['id'] as String,
       ntype: json['ntype'] as String,
       title: json['title'] as String,
@@ -23,8 +22,7 @@ _$NotificationDtoImpl _$$NotificationDtoImplFromJson(
       createdAt: DateTime.parse(json['created_at'] as String),
     );
 
-Map<String, dynamic> _$$NotificationDtoImplToJson(
-        _$NotificationDtoImpl instance) =>
+Map<String, dynamic> _$NotificationDtoToJson(_NotificationDto instance) =>
     <String, dynamic>{
       'id': instance.id,
       'ntype': instance.ntype,
@@ -35,9 +33,9 @@ Map<String, dynamic> _$$NotificationDtoImplToJson(
       'created_at': instance.createdAt.toIso8601String(),
     };
 
-_$NotificationListResponseImpl _$$NotificationListResponseImplFromJson(
+_NotificationListResponse _$NotificationListResponseFromJson(
         Map<String, dynamic> json) =>
-    _$NotificationListResponseImpl(
+    _NotificationListResponse(
       items: (json['items'] as List<dynamic>)
           .map((e) => NotificationDto.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -45,29 +43,28 @@ _$NotificationListResponseImpl _$$NotificationListResponseImplFromJson(
       unreadCount: (json['unread_count'] as num).toInt(),
     );
 
-Map<String, dynamic> _$$NotificationListResponseImplToJson(
-        _$NotificationListResponseImpl instance) =>
+Map<String, dynamic> _$NotificationListResponseToJson(
+        _NotificationListResponse instance) =>
     <String, dynamic>{
       'items': instance.items.map((e) => e.toJson()).toList(),
       'next_cursor': instance.nextCursor,
       'unread_count': instance.unreadCount,
     };
 
-_$UnreadCountResponseImpl _$$UnreadCountResponseImplFromJson(
-        Map<String, dynamic> json) =>
-    _$UnreadCountResponseImpl(
+_UnreadCountResponse _$UnreadCountResponseFromJson(Map<String, dynamic> json) =>
+    _UnreadCountResponse(
       unreadCount: (json['unread_count'] as num).toInt(),
     );
 
-Map<String, dynamic> _$$UnreadCountResponseImplToJson(
-        _$UnreadCountResponseImpl instance) =>
+Map<String, dynamic> _$UnreadCountResponseToJson(
+        _UnreadCountResponse instance) =>
     <String, dynamic>{
       'unread_count': instance.unreadCount,
     };
 
-_$WeeklyReportResponseImpl _$$WeeklyReportResponseImplFromJson(
+_WeeklyReportResponse _$WeeklyReportResponseFromJson(
         Map<String, dynamic> json) =>
-    _$WeeklyReportResponseImpl(
+    _WeeklyReportResponse(
       id: json['id'] as String,
       weekStart: json['week_start'] as String,
       totalSeconds: (json['total_seconds'] as num).toInt(),
@@ -77,8 +74,8 @@ _$WeeklyReportResponseImpl _$$WeeklyReportResponseImplFromJson(
       createdAt: DateTime.parse(json['created_at'] as String),
     );
 
-Map<String, dynamic> _$$WeeklyReportResponseImplToJson(
-        _$WeeklyReportResponseImpl instance) =>
+Map<String, dynamic> _$WeeklyReportResponseToJson(
+        _WeeklyReportResponse instance) =>
     <String, dynamic>{
       'id': instance.id,
       'week_start': instance.weekStart,

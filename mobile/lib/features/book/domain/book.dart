@@ -9,7 +9,7 @@ part 'book.freezed.dart';
 /// back to a Rausch-tinted placeholder when the upstream catalog returns no
 /// cover (Naver/Kakao regularly omits it for indie publishers).
 @freezed
-class Book with _$Book {
+abstract class Book with _$Book {
   const factory Book({
     required String id,
     required String isbn13,

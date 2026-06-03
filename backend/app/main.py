@@ -21,6 +21,7 @@ from app.domains.challenge.providers import get_challenge_service_singleton
 from app.domains.challenge.router import router as challenge_router
 from app.domains.club.router import router as club_router
 from app.domains.community.router import router as community_router
+from app.domains.discovery.providers import run_cf_retrain
 from app.domains.discovery.router import router as discovery_router
 from app.domains.feed.events import CommentAdded, ReactionAdded
 from app.domains.feed.router import router as feed_router
@@ -28,6 +29,7 @@ from app.domains.notification.providers import create_scheduler, get_notificatio
 from app.domains.notification.router import router as notification_router
 from app.domains.reading.events import ReadingSessionCompleted, UserGradeRecomputed
 from app.domains.reading.providers import get_event_bus
+from app.domains.reading.router import me_router as reading_me_router
 from app.domains.reading.router import router as reading_router
 from app.domains.social.events import FollowReceived
 from app.domains.social.router import router as social_router
@@ -50,6 +52,14 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     bus.subscribe(UserGradeRecomputed, challenge_svc.on_grade_recomputed)
 
     scheduler = create_scheduler(notification_svc)
+    scheduler.add_job(
+        run_cf_retrain,
+        "cron",
+        day_of_week="sun",
+        hour=3,
+        minute=0,
+        id="cf_retrain",
+    )
     scheduler.start()
 
     yield
@@ -90,6 +100,7 @@ def create_app() -> FastAPI:
     app.include_router(auth_router)
     app.include_router(book_router)
     app.include_router(reading_router)
+    app.include_router(reading_me_router)
     app.include_router(feed_router)
     app.include_router(notification_router)
     app.include_router(social_router)

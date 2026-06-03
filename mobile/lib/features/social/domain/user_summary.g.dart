@@ -6,8 +6,7 @@ part of 'user_summary.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$GradeStatsImpl _$$GradeStatsImplFromJson(Map<String, dynamic> json) =>
-    _$GradeStatsImpl(
+_GradeStats _$GradeStatsFromJson(Map<String, dynamic> json) => _GradeStats(
       grade: (json['grade'] as num).toInt(),
       tier: (json['tier'] as num).toInt(),
       totalBooks: (json['total_books'] as num).toInt(),
@@ -15,7 +14,7 @@ _$GradeStatsImpl _$$GradeStatsImplFromJson(Map<String, dynamic> json) =>
       streakDays: (json['streak_days'] as num).toInt(),
     );
 
-Map<String, dynamic> _$$GradeStatsImplToJson(_$GradeStatsImpl instance) =>
+Map<String, dynamic> _$GradeStatsToJson(_GradeStats instance) =>
     <String, dynamic>{
       'grade': instance.grade,
       'tier': instance.tier,
@@ -24,8 +23,8 @@ Map<String, dynamic> _$$GradeStatsImplToJson(_$GradeStatsImpl instance) =>
       'streak_days': instance.streakDays,
     };
 
-_$BadgeSummaryImpl _$$BadgeSummaryImplFromJson(Map<String, dynamic> json) =>
-    _$BadgeSummaryImpl(
+_BadgeSummary _$BadgeSummaryFromJson(Map<String, dynamic> json) =>
+    _BadgeSummary(
       id: json['id'] as String,
       name: json['name'] as String,
       iconUrl: json['icon_url'] as String,
@@ -33,7 +32,7 @@ _$BadgeSummaryImpl _$$BadgeSummaryImplFromJson(Map<String, dynamic> json) =>
       earnedAt: DateTime.parse(json['earned_at'] as String),
     );
 
-Map<String, dynamic> _$$BadgeSummaryImplToJson(_$BadgeSummaryImpl instance) =>
+Map<String, dynamic> _$BadgeSummaryToJson(_BadgeSummary instance) =>
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
@@ -42,17 +41,15 @@ Map<String, dynamic> _$$BadgeSummaryImplToJson(_$BadgeSummaryImpl instance) =>
       'earned_at': instance.earnedAt.toIso8601String(),
     };
 
-_$HighlightSummaryImpl _$$HighlightSummaryImplFromJson(
-        Map<String, dynamic> json) =>
-    _$HighlightSummaryImpl(
+_HighlightSummary _$HighlightSummaryFromJson(Map<String, dynamic> json) =>
+    _HighlightSummary(
       id: json['id'] as String,
       quoteText: json['quote_text'] as String,
       bookTitle: json['book_title'] as String?,
       createdAt: DateTime.parse(json['created_at'] as String),
     );
 
-Map<String, dynamic> _$$HighlightSummaryImplToJson(
-        _$HighlightSummaryImpl instance) =>
+Map<String, dynamic> _$HighlightSummaryToJson(_HighlightSummary instance) =>
     <String, dynamic>{
       'id': instance.id,
       'quote_text': instance.quoteText,
@@ -60,8 +57,7 @@ Map<String, dynamic> _$$HighlightSummaryImplToJson(
       'created_at': instance.createdAt.toIso8601String(),
     };
 
-_$UserSummaryImpl _$$UserSummaryImplFromJson(Map<String, dynamic> json) =>
-    _$UserSummaryImpl(
+_UserSummary _$UserSummaryFromJson(Map<String, dynamic> json) => _UserSummary(
       id: json['id'] as String,
       nickname: json['nickname'] as String,
       profileImageUrl: json['profile_image_url'] as String?,
@@ -69,7 +65,7 @@ _$UserSummaryImpl _$$UserSummaryImplFromJson(Map<String, dynamic> json) =>
       isFollowing: json['is_following'] as bool,
     );
 
-Map<String, dynamic> _$$UserSummaryImplToJson(_$UserSummaryImpl instance) =>
+Map<String, dynamic> _$UserSummaryToJson(_UserSummary instance) =>
     <String, dynamic>{
       'id': instance.id,
       'nickname': instance.nickname,
@@ -78,24 +74,21 @@ Map<String, dynamic> _$$UserSummaryImplToJson(_$UserSummaryImpl instance) =>
       'is_following': instance.isFollowing,
     };
 
-_$UserSummaryPageImpl _$$UserSummaryPageImplFromJson(
-        Map<String, dynamic> json) =>
-    _$UserSummaryPageImpl(
+_UserSummaryPage _$UserSummaryPageFromJson(Map<String, dynamic> json) =>
+    _UserSummaryPage(
       items: (json['items'] as List<dynamic>)
           .map((e) => UserSummary.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextCursor: json['next_cursor'] as String?,
     );
 
-Map<String, dynamic> _$$UserSummaryPageImplToJson(
-        _$UserSummaryPageImpl instance) =>
+Map<String, dynamic> _$UserSummaryPageToJson(_UserSummaryPage instance) =>
     <String, dynamic>{
       'items': instance.items.map((e) => e.toJson()).toList(),
       'next_cursor': instance.nextCursor,
     };
 
-_$UserProfileImpl _$$UserProfileImplFromJson(Map<String, dynamic> json) =>
-    _$UserProfileImpl(
+_UserProfile _$UserProfileFromJson(Map<String, dynamic> json) => _UserProfile(
       id: json['id'] as String,
       nickname: json['nickname'] as String,
       profileImageUrl: json['profile_image_url'] as String?,
@@ -117,7 +110,7 @@ _$UserProfileImpl _$$UserProfileImplFromJson(Map<String, dynamic> json) =>
           const [],
     );
 
-Map<String, dynamic> _$$UserProfileImplToJson(_$UserProfileImpl instance) =>
+Map<String, dynamic> _$UserProfileToJson(_UserProfile instance) =>
     <String, dynamic>{
       'id': instance.id,
       'nickname': instance.nickname,

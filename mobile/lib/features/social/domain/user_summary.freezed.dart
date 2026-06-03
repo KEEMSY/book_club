@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,179 +9,32 @@ part of 'user_summary.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-GradeStats _$GradeStatsFromJson(Map<String, dynamic> json) {
-  return _GradeStats.fromJson(json);
-}
 
 /// @nodoc
 mixin _$GradeStats {
-  int get grade => throw _privateConstructorUsedError;
-  int get tier => throw _privateConstructorUsedError;
-  int get totalBooks => throw _privateConstructorUsedError;
-  int get totalSeconds => throw _privateConstructorUsedError;
-  int get streakDays => throw _privateConstructorUsedError;
-
-  /// Serializes this GradeStats to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  int get grade;
+  int get tier;
+  int get totalBooks;
+  int get totalSeconds;
+  int get streakDays;
 
   /// Create a copy of GradeStats
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
   $GradeStatsCopyWith<GradeStats> get copyWith =>
-      throw _privateConstructorUsedError;
-}
+      _$GradeStatsCopyWithImpl<GradeStats>(this as GradeStats, _$identity);
 
-/// @nodoc
-abstract class $GradeStatsCopyWith<$Res> {
-  factory $GradeStatsCopyWith(
-          GradeStats value, $Res Function(GradeStats) then) =
-      _$GradeStatsCopyWithImpl<$Res, GradeStats>;
-  @useResult
-  $Res call(
-      {int grade, int tier, int totalBooks, int totalSeconds, int streakDays});
-}
-
-/// @nodoc
-class _$GradeStatsCopyWithImpl<$Res, $Val extends GradeStats>
-    implements $GradeStatsCopyWith<$Res> {
-  _$GradeStatsCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of GradeStats
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? grade = null,
-    Object? tier = null,
-    Object? totalBooks = null,
-    Object? totalSeconds = null,
-    Object? streakDays = null,
-  }) {
-    return _then(_value.copyWith(
-      grade: null == grade
-          ? _value.grade
-          : grade // ignore: cast_nullable_to_non_nullable
-              as int,
-      tier: null == tier
-          ? _value.tier
-          : tier // ignore: cast_nullable_to_non_nullable
-              as int,
-      totalBooks: null == totalBooks
-          ? _value.totalBooks
-          : totalBooks // ignore: cast_nullable_to_non_nullable
-              as int,
-      totalSeconds: null == totalSeconds
-          ? _value.totalSeconds
-          : totalSeconds // ignore: cast_nullable_to_non_nullable
-              as int,
-      streakDays: null == streakDays
-          ? _value.streakDays
-          : streakDays // ignore: cast_nullable_to_non_nullable
-              as int,
-    ) as $Val);
-  }
-}
-
-/// @nodoc
-abstract class _$$GradeStatsImplCopyWith<$Res>
-    implements $GradeStatsCopyWith<$Res> {
-  factory _$$GradeStatsImplCopyWith(
-          _$GradeStatsImpl value, $Res Function(_$GradeStatsImpl) then) =
-      __$$GradeStatsImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {int grade, int tier, int totalBooks, int totalSeconds, int streakDays});
-}
-
-/// @nodoc
-class __$$GradeStatsImplCopyWithImpl<$Res>
-    extends _$GradeStatsCopyWithImpl<$Res, _$GradeStatsImpl>
-    implements _$$GradeStatsImplCopyWith<$Res> {
-  __$$GradeStatsImplCopyWithImpl(
-      _$GradeStatsImpl _value, $Res Function(_$GradeStatsImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of GradeStats
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? grade = null,
-    Object? tier = null,
-    Object? totalBooks = null,
-    Object? totalSeconds = null,
-    Object? streakDays = null,
-  }) {
-    return _then(_$GradeStatsImpl(
-      grade: null == grade
-          ? _value.grade
-          : grade // ignore: cast_nullable_to_non_nullable
-              as int,
-      tier: null == tier
-          ? _value.tier
-          : tier // ignore: cast_nullable_to_non_nullable
-              as int,
-      totalBooks: null == totalBooks
-          ? _value.totalBooks
-          : totalBooks // ignore: cast_nullable_to_non_nullable
-              as int,
-      totalSeconds: null == totalSeconds
-          ? _value.totalSeconds
-          : totalSeconds // ignore: cast_nullable_to_non_nullable
-              as int,
-      streakDays: null == streakDays
-          ? _value.streakDays
-          : streakDays // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$GradeStatsImpl implements _GradeStats {
-  const _$GradeStatsImpl(
-      {required this.grade,
-      required this.tier,
-      required this.totalBooks,
-      required this.totalSeconds,
-      required this.streakDays});
-
-  factory _$GradeStatsImpl.fromJson(Map<String, dynamic> json) =>
-      _$$GradeStatsImplFromJson(json);
-
-  @override
-  final int grade;
-  @override
-  final int tier;
-  @override
-  final int totalBooks;
-  @override
-  final int totalSeconds;
-  @override
-  final int streakDays;
-
-  @override
-  String toString() {
-    return 'GradeStats(grade: $grade, tier: $tier, totalBooks: $totalBooks, totalSeconds: $totalSeconds, streakDays: $streakDays)';
-  }
+  /// Serializes this GradeStats to a JSON map.
+  Map<String, dynamic> toJson();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$GradeStatsImpl &&
+            other is GradeStats &&
             (identical(other.grade, grade) || other.grade == grade) &&
             (identical(other.tier, tier) || other.tier == tier) &&
             (identical(other.totalBooks, totalBooks) ||
@@ -197,228 +50,374 @@ class _$GradeStatsImpl implements _GradeStats {
   int get hashCode => Object.hash(
       runtimeType, grade, tier, totalBooks, totalSeconds, streakDays);
 
-  /// Create a copy of GradeStats
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$GradeStatsImplCopyWith<_$GradeStatsImpl> get copyWith =>
-      __$$GradeStatsImplCopyWithImpl<_$GradeStatsImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$GradeStatsImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _GradeStats implements GradeStats {
-  const factory _GradeStats(
-      {required final int grade,
-      required final int tier,
-      required final int totalBooks,
-      required final int totalSeconds,
-      required final int streakDays}) = _$GradeStatsImpl;
-
-  factory _GradeStats.fromJson(Map<String, dynamic> json) =
-      _$GradeStatsImpl.fromJson;
-
-  @override
-  int get grade;
-  @override
-  int get tier;
-  @override
-  int get totalBooks;
-  @override
-  int get totalSeconds;
-  @override
-  int get streakDays;
-
-  /// Create a copy of GradeStats
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$GradeStatsImplCopyWith<_$GradeStatsImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-BadgeSummary _$BadgeSummaryFromJson(Map<String, dynamic> json) {
-  return _BadgeSummary.fromJson(json);
-}
-
-/// @nodoc
-mixin _$BadgeSummary {
-  String get id => throw _privateConstructorUsedError;
-  String get name => throw _privateConstructorUsedError;
-  String get iconUrl => throw _privateConstructorUsedError;
-  String get category => throw _privateConstructorUsedError;
-  DateTime get earnedAt => throw _privateConstructorUsedError;
-
-  /// Serializes this BadgeSummary to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of BadgeSummary
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $BadgeSummaryCopyWith<BadgeSummary> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $BadgeSummaryCopyWith<$Res> {
-  factory $BadgeSummaryCopyWith(
-          BadgeSummary value, $Res Function(BadgeSummary) then) =
-      _$BadgeSummaryCopyWithImpl<$Res, BadgeSummary>;
-  @useResult
-  $Res call(
-      {String id,
-      String name,
-      String iconUrl,
-      String category,
-      DateTime earnedAt});
-}
-
-/// @nodoc
-class _$BadgeSummaryCopyWithImpl<$Res, $Val extends BadgeSummary>
-    implements $BadgeSummaryCopyWith<$Res> {
-  _$BadgeSummaryCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of BadgeSummary
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? name = null,
-    Object? iconUrl = null,
-    Object? category = null,
-    Object? earnedAt = null,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      iconUrl: null == iconUrl
-          ? _value.iconUrl
-          : iconUrl // ignore: cast_nullable_to_non_nullable
-              as String,
-      category: null == category
-          ? _value.category
-          : category // ignore: cast_nullable_to_non_nullable
-              as String,
-      earnedAt: null == earnedAt
-          ? _value.earnedAt
-          : earnedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-    ) as $Val);
+  String toString() {
+    return 'GradeStats(grade: $grade, tier: $tier, totalBooks: $totalBooks, totalSeconds: $totalSeconds, streakDays: $streakDays)';
   }
 }
 
 /// @nodoc
-abstract class _$$BadgeSummaryImplCopyWith<$Res>
-    implements $BadgeSummaryCopyWith<$Res> {
-  factory _$$BadgeSummaryImplCopyWith(
-          _$BadgeSummaryImpl value, $Res Function(_$BadgeSummaryImpl) then) =
-      __$$BadgeSummaryImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $GradeStatsCopyWith<$Res> {
+  factory $GradeStatsCopyWith(
+          GradeStats value, $Res Function(GradeStats) _then) =
+      _$GradeStatsCopyWithImpl;
   @useResult
   $Res call(
-      {String id,
-      String name,
-      String iconUrl,
-      String category,
-      DateTime earnedAt});
+      {int grade, int tier, int totalBooks, int totalSeconds, int streakDays});
 }
 
 /// @nodoc
-class __$$BadgeSummaryImplCopyWithImpl<$Res>
-    extends _$BadgeSummaryCopyWithImpl<$Res, _$BadgeSummaryImpl>
-    implements _$$BadgeSummaryImplCopyWith<$Res> {
-  __$$BadgeSummaryImplCopyWithImpl(
-      _$BadgeSummaryImpl _value, $Res Function(_$BadgeSummaryImpl) _then)
-      : super(_value, _then);
+class _$GradeStatsCopyWithImpl<$Res> implements $GradeStatsCopyWith<$Res> {
+  _$GradeStatsCopyWithImpl(this._self, this._then);
 
-  /// Create a copy of BadgeSummary
+  final GradeStats _self;
+  final $Res Function(GradeStats) _then;
+
+  /// Create a copy of GradeStats
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = null,
-    Object? name = null,
-    Object? iconUrl = null,
-    Object? category = null,
-    Object? earnedAt = null,
+    Object? grade = null,
+    Object? tier = null,
+    Object? totalBooks = null,
+    Object? totalSeconds = null,
+    Object? streakDays = null,
   }) {
-    return _then(_$BadgeSummaryImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      iconUrl: null == iconUrl
-          ? _value.iconUrl
-          : iconUrl // ignore: cast_nullable_to_non_nullable
-              as String,
-      category: null == category
-          ? _value.category
-          : category // ignore: cast_nullable_to_non_nullable
-              as String,
-      earnedAt: null == earnedAt
-          ? _value.earnedAt
-          : earnedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+    return _then(_self.copyWith(
+      grade: null == grade
+          ? _self.grade
+          : grade // ignore: cast_nullable_to_non_nullable
+              as int,
+      tier: null == tier
+          ? _self.tier
+          : tier // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalBooks: null == totalBooks
+          ? _self.totalBooks
+          : totalBooks // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalSeconds: null == totalSeconds
+          ? _self.totalSeconds
+          : totalSeconds // ignore: cast_nullable_to_non_nullable
+              as int,
+      streakDays: null == streakDays
+          ? _self.streakDays
+          : streakDays // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [GradeStats].
+extension GradeStatsPatterns on GradeStats {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_GradeStats value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _GradeStats() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_GradeStats value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _GradeStats():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_GradeStats value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _GradeStats() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(int grade, int tier, int totalBooks, int totalSeconds,
+            int streakDays)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _GradeStats() when $default != null:
+        return $default(_that.grade, _that.tier, _that.totalBooks,
+            _that.totalSeconds, _that.streakDays);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(int grade, int tier, int totalBooks, int totalSeconds,
+            int streakDays)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _GradeStats():
+        return $default(_that.grade, _that.tier, _that.totalBooks,
+            _that.totalSeconds, _that.streakDays);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(int grade, int tier, int totalBooks, int totalSeconds,
+            int streakDays)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _GradeStats() when $default != null:
+        return $default(_that.grade, _that.tier, _that.totalBooks,
+            _that.totalSeconds, _that.streakDays);
+      case _:
+        return null;
+    }
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$BadgeSummaryImpl implements _BadgeSummary {
-  const _$BadgeSummaryImpl(
-      {required this.id,
-      required this.name,
-      required this.iconUrl,
-      required this.category,
-      required this.earnedAt});
-
-  factory _$BadgeSummaryImpl.fromJson(Map<String, dynamic> json) =>
-      _$$BadgeSummaryImplFromJson(json);
-
-  @override
-  final String id;
-  @override
-  final String name;
-  @override
-  final String iconUrl;
-  @override
-  final String category;
-  @override
-  final DateTime earnedAt;
+class _GradeStats implements GradeStats {
+  const _GradeStats(
+      {required this.grade,
+      required this.tier,
+      required this.totalBooks,
+      required this.totalSeconds,
+      required this.streakDays});
+  factory _GradeStats.fromJson(Map<String, dynamic> json) =>
+      _$GradeStatsFromJson(json);
 
   @override
-  String toString() {
-    return 'BadgeSummary(id: $id, name: $name, iconUrl: $iconUrl, category: $category, earnedAt: $earnedAt)';
+  final int grade;
+  @override
+  final int tier;
+  @override
+  final int totalBooks;
+  @override
+  final int totalSeconds;
+  @override
+  final int streakDays;
+
+  /// Create a copy of GradeStats
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$GradeStatsCopyWith<_GradeStats> get copyWith =>
+      __$GradeStatsCopyWithImpl<_GradeStats>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$GradeStatsToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$BadgeSummaryImpl &&
+            other is _GradeStats &&
+            (identical(other.grade, grade) || other.grade == grade) &&
+            (identical(other.tier, tier) || other.tier == tier) &&
+            (identical(other.totalBooks, totalBooks) ||
+                other.totalBooks == totalBooks) &&
+            (identical(other.totalSeconds, totalSeconds) ||
+                other.totalSeconds == totalSeconds) &&
+            (identical(other.streakDays, streakDays) ||
+                other.streakDays == streakDays));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, grade, tier, totalBooks, totalSeconds, streakDays);
+
+  @override
+  String toString() {
+    return 'GradeStats(grade: $grade, tier: $tier, totalBooks: $totalBooks, totalSeconds: $totalSeconds, streakDays: $streakDays)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$GradeStatsCopyWith<$Res>
+    implements $GradeStatsCopyWith<$Res> {
+  factory _$GradeStatsCopyWith(
+          _GradeStats value, $Res Function(_GradeStats) _then) =
+      __$GradeStatsCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {int grade, int tier, int totalBooks, int totalSeconds, int streakDays});
+}
+
+/// @nodoc
+class __$GradeStatsCopyWithImpl<$Res> implements _$GradeStatsCopyWith<$Res> {
+  __$GradeStatsCopyWithImpl(this._self, this._then);
+
+  final _GradeStats _self;
+  final $Res Function(_GradeStats) _then;
+
+  /// Create a copy of GradeStats
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? grade = null,
+    Object? tier = null,
+    Object? totalBooks = null,
+    Object? totalSeconds = null,
+    Object? streakDays = null,
+  }) {
+    return _then(_GradeStats(
+      grade: null == grade
+          ? _self.grade
+          : grade // ignore: cast_nullable_to_non_nullable
+              as int,
+      tier: null == tier
+          ? _self.tier
+          : tier // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalBooks: null == totalBooks
+          ? _self.totalBooks
+          : totalBooks // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalSeconds: null == totalSeconds
+          ? _self.totalSeconds
+          : totalSeconds // ignore: cast_nullable_to_non_nullable
+              as int,
+      streakDays: null == streakDays
+          ? _self.streakDays
+          : streakDays // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$BadgeSummary {
+  String get id;
+  String get name;
+  String get iconUrl;
+  String get category;
+  DateTime get earnedAt;
+
+  /// Create a copy of BadgeSummary
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $BadgeSummaryCopyWith<BadgeSummary> get copyWith =>
+      _$BadgeSummaryCopyWithImpl<BadgeSummary>(
+          this as BadgeSummary, _$identity);
+
+  /// Serializes this BadgeSummary to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is BadgeSummary &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.iconUrl, iconUrl) || other.iconUrl == iconUrl) &&
@@ -433,206 +432,381 @@ class _$BadgeSummaryImpl implements _BadgeSummary {
   int get hashCode =>
       Object.hash(runtimeType, id, name, iconUrl, category, earnedAt);
 
-  /// Create a copy of BadgeSummary
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$BadgeSummaryImplCopyWith<_$BadgeSummaryImpl> get copyWith =>
-      __$$BadgeSummaryImplCopyWithImpl<_$BadgeSummaryImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$BadgeSummaryImplToJson(
-      this,
-    );
+  String toString() {
+    return 'BadgeSummary(id: $id, name: $name, iconUrl: $iconUrl, category: $category, earnedAt: $earnedAt)';
   }
 }
 
-abstract class _BadgeSummary implements BadgeSummary {
-  const factory _BadgeSummary(
-      {required final String id,
-      required final String name,
-      required final String iconUrl,
-      required final String category,
-      required final DateTime earnedAt}) = _$BadgeSummaryImpl;
-
-  factory _BadgeSummary.fromJson(Map<String, dynamic> json) =
-      _$BadgeSummaryImpl.fromJson;
-
-  @override
-  String get id;
-  @override
-  String get name;
-  @override
-  String get iconUrl;
-  @override
-  String get category;
-  @override
-  DateTime get earnedAt;
-
-  /// Create a copy of BadgeSummary
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$BadgeSummaryImplCopyWith<_$BadgeSummaryImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-HighlightSummary _$HighlightSummaryFromJson(Map<String, dynamic> json) {
-  return _HighlightSummary.fromJson(json);
-}
-
 /// @nodoc
-mixin _$HighlightSummary {
-  String get id => throw _privateConstructorUsedError;
-  String get quoteText => throw _privateConstructorUsedError;
-  String? get bookTitle => throw _privateConstructorUsedError;
-  DateTime get createdAt => throw _privateConstructorUsedError;
-
-  /// Serializes this HighlightSummary to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of HighlightSummary
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $HighlightSummaryCopyWith<HighlightSummary> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $HighlightSummaryCopyWith<$Res> {
-  factory $HighlightSummaryCopyWith(
-          HighlightSummary value, $Res Function(HighlightSummary) then) =
-      _$HighlightSummaryCopyWithImpl<$Res, HighlightSummary>;
+abstract mixin class $BadgeSummaryCopyWith<$Res> {
+  factory $BadgeSummaryCopyWith(
+          BadgeSummary value, $Res Function(BadgeSummary) _then) =
+      _$BadgeSummaryCopyWithImpl;
   @useResult
   $Res call(
-      {String id, String quoteText, String? bookTitle, DateTime createdAt});
+      {String id,
+      String name,
+      String iconUrl,
+      String category,
+      DateTime earnedAt});
 }
 
 /// @nodoc
-class _$HighlightSummaryCopyWithImpl<$Res, $Val extends HighlightSummary>
-    implements $HighlightSummaryCopyWith<$Res> {
-  _$HighlightSummaryCopyWithImpl(this._value, this._then);
+class _$BadgeSummaryCopyWithImpl<$Res> implements $BadgeSummaryCopyWith<$Res> {
+  _$BadgeSummaryCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final BadgeSummary _self;
+  final $Res Function(BadgeSummary) _then;
 
-  /// Create a copy of HighlightSummary
+  /// Create a copy of BadgeSummary
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
     Object? id = null,
-    Object? quoteText = null,
-    Object? bookTitle = freezed,
-    Object? createdAt = null,
+    Object? name = null,
+    Object? iconUrl = null,
+    Object? category = null,
+    Object? earnedAt = null,
   }) {
-    return _then(_value.copyWith(
+    return _then(_self.copyWith(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      quoteText: null == quoteText
-          ? _value.quoteText
-          : quoteText // ignore: cast_nullable_to_non_nullable
+      name: null == name
+          ? _self.name
+          : name // ignore: cast_nullable_to_non_nullable
               as String,
-      bookTitle: freezed == bookTitle
-          ? _value.bookTitle
-          : bookTitle // ignore: cast_nullable_to_non_nullable
-              as String?,
-      createdAt: null == createdAt
-          ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-    ) as $Val);
-  }
-}
-
-/// @nodoc
-abstract class _$$HighlightSummaryImplCopyWith<$Res>
-    implements $HighlightSummaryCopyWith<$Res> {
-  factory _$$HighlightSummaryImplCopyWith(_$HighlightSummaryImpl value,
-          $Res Function(_$HighlightSummaryImpl) then) =
-      __$$HighlightSummaryImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {String id, String quoteText, String? bookTitle, DateTime createdAt});
-}
-
-/// @nodoc
-class __$$HighlightSummaryImplCopyWithImpl<$Res>
-    extends _$HighlightSummaryCopyWithImpl<$Res, _$HighlightSummaryImpl>
-    implements _$$HighlightSummaryImplCopyWith<$Res> {
-  __$$HighlightSummaryImplCopyWithImpl(_$HighlightSummaryImpl _value,
-      $Res Function(_$HighlightSummaryImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of HighlightSummary
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? quoteText = null,
-    Object? bookTitle = freezed,
-    Object? createdAt = null,
-  }) {
-    return _then(_$HighlightSummaryImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
+      iconUrl: null == iconUrl
+          ? _self.iconUrl
+          : iconUrl // ignore: cast_nullable_to_non_nullable
               as String,
-      quoteText: null == quoteText
-          ? _value.quoteText
-          : quoteText // ignore: cast_nullable_to_non_nullable
+      category: null == category
+          ? _self.category
+          : category // ignore: cast_nullable_to_non_nullable
               as String,
-      bookTitle: freezed == bookTitle
-          ? _value.bookTitle
-          : bookTitle // ignore: cast_nullable_to_non_nullable
-              as String?,
-      createdAt: null == createdAt
-          ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
+      earnedAt: null == earnedAt
+          ? _self.earnedAt
+          : earnedAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [BadgeSummary].
+extension BadgeSummaryPatterns on BadgeSummary {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_BadgeSummary value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _BadgeSummary() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_BadgeSummary value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _BadgeSummary():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_BadgeSummary value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _BadgeSummary() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String id, String name, String iconUrl, String category,
+            DateTime earnedAt)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _BadgeSummary() when $default != null:
+        return $default(_that.id, _that.name, _that.iconUrl, _that.category,
+            _that.earnedAt);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String id, String name, String iconUrl, String category,
+            DateTime earnedAt)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _BadgeSummary():
+        return $default(_that.id, _that.name, _that.iconUrl, _that.category,
+            _that.earnedAt);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String id, String name, String iconUrl, String category,
+            DateTime earnedAt)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _BadgeSummary() when $default != null:
+        return $default(_that.id, _that.name, _that.iconUrl, _that.category,
+            _that.earnedAt);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$HighlightSummaryImpl implements _HighlightSummary {
-  const _$HighlightSummaryImpl(
+class _BadgeSummary implements BadgeSummary {
+  const _BadgeSummary(
       {required this.id,
-      required this.quoteText,
-      this.bookTitle,
-      required this.createdAt});
-
-  factory _$HighlightSummaryImpl.fromJson(Map<String, dynamic> json) =>
-      _$$HighlightSummaryImplFromJson(json);
+      required this.name,
+      required this.iconUrl,
+      required this.category,
+      required this.earnedAt});
+  factory _BadgeSummary.fromJson(Map<String, dynamic> json) =>
+      _$BadgeSummaryFromJson(json);
 
   @override
   final String id;
   @override
-  final String quoteText;
+  final String name;
   @override
-  final String? bookTitle;
+  final String iconUrl;
   @override
-  final DateTime createdAt;
+  final String category;
+  @override
+  final DateTime earnedAt;
+
+  /// Create a copy of BadgeSummary
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$BadgeSummaryCopyWith<_BadgeSummary> get copyWith =>
+      __$BadgeSummaryCopyWithImpl<_BadgeSummary>(this, _$identity);
 
   @override
-  String toString() {
-    return 'HighlightSummary(id: $id, quoteText: $quoteText, bookTitle: $bookTitle, createdAt: $createdAt)';
+  Map<String, dynamic> toJson() {
+    return _$BadgeSummaryToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$HighlightSummaryImpl &&
+            other is _BadgeSummary &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.iconUrl, iconUrl) || other.iconUrl == iconUrl) &&
+            (identical(other.category, category) ||
+                other.category == category) &&
+            (identical(other.earnedAt, earnedAt) ||
+                other.earnedAt == earnedAt));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, id, name, iconUrl, category, earnedAt);
+
+  @override
+  String toString() {
+    return 'BadgeSummary(id: $id, name: $name, iconUrl: $iconUrl, category: $category, earnedAt: $earnedAt)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$BadgeSummaryCopyWith<$Res>
+    implements $BadgeSummaryCopyWith<$Res> {
+  factory _$BadgeSummaryCopyWith(
+          _BadgeSummary value, $Res Function(_BadgeSummary) _then) =
+      __$BadgeSummaryCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      String name,
+      String iconUrl,
+      String category,
+      DateTime earnedAt});
+}
+
+/// @nodoc
+class __$BadgeSummaryCopyWithImpl<$Res>
+    implements _$BadgeSummaryCopyWith<$Res> {
+  __$BadgeSummaryCopyWithImpl(this._self, this._then);
+
+  final _BadgeSummary _self;
+  final $Res Function(_BadgeSummary) _then;
+
+  /// Create a copy of BadgeSummary
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? iconUrl = null,
+    Object? category = null,
+    Object? earnedAt = null,
+  }) {
+    return _then(_BadgeSummary(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _self.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      iconUrl: null == iconUrl
+          ? _self.iconUrl
+          : iconUrl // ignore: cast_nullable_to_non_nullable
+              as String,
+      category: null == category
+          ? _self.category
+          : category // ignore: cast_nullable_to_non_nullable
+              as String,
+      earnedAt: null == earnedAt
+          ? _self.earnedAt
+          : earnedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$HighlightSummary {
+  String get id;
+  String get quoteText;
+  String? get bookTitle;
+  DateTime get createdAt;
+
+  /// Create a copy of HighlightSummary
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $HighlightSummaryCopyWith<HighlightSummary> get copyWith =>
+      _$HighlightSummaryCopyWithImpl<HighlightSummary>(
+          this as HighlightSummary, _$identity);
+
+  /// Serializes this HighlightSummary to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is HighlightSummary &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.quoteText, quoteText) ||
                 other.quoteText == quoteText) &&
@@ -647,226 +821,361 @@ class _$HighlightSummaryImpl implements _HighlightSummary {
   int get hashCode =>
       Object.hash(runtimeType, id, quoteText, bookTitle, createdAt);
 
-  /// Create a copy of HighlightSummary
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$HighlightSummaryImplCopyWith<_$HighlightSummaryImpl> get copyWith =>
-      __$$HighlightSummaryImplCopyWithImpl<_$HighlightSummaryImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$HighlightSummaryImplToJson(
-      this,
-    );
+  String toString() {
+    return 'HighlightSummary(id: $id, quoteText: $quoteText, bookTitle: $bookTitle, createdAt: $createdAt)';
   }
 }
 
-abstract class _HighlightSummary implements HighlightSummary {
-  const factory _HighlightSummary(
-      {required final String id,
-      required final String quoteText,
-      final String? bookTitle,
-      required final DateTime createdAt}) = _$HighlightSummaryImpl;
-
-  factory _HighlightSummary.fromJson(Map<String, dynamic> json) =
-      _$HighlightSummaryImpl.fromJson;
-
-  @override
-  String get id;
-  @override
-  String get quoteText;
-  @override
-  String? get bookTitle;
-  @override
-  DateTime get createdAt;
-
-  /// Create a copy of HighlightSummary
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$HighlightSummaryImplCopyWith<_$HighlightSummaryImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-UserSummary _$UserSummaryFromJson(Map<String, dynamic> json) {
-  return _UserSummary.fromJson(json);
-}
-
 /// @nodoc
-mixin _$UserSummary {
-  String get id => throw _privateConstructorUsedError;
-  String get nickname => throw _privateConstructorUsedError;
-  String? get profileImageUrl => throw _privateConstructorUsedError;
-  String? get bio => throw _privateConstructorUsedError;
-  bool get isFollowing => throw _privateConstructorUsedError;
-
-  /// Serializes this UserSummary to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of UserSummary
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $UserSummaryCopyWith<UserSummary> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $UserSummaryCopyWith<$Res> {
-  factory $UserSummaryCopyWith(
-          UserSummary value, $Res Function(UserSummary) then) =
-      _$UserSummaryCopyWithImpl<$Res, UserSummary>;
+abstract mixin class $HighlightSummaryCopyWith<$Res> {
+  factory $HighlightSummaryCopyWith(
+          HighlightSummary value, $Res Function(HighlightSummary) _then) =
+      _$HighlightSummaryCopyWithImpl;
   @useResult
   $Res call(
-      {String id,
-      String nickname,
-      String? profileImageUrl,
-      String? bio,
-      bool isFollowing});
+      {String id, String quoteText, String? bookTitle, DateTime createdAt});
 }
 
 /// @nodoc
-class _$UserSummaryCopyWithImpl<$Res, $Val extends UserSummary>
-    implements $UserSummaryCopyWith<$Res> {
-  _$UserSummaryCopyWithImpl(this._value, this._then);
+class _$HighlightSummaryCopyWithImpl<$Res>
+    implements $HighlightSummaryCopyWith<$Res> {
+  _$HighlightSummaryCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final HighlightSummary _self;
+  final $Res Function(HighlightSummary) _then;
 
-  /// Create a copy of UserSummary
+  /// Create a copy of HighlightSummary
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
     Object? id = null,
-    Object? nickname = null,
-    Object? profileImageUrl = freezed,
-    Object? bio = freezed,
-    Object? isFollowing = null,
+    Object? quoteText = null,
+    Object? bookTitle = freezed,
+    Object? createdAt = null,
   }) {
-    return _then(_value.copyWith(
+    return _then(_self.copyWith(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      nickname: null == nickname
-          ? _value.nickname
-          : nickname // ignore: cast_nullable_to_non_nullable
+      quoteText: null == quoteText
+          ? _self.quoteText
+          : quoteText // ignore: cast_nullable_to_non_nullable
               as String,
-      profileImageUrl: freezed == profileImageUrl
-          ? _value.profileImageUrl
-          : profileImageUrl // ignore: cast_nullable_to_non_nullable
+      bookTitle: freezed == bookTitle
+          ? _self.bookTitle
+          : bookTitle // ignore: cast_nullable_to_non_nullable
               as String?,
-      bio: freezed == bio
-          ? _value.bio
-          : bio // ignore: cast_nullable_to_non_nullable
-              as String?,
-      isFollowing: null == isFollowing
-          ? _value.isFollowing
-          : isFollowing // ignore: cast_nullable_to_non_nullable
-              as bool,
-    ) as $Val);
-  }
-}
-
-/// @nodoc
-abstract class _$$UserSummaryImplCopyWith<$Res>
-    implements $UserSummaryCopyWith<$Res> {
-  factory _$$UserSummaryImplCopyWith(
-          _$UserSummaryImpl value, $Res Function(_$UserSummaryImpl) then) =
-      __$$UserSummaryImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {String id,
-      String nickname,
-      String? profileImageUrl,
-      String? bio,
-      bool isFollowing});
-}
-
-/// @nodoc
-class __$$UserSummaryImplCopyWithImpl<$Res>
-    extends _$UserSummaryCopyWithImpl<$Res, _$UserSummaryImpl>
-    implements _$$UserSummaryImplCopyWith<$Res> {
-  __$$UserSummaryImplCopyWithImpl(
-      _$UserSummaryImpl _value, $Res Function(_$UserSummaryImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of UserSummary
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? nickname = null,
-    Object? profileImageUrl = freezed,
-    Object? bio = freezed,
-    Object? isFollowing = null,
-  }) {
-    return _then(_$UserSummaryImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      nickname: null == nickname
-          ? _value.nickname
-          : nickname // ignore: cast_nullable_to_non_nullable
-              as String,
-      profileImageUrl: freezed == profileImageUrl
-          ? _value.profileImageUrl
-          : profileImageUrl // ignore: cast_nullable_to_non_nullable
-              as String?,
-      bio: freezed == bio
-          ? _value.bio
-          : bio // ignore: cast_nullable_to_non_nullable
-              as String?,
-      isFollowing: null == isFollowing
-          ? _value.isFollowing
-          : isFollowing // ignore: cast_nullable_to_non_nullable
-              as bool,
+      createdAt: null == createdAt
+          ? _self.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
     ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [HighlightSummary].
+extension HighlightSummaryPatterns on HighlightSummary {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_HighlightSummary value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _HighlightSummary() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_HighlightSummary value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _HighlightSummary():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_HighlightSummary value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _HighlightSummary() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String id, String quoteText, String? bookTitle, DateTime createdAt)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _HighlightSummary() when $default != null:
+        return $default(
+            _that.id, _that.quoteText, _that.bookTitle, _that.createdAt);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String id, String quoteText, String? bookTitle, DateTime createdAt)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _HighlightSummary():
+        return $default(
+            _that.id, _that.quoteText, _that.bookTitle, _that.createdAt);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String id, String quoteText, String? bookTitle, DateTime createdAt)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _HighlightSummary() when $default != null:
+        return $default(
+            _that.id, _that.quoteText, _that.bookTitle, _that.createdAt);
+      case _:
+        return null;
+    }
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$UserSummaryImpl implements _UserSummary {
-  const _$UserSummaryImpl(
+class _HighlightSummary implements HighlightSummary {
+  const _HighlightSummary(
       {required this.id,
-      required this.nickname,
-      this.profileImageUrl,
-      this.bio,
-      required this.isFollowing});
-
-  factory _$UserSummaryImpl.fromJson(Map<String, dynamic> json) =>
-      _$$UserSummaryImplFromJson(json);
+      required this.quoteText,
+      this.bookTitle,
+      required this.createdAt});
+  factory _HighlightSummary.fromJson(Map<String, dynamic> json) =>
+      _$HighlightSummaryFromJson(json);
 
   @override
   final String id;
   @override
-  final String nickname;
+  final String quoteText;
   @override
-  final String? profileImageUrl;
+  final String? bookTitle;
   @override
-  final String? bio;
+  final DateTime createdAt;
+
+  /// Create a copy of HighlightSummary
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  final bool isFollowing;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$HighlightSummaryCopyWith<_HighlightSummary> get copyWith =>
+      __$HighlightSummaryCopyWithImpl<_HighlightSummary>(this, _$identity);
 
   @override
-  String toString() {
-    return 'UserSummary(id: $id, nickname: $nickname, profileImageUrl: $profileImageUrl, bio: $bio, isFollowing: $isFollowing)';
+  Map<String, dynamic> toJson() {
+    return _$HighlightSummaryToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$UserSummaryImpl &&
+            other is _HighlightSummary &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.quoteText, quoteText) ||
+                other.quoteText == quoteText) &&
+            (identical(other.bookTitle, bookTitle) ||
+                other.bookTitle == bookTitle) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, id, quoteText, bookTitle, createdAt);
+
+  @override
+  String toString() {
+    return 'HighlightSummary(id: $id, quoteText: $quoteText, bookTitle: $bookTitle, createdAt: $createdAt)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$HighlightSummaryCopyWith<$Res>
+    implements $HighlightSummaryCopyWith<$Res> {
+  factory _$HighlightSummaryCopyWith(
+          _HighlightSummary value, $Res Function(_HighlightSummary) _then) =
+      __$HighlightSummaryCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String id, String quoteText, String? bookTitle, DateTime createdAt});
+}
+
+/// @nodoc
+class __$HighlightSummaryCopyWithImpl<$Res>
+    implements _$HighlightSummaryCopyWith<$Res> {
+  __$HighlightSummaryCopyWithImpl(this._self, this._then);
+
+  final _HighlightSummary _self;
+  final $Res Function(_HighlightSummary) _then;
+
+  /// Create a copy of HighlightSummary
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? quoteText = null,
+    Object? bookTitle = freezed,
+    Object? createdAt = null,
+  }) {
+    return _then(_HighlightSummary(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      quoteText: null == quoteText
+          ? _self.quoteText
+          : quoteText // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookTitle: freezed == bookTitle
+          ? _self.bookTitle
+          : bookTitle // ignore: cast_nullable_to_non_nullable
+              as String?,
+      createdAt: null == createdAt
+          ? _self.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$UserSummary {
+  String get id;
+  String get nickname;
+  String? get profileImageUrl;
+  String? get bio;
+  bool get isFollowing;
+
+  /// Create a copy of UserSummary
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $UserSummaryCopyWith<UserSummary> get copyWith =>
+      _$UserSummaryCopyWithImpl<UserSummary>(this as UserSummary, _$identity);
+
+  /// Serializes this UserSummary to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is UserSummary &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.nickname, nickname) ||
                 other.nickname == nickname) &&
@@ -882,129 +1191,411 @@ class _$UserSummaryImpl implements _UserSummary {
   int get hashCode =>
       Object.hash(runtimeType, id, nickname, profileImageUrl, bio, isFollowing);
 
-  /// Create a copy of UserSummary
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$UserSummaryImplCopyWith<_$UserSummaryImpl> get copyWith =>
-      __$$UserSummaryImplCopyWithImpl<_$UserSummaryImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$UserSummaryImplToJson(
-      this,
-    );
+  String toString() {
+    return 'UserSummary(id: $id, nickname: $nickname, profileImageUrl: $profileImageUrl, bio: $bio, isFollowing: $isFollowing)';
   }
 }
 
-abstract class _UserSummary implements UserSummary {
-  const factory _UserSummary(
-      {required final String id,
-      required final String nickname,
-      final String? profileImageUrl,
-      final String? bio,
-      required final bool isFollowing}) = _$UserSummaryImpl;
+/// @nodoc
+abstract mixin class $UserSummaryCopyWith<$Res> {
+  factory $UserSummaryCopyWith(
+          UserSummary value, $Res Function(UserSummary) _then) =
+      _$UserSummaryCopyWithImpl;
+  @useResult
+  $Res call(
+      {String id,
+      String nickname,
+      String? profileImageUrl,
+      String? bio,
+      bool isFollowing});
+}
 
-  factory _UserSummary.fromJson(Map<String, dynamic> json) =
-      _$UserSummaryImpl.fromJson;
+/// @nodoc
+class _$UserSummaryCopyWithImpl<$Res> implements $UserSummaryCopyWith<$Res> {
+  _$UserSummaryCopyWithImpl(this._self, this._then);
+
+  final UserSummary _self;
+  final $Res Function(UserSummary) _then;
+
+  /// Create a copy of UserSummary
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? nickname = null,
+    Object? profileImageUrl = freezed,
+    Object? bio = freezed,
+    Object? isFollowing = null,
+  }) {
+    return _then(_self.copyWith(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      nickname: null == nickname
+          ? _self.nickname
+          : nickname // ignore: cast_nullable_to_non_nullable
+              as String,
+      profileImageUrl: freezed == profileImageUrl
+          ? _self.profileImageUrl
+          : profileImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      bio: freezed == bio
+          ? _self.bio
+          : bio // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isFollowing: null == isFollowing
+          ? _self.isFollowing
+          : isFollowing // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [UserSummary].
+extension UserSummaryPatterns on UserSummary {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_UserSummary value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _UserSummary() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_UserSummary value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _UserSummary():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_UserSummary value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _UserSummary() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String id, String nickname, String? profileImageUrl,
+            String? bio, bool isFollowing)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _UserSummary() when $default != null:
+        return $default(_that.id, _that.nickname, _that.profileImageUrl,
+            _that.bio, _that.isFollowing);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String id, String nickname, String? profileImageUrl,
+            String? bio, bool isFollowing)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _UserSummary():
+        return $default(_that.id, _that.nickname, _that.profileImageUrl,
+            _that.bio, _that.isFollowing);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String id, String nickname, String? profileImageUrl,
+            String? bio, bool isFollowing)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _UserSummary() when $default != null:
+        return $default(_that.id, _that.nickname, _that.profileImageUrl,
+            _that.bio, _that.isFollowing);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _UserSummary implements UserSummary {
+  const _UserSummary(
+      {required this.id,
+      required this.nickname,
+      this.profileImageUrl,
+      this.bio,
+      required this.isFollowing});
+  factory _UserSummary.fromJson(Map<String, dynamic> json) =>
+      _$UserSummaryFromJson(json);
 
   @override
-  String get id;
+  final String id;
   @override
-  String get nickname;
+  final String nickname;
   @override
-  String? get profileImageUrl;
+  final String? profileImageUrl;
   @override
-  String? get bio;
+  final String? bio;
   @override
-  bool get isFollowing;
+  final bool isFollowing;
 
   /// Create a copy of UserSummary
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$UserSummaryImplCopyWith<_$UserSummaryImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  _$UserSummaryCopyWith<_UserSummary> get copyWith =>
+      __$UserSummaryCopyWithImpl<_UserSummary>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$UserSummaryToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _UserSummary &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.nickname, nickname) ||
+                other.nickname == nickname) &&
+            (identical(other.profileImageUrl, profileImageUrl) ||
+                other.profileImageUrl == profileImageUrl) &&
+            (identical(other.bio, bio) || other.bio == bio) &&
+            (identical(other.isFollowing, isFollowing) ||
+                other.isFollowing == isFollowing));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, id, nickname, profileImageUrl, bio, isFollowing);
+
+  @override
+  String toString() {
+    return 'UserSummary(id: $id, nickname: $nickname, profileImageUrl: $profileImageUrl, bio: $bio, isFollowing: $isFollowing)';
+  }
 }
 
-UserSummaryPage _$UserSummaryPageFromJson(Map<String, dynamic> json) {
-  return _UserSummaryPage.fromJson(json);
+/// @nodoc
+abstract mixin class _$UserSummaryCopyWith<$Res>
+    implements $UserSummaryCopyWith<$Res> {
+  factory _$UserSummaryCopyWith(
+          _UserSummary value, $Res Function(_UserSummary) _then) =
+      __$UserSummaryCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      String nickname,
+      String? profileImageUrl,
+      String? bio,
+      bool isFollowing});
+}
+
+/// @nodoc
+class __$UserSummaryCopyWithImpl<$Res> implements _$UserSummaryCopyWith<$Res> {
+  __$UserSummaryCopyWithImpl(this._self, this._then);
+
+  final _UserSummary _self;
+  final $Res Function(_UserSummary) _then;
+
+  /// Create a copy of UserSummary
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? nickname = null,
+    Object? profileImageUrl = freezed,
+    Object? bio = freezed,
+    Object? isFollowing = null,
+  }) {
+    return _then(_UserSummary(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      nickname: null == nickname
+          ? _self.nickname
+          : nickname // ignore: cast_nullable_to_non_nullable
+              as String,
+      profileImageUrl: freezed == profileImageUrl
+          ? _self.profileImageUrl
+          : profileImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      bio: freezed == bio
+          ? _self.bio
+          : bio // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isFollowing: null == isFollowing
+          ? _self.isFollowing
+          : isFollowing // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ));
+  }
 }
 
 /// @nodoc
 mixin _$UserSummaryPage {
-  List<UserSummary> get items => throw _privateConstructorUsedError;
-  String? get nextCursor => throw _privateConstructorUsedError;
-
-  /// Serializes this UserSummaryPage to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  List<UserSummary> get items;
+  String? get nextCursor;
 
   /// Create a copy of UserSummaryPage
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $UserSummaryPageCopyWith<UserSummaryPage> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $UserSummaryPageCopyWith<$Res> {
-  factory $UserSummaryPageCopyWith(
-          UserSummaryPage value, $Res Function(UserSummaryPage) then) =
-      _$UserSummaryPageCopyWithImpl<$Res, UserSummaryPage>;
-  @useResult
-  $Res call({List<UserSummary> items, String? nextCursor});
-}
-
-/// @nodoc
-class _$UserSummaryPageCopyWithImpl<$Res, $Val extends UserSummaryPage>
-    implements $UserSummaryPageCopyWith<$Res> {
-  _$UserSummaryPageCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of UserSummaryPage
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $UserSummaryPageCopyWith<UserSummaryPage> get copyWith =>
+      _$UserSummaryPageCopyWithImpl<UserSummaryPage>(
+          this as UserSummaryPage, _$identity);
+
+  /// Serializes this UserSummaryPage to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? items = null,
-    Object? nextCursor = freezed,
-  }) {
-    return _then(_value.copyWith(
-      items: null == items
-          ? _value.items
-          : items // ignore: cast_nullable_to_non_nullable
-              as List<UserSummary>,
-      nextCursor: freezed == nextCursor
-          ? _value.nextCursor
-          : nextCursor // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is UserSummaryPage &&
+            const DeepCollectionEquality().equals(other.items, items) &&
+            (identical(other.nextCursor, nextCursor) ||
+                other.nextCursor == nextCursor));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, const DeepCollectionEquality().hash(items), nextCursor);
+
+  @override
+  String toString() {
+    return 'UserSummaryPage(items: $items, nextCursor: $nextCursor)';
   }
 }
 
 /// @nodoc
-abstract class _$$UserSummaryPageImplCopyWith<$Res>
-    implements $UserSummaryPageCopyWith<$Res> {
-  factory _$$UserSummaryPageImplCopyWith(_$UserSummaryPageImpl value,
-          $Res Function(_$UserSummaryPageImpl) then) =
-      __$$UserSummaryPageImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $UserSummaryPageCopyWith<$Res> {
+  factory $UserSummaryPageCopyWith(
+          UserSummaryPage value, $Res Function(UserSummaryPage) _then) =
+      _$UserSummaryPageCopyWithImpl;
   @useResult
   $Res call({List<UserSummary> items, String? nextCursor});
 }
 
 /// @nodoc
-class __$$UserSummaryPageImplCopyWithImpl<$Res>
-    extends _$UserSummaryPageCopyWithImpl<$Res, _$UserSummaryPageImpl>
-    implements _$$UserSummaryPageImplCopyWith<$Res> {
-  __$$UserSummaryPageImplCopyWithImpl(
-      _$UserSummaryPageImpl _value, $Res Function(_$UserSummaryPageImpl) _then)
-      : super(_value, _then);
+class _$UserSummaryPageCopyWithImpl<$Res>
+    implements $UserSummaryPageCopyWith<$Res> {
+  _$UserSummaryPageCopyWithImpl(this._self, this._then);
+
+  final UserSummaryPage _self;
+  final $Res Function(UserSummaryPage) _then;
 
   /// Create a copy of UserSummaryPage
   /// with the given fields replaced by the non-null parameter values.
@@ -1014,28 +1605,184 @@ class __$$UserSummaryPageImplCopyWithImpl<$Res>
     Object? items = null,
     Object? nextCursor = freezed,
   }) {
-    return _then(_$UserSummaryPageImpl(
+    return _then(_self.copyWith(
       items: null == items
-          ? _value._items
+          ? _self.items
           : items // ignore: cast_nullable_to_non_nullable
               as List<UserSummary>,
       nextCursor: freezed == nextCursor
-          ? _value.nextCursor
+          ? _self.nextCursor
           : nextCursor // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [UserSummaryPage].
+extension UserSummaryPagePatterns on UserSummaryPage {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_UserSummaryPage value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _UserSummaryPage() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_UserSummaryPage value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _UserSummaryPage():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_UserSummaryPage value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _UserSummaryPage() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(List<UserSummary> items, String? nextCursor)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _UserSummaryPage() when $default != null:
+        return $default(_that.items, _that.nextCursor);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(List<UserSummary> items, String? nextCursor) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _UserSummaryPage():
+        return $default(_that.items, _that.nextCursor);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(List<UserSummary> items, String? nextCursor)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _UserSummaryPage() when $default != null:
+        return $default(_that.items, _that.nextCursor);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$UserSummaryPageImpl implements _UserSummaryPage {
-  const _$UserSummaryPageImpl(
+class _UserSummaryPage implements UserSummaryPage {
+  const _UserSummaryPage(
       {required final List<UserSummary> items, this.nextCursor})
       : _items = items;
-
-  factory _$UserSummaryPageImpl.fromJson(Map<String, dynamic> json) =>
-      _$$UserSummaryPageImplFromJson(json);
+  factory _UserSummaryPage.fromJson(Map<String, dynamic> json) =>
+      _$UserSummaryPageFromJson(json);
 
   final List<UserSummary> _items;
   @override
@@ -1048,16 +1795,26 @@ class _$UserSummaryPageImpl implements _UserSummaryPage {
   @override
   final String? nextCursor;
 
+  /// Create a copy of UserSummaryPage
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'UserSummaryPage(items: $items, nextCursor: $nextCursor)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$UserSummaryPageCopyWith<_UserSummaryPage> get copyWith =>
+      __$UserSummaryPageCopyWithImpl<_UserSummaryPage>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$UserSummaryPageToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$UserSummaryPageImpl &&
+            other is _UserSummaryPage &&
             const DeepCollectionEquality().equals(other._items, _items) &&
             (identical(other.nextCursor, nextCursor) ||
                 other.nextCursor == nextCursor));
@@ -1068,78 +1825,128 @@ class _$UserSummaryPageImpl implements _UserSummaryPage {
   int get hashCode => Object.hash(
       runtimeType, const DeepCollectionEquality().hash(_items), nextCursor);
 
-  /// Create a copy of UserSummaryPage
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$UserSummaryPageImplCopyWith<_$UserSummaryPageImpl> get copyWith =>
-      __$$UserSummaryPageImplCopyWithImpl<_$UserSummaryPageImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$UserSummaryPageImplToJson(
-      this,
-    );
+  String toString() {
+    return 'UserSummaryPage(items: $items, nextCursor: $nextCursor)';
   }
 }
 
-abstract class _UserSummaryPage implements UserSummaryPage {
-  const factory _UserSummaryPage(
-      {required final List<UserSummary> items,
-      final String? nextCursor}) = _$UserSummaryPageImpl;
-
-  factory _UserSummaryPage.fromJson(Map<String, dynamic> json) =
-      _$UserSummaryPageImpl.fromJson;
-
+/// @nodoc
+abstract mixin class _$UserSummaryPageCopyWith<$Res>
+    implements $UserSummaryPageCopyWith<$Res> {
+  factory _$UserSummaryPageCopyWith(
+          _UserSummaryPage value, $Res Function(_UserSummaryPage) _then) =
+      __$UserSummaryPageCopyWithImpl;
   @override
-  List<UserSummary> get items;
-  @override
-  String? get nextCursor;
+  @useResult
+  $Res call({List<UserSummary> items, String? nextCursor});
+}
+
+/// @nodoc
+class __$UserSummaryPageCopyWithImpl<$Res>
+    implements _$UserSummaryPageCopyWith<$Res> {
+  __$UserSummaryPageCopyWithImpl(this._self, this._then);
+
+  final _UserSummaryPage _self;
+  final $Res Function(_UserSummaryPage) _then;
 
   /// Create a copy of UserSummaryPage
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$UserSummaryPageImplCopyWith<_$UserSummaryPageImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-UserProfile _$UserProfileFromJson(Map<String, dynamic> json) {
-  return _UserProfile.fromJson(json);
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? items = null,
+    Object? nextCursor = freezed,
+  }) {
+    return _then(_UserSummaryPage(
+      items: null == items
+          ? _self._items
+          : items // ignore: cast_nullable_to_non_nullable
+              as List<UserSummary>,
+      nextCursor: freezed == nextCursor
+          ? _self.nextCursor
+          : nextCursor // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
 }
 
 /// @nodoc
 mixin _$UserProfile {
-  String get id => throw _privateConstructorUsedError;
-  String get nickname => throw _privateConstructorUsedError;
-  String? get profileImageUrl => throw _privateConstructorUsedError;
-  String? get bio => throw _privateConstructorUsedError;
-  int get followerCount => throw _privateConstructorUsedError;
-  int get followingCount => throw _privateConstructorUsedError;
-  bool get isFollowing => throw _privateConstructorUsedError;
-  bool get isMe => throw _privateConstructorUsedError;
-  GradeStats? get gradeStats => throw _privateConstructorUsedError;
-  List<BadgeSummary> get badges => throw _privateConstructorUsedError;
-  List<HighlightSummary> get recentHighlights =>
-      throw _privateConstructorUsedError;
-
-  /// Serializes this UserProfile to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  String get id;
+  String get nickname;
+  String? get profileImageUrl;
+  String? get bio;
+  int get followerCount;
+  int get followingCount;
+  bool get isFollowing;
+  bool get isMe;
+  GradeStats? get gradeStats;
+  List<BadgeSummary> get badges;
+  List<HighlightSummary> get recentHighlights;
 
   /// Create a copy of UserProfile
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
   $UserProfileCopyWith<UserProfile> get copyWith =>
-      throw _privateConstructorUsedError;
+      _$UserProfileCopyWithImpl<UserProfile>(this as UserProfile, _$identity);
+
+  /// Serializes this UserProfile to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is UserProfile &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.nickname, nickname) ||
+                other.nickname == nickname) &&
+            (identical(other.profileImageUrl, profileImageUrl) ||
+                other.profileImageUrl == profileImageUrl) &&
+            (identical(other.bio, bio) || other.bio == bio) &&
+            (identical(other.followerCount, followerCount) ||
+                other.followerCount == followerCount) &&
+            (identical(other.followingCount, followingCount) ||
+                other.followingCount == followingCount) &&
+            (identical(other.isFollowing, isFollowing) ||
+                other.isFollowing == isFollowing) &&
+            (identical(other.isMe, isMe) || other.isMe == isMe) &&
+            (identical(other.gradeStats, gradeStats) ||
+                other.gradeStats == gradeStats) &&
+            const DeepCollectionEquality().equals(other.badges, badges) &&
+            const DeepCollectionEquality()
+                .equals(other.recentHighlights, recentHighlights));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      nickname,
+      profileImageUrl,
+      bio,
+      followerCount,
+      followingCount,
+      isFollowing,
+      isMe,
+      gradeStats,
+      const DeepCollectionEquality().hash(badges),
+      const DeepCollectionEquality().hash(recentHighlights));
+
+  @override
+  String toString() {
+    return 'UserProfile(id: $id, nickname: $nickname, profileImageUrl: $profileImageUrl, bio: $bio, followerCount: $followerCount, followingCount: $followingCount, isFollowing: $isFollowing, isMe: $isMe, gradeStats: $gradeStats, badges: $badges, recentHighlights: $recentHighlights)';
+  }
 }
 
 /// @nodoc
-abstract class $UserProfileCopyWith<$Res> {
+abstract mixin class $UserProfileCopyWith<$Res> {
   factory $UserProfileCopyWith(
-          UserProfile value, $Res Function(UserProfile) then) =
-      _$UserProfileCopyWithImpl<$Res, UserProfile>;
+          UserProfile value, $Res Function(UserProfile) _then) =
+      _$UserProfileCopyWithImpl;
   @useResult
   $Res call(
       {String id,
@@ -1158,14 +1965,11 @@ abstract class $UserProfileCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$UserProfileCopyWithImpl<$Res, $Val extends UserProfile>
-    implements $UserProfileCopyWith<$Res> {
-  _$UserProfileCopyWithImpl(this._value, this._then);
+class _$UserProfileCopyWithImpl<$Res> implements $UserProfileCopyWith<$Res> {
+  _$UserProfileCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final UserProfile _self;
+  final $Res Function(UserProfile) _then;
 
   /// Create a copy of UserProfile
   /// with the given fields replaced by the non-null parameter values.
@@ -1184,52 +1988,52 @@ class _$UserProfileCopyWithImpl<$Res, $Val extends UserProfile>
     Object? badges = null,
     Object? recentHighlights = null,
   }) {
-    return _then(_value.copyWith(
+    return _then(_self.copyWith(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
       nickname: null == nickname
-          ? _value.nickname
+          ? _self.nickname
           : nickname // ignore: cast_nullable_to_non_nullable
               as String,
       profileImageUrl: freezed == profileImageUrl
-          ? _value.profileImageUrl
+          ? _self.profileImageUrl
           : profileImageUrl // ignore: cast_nullable_to_non_nullable
               as String?,
       bio: freezed == bio
-          ? _value.bio
+          ? _self.bio
           : bio // ignore: cast_nullable_to_non_nullable
               as String?,
       followerCount: null == followerCount
-          ? _value.followerCount
+          ? _self.followerCount
           : followerCount // ignore: cast_nullable_to_non_nullable
               as int,
       followingCount: null == followingCount
-          ? _value.followingCount
+          ? _self.followingCount
           : followingCount // ignore: cast_nullable_to_non_nullable
               as int,
       isFollowing: null == isFollowing
-          ? _value.isFollowing
+          ? _self.isFollowing
           : isFollowing // ignore: cast_nullable_to_non_nullable
               as bool,
       isMe: null == isMe
-          ? _value.isMe
+          ? _self.isMe
           : isMe // ignore: cast_nullable_to_non_nullable
               as bool,
       gradeStats: freezed == gradeStats
-          ? _value.gradeStats
+          ? _self.gradeStats
           : gradeStats // ignore: cast_nullable_to_non_nullable
               as GradeStats?,
       badges: null == badges
-          ? _value.badges
+          ? _self.badges
           : badges // ignore: cast_nullable_to_non_nullable
               as List<BadgeSummary>,
       recentHighlights: null == recentHighlights
-          ? _value.recentHighlights
+          ? _self.recentHighlights
           : recentHighlights // ignore: cast_nullable_to_non_nullable
               as List<HighlightSummary>,
-    ) as $Val);
+    ));
   }
 
   /// Create a copy of UserProfile
@@ -1237,119 +2041,246 @@ class _$UserProfileCopyWithImpl<$Res, $Val extends UserProfile>
   @override
   @pragma('vm:prefer-inline')
   $GradeStatsCopyWith<$Res>? get gradeStats {
-    if (_value.gradeStats == null) {
+    if (_self.gradeStats == null) {
       return null;
     }
 
-    return $GradeStatsCopyWith<$Res>(_value.gradeStats!, (value) {
-      return _then(_value.copyWith(gradeStats: value) as $Val);
+    return $GradeStatsCopyWith<$Res>(_self.gradeStats!, (value) {
+      return _then(_self.copyWith(gradeStats: value));
     });
   }
 }
 
-/// @nodoc
-abstract class _$$UserProfileImplCopyWith<$Res>
-    implements $UserProfileCopyWith<$Res> {
-  factory _$$UserProfileImplCopyWith(
-          _$UserProfileImpl value, $Res Function(_$UserProfileImpl) then) =
-      __$$UserProfileImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {String id,
-      String nickname,
-      String? profileImageUrl,
-      String? bio,
-      int followerCount,
-      int followingCount,
-      bool isFollowing,
-      bool isMe,
-      GradeStats? gradeStats,
-      List<BadgeSummary> badges,
-      List<HighlightSummary> recentHighlights});
+/// Adds pattern-matching-related methods to [UserProfile].
+extension UserProfilePatterns on UserProfile {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
 
-  @override
-  $GradeStatsCopyWith<$Res>? get gradeStats;
-}
-
-/// @nodoc
-class __$$UserProfileImplCopyWithImpl<$Res>
-    extends _$UserProfileCopyWithImpl<$Res, _$UserProfileImpl>
-    implements _$$UserProfileImplCopyWith<$Res> {
-  __$$UserProfileImplCopyWithImpl(
-      _$UserProfileImpl _value, $Res Function(_$UserProfileImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of UserProfile
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? nickname = null,
-    Object? profileImageUrl = freezed,
-    Object? bio = freezed,
-    Object? followerCount = null,
-    Object? followingCount = null,
-    Object? isFollowing = null,
-    Object? isMe = null,
-    Object? gradeStats = freezed,
-    Object? badges = null,
-    Object? recentHighlights = null,
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_UserProfile value)? $default, {
+    required TResult orElse(),
   }) {
-    return _then(_$UserProfileImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      nickname: null == nickname
-          ? _value.nickname
-          : nickname // ignore: cast_nullable_to_non_nullable
-              as String,
-      profileImageUrl: freezed == profileImageUrl
-          ? _value.profileImageUrl
-          : profileImageUrl // ignore: cast_nullable_to_non_nullable
-              as String?,
-      bio: freezed == bio
-          ? _value.bio
-          : bio // ignore: cast_nullable_to_non_nullable
-              as String?,
-      followerCount: null == followerCount
-          ? _value.followerCount
-          : followerCount // ignore: cast_nullable_to_non_nullable
-              as int,
-      followingCount: null == followingCount
-          ? _value.followingCount
-          : followingCount // ignore: cast_nullable_to_non_nullable
-              as int,
-      isFollowing: null == isFollowing
-          ? _value.isFollowing
-          : isFollowing // ignore: cast_nullable_to_non_nullable
-              as bool,
-      isMe: null == isMe
-          ? _value.isMe
-          : isMe // ignore: cast_nullable_to_non_nullable
-              as bool,
-      gradeStats: freezed == gradeStats
-          ? _value.gradeStats
-          : gradeStats // ignore: cast_nullable_to_non_nullable
-              as GradeStats?,
-      badges: null == badges
-          ? _value._badges
-          : badges // ignore: cast_nullable_to_non_nullable
-              as List<BadgeSummary>,
-      recentHighlights: null == recentHighlights
-          ? _value._recentHighlights
-          : recentHighlights // ignore: cast_nullable_to_non_nullable
-              as List<HighlightSummary>,
-    ));
+    final _that = this;
+    switch (_that) {
+      case _UserProfile() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_UserProfile value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _UserProfile():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_UserProfile value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _UserProfile() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String nickname,
+            String? profileImageUrl,
+            String? bio,
+            int followerCount,
+            int followingCount,
+            bool isFollowing,
+            bool isMe,
+            GradeStats? gradeStats,
+            List<BadgeSummary> badges,
+            List<HighlightSummary> recentHighlights)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _UserProfile() when $default != null:
+        return $default(
+            _that.id,
+            _that.nickname,
+            _that.profileImageUrl,
+            _that.bio,
+            _that.followerCount,
+            _that.followingCount,
+            _that.isFollowing,
+            _that.isMe,
+            _that.gradeStats,
+            _that.badges,
+            _that.recentHighlights);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String nickname,
+            String? profileImageUrl,
+            String? bio,
+            int followerCount,
+            int followingCount,
+            bool isFollowing,
+            bool isMe,
+            GradeStats? gradeStats,
+            List<BadgeSummary> badges,
+            List<HighlightSummary> recentHighlights)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _UserProfile():
+        return $default(
+            _that.id,
+            _that.nickname,
+            _that.profileImageUrl,
+            _that.bio,
+            _that.followerCount,
+            _that.followingCount,
+            _that.isFollowing,
+            _that.isMe,
+            _that.gradeStats,
+            _that.badges,
+            _that.recentHighlights);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String id,
+            String nickname,
+            String? profileImageUrl,
+            String? bio,
+            int followerCount,
+            int followingCount,
+            bool isFollowing,
+            bool isMe,
+            GradeStats? gradeStats,
+            List<BadgeSummary> badges,
+            List<HighlightSummary> recentHighlights)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _UserProfile() when $default != null:
+        return $default(
+            _that.id,
+            _that.nickname,
+            _that.profileImageUrl,
+            _that.bio,
+            _that.followerCount,
+            _that.followingCount,
+            _that.isFollowing,
+            _that.isMe,
+            _that.gradeStats,
+            _that.badges,
+            _that.recentHighlights);
+      case _:
+        return null;
+    }
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$UserProfileImpl implements _UserProfile {
-  const _$UserProfileImpl(
+class _UserProfile implements UserProfile {
+  const _UserProfile(
       {required this.id,
       required this.nickname,
       this.profileImageUrl,
@@ -1363,9 +2294,8 @@ class _$UserProfileImpl implements _UserProfile {
       final List<HighlightSummary> recentHighlights = const []})
       : _badges = badges,
         _recentHighlights = recentHighlights;
-
-  factory _$UserProfileImpl.fromJson(Map<String, dynamic> json) =>
-      _$$UserProfileImplFromJson(json);
+  factory _UserProfile.fromJson(Map<String, dynamic> json) =>
+      _$UserProfileFromJson(json);
 
   @override
   final String id;
@@ -1404,16 +2334,26 @@ class _$UserProfileImpl implements _UserProfile {
     return EqualUnmodifiableListView(_recentHighlights);
   }
 
+  /// Create a copy of UserProfile
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'UserProfile(id: $id, nickname: $nickname, profileImageUrl: $profileImageUrl, bio: $bio, followerCount: $followerCount, followingCount: $followingCount, isFollowing: $isFollowing, isMe: $isMe, gradeStats: $gradeStats, badges: $badges, recentHighlights: $recentHighlights)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$UserProfileCopyWith<_UserProfile> get copyWith =>
+      __$UserProfileCopyWithImpl<_UserProfile>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$UserProfileToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$UserProfileImpl &&
+            other is _UserProfile &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.nickname, nickname) ||
                 other.nickname == nickname) &&
@@ -1450,66 +2390,122 @@ class _$UserProfileImpl implements _UserProfile {
       const DeepCollectionEquality().hash(_badges),
       const DeepCollectionEquality().hash(_recentHighlights));
 
-  /// Create a copy of UserProfile
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$UserProfileImplCopyWith<_$UserProfileImpl> get copyWith =>
-      __$$UserProfileImplCopyWithImpl<_$UserProfileImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$UserProfileImplToJson(
-      this,
-    );
+  String toString() {
+    return 'UserProfile(id: $id, nickname: $nickname, profileImageUrl: $profileImageUrl, bio: $bio, followerCount: $followerCount, followingCount: $followingCount, isFollowing: $isFollowing, isMe: $isMe, gradeStats: $gradeStats, badges: $badges, recentHighlights: $recentHighlights)';
   }
 }
 
-abstract class _UserProfile implements UserProfile {
-  const factory _UserProfile(
-      {required final String id,
-      required final String nickname,
-      final String? profileImageUrl,
-      final String? bio,
-      required final int followerCount,
-      required final int followingCount,
-      required final bool isFollowing,
-      required final bool isMe,
-      final GradeStats? gradeStats,
-      final List<BadgeSummary> badges,
-      final List<HighlightSummary> recentHighlights}) = _$UserProfileImpl;
+/// @nodoc
+abstract mixin class _$UserProfileCopyWith<$Res>
+    implements $UserProfileCopyWith<$Res> {
+  factory _$UserProfileCopyWith(
+          _UserProfile value, $Res Function(_UserProfile) _then) =
+      __$UserProfileCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      String nickname,
+      String? profileImageUrl,
+      String? bio,
+      int followerCount,
+      int followingCount,
+      bool isFollowing,
+      bool isMe,
+      GradeStats? gradeStats,
+      List<BadgeSummary> badges,
+      List<HighlightSummary> recentHighlights});
 
-  factory _UserProfile.fromJson(Map<String, dynamic> json) =
-      _$UserProfileImpl.fromJson;
+  @override
+  $GradeStatsCopyWith<$Res>? get gradeStats;
+}
 
-  @override
-  String get id;
-  @override
-  String get nickname;
-  @override
-  String? get profileImageUrl;
-  @override
-  String? get bio;
-  @override
-  int get followerCount;
-  @override
-  int get followingCount;
-  @override
-  bool get isFollowing;
-  @override
-  bool get isMe;
-  @override
-  GradeStats? get gradeStats;
-  @override
-  List<BadgeSummary> get badges;
-  @override
-  List<HighlightSummary> get recentHighlights;
+/// @nodoc
+class __$UserProfileCopyWithImpl<$Res> implements _$UserProfileCopyWith<$Res> {
+  __$UserProfileCopyWithImpl(this._self, this._then);
+
+  final _UserProfile _self;
+  final $Res Function(_UserProfile) _then;
 
   /// Create a copy of UserProfile
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$UserProfileImplCopyWith<_$UserProfileImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? nickname = null,
+    Object? profileImageUrl = freezed,
+    Object? bio = freezed,
+    Object? followerCount = null,
+    Object? followingCount = null,
+    Object? isFollowing = null,
+    Object? isMe = null,
+    Object? gradeStats = freezed,
+    Object? badges = null,
+    Object? recentHighlights = null,
+  }) {
+    return _then(_UserProfile(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      nickname: null == nickname
+          ? _self.nickname
+          : nickname // ignore: cast_nullable_to_non_nullable
+              as String,
+      profileImageUrl: freezed == profileImageUrl
+          ? _self.profileImageUrl
+          : profileImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      bio: freezed == bio
+          ? _self.bio
+          : bio // ignore: cast_nullable_to_non_nullable
+              as String?,
+      followerCount: null == followerCount
+          ? _self.followerCount
+          : followerCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      followingCount: null == followingCount
+          ? _self.followingCount
+          : followingCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      isFollowing: null == isFollowing
+          ? _self.isFollowing
+          : isFollowing // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isMe: null == isMe
+          ? _self.isMe
+          : isMe // ignore: cast_nullable_to_non_nullable
+              as bool,
+      gradeStats: freezed == gradeStats
+          ? _self.gradeStats
+          : gradeStats // ignore: cast_nullable_to_non_nullable
+              as GradeStats?,
+      badges: null == badges
+          ? _self._badges
+          : badges // ignore: cast_nullable_to_non_nullable
+              as List<BadgeSummary>,
+      recentHighlights: null == recentHighlights
+          ? _self._recentHighlights
+          : recentHighlights // ignore: cast_nullable_to_non_nullable
+              as List<HighlightSummary>,
+    ));
+  }
+
+  /// Create a copy of UserProfile
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $GradeStatsCopyWith<$Res>? get gradeStats {
+    if (_self.gradeStats == null) {
+      return null;
+    }
+
+    return $GradeStatsCopyWith<$Res>(_self.gradeStats!, (value) {
+      return _then(_self.copyWith(gradeStats: value));
+    });
+  }
 }
+
+// dart format on

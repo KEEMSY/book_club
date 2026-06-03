@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,54 +9,45 @@ part of 'grade_state.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$GradeState {
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() loading,
-    required TResult Function(GradeSummary summary, bool recentGradeUp) loaded,
-    required TResult Function(String code, String message) error,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
-    TResult? Function()? loading,
-    TResult? Function(GradeSummary summary, bool recentGradeUp)? loaded,
-    TResult? Function(String code, String message)? error,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? loading,
-    TResult Function(GradeSummary summary, bool recentGradeUp)? loaded,
-    TResult Function(String code, String message)? error,
-    required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(GradeInitial value) initial,
-    required TResult Function(GradeLoading value) loading,
-    required TResult Function(GradeLoaded value) loaded,
-    required TResult Function(GradeError value) error,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(GradeInitial value)? initial,
-    TResult? Function(GradeLoading value)? loading,
-    TResult? Function(GradeLoaded value)? loaded,
-    TResult? Function(GradeError value)? error,
-  }) =>
-      throw _privateConstructorUsedError;
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is GradeState);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'GradeState()';
+  }
+}
+
+/// @nodoc
+class $GradeStateCopyWith<$Res> {
+  $GradeStateCopyWith(GradeState _, $Res Function(GradeState) __);
+}
+
+/// Adds pattern-matching-related methods to [GradeState].
+extension GradeStatePatterns on GradeState {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(GradeInitial value)? initial,
@@ -64,270 +55,273 @@ mixin _$GradeState {
     TResult Function(GradeLoaded value)? loaded,
     TResult Function(GradeError value)? error,
     required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
+  }) {
+    final _that = this;
+    switch (_that) {
+      case GradeInitial() when initial != null:
+        return initial(_that);
+      case GradeLoading() when loading != null:
+        return loading(_that);
+      case GradeLoaded() when loaded != null:
+        return loaded(_that);
+      case GradeError() when error != null:
+        return error(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(GradeInitial value) initial,
+    required TResult Function(GradeLoading value) loading,
+    required TResult Function(GradeLoaded value) loaded,
+    required TResult Function(GradeError value) error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case GradeInitial():
+        return initial(_that);
+      case GradeLoading():
+        return loading(_that);
+      case GradeLoaded():
+        return loaded(_that);
+      case GradeError():
+        return error(_that);
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(GradeInitial value)? initial,
+    TResult? Function(GradeLoading value)? loading,
+    TResult? Function(GradeLoaded value)? loaded,
+    TResult? Function(GradeError value)? error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case GradeInitial() when initial != null:
+        return initial(_that);
+      case GradeLoading() when loading != null:
+        return loading(_that);
+      case GradeLoaded() when loaded != null:
+        return loaded(_that);
+      case GradeError() when error != null:
+        return error(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initial,
+    TResult Function()? loading,
+    TResult Function(GradeSummary summary, bool recentGradeUp)? loaded,
+    TResult Function(String code, String message)? error,
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case GradeInitial() when initial != null:
+        return initial();
+      case GradeLoading() when loading != null:
+        return loading();
+      case GradeLoaded() when loaded != null:
+        return loaded(_that.summary, _that.recentGradeUp);
+      case GradeError() when error != null:
+        return error(_that.code, _that.message);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initial,
+    required TResult Function() loading,
+    required TResult Function(GradeSummary summary, bool recentGradeUp) loaded,
+    required TResult Function(String code, String message) error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case GradeInitial():
+        return initial();
+      case GradeLoading():
+        return loading();
+      case GradeLoaded():
+        return loaded(_that.summary, _that.recentGradeUp);
+      case GradeError():
+        return error(_that.code, _that.message);
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? initial,
+    TResult? Function()? loading,
+    TResult? Function(GradeSummary summary, bool recentGradeUp)? loaded,
+    TResult? Function(String code, String message)? error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case GradeInitial() when initial != null:
+        return initial();
+      case GradeLoading() when loading != null:
+        return loading();
+      case GradeLoaded() when loaded != null:
+        return loaded(_that.summary, _that.recentGradeUp);
+      case GradeError() when error != null:
+        return error(_that.code, _that.message);
+      case _:
+        return null;
+    }
+  }
 }
 
 /// @nodoc
-abstract class $GradeStateCopyWith<$Res> {
-  factory $GradeStateCopyWith(
-          GradeState value, $Res Function(GradeState) then) =
-      _$GradeStateCopyWithImpl<$Res, GradeState>;
-}
 
-/// @nodoc
-class _$GradeStateCopyWithImpl<$Res, $Val extends GradeState>
-    implements $GradeStateCopyWith<$Res> {
-  _$GradeStateCopyWithImpl(this._value, this._then);
+class GradeInitial implements GradeState {
+  const GradeInitial();
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is GradeInitial);
+  }
 
-  /// Create a copy of GradeState
-  /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-abstract class _$$GradeInitialImplCopyWith<$Res> {
-  factory _$$GradeInitialImplCopyWith(
-          _$GradeInitialImpl value, $Res Function(_$GradeInitialImpl) then) =
-      __$$GradeInitialImplCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$$GradeInitialImplCopyWithImpl<$Res>
-    extends _$GradeStateCopyWithImpl<$Res, _$GradeInitialImpl>
-    implements _$$GradeInitialImplCopyWith<$Res> {
-  __$$GradeInitialImplCopyWithImpl(
-      _$GradeInitialImpl _value, $Res Function(_$GradeInitialImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of GradeState
-  /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-
-class _$GradeInitialImpl implements GradeInitial {
-  const _$GradeInitialImpl();
+  @override
+  int get hashCode => runtimeType.hashCode;
 
   @override
   String toString() {
     return 'GradeState.initial()';
   }
+}
+
+/// @nodoc
+
+class GradeLoading implements GradeState {
+  const GradeLoading();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$GradeInitialImpl);
+        (other.runtimeType == runtimeType && other is GradeLoading);
   }
 
   @override
   int get hashCode => runtimeType.hashCode;
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() loading,
-    required TResult Function(GradeSummary summary, bool recentGradeUp) loaded,
-    required TResult Function(String code, String message) error,
-  }) {
-    return initial();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
-    TResult? Function()? loading,
-    TResult? Function(GradeSummary summary, bool recentGradeUp)? loaded,
-    TResult? Function(String code, String message)? error,
-  }) {
-    return initial?.call();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? loading,
-    TResult Function(GradeSummary summary, bool recentGradeUp)? loaded,
-    TResult Function(String code, String message)? error,
-    required TResult orElse(),
-  }) {
-    if (initial != null) {
-      return initial();
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(GradeInitial value) initial,
-    required TResult Function(GradeLoading value) loading,
-    required TResult Function(GradeLoaded value) loaded,
-    required TResult Function(GradeError value) error,
-  }) {
-    return initial(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(GradeInitial value)? initial,
-    TResult? Function(GradeLoading value)? loading,
-    TResult? Function(GradeLoaded value)? loaded,
-    TResult? Function(GradeError value)? error,
-  }) {
-    return initial?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(GradeInitial value)? initial,
-    TResult Function(GradeLoading value)? loading,
-    TResult Function(GradeLoaded value)? loaded,
-    TResult Function(GradeError value)? error,
-    required TResult orElse(),
-  }) {
-    if (initial != null) {
-      return initial(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class GradeInitial implements GradeState {
-  const factory GradeInitial() = _$GradeInitialImpl;
-}
-
-/// @nodoc
-abstract class _$$GradeLoadingImplCopyWith<$Res> {
-  factory _$$GradeLoadingImplCopyWith(
-          _$GradeLoadingImpl value, $Res Function(_$GradeLoadingImpl) then) =
-      __$$GradeLoadingImplCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$$GradeLoadingImplCopyWithImpl<$Res>
-    extends _$GradeStateCopyWithImpl<$Res, _$GradeLoadingImpl>
-    implements _$$GradeLoadingImplCopyWith<$Res> {
-  __$$GradeLoadingImplCopyWithImpl(
-      _$GradeLoadingImpl _value, $Res Function(_$GradeLoadingImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of GradeState
-  /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-
-class _$GradeLoadingImpl implements GradeLoading {
-  const _$GradeLoadingImpl();
 
   @override
   String toString() {
     return 'GradeState.loading()';
   }
+}
+
+/// @nodoc
+
+class GradeLoaded implements GradeState {
+  const GradeLoaded({required this.summary, this.recentGradeUp = false});
+
+  final GradeSummary summary;
+  @JsonKey()
+  final bool recentGradeUp;
+
+  /// Create a copy of GradeState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $GradeLoadedCopyWith<GradeLoaded> get copyWith =>
+      _$GradeLoadedCopyWithImpl<GradeLoaded>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$GradeLoadingImpl);
+        (other.runtimeType == runtimeType &&
+            other is GradeLoaded &&
+            (identical(other.summary, summary) || other.summary == summary) &&
+            (identical(other.recentGradeUp, recentGradeUp) ||
+                other.recentGradeUp == recentGradeUp));
   }
 
   @override
-  int get hashCode => runtimeType.hashCode;
+  int get hashCode => Object.hash(runtimeType, summary, recentGradeUp);
 
   @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() loading,
-    required TResult Function(GradeSummary summary, bool recentGradeUp) loaded,
-    required TResult Function(String code, String message) error,
-  }) {
-    return loading();
+  String toString() {
+    return 'GradeState.loaded(summary: $summary, recentGradeUp: $recentGradeUp)';
   }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
-    TResult? Function()? loading,
-    TResult? Function(GradeSummary summary, bool recentGradeUp)? loaded,
-    TResult? Function(String code, String message)? error,
-  }) {
-    return loading?.call();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? loading,
-    TResult Function(GradeSummary summary, bool recentGradeUp)? loaded,
-    TResult Function(String code, String message)? error,
-    required TResult orElse(),
-  }) {
-    if (loading != null) {
-      return loading();
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(GradeInitial value) initial,
-    required TResult Function(GradeLoading value) loading,
-    required TResult Function(GradeLoaded value) loaded,
-    required TResult Function(GradeError value) error,
-  }) {
-    return loading(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(GradeInitial value)? initial,
-    TResult? Function(GradeLoading value)? loading,
-    TResult? Function(GradeLoaded value)? loaded,
-    TResult? Function(GradeError value)? error,
-  }) {
-    return loading?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(GradeInitial value)? initial,
-    TResult Function(GradeLoading value)? loading,
-    TResult Function(GradeLoaded value)? loaded,
-    TResult Function(GradeError value)? error,
-    required TResult orElse(),
-  }) {
-    if (loading != null) {
-      return loading(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class GradeLoading implements GradeState {
-  const factory GradeLoading() = _$GradeLoadingImpl;
 }
 
 /// @nodoc
-abstract class _$$GradeLoadedImplCopyWith<$Res> {
-  factory _$$GradeLoadedImplCopyWith(
-          _$GradeLoadedImpl value, $Res Function(_$GradeLoadedImpl) then) =
-      __$$GradeLoadedImplCopyWithImpl<$Res>;
+abstract mixin class $GradeLoadedCopyWith<$Res>
+    implements $GradeStateCopyWith<$Res> {
+  factory $GradeLoadedCopyWith(
+          GradeLoaded value, $Res Function(GradeLoaded) _then) =
+      _$GradeLoadedCopyWithImpl;
   @useResult
   $Res call({GradeSummary summary, bool recentGradeUp});
 
@@ -335,28 +329,26 @@ abstract class _$$GradeLoadedImplCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$$GradeLoadedImplCopyWithImpl<$Res>
-    extends _$GradeStateCopyWithImpl<$Res, _$GradeLoadedImpl>
-    implements _$$GradeLoadedImplCopyWith<$Res> {
-  __$$GradeLoadedImplCopyWithImpl(
-      _$GradeLoadedImpl _value, $Res Function(_$GradeLoadedImpl) _then)
-      : super(_value, _then);
+class _$GradeLoadedCopyWithImpl<$Res> implements $GradeLoadedCopyWith<$Res> {
+  _$GradeLoadedCopyWithImpl(this._self, this._then);
+
+  final GradeLoaded _self;
+  final $Res Function(GradeLoaded) _then;
 
   /// Create a copy of GradeState
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
-  @override
   $Res call({
     Object? summary = null,
     Object? recentGradeUp = null,
   }) {
-    return _then(_$GradeLoadedImpl(
+    return _then(GradeLoaded(
       summary: null == summary
-          ? _value.summary
+          ? _self.summary
           : summary // ignore: cast_nullable_to_non_nullable
               as GradeSummary,
       recentGradeUp: null == recentGradeUp
-          ? _value.recentGradeUp
+          ? _self.recentGradeUp
           : recentGradeUp // ignore: cast_nullable_to_non_nullable
               as bool,
     ));
@@ -367,197 +359,32 @@ class __$$GradeLoadedImplCopyWithImpl<$Res>
   @override
   @pragma('vm:prefer-inline')
   $GradeSummaryCopyWith<$Res> get summary {
-    return $GradeSummaryCopyWith<$Res>(_value.summary, (value) {
-      return _then(_value.copyWith(summary: value));
+    return $GradeSummaryCopyWith<$Res>(_self.summary, (value) {
+      return _then(_self.copyWith(summary: value));
     });
   }
 }
 
 /// @nodoc
 
-class _$GradeLoadedImpl implements GradeLoaded {
-  const _$GradeLoadedImpl({required this.summary, this.recentGradeUp = false});
+class GradeError implements GradeState {
+  const GradeError({required this.code, required this.message});
 
-  @override
-  final GradeSummary summary;
-  @override
-  @JsonKey()
-  final bool recentGradeUp;
-
-  @override
-  String toString() {
-    return 'GradeState.loaded(summary: $summary, recentGradeUp: $recentGradeUp)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$GradeLoadedImpl &&
-            (identical(other.summary, summary) || other.summary == summary) &&
-            (identical(other.recentGradeUp, recentGradeUp) ||
-                other.recentGradeUp == recentGradeUp));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, summary, recentGradeUp);
-
-  /// Create a copy of GradeState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$GradeLoadedImplCopyWith<_$GradeLoadedImpl> get copyWith =>
-      __$$GradeLoadedImplCopyWithImpl<_$GradeLoadedImpl>(this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() loading,
-    required TResult Function(GradeSummary summary, bool recentGradeUp) loaded,
-    required TResult Function(String code, String message) error,
-  }) {
-    return loaded(summary, recentGradeUp);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
-    TResult? Function()? loading,
-    TResult? Function(GradeSummary summary, bool recentGradeUp)? loaded,
-    TResult? Function(String code, String message)? error,
-  }) {
-    return loaded?.call(summary, recentGradeUp);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? loading,
-    TResult Function(GradeSummary summary, bool recentGradeUp)? loaded,
-    TResult Function(String code, String message)? error,
-    required TResult orElse(),
-  }) {
-    if (loaded != null) {
-      return loaded(summary, recentGradeUp);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(GradeInitial value) initial,
-    required TResult Function(GradeLoading value) loading,
-    required TResult Function(GradeLoaded value) loaded,
-    required TResult Function(GradeError value) error,
-  }) {
-    return loaded(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(GradeInitial value)? initial,
-    TResult? Function(GradeLoading value)? loading,
-    TResult? Function(GradeLoaded value)? loaded,
-    TResult? Function(GradeError value)? error,
-  }) {
-    return loaded?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(GradeInitial value)? initial,
-    TResult Function(GradeLoading value)? loading,
-    TResult Function(GradeLoaded value)? loaded,
-    TResult Function(GradeError value)? error,
-    required TResult orElse(),
-  }) {
-    if (loaded != null) {
-      return loaded(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class GradeLoaded implements GradeState {
-  const factory GradeLoaded(
-      {required final GradeSummary summary,
-      final bool recentGradeUp}) = _$GradeLoadedImpl;
-
-  GradeSummary get summary;
-  bool get recentGradeUp;
-
-  /// Create a copy of GradeState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$GradeLoadedImplCopyWith<_$GradeLoadedImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class _$$GradeErrorImplCopyWith<$Res> {
-  factory _$$GradeErrorImplCopyWith(
-          _$GradeErrorImpl value, $Res Function(_$GradeErrorImpl) then) =
-      __$$GradeErrorImplCopyWithImpl<$Res>;
-  @useResult
-  $Res call({String code, String message});
-}
-
-/// @nodoc
-class __$$GradeErrorImplCopyWithImpl<$Res>
-    extends _$GradeStateCopyWithImpl<$Res, _$GradeErrorImpl>
-    implements _$$GradeErrorImplCopyWith<$Res> {
-  __$$GradeErrorImplCopyWithImpl(
-      _$GradeErrorImpl _value, $Res Function(_$GradeErrorImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of GradeState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? code = null,
-    Object? message = null,
-  }) {
-    return _then(_$GradeErrorImpl(
-      code: null == code
-          ? _value.code
-          : code // ignore: cast_nullable_to_non_nullable
-              as String,
-      message: null == message
-          ? _value.message
-          : message // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
-  }
-}
-
-/// @nodoc
-
-class _$GradeErrorImpl implements GradeError {
-  const _$GradeErrorImpl({required this.code, required this.message});
-
-  @override
   final String code;
-  @override
   final String message;
 
-  @override
-  String toString() {
-    return 'GradeState.error(code: $code, message: $message)';
-  }
+  /// Create a copy of GradeState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $GradeErrorCopyWith<GradeError> get copyWith =>
+      _$GradeErrorCopyWithImpl<GradeError>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$GradeErrorImpl &&
+            other is GradeError &&
             (identical(other.code, code) || other.code == code) &&
             (identical(other.message, message) || other.message == message));
   }
@@ -565,100 +392,47 @@ class _$GradeErrorImpl implements GradeError {
   @override
   int get hashCode => Object.hash(runtimeType, code, message);
 
+  @override
+  String toString() {
+    return 'GradeState.error(code: $code, message: $message)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $GradeErrorCopyWith<$Res>
+    implements $GradeStateCopyWith<$Res> {
+  factory $GradeErrorCopyWith(
+          GradeError value, $Res Function(GradeError) _then) =
+      _$GradeErrorCopyWithImpl;
+  @useResult
+  $Res call({String code, String message});
+}
+
+/// @nodoc
+class _$GradeErrorCopyWithImpl<$Res> implements $GradeErrorCopyWith<$Res> {
+  _$GradeErrorCopyWithImpl(this._self, this._then);
+
+  final GradeError _self;
+  final $Res Function(GradeError) _then;
+
   /// Create a copy of GradeState
   /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
   @pragma('vm:prefer-inline')
-  _$$GradeErrorImplCopyWith<_$GradeErrorImpl> get copyWith =>
-      __$$GradeErrorImplCopyWithImpl<_$GradeErrorImpl>(this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() loading,
-    required TResult Function(GradeSummary summary, bool recentGradeUp) loaded,
-    required TResult Function(String code, String message) error,
+  $Res call({
+    Object? code = null,
+    Object? message = null,
   }) {
-    return error(code, message);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
-    TResult? Function()? loading,
-    TResult? Function(GradeSummary summary, bool recentGradeUp)? loaded,
-    TResult? Function(String code, String message)? error,
-  }) {
-    return error?.call(code, message);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? loading,
-    TResult Function(GradeSummary summary, bool recentGradeUp)? loaded,
-    TResult Function(String code, String message)? error,
-    required TResult orElse(),
-  }) {
-    if (error != null) {
-      return error(code, message);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(GradeInitial value) initial,
-    required TResult Function(GradeLoading value) loading,
-    required TResult Function(GradeLoaded value) loaded,
-    required TResult Function(GradeError value) error,
-  }) {
-    return error(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(GradeInitial value)? initial,
-    TResult? Function(GradeLoading value)? loading,
-    TResult? Function(GradeLoaded value)? loaded,
-    TResult? Function(GradeError value)? error,
-  }) {
-    return error?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(GradeInitial value)? initial,
-    TResult Function(GradeLoading value)? loading,
-    TResult Function(GradeLoaded value)? loaded,
-    TResult Function(GradeError value)? error,
-    required TResult orElse(),
-  }) {
-    if (error != null) {
-      return error(this);
-    }
-    return orElse();
+    return _then(GradeError(
+      code: null == code
+          ? _self.code
+          : code // ignore: cast_nullable_to_non_nullable
+              as String,
+      message: null == message
+          ? _self.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
   }
 }
 
-abstract class GradeError implements GradeState {
-  const factory GradeError(
-      {required final String code,
-      required final String message}) = _$GradeErrorImpl;
-
-  String get code;
-  String get message;
-
-  /// Create a copy of GradeState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$GradeErrorImplCopyWith<_$GradeErrorImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
+// dart format on

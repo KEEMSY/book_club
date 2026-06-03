@@ -12,7 +12,9 @@ import logging
 import time
 
 import httpx
-from google.auth.transport.requests import Request as GoogleRequest  # type: ignore[import-not-found]
+from google.auth.transport.requests import (
+    Request as GoogleRequest,  # type: ignore[import-not-found]
+)
 from google.oauth2 import service_account  # type: ignore[import-not-found]
 
 logger = logging.getLogger(__name__)

@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,29 +9,52 @@ part of 'comment.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$Comment {
-  String get id => throw _privateConstructorUsedError;
-  PostAuthor get user => throw _privateConstructorUsedError;
-  String get content => throw _privateConstructorUsedError;
-  String? get parentId => throw _privateConstructorUsedError;
-  DateTime get createdAt => throw _privateConstructorUsedError;
+  String get id;
+  PostAuthor get user;
+  String get content;
+  String? get parentId;
+  DateTime get createdAt;
 
   /// Create a copy of Comment
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $CommentCopyWith<Comment> get copyWith => throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  $CommentCopyWith<Comment> get copyWith =>
+      _$CommentCopyWithImpl<Comment>(this as Comment, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is Comment &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.user, user) || other.user == user) &&
+            (identical(other.content, content) || other.content == content) &&
+            (identical(other.parentId, parentId) ||
+                other.parentId == parentId) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, id, user, content, parentId, createdAt);
+
+  @override
+  String toString() {
+    return 'Comment(id: $id, user: $user, content: $content, parentId: $parentId, createdAt: $createdAt)';
+  }
 }
 
 /// @nodoc
-abstract class $CommentCopyWith<$Res> {
-  factory $CommentCopyWith(Comment value, $Res Function(Comment) then) =
-      _$CommentCopyWithImpl<$Res, Comment>;
+abstract mixin class $CommentCopyWith<$Res> {
+  factory $CommentCopyWith(Comment value, $Res Function(Comment) _then) =
+      _$CommentCopyWithImpl;
   @useResult
   $Res call(
       {String id,
@@ -44,14 +67,11 @@ abstract class $CommentCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$CommentCopyWithImpl<$Res, $Val extends Comment>
-    implements $CommentCopyWith<$Res> {
-  _$CommentCopyWithImpl(this._value, this._then);
+class _$CommentCopyWithImpl<$Res> implements $CommentCopyWith<$Res> {
+  _$CommentCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final Comment _self;
+  final $Res Function(Comment) _then;
 
   /// Create a copy of Comment
   /// with the given fields replaced by the non-null parameter values.
@@ -64,28 +84,28 @@ class _$CommentCopyWithImpl<$Res, $Val extends Comment>
     Object? parentId = freezed,
     Object? createdAt = null,
   }) {
-    return _then(_value.copyWith(
+    return _then(_self.copyWith(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
       user: null == user
-          ? _value.user
+          ? _self.user
           : user // ignore: cast_nullable_to_non_nullable
               as PostAuthor,
       content: null == content
-          ? _value.content
+          ? _self.content
           : content // ignore: cast_nullable_to_non_nullable
               as String,
       parentId: freezed == parentId
-          ? _value.parentId
+          ? _self.parentId
           : parentId // ignore: cast_nullable_to_non_nullable
               as String?,
       createdAt: null == createdAt
-          ? _value.createdAt
+          ? _self.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
-    ) as $Val);
+    ));
   }
 
   /// Create a copy of Comment
@@ -93,78 +113,182 @@ class _$CommentCopyWithImpl<$Res, $Val extends Comment>
   @override
   @pragma('vm:prefer-inline')
   $PostAuthorCopyWith<$Res> get user {
-    return $PostAuthorCopyWith<$Res>(_value.user, (value) {
-      return _then(_value.copyWith(user: value) as $Val);
+    return $PostAuthorCopyWith<$Res>(_self.user, (value) {
+      return _then(_self.copyWith(user: value));
     });
   }
 }
 
-/// @nodoc
-abstract class _$$CommentImplCopyWith<$Res> implements $CommentCopyWith<$Res> {
-  factory _$$CommentImplCopyWith(
-          _$CommentImpl value, $Res Function(_$CommentImpl) then) =
-      __$$CommentImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {String id,
-      PostAuthor user,
-      String content,
-      String? parentId,
-      DateTime createdAt});
+/// Adds pattern-matching-related methods to [Comment].
+extension CommentPatterns on Comment {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
 
-  @override
-  $PostAuthorCopyWith<$Res> get user;
-}
-
-/// @nodoc
-class __$$CommentImplCopyWithImpl<$Res>
-    extends _$CommentCopyWithImpl<$Res, _$CommentImpl>
-    implements _$$CommentImplCopyWith<$Res> {
-  __$$CommentImplCopyWithImpl(
-      _$CommentImpl _value, $Res Function(_$CommentImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of Comment
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? user = null,
-    Object? content = null,
-    Object? parentId = freezed,
-    Object? createdAt = null,
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_Comment value)? $default, {
+    required TResult orElse(),
   }) {
-    return _then(_$CommentImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      user: null == user
-          ? _value.user
-          : user // ignore: cast_nullable_to_non_nullable
-              as PostAuthor,
-      content: null == content
-          ? _value.content
-          : content // ignore: cast_nullable_to_non_nullable
-              as String,
-      parentId: freezed == parentId
-          ? _value.parentId
-          : parentId // ignore: cast_nullable_to_non_nullable
-              as String?,
-      createdAt: null == createdAt
-          ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-    ));
+    final _that = this;
+    switch (_that) {
+      case _Comment() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_Comment value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _Comment():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_Comment value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _Comment() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String id, PostAuthor user, String content,
+            String? parentId, DateTime createdAt)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _Comment() when $default != null:
+        return $default(_that.id, _that.user, _that.content, _that.parentId,
+            _that.createdAt);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String id, PostAuthor user, String content,
+            String? parentId, DateTime createdAt)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _Comment():
+        return $default(_that.id, _that.user, _that.content, _that.parentId,
+            _that.createdAt);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String id, PostAuthor user, String content,
+            String? parentId, DateTime createdAt)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _Comment() when $default != null:
+        return $default(_that.id, _that.user, _that.content, _that.parentId,
+            _that.createdAt);
+      case _:
+        return null;
+    }
   }
 }
 
 /// @nodoc
 
-class _$CommentImpl implements _Comment {
-  const _$CommentImpl(
+class _Comment implements Comment {
+  const _Comment(
       {required this.id,
       required this.user,
       required this.content,
@@ -182,16 +306,19 @@ class _$CommentImpl implements _Comment {
   @override
   final DateTime createdAt;
 
+  /// Create a copy of Comment
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'Comment(id: $id, user: $user, content: $content, parentId: $parentId, createdAt: $createdAt)';
-  }
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$CommentCopyWith<_Comment> get copyWith =>
+      __$CommentCopyWithImpl<_Comment>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$CommentImpl &&
+            other is _Comment &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.user, user) || other.user == user) &&
             (identical(other.content, content) || other.content == content) &&
@@ -205,112 +332,129 @@ class _$CommentImpl implements _Comment {
   int get hashCode =>
       Object.hash(runtimeType, id, user, content, parentId, createdAt);
 
-  /// Create a copy of Comment
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$CommentImplCopyWith<_$CommentImpl> get copyWith =>
-      __$$CommentImplCopyWithImpl<_$CommentImpl>(this, _$identity);
-}
-
-abstract class _Comment implements Comment {
-  const factory _Comment(
-      {required final String id,
-      required final PostAuthor user,
-      required final String content,
-      final String? parentId,
-      required final DateTime createdAt}) = _$CommentImpl;
-
-  @override
-  String get id;
-  @override
-  PostAuthor get user;
-  @override
-  String get content;
-  @override
-  String? get parentId;
-  @override
-  DateTime get createdAt;
-
-  /// Create a copy of Comment
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$CommentImplCopyWith<_$CommentImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-mixin _$CommentPage {
-  List<Comment> get items => throw _privateConstructorUsedError;
-  String? get nextCursor => throw _privateConstructorUsedError;
-
-  /// Create a copy of CommentPage
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $CommentPageCopyWith<CommentPage> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $CommentPageCopyWith<$Res> {
-  factory $CommentPageCopyWith(
-          CommentPage value, $Res Function(CommentPage) then) =
-      _$CommentPageCopyWithImpl<$Res, CommentPage>;
-  @useResult
-  $Res call({List<Comment> items, String? nextCursor});
-}
-
-/// @nodoc
-class _$CommentPageCopyWithImpl<$Res, $Val extends CommentPage>
-    implements $CommentPageCopyWith<$Res> {
-  _$CommentPageCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of CommentPage
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? items = null,
-    Object? nextCursor = freezed,
-  }) {
-    return _then(_value.copyWith(
-      items: null == items
-          ? _value.items
-          : items // ignore: cast_nullable_to_non_nullable
-              as List<Comment>,
-      nextCursor: freezed == nextCursor
-          ? _value.nextCursor
-          : nextCursor // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ) as $Val);
+  String toString() {
+    return 'Comment(id: $id, user: $user, content: $content, parentId: $parentId, createdAt: $createdAt)';
   }
 }
 
 /// @nodoc
-abstract class _$$CommentPageImplCopyWith<$Res>
-    implements $CommentPageCopyWith<$Res> {
-  factory _$$CommentPageImplCopyWith(
-          _$CommentPageImpl value, $Res Function(_$CommentPageImpl) then) =
-      __$$CommentPageImplCopyWithImpl<$Res>;
+abstract mixin class _$CommentCopyWith<$Res> implements $CommentCopyWith<$Res> {
+  factory _$CommentCopyWith(_Comment value, $Res Function(_Comment) _then) =
+      __$CommentCopyWithImpl;
   @override
+  @useResult
+  $Res call(
+      {String id,
+      PostAuthor user,
+      String content,
+      String? parentId,
+      DateTime createdAt});
+
+  @override
+  $PostAuthorCopyWith<$Res> get user;
+}
+
+/// @nodoc
+class __$CommentCopyWithImpl<$Res> implements _$CommentCopyWith<$Res> {
+  __$CommentCopyWithImpl(this._self, this._then);
+
+  final _Comment _self;
+  final $Res Function(_Comment) _then;
+
+  /// Create a copy of Comment
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? user = null,
+    Object? content = null,
+    Object? parentId = freezed,
+    Object? createdAt = null,
+  }) {
+    return _then(_Comment(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      user: null == user
+          ? _self.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as PostAuthor,
+      content: null == content
+          ? _self.content
+          : content // ignore: cast_nullable_to_non_nullable
+              as String,
+      parentId: freezed == parentId
+          ? _self.parentId
+          : parentId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      createdAt: null == createdAt
+          ? _self.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
+
+  /// Create a copy of Comment
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $PostAuthorCopyWith<$Res> get user {
+    return $PostAuthorCopyWith<$Res>(_self.user, (value) {
+      return _then(_self.copyWith(user: value));
+    });
+  }
+}
+
+/// @nodoc
+mixin _$CommentPage {
+  List<Comment> get items;
+  String? get nextCursor;
+
+  /// Create a copy of CommentPage
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $CommentPageCopyWith<CommentPage> get copyWith =>
+      _$CommentPageCopyWithImpl<CommentPage>(this as CommentPage, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is CommentPage &&
+            const DeepCollectionEquality().equals(other.items, items) &&
+            (identical(other.nextCursor, nextCursor) ||
+                other.nextCursor == nextCursor));
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, const DeepCollectionEquality().hash(items), nextCursor);
+
+  @override
+  String toString() {
+    return 'CommentPage(items: $items, nextCursor: $nextCursor)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $CommentPageCopyWith<$Res> {
+  factory $CommentPageCopyWith(
+          CommentPage value, $Res Function(CommentPage) _then) =
+      _$CommentPageCopyWithImpl;
   @useResult
   $Res call({List<Comment> items, String? nextCursor});
 }
 
 /// @nodoc
-class __$$CommentPageImplCopyWithImpl<$Res>
-    extends _$CommentPageCopyWithImpl<$Res, _$CommentPageImpl>
-    implements _$$CommentPageImplCopyWith<$Res> {
-  __$$CommentPageImplCopyWithImpl(
-      _$CommentPageImpl _value, $Res Function(_$CommentPageImpl) _then)
-      : super(_value, _then);
+class _$CommentPageCopyWithImpl<$Res> implements $CommentPageCopyWith<$Res> {
+  _$CommentPageCopyWithImpl(this._self, this._then);
+
+  final CommentPage _self;
+  final $Res Function(CommentPage) _then;
 
   /// Create a copy of CommentPage
   /// with the given fields replaced by the non-null parameter values.
@@ -320,23 +464,180 @@ class __$$CommentPageImplCopyWithImpl<$Res>
     Object? items = null,
     Object? nextCursor = freezed,
   }) {
-    return _then(_$CommentPageImpl(
+    return _then(_self.copyWith(
       items: null == items
-          ? _value._items
+          ? _self.items
           : items // ignore: cast_nullable_to_non_nullable
               as List<Comment>,
       nextCursor: freezed == nextCursor
-          ? _value.nextCursor
+          ? _self.nextCursor
           : nextCursor // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [CommentPage].
+extension CommentPagePatterns on CommentPage {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_CommentPage value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _CommentPage() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_CommentPage value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _CommentPage():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_CommentPage value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _CommentPage() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(List<Comment> items, String? nextCursor)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _CommentPage() when $default != null:
+        return $default(_that.items, _that.nextCursor);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(List<Comment> items, String? nextCursor) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _CommentPage():
+        return $default(_that.items, _that.nextCursor);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(List<Comment> items, String? nextCursor)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _CommentPage() when $default != null:
+        return $default(_that.items, _that.nextCursor);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 
-class _$CommentPageImpl implements _CommentPage {
-  const _$CommentPageImpl({required final List<Comment> items, this.nextCursor})
+class _CommentPage implements CommentPage {
+  const _CommentPage({required final List<Comment> items, this.nextCursor})
       : _items = items;
 
   final List<Comment> _items;
@@ -350,16 +651,19 @@ class _$CommentPageImpl implements _CommentPage {
   @override
   final String? nextCursor;
 
+  /// Create a copy of CommentPage
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'CommentPage(items: $items, nextCursor: $nextCursor)';
-  }
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$CommentPageCopyWith<_CommentPage> get copyWith =>
+      __$CommentPageCopyWithImpl<_CommentPage>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$CommentPageImpl &&
+            other is _CommentPage &&
             const DeepCollectionEquality().equals(other._items, _items) &&
             (identical(other.nextCursor, nextCursor) ||
                 other.nextCursor == nextCursor));
@@ -369,29 +673,49 @@ class _$CommentPageImpl implements _CommentPage {
   int get hashCode => Object.hash(
       runtimeType, const DeepCollectionEquality().hash(_items), nextCursor);
 
+  @override
+  String toString() {
+    return 'CommentPage(items: $items, nextCursor: $nextCursor)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$CommentPageCopyWith<$Res>
+    implements $CommentPageCopyWith<$Res> {
+  factory _$CommentPageCopyWith(
+          _CommentPage value, $Res Function(_CommentPage) _then) =
+      __$CommentPageCopyWithImpl;
+  @override
+  @useResult
+  $Res call({List<Comment> items, String? nextCursor});
+}
+
+/// @nodoc
+class __$CommentPageCopyWithImpl<$Res> implements _$CommentPageCopyWith<$Res> {
+  __$CommentPageCopyWithImpl(this._self, this._then);
+
+  final _CommentPage _self;
+  final $Res Function(_CommentPage) _then;
+
   /// Create a copy of CommentPage
   /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$CommentPageImplCopyWith<_$CommentPageImpl> get copyWith =>
-      __$$CommentPageImplCopyWithImpl<_$CommentPageImpl>(this, _$identity);
+  $Res call({
+    Object? items = null,
+    Object? nextCursor = freezed,
+  }) {
+    return _then(_CommentPage(
+      items: null == items
+          ? _self._items
+          : items // ignore: cast_nullable_to_non_nullable
+              as List<Comment>,
+      nextCursor: freezed == nextCursor
+          ? _self.nextCursor
+          : nextCursor // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
 }
 
-abstract class _CommentPage implements CommentPage {
-  const factory _CommentPage(
-      {required final List<Comment> items,
-      final String? nextCursor}) = _$CommentPageImpl;
-
-  @override
-  List<Comment> get items;
-  @override
-  String? get nextCursor;
-
-  /// Create a copy of CommentPage
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$CommentPageImplCopyWith<_$CommentPageImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
+// dart format on

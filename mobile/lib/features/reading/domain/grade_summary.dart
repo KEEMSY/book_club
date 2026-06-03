@@ -7,7 +7,7 @@ part 'grade_summary.freezed.dart';
 /// Remaining distance to the next grade (books + seconds). Null when the user
 /// has reached grade 5 (서재 마스터).
 @freezed
-class NextGradeThresholds with _$NextGradeThresholds {
+abstract class NextGradeThresholds with _$NextGradeThresholds {
   const factory NextGradeThresholds({
     required int targetBooks,
     required int targetSeconds,
@@ -22,7 +22,7 @@ class NextGradeThresholds with _$NextGradeThresholds {
 /// [tier] is a 1–3 sub-division within each grade (added in backend v2).
 /// Defaults to 1 so existing API responses without the field remain valid.
 @freezed
-class GradeSummary with _$GradeSummary {
+abstract class GradeSummary with _$GradeSummary {
   const GradeSummary._();
 
   const factory GradeSummary({

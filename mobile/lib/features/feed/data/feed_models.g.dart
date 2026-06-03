@@ -6,22 +6,21 @@ part of 'feed_models.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$PostAuthorDtoImpl _$$PostAuthorDtoImplFromJson(Map<String, dynamic> json) =>
-    _$PostAuthorDtoImpl(
+_PostAuthorDto _$PostAuthorDtoFromJson(Map<String, dynamic> json) =>
+    _PostAuthorDto(
       id: json['id'] as String,
       nickname: json['nickname'] as String,
       profileImageUrl: json['profile_image_url'] as String?,
     );
 
-Map<String, dynamic> _$$PostAuthorDtoImplToJson(_$PostAuthorDtoImpl instance) =>
+Map<String, dynamic> _$PostAuthorDtoToJson(_PostAuthorDto instance) =>
     <String, dynamic>{
       'id': instance.id,
       'nickname': instance.nickname,
       'profile_image_url': instance.profileImageUrl,
     };
 
-_$PostDtoImpl _$$PostDtoImplFromJson(Map<String, dynamic> json) =>
-    _$PostDtoImpl(
+_PostDto _$PostDtoFromJson(Map<String, dynamic> json) => _PostDto(
       id: json['id'] as String,
       bookId: json['book_id'] as String,
       bookTitle: json['book_title'] as String?,
@@ -40,8 +39,7 @@ _$PostDtoImpl _$$PostDtoImplFromJson(Map<String, dynamic> json) =>
       createdAt: DateTime.parse(json['created_at'] as String),
     );
 
-Map<String, dynamic> _$$PostDtoImplToJson(_$PostDtoImpl instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$PostDtoToJson(_PostDto instance) => <String, dynamic>{
       'id': instance.id,
       'book_id': instance.bookId,
       'book_title': instance.bookTitle,
@@ -56,23 +54,21 @@ Map<String, dynamic> _$$PostDtoImplToJson(_$PostDtoImpl instance) =>
       'created_at': instance.createdAt.toIso8601String(),
     };
 
-_$PostPageDtoImpl _$$PostPageDtoImplFromJson(Map<String, dynamic> json) =>
-    _$PostPageDtoImpl(
+_PostPageDto _$PostPageDtoFromJson(Map<String, dynamic> json) => _PostPageDto(
       items: (json['items'] as List<dynamic>)
           .map((e) => PostDto.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextCursor: json['next_cursor'] as String?,
     );
 
-Map<String, dynamic> _$$PostPageDtoImplToJson(_$PostPageDtoImpl instance) =>
+Map<String, dynamic> _$PostPageDtoToJson(_PostPageDto instance) =>
     <String, dynamic>{
       'items': instance.items.map((e) => e.toJson()).toList(),
       'next_cursor': instance.nextCursor,
     };
 
-_$CreatePostRequestImpl _$$CreatePostRequestImplFromJson(
-        Map<String, dynamic> json) =>
-    _$CreatePostRequestImpl(
+_CreatePostRequest _$CreatePostRequestFromJson(Map<String, dynamic> json) =>
+    _CreatePostRequest(
       bookId: json['book_id'] as String,
       postType: json['post_type'] as String,
       content: json['content'] as String,
@@ -81,8 +77,7 @@ _$CreatePostRequestImpl _$$CreatePostRequestImplFromJson(
           .toList(),
     );
 
-Map<String, dynamic> _$$CreatePostRequestImplToJson(
-        _$CreatePostRequestImpl instance) =>
+Map<String, dynamic> _$CreatePostRequestToJson(_CreatePostRequest instance) =>
     <String, dynamic>{
       'book_id': instance.bookId,
       'post_type': instance.postType,
@@ -90,29 +85,28 @@ Map<String, dynamic> _$$CreatePostRequestImplToJson(
       'image_keys': instance.imageKeys,
     };
 
-_$PresignImageRequestImpl _$$PresignImageRequestImplFromJson(
-        Map<String, dynamic> json) =>
-    _$PresignImageRequestImpl(
+_PresignImageRequest _$PresignImageRequestFromJson(Map<String, dynamic> json) =>
+    _PresignImageRequest(
       contentType: json['content_type'] as String,
     );
 
-Map<String, dynamic> _$$PresignImageRequestImplToJson(
-        _$PresignImageRequestImpl instance) =>
+Map<String, dynamic> _$PresignImageRequestToJson(
+        _PresignImageRequest instance) =>
     <String, dynamic>{
       'content_type': instance.contentType,
     };
 
-_$PresignImageResponseImpl _$$PresignImageResponseImplFromJson(
+_PresignImageResponse _$PresignImageResponseFromJson(
         Map<String, dynamic> json) =>
-    _$PresignImageResponseImpl(
+    _PresignImageResponse(
       url: json['url'] as String,
       key: json['key'] as String,
       headers: Map<String, String>.from(json['headers'] as Map),
       expiresIn: (json['expires_in'] as num).toInt(),
     );
 
-Map<String, dynamic> _$$PresignImageResponseImplToJson(
-        _$PresignImageResponseImpl instance) =>
+Map<String, dynamic> _$PresignImageResponseToJson(
+        _PresignImageResponse instance) =>
     <String, dynamic>{
       'url': instance.url,
       'key': instance.key,
@@ -120,34 +114,29 @@ Map<String, dynamic> _$$PresignImageResponseImplToJson(
       'expires_in': instance.expiresIn,
     };
 
-_$ReactionRequestImpl _$$ReactionRequestImplFromJson(
-        Map<String, dynamic> json) =>
-    _$ReactionRequestImpl(
+_ReactionRequest _$ReactionRequestFromJson(Map<String, dynamic> json) =>
+    _ReactionRequest(
       reactionType: json['reaction_type'] as String,
     );
 
-Map<String, dynamic> _$$ReactionRequestImplToJson(
-        _$ReactionRequestImpl instance) =>
+Map<String, dynamic> _$ReactionRequestToJson(_ReactionRequest instance) =>
     <String, dynamic>{
       'reaction_type': instance.reactionType,
     };
 
-_$ReactionResponseImpl _$$ReactionResponseImplFromJson(
-        Map<String, dynamic> json) =>
-    _$ReactionResponseImpl(
+_ReactionResponse _$ReactionResponseFromJson(Map<String, dynamic> json) =>
+    _ReactionResponse(
       state: json['state'] as String,
       counts: Map<String, int>.from(json['counts'] as Map),
     );
 
-Map<String, dynamic> _$$ReactionResponseImplToJson(
-        _$ReactionResponseImpl instance) =>
+Map<String, dynamic> _$ReactionResponseToJson(_ReactionResponse instance) =>
     <String, dynamic>{
       'state': instance.state,
       'counts': instance.counts,
     };
 
-_$CommentDtoImpl _$$CommentDtoImplFromJson(Map<String, dynamic> json) =>
-    _$CommentDtoImpl(
+_CommentDto _$CommentDtoFromJson(Map<String, dynamic> json) => _CommentDto(
       id: json['id'] as String,
       user: PostAuthorDto.fromJson(json['user'] as Map<String, dynamic>),
       content: json['content'] as String,
@@ -155,7 +144,7 @@ _$CommentDtoImpl _$$CommentDtoImplFromJson(Map<String, dynamic> json) =>
       createdAt: DateTime.parse(json['created_at'] as String),
     );
 
-Map<String, dynamic> _$$CommentDtoImplToJson(_$CommentDtoImpl instance) =>
+Map<String, dynamic> _$CommentDtoToJson(_CommentDto instance) =>
     <String, dynamic>{
       'id': instance.id,
       'user': instance.user.toJson(),
@@ -164,37 +153,36 @@ Map<String, dynamic> _$$CommentDtoImplToJson(_$CommentDtoImpl instance) =>
       'created_at': instance.createdAt.toIso8601String(),
     };
 
-_$CommentPageDtoImpl _$$CommentPageDtoImplFromJson(Map<String, dynamic> json) =>
-    _$CommentPageDtoImpl(
+_CommentPageDto _$CommentPageDtoFromJson(Map<String, dynamic> json) =>
+    _CommentPageDto(
       items: (json['items'] as List<dynamic>)
           .map((e) => CommentDto.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextCursor: json['next_cursor'] as String?,
     );
 
-Map<String, dynamic> _$$CommentPageDtoImplToJson(
-        _$CommentPageDtoImpl instance) =>
+Map<String, dynamic> _$CommentPageDtoToJson(_CommentPageDto instance) =>
     <String, dynamic>{
       'items': instance.items.map((e) => e.toJson()).toList(),
       'next_cursor': instance.nextCursor,
     };
 
-_$CreateCommentRequestImpl _$$CreateCommentRequestImplFromJson(
+_CreateCommentRequest _$CreateCommentRequestFromJson(
         Map<String, dynamic> json) =>
-    _$CreateCommentRequestImpl(
+    _CreateCommentRequest(
       parentId: json['parent_id'] as String?,
       content: json['content'] as String,
     );
 
-Map<String, dynamic> _$$CreateCommentRequestImplToJson(
-        _$CreateCommentRequestImpl instance) =>
+Map<String, dynamic> _$CreateCommentRequestToJson(
+        _CreateCommentRequest instance) =>
     <String, dynamic>{
       'parent_id': instance.parentId,
       'content': instance.content,
     };
 
-_$HighlightDtoImpl _$$HighlightDtoImplFromJson(Map<String, dynamic> json) =>
-    _$HighlightDtoImpl(
+_HighlightDto _$HighlightDtoFromJson(Map<String, dynamic> json) =>
+    _HighlightDto(
       id: json['id'] as String,
       userBookId: json['user_book_id'] as String,
       quoteText: json['quote_text'] as String,
@@ -203,7 +191,7 @@ _$HighlightDtoImpl _$$HighlightDtoImplFromJson(Map<String, dynamic> json) =>
       createdAt: DateTime.parse(json['created_at'] as String),
     );
 
-Map<String, dynamic> _$$HighlightDtoImplToJson(_$HighlightDtoImpl instance) =>
+Map<String, dynamic> _$HighlightDtoToJson(_HighlightDto instance) =>
     <String, dynamic>{
       'id': instance.id,
       'user_book_id': instance.userBookId,
@@ -213,41 +201,39 @@ Map<String, dynamic> _$$HighlightDtoImplToJson(_$HighlightDtoImpl instance) =>
       'created_at': instance.createdAt.toIso8601String(),
     };
 
-_$HighlightPageDtoImpl _$$HighlightPageDtoImplFromJson(
-        Map<String, dynamic> json) =>
-    _$HighlightPageDtoImpl(
+_HighlightPageDto _$HighlightPageDtoFromJson(Map<String, dynamic> json) =>
+    _HighlightPageDto(
       items: (json['items'] as List<dynamic>)
           .map((e) => HighlightDto.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextCursor: json['next_cursor'] as String?,
     );
 
-Map<String, dynamic> _$$HighlightPageDtoImplToJson(
-        _$HighlightPageDtoImpl instance) =>
+Map<String, dynamic> _$HighlightPageDtoToJson(_HighlightPageDto instance) =>
     <String, dynamic>{
       'items': instance.items.map((e) => e.toJson()).toList(),
       'next_cursor': instance.nextCursor,
     };
 
-_$CreateHighlightRequestImpl _$$CreateHighlightRequestImplFromJson(
+_CreateHighlightRequest _$CreateHighlightRequestFromJson(
         Map<String, dynamic> json) =>
-    _$CreateHighlightRequestImpl(
+    _CreateHighlightRequest(
       quoteText: json['quote_text'] as String,
       pageNumber: (json['page_number'] as num?)?.toInt(),
       noteText: json['note_text'] as String?,
     );
 
-Map<String, dynamic> _$$CreateHighlightRequestImplToJson(
-        _$CreateHighlightRequestImpl instance) =>
+Map<String, dynamic> _$CreateHighlightRequestToJson(
+        _CreateHighlightRequest instance) =>
     <String, dynamic>{
       'quote_text': instance.quoteText,
       'page_number': instance.pageNumber,
       'note_text': instance.noteText,
     };
 
-_$BookHighlightGroupDtoImpl _$$BookHighlightGroupDtoImplFromJson(
+_BookHighlightGroupDto _$BookHighlightGroupDtoFromJson(
         Map<String, dynamic> json) =>
-    _$BookHighlightGroupDtoImpl(
+    _BookHighlightGroupDto(
       userBookId: json['user_book_id'] as String,
       bookId: json['book_id'] as String,
       bookTitle: json['book_title'] as String?,
@@ -257,8 +243,8 @@ _$BookHighlightGroupDtoImpl _$$BookHighlightGroupDtoImplFromJson(
           .toList(),
     );
 
-Map<String, dynamic> _$$BookHighlightGroupDtoImplToJson(
-        _$BookHighlightGroupDtoImpl instance) =>
+Map<String, dynamic> _$BookHighlightGroupDtoToJson(
+        _BookHighlightGroupDto instance) =>
     <String, dynamic>{
       'user_book_id': instance.userBookId,
       'book_id': instance.bookId,
@@ -267,16 +253,16 @@ Map<String, dynamic> _$$BookHighlightGroupDtoImplToJson(
       'highlights': instance.highlights.map((e) => e.toJson()).toList(),
     };
 
-_$AllHighlightsResponseDtoImpl _$$AllHighlightsResponseDtoImplFromJson(
+_AllHighlightsResponseDto _$AllHighlightsResponseDtoFromJson(
         Map<String, dynamic> json) =>
-    _$AllHighlightsResponseDtoImpl(
+    _AllHighlightsResponseDto(
       groups: (json['groups'] as List<dynamic>)
           .map((e) => BookHighlightGroupDto.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
-Map<String, dynamic> _$$AllHighlightsResponseDtoImplToJson(
-        _$AllHighlightsResponseDtoImpl instance) =>
+Map<String, dynamic> _$AllHighlightsResponseDtoToJson(
+        _AllHighlightsResponseDto instance) =>
     <String, dynamic>{
       'groups': instance.groups.map((e) => e.toJson()).toList(),
     };

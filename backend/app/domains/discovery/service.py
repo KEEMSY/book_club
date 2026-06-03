@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TypedDict
+from typing import TYPE_CHECKING, TypedDict
 from uuid import UUID
 
 from app.domains.discovery.repository import DiscoveryRepository
+
+if TYPE_CHECKING:
+    from app.domains.discovery.ml.port import MLRecommendationPort
 
 
 class RecommendedBookItem(TypedDict):
@@ -18,6 +21,21 @@ class RecommendedBookItem(TypedDict):
 @dataclass(slots=True)
 class DiscoveryService:
     repo: DiscoveryRepository
+    ml: MLRecommendationPort | None = None
+
+    async def get_ml_recommendations(self, user_id: UUID) -> list[RecommendedBookItem]:
+        """Return ML-powered item-CF recommendations, falling back to rule-based.
+
+        Falls back when:
+        - No ML engine is wired (ml is None).
+        - The engine signals a cold-start by returning an empty list.
+        """
+        if self.ml is not None:
+            ml_results = await self.ml.recommend(user_id)
+            if ml_results:
+                return ml_results
+        # Cold-start or unconfigured engine — delegate to rule-based path.
+        return await self.get_recommendations(user_id)
 
     async def get_recommendations(self, user_id: UUID) -> list[RecommendedBookItem]:
         popular = await self.repo.community_popular(user_id=user_id)

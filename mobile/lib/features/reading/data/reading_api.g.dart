@@ -6,7 +6,7 @@ part of 'reading_api.dart';
 // RetrofitGenerator
 // **************************************************************************
 
-// ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations
+// ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations,unused_element_parameter
 
 class _ReadingApi implements ReadingApi {
   _ReadingApi(this._dio, {this.baseUrl, this.errorLogger});
@@ -272,7 +272,10 @@ class _ReadingApi implements ReadingApi {
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
     late Map<String, dynamic> _value;
     try {
-      _value = _result.data!;
+      _value = _result.data!.map(
+        (k, dynamic v) =>
+            MapEntry(k, dynamic.fromJson(v as Map<String, dynamic>)),
+      );
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;
@@ -299,7 +302,10 @@ class _ReadingApi implements ReadingApi {
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
     late Map<String, dynamic>? _value;
     try {
-      _value = _result.data;
+      _value = _result.data?.map(
+        (k, dynamic v) =>
+            MapEntry(k, dynamic.fromJson(v as Map<String, dynamic>)),
+      );
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;

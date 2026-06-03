@@ -32,7 +32,7 @@ enum ReadingSessionSource {
 /// Domain-layer projection of `ReadingSessionPublic`. [endedAt] and
 /// [durationSec] are null while the session is still running.
 @freezed
-class ReadingSession with _$ReadingSession {
+abstract class ReadingSession with _$ReadingSession {
   const factory ReadingSession({
     required String id,
     required String userBookId,

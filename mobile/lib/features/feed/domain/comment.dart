@@ -11,7 +11,7 @@ part 'comment.freezed.dart';
 /// reply. The UI honours this by disabling the "답글" affordance on tiles
 /// that already carry a [parentId].
 @freezed
-class Comment with _$Comment {
+abstract class Comment with _$Comment {
   const factory Comment({
     required String id,
     required PostAuthor user,
@@ -25,7 +25,7 @@ class Comment with _$Comment {
 /// (oldest first) so the sheet can append fresh pages naturally as the user
 /// scrolls down.
 @freezed
-class CommentPage with _$CommentPage {
+abstract class CommentPage with _$CommentPage {
   const factory CommentPage({
     required List<Comment> items,
     String? nextCursor,

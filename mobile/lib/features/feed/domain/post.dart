@@ -15,7 +15,7 @@ part 'post.freezed.dart';
 /// [myReactions] is the set of reactions the current user has applied. The
 /// reaction bar uses `myReactions.contains(...)` to drive the active state.
 @freezed
-class Post with _$Post {
+abstract class Post with _$Post {
   const factory Post({
     required String id,
     required String bookId,
@@ -36,7 +36,7 @@ class Post with _$Post {
 /// `null` when the server has no more rows; the notifier stops requesting
 /// further pages at that point.
 @freezed
-class PostPage with _$PostPage {
+abstract class PostPage with _$PostPage {
   const factory PostPage({
     required List<Post> items,
     String? nextCursor,
@@ -48,7 +48,7 @@ class PostPage with _$PostPage {
 /// without a follow-up GET, and [state] tells us whether to add or remove the
 /// reaction from `myReactions`.
 @freezed
-class ReactionToggleResult with _$ReactionToggleResult {
+abstract class ReactionToggleResult with _$ReactionToggleResult {
   const factory ReactionToggleResult({
     required ReactionToggleState state,
     required Map<ReactionType, int> counts,

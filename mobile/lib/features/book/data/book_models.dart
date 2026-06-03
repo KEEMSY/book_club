@@ -12,7 +12,7 @@ part 'book_models.g.dart';
 /// as strings here; conversion to domain enums happens at the repository
 /// boundary via [BookDto.toDomain].
 @freezed
-class BookDto with _$BookDto {
+abstract class BookDto with _$BookDto {
   const BookDto._();
 
   const factory BookDto({
@@ -45,7 +45,7 @@ class BookDto with _$BookDto {
 /// snake_case string (`reading`, `completed`, etc.); we parse into the Dart
 /// enum on the domain-side via [UserBookDto.toDomain].
 @freezed
-class UserBookDto with _$UserBookDto {
+abstract class UserBookDto with _$UserBookDto {
   const UserBookDto._();
 
   const factory UserBookDto({
@@ -76,7 +76,7 @@ class UserBookDto with _$UserBookDto {
 
 /// `GET /books/search` response envelope.
 @freezed
-class BookSearchResponse with _$BookSearchResponse {
+abstract class BookSearchResponse with _$BookSearchResponse {
   const factory BookSearchResponse({
     required List<BookDto> items,
     required int page,
@@ -91,7 +91,7 @@ class BookSearchResponse with _$BookSearchResponse {
 /// `GET /me/library` cursor-paginated envelope. [nextCursor] is null when
 /// the server has no more rows — the client stops requesting at that point.
 @freezed
-class LibraryPageDto with _$LibraryPageDto {
+abstract class LibraryPageDto with _$LibraryPageDto {
   const factory LibraryPageDto({
     required List<UserBookDto> items,
     String? nextCursor,
@@ -103,7 +103,7 @@ class LibraryPageDto with _$LibraryPageDto {
 
 /// Request body for `POST /me/library`.
 @freezed
-class AddToLibraryRequest with _$AddToLibraryRequest {
+abstract class AddToLibraryRequest with _$AddToLibraryRequest {
   const factory AddToLibraryRequest({
     required String bookId,
     @Default('reading') String status,
@@ -117,7 +117,7 @@ class AddToLibraryRequest with _$AddToLibraryRequest {
 /// as a raw string here so we can continue to default `field_rename: snake`
 /// without a custom converter.
 @freezed
-class UpdateStatusRequest with _$UpdateStatusRequest {
+abstract class UpdateStatusRequest with _$UpdateStatusRequest {
   const factory UpdateStatusRequest({
     required String status,
   }) = _UpdateStatusRequest;
@@ -128,7 +128,7 @@ class UpdateStatusRequest with _$UpdateStatusRequest {
 
 /// Single horizontal section returned by `GET /books/discover`.
 @freezed
-class DiscoverSectionDto with _$DiscoverSectionDto {
+abstract class DiscoverSectionDto with _$DiscoverSectionDto {
   const factory DiscoverSectionDto({
     required String id,
     required String title,
@@ -140,7 +140,7 @@ class DiscoverSectionDto with _$DiscoverSectionDto {
 
 /// Top-level envelope for `GET /books/discover`.
 @freezed
-class DiscoverResponseDto with _$DiscoverResponseDto {
+abstract class DiscoverResponseDto with _$DiscoverResponseDto {
   const factory DiscoverResponseDto({
     required List<DiscoverSectionDto> sections,
   }) = _DiscoverResponseDto;
@@ -153,7 +153,7 @@ class DiscoverResponseDto with _$DiscoverResponseDto {
 /// stays nullable because the review field is optional — the backend accepts
 /// a rating-only submission and auto-transitions status to completed.
 @freezed
-class SubmitReviewRequest with _$SubmitReviewRequest {
+abstract class SubmitReviewRequest with _$SubmitReviewRequest {
   const factory SubmitReviewRequest({
     required int rating,
     String? oneLineReview,
@@ -165,7 +165,7 @@ class SubmitReviewRequest with _$SubmitReviewRequest {
 
 /// Single review item from `GET /books/{book_id}/reviews`.
 @freezed
-class BookReviewDto with _$BookReviewDto {
+abstract class BookReviewDto with _$BookReviewDto {
   const BookReviewDto._();
 
   const factory BookReviewDto({
@@ -194,7 +194,7 @@ class BookReviewDto with _$BookReviewDto {
 
 /// Response envelope for `GET /books/{book_id}/reviews`.
 @freezed
-class BookReviewsResponseDto with _$BookReviewsResponseDto {
+abstract class BookReviewsResponseDto with _$BookReviewsResponseDto {
   const factory BookReviewsResponseDto({
     required List<BookReviewDto> items,
   }) = _BookReviewsResponseDto;

@@ -32,6 +32,7 @@ from app.domains.reading.repository import (
     DailyStatRepository,
     GoalRepository,
     ReadingSessionRepository,
+    ReadingStatsRepository,
     UserGradeRepository,
 )
 from app.domains.reading.service import ReadingService
@@ -178,4 +179,5 @@ def get_reading_service(
         bus=bus,
         stage_event=_stage,
         bookmark_repo=BookmarkRepository(session),
+        stats_repo=ReadingStatsRepository(session),
     )

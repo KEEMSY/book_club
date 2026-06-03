@@ -82,7 +82,10 @@ class DiscoveryScreen extends ConsumerWidget {
             // ── 맞춤 추천 (personalized, shown only when available) ──────
             if (recs.isNotEmpty) ...[
               const SliverToBoxAdapter(
-                child: _SectionHeader(title: '맞춤 추천'),
+                child: _SectionHeader(
+                  title: '당신만을 위한 추천',
+                  subtitle: '읽기 기록을 바탕으로 골랐어요',
+                ),
               ),
               SliverToBoxAdapter(
                 child: _BookRow(
@@ -93,6 +96,7 @@ class DiscoveryScreen extends ConsumerWidget {
                           title: r.title,
                           author: r.author,
                           coverUrl: r.coverUrl,
+                          reason: r.reason,
                         ),
                       )
                       .toList(growable: false),
@@ -127,6 +131,21 @@ class DiscoveryScreen extends ConsumerWidget {
   }
 }
 
+/// Maps a raw reason string from the ML recommendation API to a short
+/// human-readable Korean label shown on the card chip.
+String? _reasonLabel(String? reason) {
+  switch (reason) {
+    case 'community_popular':
+      return '많이 읽힌 책';
+    case 'similar_readers':
+      return '비슷한 독자들이 읽은 책';
+    case 'recently_added':
+      return '최근 많이 읽힌 책';
+    default:
+      return null;
+  }
+}
+
 /// Normalised card data so both recommendation and discover books share the
 /// same row widget without coupling it to either domain type.
 class _BookRowItem {
@@ -135,18 +154,23 @@ class _BookRowItem {
     required this.title,
     required this.author,
     this.coverUrl,
+    this.reason,
   });
 
   final String id;
   final String title;
   final String author;
   final String? coverUrl;
+  // reason is only set for ML-recommended items.
+  final String? reason;
 }
 
 class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.title});
+  const _SectionHeader({required this.title, this.subtitle});
 
   final String title;
+  // Optional supporting line shown below the main title.
+  final String? subtitle;
 
   @override
   Widget build(BuildContext context) {
@@ -159,10 +183,24 @@ class _SectionHeader extends StatelessWidget {
         spacing.lg,
         spacing.sm,
       ),
-      child: Text(
-        title,
-        style:
-            theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: theme.textTheme.titleMedium
+                ?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          if (subtitle != null) ...[
+            const SizedBox(height: 2),
+            Text(
+              subtitle!,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
@@ -198,6 +236,7 @@ class _BookCard extends StatelessWidget {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
     final radii = theme.extension<AppRadius>()!;
+    final label = _reasonLabel(item.reason);
 
     return GestureDetector(
       onTap: () => context.push('/books/${item.id}'),
@@ -207,10 +246,24 @@ class _BookCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            BookCover(
-              coverUrl: item.coverUrl,
-              width: 100,
-              borderRadius: BorderRadius.circular(radii.md),
+            Stack(
+              children: [
+                BookCover(
+                  coverUrl: item.coverUrl,
+                  width: 100,
+                  borderRadius: BorderRadius.circular(radii.md),
+                ),
+                if (label != null)
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: _ReasonChip(
+                      label: label,
+                      borderRadius: radii.md,
+                    ),
+                  ),
+              ],
             ),
             SizedBox(height: spacing.xs),
             Text(
@@ -230,6 +283,43 @@ class _BookCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Accent-coloured semi-transparent chip overlaid on the bottom of a book
+/// cover image to explain why this title was recommended.
+class _ReasonChip extends StatelessWidget {
+  const _ReasonChip({required this.label, required this.borderRadius});
+
+  final String label;
+  final double borderRadius;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final accent = theme.colorScheme.primary;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+      decoration: BoxDecoration(
+        color: accent.withValues(alpha: 0.82),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(borderRadius),
+          bottomRight: Radius.circular(borderRadius),
+        ),
+      ),
+      child: Text(
+        label,
+        style: theme.textTheme.labelSmall?.copyWith(
+          color: theme.colorScheme.onPrimary,
+          fontWeight: FontWeight.w600,
+          height: 1.2,
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        textAlign: TextAlign.center,
       ),
     );
   }

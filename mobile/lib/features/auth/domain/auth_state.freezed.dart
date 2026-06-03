@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,59 +9,45 @@ part of 'auth_state.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$AuthState {
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() unauthenticated,
-    required TResult Function() authenticating,
-    required TResult Function(AuthUser user) authenticated,
-    required TResult Function(String code, String message) failure,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
-    TResult? Function()? unauthenticated,
-    TResult? Function()? authenticating,
-    TResult? Function(AuthUser user)? authenticated,
-    TResult? Function(String code, String message)? failure,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? unauthenticated,
-    TResult Function()? authenticating,
-    TResult Function(AuthUser user)? authenticated,
-    TResult Function(String code, String message)? failure,
-    required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(AuthInitial value) initial,
-    required TResult Function(Unauthenticated value) unauthenticated,
-    required TResult Function(Authenticating value) authenticating,
-    required TResult Function(Authenticated value) authenticated,
-    required TResult Function(AuthFailure value) failure,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(AuthInitial value)? initial,
-    TResult? Function(Unauthenticated value)? unauthenticated,
-    TResult? Function(Authenticating value)? authenticating,
-    TResult? Function(Authenticated value)? authenticated,
-    TResult? Function(AuthFailure value)? failure,
-  }) =>
-      throw _privateConstructorUsedError;
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is AuthState);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'AuthState()';
+  }
+}
+
+/// @nodoc
+class $AuthStateCopyWith<$Res> {
+  $AuthStateCopyWith(AuthState _, $Res Function(AuthState) __);
+}
+
+/// Adds pattern-matching-related methods to [AuthState].
+extension AuthStatePatterns on AuthState {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(AuthInitial value)? initial,
@@ -70,404 +56,306 @@ mixin _$AuthState {
     TResult Function(Authenticated value)? authenticated,
     TResult Function(AuthFailure value)? failure,
     required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
+  }) {
+    final _that = this;
+    switch (_that) {
+      case AuthInitial() when initial != null:
+        return initial(_that);
+      case Unauthenticated() when unauthenticated != null:
+        return unauthenticated(_that);
+      case Authenticating() when authenticating != null:
+        return authenticating(_that);
+      case Authenticated() when authenticated != null:
+        return authenticated(_that);
+      case AuthFailure() when failure != null:
+        return failure(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(AuthInitial value) initial,
+    required TResult Function(Unauthenticated value) unauthenticated,
+    required TResult Function(Authenticating value) authenticating,
+    required TResult Function(Authenticated value) authenticated,
+    required TResult Function(AuthFailure value) failure,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case AuthInitial():
+        return initial(_that);
+      case Unauthenticated():
+        return unauthenticated(_that);
+      case Authenticating():
+        return authenticating(_that);
+      case Authenticated():
+        return authenticated(_that);
+      case AuthFailure():
+        return failure(_that);
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(AuthInitial value)? initial,
+    TResult? Function(Unauthenticated value)? unauthenticated,
+    TResult? Function(Authenticating value)? authenticating,
+    TResult? Function(Authenticated value)? authenticated,
+    TResult? Function(AuthFailure value)? failure,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case AuthInitial() when initial != null:
+        return initial(_that);
+      case Unauthenticated() when unauthenticated != null:
+        return unauthenticated(_that);
+      case Authenticating() when authenticating != null:
+        return authenticating(_that);
+      case Authenticated() when authenticated != null:
+        return authenticated(_that);
+      case AuthFailure() when failure != null:
+        return failure(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initial,
+    TResult Function()? unauthenticated,
+    TResult Function()? authenticating,
+    TResult Function(AuthUser user)? authenticated,
+    TResult Function(String code, String message)? failure,
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case AuthInitial() when initial != null:
+        return initial();
+      case Unauthenticated() when unauthenticated != null:
+        return unauthenticated();
+      case Authenticating() when authenticating != null:
+        return authenticating();
+      case Authenticated() when authenticated != null:
+        return authenticated(_that.user);
+      case AuthFailure() when failure != null:
+        return failure(_that.code, _that.message);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initial,
+    required TResult Function() unauthenticated,
+    required TResult Function() authenticating,
+    required TResult Function(AuthUser user) authenticated,
+    required TResult Function(String code, String message) failure,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case AuthInitial():
+        return initial();
+      case Unauthenticated():
+        return unauthenticated();
+      case Authenticating():
+        return authenticating();
+      case Authenticated():
+        return authenticated(_that.user);
+      case AuthFailure():
+        return failure(_that.code, _that.message);
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? initial,
+    TResult? Function()? unauthenticated,
+    TResult? Function()? authenticating,
+    TResult? Function(AuthUser user)? authenticated,
+    TResult? Function(String code, String message)? failure,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case AuthInitial() when initial != null:
+        return initial();
+      case Unauthenticated() when unauthenticated != null:
+        return unauthenticated();
+      case Authenticating() when authenticating != null:
+        return authenticating();
+      case Authenticated() when authenticated != null:
+        return authenticated(_that.user);
+      case AuthFailure() when failure != null:
+        return failure(_that.code, _that.message);
+      case _:
+        return null;
+    }
+  }
 }
 
 /// @nodoc
-abstract class $AuthStateCopyWith<$Res> {
-  factory $AuthStateCopyWith(AuthState value, $Res Function(AuthState) then) =
-      _$AuthStateCopyWithImpl<$Res, AuthState>;
-}
 
-/// @nodoc
-class _$AuthStateCopyWithImpl<$Res, $Val extends AuthState>
-    implements $AuthStateCopyWith<$Res> {
-  _$AuthStateCopyWithImpl(this._value, this._then);
+class AuthInitial implements AuthState {
+  const AuthInitial();
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is AuthInitial);
+  }
 
-  /// Create a copy of AuthState
-  /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-abstract class _$$AuthInitialImplCopyWith<$Res> {
-  factory _$$AuthInitialImplCopyWith(
-          _$AuthInitialImpl value, $Res Function(_$AuthInitialImpl) then) =
-      __$$AuthInitialImplCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$$AuthInitialImplCopyWithImpl<$Res>
-    extends _$AuthStateCopyWithImpl<$Res, _$AuthInitialImpl>
-    implements _$$AuthInitialImplCopyWith<$Res> {
-  __$$AuthInitialImplCopyWithImpl(
-      _$AuthInitialImpl _value, $Res Function(_$AuthInitialImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of AuthState
-  /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-
-class _$AuthInitialImpl implements AuthInitial {
-  const _$AuthInitialImpl();
+  @override
+  int get hashCode => runtimeType.hashCode;
 
   @override
   String toString() {
     return 'AuthState.initial()';
   }
+}
+
+/// @nodoc
+
+class Unauthenticated implements AuthState {
+  const Unauthenticated();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$AuthInitialImpl);
+        (other.runtimeType == runtimeType && other is Unauthenticated);
   }
 
   @override
   int get hashCode => runtimeType.hashCode;
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() unauthenticated,
-    required TResult Function() authenticating,
-    required TResult Function(AuthUser user) authenticated,
-    required TResult Function(String code, String message) failure,
-  }) {
-    return initial();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
-    TResult? Function()? unauthenticated,
-    TResult? Function()? authenticating,
-    TResult? Function(AuthUser user)? authenticated,
-    TResult? Function(String code, String message)? failure,
-  }) {
-    return initial?.call();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? unauthenticated,
-    TResult Function()? authenticating,
-    TResult Function(AuthUser user)? authenticated,
-    TResult Function(String code, String message)? failure,
-    required TResult orElse(),
-  }) {
-    if (initial != null) {
-      return initial();
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(AuthInitial value) initial,
-    required TResult Function(Unauthenticated value) unauthenticated,
-    required TResult Function(Authenticating value) authenticating,
-    required TResult Function(Authenticated value) authenticated,
-    required TResult Function(AuthFailure value) failure,
-  }) {
-    return initial(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(AuthInitial value)? initial,
-    TResult? Function(Unauthenticated value)? unauthenticated,
-    TResult? Function(Authenticating value)? authenticating,
-    TResult? Function(Authenticated value)? authenticated,
-    TResult? Function(AuthFailure value)? failure,
-  }) {
-    return initial?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(AuthInitial value)? initial,
-    TResult Function(Unauthenticated value)? unauthenticated,
-    TResult Function(Authenticating value)? authenticating,
-    TResult Function(Authenticated value)? authenticated,
-    TResult Function(AuthFailure value)? failure,
-    required TResult orElse(),
-  }) {
-    if (initial != null) {
-      return initial(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class AuthInitial implements AuthState {
-  const factory AuthInitial() = _$AuthInitialImpl;
-}
-
-/// @nodoc
-abstract class _$$UnauthenticatedImplCopyWith<$Res> {
-  factory _$$UnauthenticatedImplCopyWith(_$UnauthenticatedImpl value,
-          $Res Function(_$UnauthenticatedImpl) then) =
-      __$$UnauthenticatedImplCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$$UnauthenticatedImplCopyWithImpl<$Res>
-    extends _$AuthStateCopyWithImpl<$Res, _$UnauthenticatedImpl>
-    implements _$$UnauthenticatedImplCopyWith<$Res> {
-  __$$UnauthenticatedImplCopyWithImpl(
-      _$UnauthenticatedImpl _value, $Res Function(_$UnauthenticatedImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of AuthState
-  /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-
-class _$UnauthenticatedImpl implements Unauthenticated {
-  const _$UnauthenticatedImpl();
 
   @override
   String toString() {
     return 'AuthState.unauthenticated()';
   }
+}
+
+/// @nodoc
+
+class Authenticating implements AuthState {
+  const Authenticating();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$UnauthenticatedImpl);
+        (other.runtimeType == runtimeType && other is Authenticating);
   }
 
   @override
   int get hashCode => runtimeType.hashCode;
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() unauthenticated,
-    required TResult Function() authenticating,
-    required TResult Function(AuthUser user) authenticated,
-    required TResult Function(String code, String message) failure,
-  }) {
-    return unauthenticated();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
-    TResult? Function()? unauthenticated,
-    TResult? Function()? authenticating,
-    TResult? Function(AuthUser user)? authenticated,
-    TResult? Function(String code, String message)? failure,
-  }) {
-    return unauthenticated?.call();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? unauthenticated,
-    TResult Function()? authenticating,
-    TResult Function(AuthUser user)? authenticated,
-    TResult Function(String code, String message)? failure,
-    required TResult orElse(),
-  }) {
-    if (unauthenticated != null) {
-      return unauthenticated();
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(AuthInitial value) initial,
-    required TResult Function(Unauthenticated value) unauthenticated,
-    required TResult Function(Authenticating value) authenticating,
-    required TResult Function(Authenticated value) authenticated,
-    required TResult Function(AuthFailure value) failure,
-  }) {
-    return unauthenticated(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(AuthInitial value)? initial,
-    TResult? Function(Unauthenticated value)? unauthenticated,
-    TResult? Function(Authenticating value)? authenticating,
-    TResult? Function(Authenticated value)? authenticated,
-    TResult? Function(AuthFailure value)? failure,
-  }) {
-    return unauthenticated?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(AuthInitial value)? initial,
-    TResult Function(Unauthenticated value)? unauthenticated,
-    TResult Function(Authenticating value)? authenticating,
-    TResult Function(Authenticated value)? authenticated,
-    TResult Function(AuthFailure value)? failure,
-    required TResult orElse(),
-  }) {
-    if (unauthenticated != null) {
-      return unauthenticated(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class Unauthenticated implements AuthState {
-  const factory Unauthenticated() = _$UnauthenticatedImpl;
-}
-
-/// @nodoc
-abstract class _$$AuthenticatingImplCopyWith<$Res> {
-  factory _$$AuthenticatingImplCopyWith(_$AuthenticatingImpl value,
-          $Res Function(_$AuthenticatingImpl) then) =
-      __$$AuthenticatingImplCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$$AuthenticatingImplCopyWithImpl<$Res>
-    extends _$AuthStateCopyWithImpl<$Res, _$AuthenticatingImpl>
-    implements _$$AuthenticatingImplCopyWith<$Res> {
-  __$$AuthenticatingImplCopyWithImpl(
-      _$AuthenticatingImpl _value, $Res Function(_$AuthenticatingImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of AuthState
-  /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-
-class _$AuthenticatingImpl implements Authenticating {
-  const _$AuthenticatingImpl();
 
   @override
   String toString() {
     return 'AuthState.authenticating()';
   }
+}
+
+/// @nodoc
+
+class Authenticated implements AuthState {
+  const Authenticated(this.user);
+
+  final AuthUser user;
+
+  /// Create a copy of AuthState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $AuthenticatedCopyWith<Authenticated> get copyWith =>
+      _$AuthenticatedCopyWithImpl<Authenticated>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$AuthenticatingImpl);
+        (other.runtimeType == runtimeType &&
+            other is Authenticated &&
+            (identical(other.user, user) || other.user == user));
   }
 
   @override
-  int get hashCode => runtimeType.hashCode;
+  int get hashCode => Object.hash(runtimeType, user);
 
   @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() unauthenticated,
-    required TResult Function() authenticating,
-    required TResult Function(AuthUser user) authenticated,
-    required TResult Function(String code, String message) failure,
-  }) {
-    return authenticating();
+  String toString() {
+    return 'AuthState.authenticated(user: $user)';
   }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
-    TResult? Function()? unauthenticated,
-    TResult? Function()? authenticating,
-    TResult? Function(AuthUser user)? authenticated,
-    TResult? Function(String code, String message)? failure,
-  }) {
-    return authenticating?.call();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? unauthenticated,
-    TResult Function()? authenticating,
-    TResult Function(AuthUser user)? authenticated,
-    TResult Function(String code, String message)? failure,
-    required TResult orElse(),
-  }) {
-    if (authenticating != null) {
-      return authenticating();
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(AuthInitial value) initial,
-    required TResult Function(Unauthenticated value) unauthenticated,
-    required TResult Function(Authenticating value) authenticating,
-    required TResult Function(Authenticated value) authenticated,
-    required TResult Function(AuthFailure value) failure,
-  }) {
-    return authenticating(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(AuthInitial value)? initial,
-    TResult? Function(Unauthenticated value)? unauthenticated,
-    TResult? Function(Authenticating value)? authenticating,
-    TResult? Function(Authenticated value)? authenticated,
-    TResult? Function(AuthFailure value)? failure,
-  }) {
-    return authenticating?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(AuthInitial value)? initial,
-    TResult Function(Unauthenticated value)? unauthenticated,
-    TResult Function(Authenticating value)? authenticating,
-    TResult Function(Authenticated value)? authenticated,
-    TResult Function(AuthFailure value)? failure,
-    required TResult orElse(),
-  }) {
-    if (authenticating != null) {
-      return authenticating(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class Authenticating implements AuthState {
-  const factory Authenticating() = _$AuthenticatingImpl;
 }
 
 /// @nodoc
-abstract class _$$AuthenticatedImplCopyWith<$Res> {
-  factory _$$AuthenticatedImplCopyWith(
-          _$AuthenticatedImpl value, $Res Function(_$AuthenticatedImpl) then) =
-      __$$AuthenticatedImplCopyWithImpl<$Res>;
+abstract mixin class $AuthenticatedCopyWith<$Res>
+    implements $AuthStateCopyWith<$Res> {
+  factory $AuthenticatedCopyWith(
+          Authenticated value, $Res Function(Authenticated) _then) =
+      _$AuthenticatedCopyWithImpl;
   @useResult
   $Res call({AuthUser user});
 
@@ -475,23 +363,22 @@ abstract class _$$AuthenticatedImplCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$$AuthenticatedImplCopyWithImpl<$Res>
-    extends _$AuthStateCopyWithImpl<$Res, _$AuthenticatedImpl>
-    implements _$$AuthenticatedImplCopyWith<$Res> {
-  __$$AuthenticatedImplCopyWithImpl(
-      _$AuthenticatedImpl _value, $Res Function(_$AuthenticatedImpl) _then)
-      : super(_value, _then);
+class _$AuthenticatedCopyWithImpl<$Res>
+    implements $AuthenticatedCopyWith<$Res> {
+  _$AuthenticatedCopyWithImpl(this._self, this._then);
+
+  final Authenticated _self;
+  final $Res Function(Authenticated) _then;
 
   /// Create a copy of AuthState
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
-  @override
   $Res call({
     Object? user = null,
   }) {
-    return _then(_$AuthenticatedImpl(
+    return _then(Authenticated(
       null == user
-          ? _value.user
+          ? _self.user
           : user // ignore: cast_nullable_to_non_nullable
               as AuthUser,
     ));
@@ -502,195 +389,32 @@ class __$$AuthenticatedImplCopyWithImpl<$Res>
   @override
   @pragma('vm:prefer-inline')
   $AuthUserCopyWith<$Res> get user {
-    return $AuthUserCopyWith<$Res>(_value.user, (value) {
-      return _then(_value.copyWith(user: value));
+    return $AuthUserCopyWith<$Res>(_self.user, (value) {
+      return _then(_self.copyWith(user: value));
     });
   }
 }
 
 /// @nodoc
 
-class _$AuthenticatedImpl implements Authenticated {
-  const _$AuthenticatedImpl(this.user);
+class AuthFailure implements AuthState {
+  const AuthFailure({required this.code, required this.message});
 
-  @override
-  final AuthUser user;
-
-  @override
-  String toString() {
-    return 'AuthState.authenticated(user: $user)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$AuthenticatedImpl &&
-            (identical(other.user, user) || other.user == user));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, user);
-
-  /// Create a copy of AuthState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$AuthenticatedImplCopyWith<_$AuthenticatedImpl> get copyWith =>
-      __$$AuthenticatedImplCopyWithImpl<_$AuthenticatedImpl>(this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() unauthenticated,
-    required TResult Function() authenticating,
-    required TResult Function(AuthUser user) authenticated,
-    required TResult Function(String code, String message) failure,
-  }) {
-    return authenticated(user);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
-    TResult? Function()? unauthenticated,
-    TResult? Function()? authenticating,
-    TResult? Function(AuthUser user)? authenticated,
-    TResult? Function(String code, String message)? failure,
-  }) {
-    return authenticated?.call(user);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? unauthenticated,
-    TResult Function()? authenticating,
-    TResult Function(AuthUser user)? authenticated,
-    TResult Function(String code, String message)? failure,
-    required TResult orElse(),
-  }) {
-    if (authenticated != null) {
-      return authenticated(user);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(AuthInitial value) initial,
-    required TResult Function(Unauthenticated value) unauthenticated,
-    required TResult Function(Authenticating value) authenticating,
-    required TResult Function(Authenticated value) authenticated,
-    required TResult Function(AuthFailure value) failure,
-  }) {
-    return authenticated(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(AuthInitial value)? initial,
-    TResult? Function(Unauthenticated value)? unauthenticated,
-    TResult? Function(Authenticating value)? authenticating,
-    TResult? Function(Authenticated value)? authenticated,
-    TResult? Function(AuthFailure value)? failure,
-  }) {
-    return authenticated?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(AuthInitial value)? initial,
-    TResult Function(Unauthenticated value)? unauthenticated,
-    TResult Function(Authenticating value)? authenticating,
-    TResult Function(Authenticated value)? authenticated,
-    TResult Function(AuthFailure value)? failure,
-    required TResult orElse(),
-  }) {
-    if (authenticated != null) {
-      return authenticated(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class Authenticated implements AuthState {
-  const factory Authenticated(final AuthUser user) = _$AuthenticatedImpl;
-
-  AuthUser get user;
-
-  /// Create a copy of AuthState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$AuthenticatedImplCopyWith<_$AuthenticatedImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class _$$AuthFailureImplCopyWith<$Res> {
-  factory _$$AuthFailureImplCopyWith(
-          _$AuthFailureImpl value, $Res Function(_$AuthFailureImpl) then) =
-      __$$AuthFailureImplCopyWithImpl<$Res>;
-  @useResult
-  $Res call({String code, String message});
-}
-
-/// @nodoc
-class __$$AuthFailureImplCopyWithImpl<$Res>
-    extends _$AuthStateCopyWithImpl<$Res, _$AuthFailureImpl>
-    implements _$$AuthFailureImplCopyWith<$Res> {
-  __$$AuthFailureImplCopyWithImpl(
-      _$AuthFailureImpl _value, $Res Function(_$AuthFailureImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of AuthState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? code = null,
-    Object? message = null,
-  }) {
-    return _then(_$AuthFailureImpl(
-      code: null == code
-          ? _value.code
-          : code // ignore: cast_nullable_to_non_nullable
-              as String,
-      message: null == message
-          ? _value.message
-          : message // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
-  }
-}
-
-/// @nodoc
-
-class _$AuthFailureImpl implements AuthFailure {
-  const _$AuthFailureImpl({required this.code, required this.message});
-
-  @override
   final String code;
-  @override
   final String message;
 
-  @override
-  String toString() {
-    return 'AuthState.failure(code: $code, message: $message)';
-  }
+  /// Create a copy of AuthState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $AuthFailureCopyWith<AuthFailure> get copyWith =>
+      _$AuthFailureCopyWithImpl<AuthFailure>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$AuthFailureImpl &&
+            other is AuthFailure &&
             (identical(other.code, code) || other.code == code) &&
             (identical(other.message, message) || other.message == message));
   }
@@ -698,106 +422,47 @@ class _$AuthFailureImpl implements AuthFailure {
   @override
   int get hashCode => Object.hash(runtimeType, code, message);
 
+  @override
+  String toString() {
+    return 'AuthState.failure(code: $code, message: $message)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $AuthFailureCopyWith<$Res>
+    implements $AuthStateCopyWith<$Res> {
+  factory $AuthFailureCopyWith(
+          AuthFailure value, $Res Function(AuthFailure) _then) =
+      _$AuthFailureCopyWithImpl;
+  @useResult
+  $Res call({String code, String message});
+}
+
+/// @nodoc
+class _$AuthFailureCopyWithImpl<$Res> implements $AuthFailureCopyWith<$Res> {
+  _$AuthFailureCopyWithImpl(this._self, this._then);
+
+  final AuthFailure _self;
+  final $Res Function(AuthFailure) _then;
+
   /// Create a copy of AuthState
   /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
   @pragma('vm:prefer-inline')
-  _$$AuthFailureImplCopyWith<_$AuthFailureImpl> get copyWith =>
-      __$$AuthFailureImplCopyWithImpl<_$AuthFailureImpl>(this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() unauthenticated,
-    required TResult Function() authenticating,
-    required TResult Function(AuthUser user) authenticated,
-    required TResult Function(String code, String message) failure,
+  $Res call({
+    Object? code = null,
+    Object? message = null,
   }) {
-    return failure(code, message);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
-    TResult? Function()? unauthenticated,
-    TResult? Function()? authenticating,
-    TResult? Function(AuthUser user)? authenticated,
-    TResult? Function(String code, String message)? failure,
-  }) {
-    return failure?.call(code, message);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? unauthenticated,
-    TResult Function()? authenticating,
-    TResult Function(AuthUser user)? authenticated,
-    TResult Function(String code, String message)? failure,
-    required TResult orElse(),
-  }) {
-    if (failure != null) {
-      return failure(code, message);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(AuthInitial value) initial,
-    required TResult Function(Unauthenticated value) unauthenticated,
-    required TResult Function(Authenticating value) authenticating,
-    required TResult Function(Authenticated value) authenticated,
-    required TResult Function(AuthFailure value) failure,
-  }) {
-    return failure(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(AuthInitial value)? initial,
-    TResult? Function(Unauthenticated value)? unauthenticated,
-    TResult? Function(Authenticating value)? authenticating,
-    TResult? Function(Authenticated value)? authenticated,
-    TResult? Function(AuthFailure value)? failure,
-  }) {
-    return failure?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(AuthInitial value)? initial,
-    TResult Function(Unauthenticated value)? unauthenticated,
-    TResult Function(Authenticating value)? authenticating,
-    TResult Function(Authenticated value)? authenticated,
-    TResult Function(AuthFailure value)? failure,
-    required TResult orElse(),
-  }) {
-    if (failure != null) {
-      return failure(this);
-    }
-    return orElse();
+    return _then(AuthFailure(
+      code: null == code
+          ? _self.code
+          : code // ignore: cast_nullable_to_non_nullable
+              as String,
+      message: null == message
+          ? _self.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
   }
 }
 
-abstract class AuthFailure implements AuthState {
-  const factory AuthFailure(
-      {required final String code,
-      required final String message}) = _$AuthFailureImpl;
-
-  String get code;
-  String get message;
-
-  /// Create a copy of AuthState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$AuthFailureImplCopyWith<_$AuthFailureImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
+// dart format on

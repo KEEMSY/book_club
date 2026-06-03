@@ -225,3 +225,32 @@ class ReadingYearStatsPublic(BaseModel):
     total_seconds: int
     streak_days: int
     longest_streak: int
+
+
+class ReadingSpeedStatsPublic(BaseModel):
+    avg_minutes_per_page: float | None
+    avg_pages_per_hour: float | None
+
+
+class FormatBreakdownPublic(BaseModel):
+    paper: int
+    ebook: int
+    audio: int
+
+
+class MonthlyHoursPublic(BaseModel):
+    month: str  # "YYYY-MM"
+    hours: float
+
+
+class GenreBreakdownPublic(BaseModel):
+    genre: str
+    count: int
+
+
+class ReadingStatsResponse(BaseModel):
+    speed: ReadingSpeedStatsPublic
+    format_breakdown: FormatBreakdownPublic
+    monthly_hours: list[MonthlyHoursPublic]
+    genre_breakdown: list[GenreBreakdownPublic]
+    avg_completion_days: float | None

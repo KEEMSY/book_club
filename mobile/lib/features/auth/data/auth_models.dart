@@ -13,7 +13,7 @@ part 'auth_models.g.dart';
 /// `/v2/user/me` endpoint itself; no server-side token exchange takes place.
 /// Snake-case JSON keys are handled globally via `build.yaml`.
 @freezed
-class KakaoLoginRequest with _$KakaoLoginRequest {
+abstract class KakaoLoginRequest with _$KakaoLoginRequest {
   const factory KakaoLoginRequest({
     required String accessToken,
   }) = _KakaoLoginRequest;
@@ -25,7 +25,7 @@ class KakaoLoginRequest with _$KakaoLoginRequest {
 /// Request to POST /auth/apple. [authorizationCode] is forward-compat for a
 /// future server-side Apple refresh exchange — M1 backend ignores it.
 @freezed
-class AppleLoginRequest with _$AppleLoginRequest {
+abstract class AppleLoginRequest with _$AppleLoginRequest {
   const factory AppleLoginRequest({
     required String identityToken,
     String? authorizationCode,
@@ -42,7 +42,7 @@ class AppleLoginRequest with _$AppleLoginRequest {
 /// builds that hit a non-dev backend fail with the normal 404 repository
 /// mapping instead of a freezed/json_serializable compile error.
 @freezed
-class DevLoginRequest with _$DevLoginRequest {
+abstract class DevLoginRequest with _$DevLoginRequest {
   const factory DevLoginRequest({
     @Default('개발자') String nickname,
     String? email,
@@ -53,7 +53,7 @@ class DevLoginRequest with _$DevLoginRequest {
 }
 
 @freezed
-class RefreshRequest with _$RefreshRequest {
+abstract class RefreshRequest with _$RefreshRequest {
   const factory RefreshRequest({
     required String refreshToken,
   }) = _RefreshRequest;
@@ -63,7 +63,7 @@ class RefreshRequest with _$RefreshRequest {
 }
 
 @freezed
-class DeviceTokenRegisterRequest with _$DeviceTokenRegisterRequest {
+abstract class DeviceTokenRegisterRequest with _$DeviceTokenRegisterRequest {
   const factory DeviceTokenRegisterRequest({
     required String token,
     required String platform,
@@ -79,7 +79,7 @@ class DeviceTokenRegisterRequest with _$DeviceTokenRegisterRequest {
 /// without a custom converter. Conversion to the domain enum happens at the
 /// repository boundary ([AuthUserDto.toDomain]).
 @freezed
-class AuthUserDto with _$AuthUserDto {
+abstract class AuthUserDto with _$AuthUserDto {
   const AuthUserDto._();
 
   const factory AuthUserDto({
@@ -107,7 +107,7 @@ class AuthUserDto with _$AuthUserDto {
 }
 
 @freezed
-class LoginResponse with _$LoginResponse {
+abstract class LoginResponse with _$LoginResponse {
   const factory LoginResponse({
     required String accessToken,
     required String refreshToken,
@@ -122,7 +122,7 @@ class LoginResponse with _$LoginResponse {
 }
 
 @freezed
-class RefreshResponse with _$RefreshResponse {
+abstract class RefreshResponse with _$RefreshResponse {
   const factory RefreshResponse({
     required String accessToken,
     required String refreshToken,

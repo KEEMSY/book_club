@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,32 +9,57 @@ part of 'user_book.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$UserBook {
-  String get id => throw _privateConstructorUsedError;
-  Book get book => throw _privateConstructorUsedError;
-  BookStatus get status => throw _privateConstructorUsedError;
-  DateTime? get startedAt => throw _privateConstructorUsedError;
-  DateTime? get finishedAt => throw _privateConstructorUsedError;
-  int? get rating => throw _privateConstructorUsedError;
-  String? get oneLineReview => throw _privateConstructorUsedError;
+  String get id;
+  Book get book;
+  BookStatus get status;
+  DateTime? get startedAt;
+  DateTime? get finishedAt;
+  int? get rating;
+  String? get oneLineReview;
 
   /// Create a copy of UserBook
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
   $UserBookCopyWith<UserBook> get copyWith =>
-      throw _privateConstructorUsedError;
+      _$UserBookCopyWithImpl<UserBook>(this as UserBook, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is UserBook &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.book, book) || other.book == book) &&
+            (identical(other.status, status) || other.status == status) &&
+            (identical(other.startedAt, startedAt) ||
+                other.startedAt == startedAt) &&
+            (identical(other.finishedAt, finishedAt) ||
+                other.finishedAt == finishedAt) &&
+            (identical(other.rating, rating) || other.rating == rating) &&
+            (identical(other.oneLineReview, oneLineReview) ||
+                other.oneLineReview == oneLineReview));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, id, book, status, startedAt,
+      finishedAt, rating, oneLineReview);
+
+  @override
+  String toString() {
+    return 'UserBook(id: $id, book: $book, status: $status, startedAt: $startedAt, finishedAt: $finishedAt, rating: $rating, oneLineReview: $oneLineReview)';
+  }
 }
 
 /// @nodoc
-abstract class $UserBookCopyWith<$Res> {
-  factory $UserBookCopyWith(UserBook value, $Res Function(UserBook) then) =
-      _$UserBookCopyWithImpl<$Res, UserBook>;
+abstract mixin class $UserBookCopyWith<$Res> {
+  factory $UserBookCopyWith(UserBook value, $Res Function(UserBook) _then) =
+      _$UserBookCopyWithImpl;
   @useResult
   $Res call(
       {String id,
@@ -49,14 +74,11 @@ abstract class $UserBookCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$UserBookCopyWithImpl<$Res, $Val extends UserBook>
-    implements $UserBookCopyWith<$Res> {
-  _$UserBookCopyWithImpl(this._value, this._then);
+class _$UserBookCopyWithImpl<$Res> implements $UserBookCopyWith<$Res> {
+  _$UserBookCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final UserBook _self;
+  final $Res Function(UserBook) _then;
 
   /// Create a copy of UserBook
   /// with the given fields replaced by the non-null parameter values.
@@ -71,36 +93,36 @@ class _$UserBookCopyWithImpl<$Res, $Val extends UserBook>
     Object? rating = freezed,
     Object? oneLineReview = freezed,
   }) {
-    return _then(_value.copyWith(
+    return _then(_self.copyWith(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
       book: null == book
-          ? _value.book
+          ? _self.book
           : book // ignore: cast_nullable_to_non_nullable
               as Book,
       status: null == status
-          ? _value.status
+          ? _self.status
           : status // ignore: cast_nullable_to_non_nullable
               as BookStatus,
       startedAt: freezed == startedAt
-          ? _value.startedAt
+          ? _self.startedAt
           : startedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
       finishedAt: freezed == finishedAt
-          ? _value.finishedAt
+          ? _self.finishedAt
           : finishedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
       rating: freezed == rating
-          ? _value.rating
+          ? _self.rating
           : rating // ignore: cast_nullable_to_non_nullable
               as int?,
       oneLineReview: freezed == oneLineReview
-          ? _value.oneLineReview
+          ? _self.oneLineReview
           : oneLineReview // ignore: cast_nullable_to_non_nullable
               as String?,
-    ) as $Val);
+    ));
   }
 
   /// Create a copy of UserBook
@@ -108,91 +130,200 @@ class _$UserBookCopyWithImpl<$Res, $Val extends UserBook>
   @override
   @pragma('vm:prefer-inline')
   $BookCopyWith<$Res> get book {
-    return $BookCopyWith<$Res>(_value.book, (value) {
-      return _then(_value.copyWith(book: value) as $Val);
+    return $BookCopyWith<$Res>(_self.book, (value) {
+      return _then(_self.copyWith(book: value));
     });
   }
 }
 
-/// @nodoc
-abstract class _$$UserBookImplCopyWith<$Res>
-    implements $UserBookCopyWith<$Res> {
-  factory _$$UserBookImplCopyWith(
-          _$UserBookImpl value, $Res Function(_$UserBookImpl) then) =
-      __$$UserBookImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {String id,
-      Book book,
-      BookStatus status,
-      DateTime? startedAt,
-      DateTime? finishedAt,
-      int? rating,
-      String? oneLineReview});
+/// Adds pattern-matching-related methods to [UserBook].
+extension UserBookPatterns on UserBook {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
 
-  @override
-  $BookCopyWith<$Res> get book;
-}
-
-/// @nodoc
-class __$$UserBookImplCopyWithImpl<$Res>
-    extends _$UserBookCopyWithImpl<$Res, _$UserBookImpl>
-    implements _$$UserBookImplCopyWith<$Res> {
-  __$$UserBookImplCopyWithImpl(
-      _$UserBookImpl _value, $Res Function(_$UserBookImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of UserBook
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? book = null,
-    Object? status = null,
-    Object? startedAt = freezed,
-    Object? finishedAt = freezed,
-    Object? rating = freezed,
-    Object? oneLineReview = freezed,
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_UserBook value)? $default, {
+    required TResult orElse(),
   }) {
-    return _then(_$UserBookImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      book: null == book
-          ? _value.book
-          : book // ignore: cast_nullable_to_non_nullable
-              as Book,
-      status: null == status
-          ? _value.status
-          : status // ignore: cast_nullable_to_non_nullable
-              as BookStatus,
-      startedAt: freezed == startedAt
-          ? _value.startedAt
-          : startedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      finishedAt: freezed == finishedAt
-          ? _value.finishedAt
-          : finishedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      rating: freezed == rating
-          ? _value.rating
-          : rating // ignore: cast_nullable_to_non_nullable
-              as int?,
-      oneLineReview: freezed == oneLineReview
-          ? _value.oneLineReview
-          : oneLineReview // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ));
+    final _that = this;
+    switch (_that) {
+      case _UserBook() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_UserBook value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _UserBook():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_UserBook value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _UserBook() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String id,
+            Book book,
+            BookStatus status,
+            DateTime? startedAt,
+            DateTime? finishedAt,
+            int? rating,
+            String? oneLineReview)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _UserBook() when $default != null:
+        return $default(_that.id, _that.book, _that.status, _that.startedAt,
+            _that.finishedAt, _that.rating, _that.oneLineReview);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String id,
+            Book book,
+            BookStatus status,
+            DateTime? startedAt,
+            DateTime? finishedAt,
+            int? rating,
+            String? oneLineReview)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _UserBook():
+        return $default(_that.id, _that.book, _that.status, _that.startedAt,
+            _that.finishedAt, _that.rating, _that.oneLineReview);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String id,
+            Book book,
+            BookStatus status,
+            DateTime? startedAt,
+            DateTime? finishedAt,
+            int? rating,
+            String? oneLineReview)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _UserBook() when $default != null:
+        return $default(_that.id, _that.book, _that.status, _that.startedAt,
+            _that.finishedAt, _that.rating, _that.oneLineReview);
+      case _:
+        return null;
+    }
   }
 }
 
 /// @nodoc
 
-class _$UserBookImpl implements _UserBook {
-  const _$UserBookImpl(
+class _UserBook implements UserBook {
+  const _UserBook(
       {required this.id,
       required this.book,
       required this.status,
@@ -216,16 +347,19 @@ class _$UserBookImpl implements _UserBook {
   @override
   final String? oneLineReview;
 
+  /// Create a copy of UserBook
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'UserBook(id: $id, book: $book, status: $status, startedAt: $startedAt, finishedAt: $finishedAt, rating: $rating, oneLineReview: $oneLineReview)';
-  }
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$UserBookCopyWith<_UserBook> get copyWith =>
+      __$UserBookCopyWithImpl<_UserBook>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$UserBookImpl &&
+            other is _UserBook &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.book, book) || other.book == book) &&
             (identical(other.status, status) || other.status == status) &&
@@ -242,44 +376,93 @@ class _$UserBookImpl implements _UserBook {
   int get hashCode => Object.hash(runtimeType, id, book, status, startedAt,
       finishedAt, rating, oneLineReview);
 
+  @override
+  String toString() {
+    return 'UserBook(id: $id, book: $book, status: $status, startedAt: $startedAt, finishedAt: $finishedAt, rating: $rating, oneLineReview: $oneLineReview)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$UserBookCopyWith<$Res>
+    implements $UserBookCopyWith<$Res> {
+  factory _$UserBookCopyWith(_UserBook value, $Res Function(_UserBook) _then) =
+      __$UserBookCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      Book book,
+      BookStatus status,
+      DateTime? startedAt,
+      DateTime? finishedAt,
+      int? rating,
+      String? oneLineReview});
+
+  @override
+  $BookCopyWith<$Res> get book;
+}
+
+/// @nodoc
+class __$UserBookCopyWithImpl<$Res> implements _$UserBookCopyWith<$Res> {
+  __$UserBookCopyWithImpl(this._self, this._then);
+
+  final _UserBook _self;
+  final $Res Function(_UserBook) _then;
+
   /// Create a copy of UserBook
   /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$UserBookImplCopyWith<_$UserBookImpl> get copyWith =>
-      __$$UserBookImplCopyWithImpl<_$UserBookImpl>(this, _$identity);
-}
-
-abstract class _UserBook implements UserBook {
-  const factory _UserBook(
-      {required final String id,
-      required final Book book,
-      required final BookStatus status,
-      final DateTime? startedAt,
-      final DateTime? finishedAt,
-      final int? rating,
-      final String? oneLineReview}) = _$UserBookImpl;
-
-  @override
-  String get id;
-  @override
-  Book get book;
-  @override
-  BookStatus get status;
-  @override
-  DateTime? get startedAt;
-  @override
-  DateTime? get finishedAt;
-  @override
-  int? get rating;
-  @override
-  String? get oneLineReview;
+  $Res call({
+    Object? id = null,
+    Object? book = null,
+    Object? status = null,
+    Object? startedAt = freezed,
+    Object? finishedAt = freezed,
+    Object? rating = freezed,
+    Object? oneLineReview = freezed,
+  }) {
+    return _then(_UserBook(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      book: null == book
+          ? _self.book
+          : book // ignore: cast_nullable_to_non_nullable
+              as Book,
+      status: null == status
+          ? _self.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as BookStatus,
+      startedAt: freezed == startedAt
+          ? _self.startedAt
+          : startedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      finishedAt: freezed == finishedAt
+          ? _self.finishedAt
+          : finishedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      rating: freezed == rating
+          ? _self.rating
+          : rating // ignore: cast_nullable_to_non_nullable
+              as int?,
+      oneLineReview: freezed == oneLineReview
+          ? _self.oneLineReview
+          : oneLineReview // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
 
   /// Create a copy of UserBook
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$UserBookImplCopyWith<_$UserBookImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  $BookCopyWith<$Res> get book {
+    return $BookCopyWith<$Res>(_self.book, (value) {
+      return _then(_self.copyWith(book: value));
+    });
+  }
 }
+
+// dart format on

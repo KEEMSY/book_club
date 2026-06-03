@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,54 +9,45 @@ part of 'highlight_state.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$HighlightState {
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() loading,
-    required TResult Function(List<Highlight> items, String? nextCursor) loaded,
-    required TResult Function(String code, String message) error,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
-    TResult? Function()? loading,
-    TResult? Function(List<Highlight> items, String? nextCursor)? loaded,
-    TResult? Function(String code, String message)? error,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? loading,
-    TResult Function(List<Highlight> items, String? nextCursor)? loaded,
-    TResult Function(String code, String message)? error,
-    required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(HighlightInitial value) initial,
-    required TResult Function(HighlightLoading value) loading,
-    required TResult Function(HighlightLoaded value) loaded,
-    required TResult Function(HighlightError value) error,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(HighlightInitial value)? initial,
-    TResult? Function(HighlightLoading value)? loading,
-    TResult? Function(HighlightLoaded value)? loaded,
-    TResult? Function(HighlightError value)? error,
-  }) =>
-      throw _privateConstructorUsedError;
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is HighlightState);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'HighlightState()';
+  }
+}
+
+/// @nodoc
+class $HighlightStateCopyWith<$Res> {
+  $HighlightStateCopyWith(HighlightState _, $Res Function(HighlightState) __);
+}
+
+/// Adds pattern-matching-related methods to [HighlightState].
+extension HighlightStatePatterns on HighlightState {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(HighlightInitial value)? initial,
@@ -64,331 +55,259 @@ mixin _$HighlightState {
     TResult Function(HighlightLoaded value)? loaded,
     TResult Function(HighlightError value)? error,
     required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
+  }) {
+    final _that = this;
+    switch (_that) {
+      case HighlightInitial() when initial != null:
+        return initial(_that);
+      case HighlightLoading() when loading != null:
+        return loading(_that);
+      case HighlightLoaded() when loaded != null:
+        return loaded(_that);
+      case HighlightError() when error != null:
+        return error(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(HighlightInitial value) initial,
+    required TResult Function(HighlightLoading value) loading,
+    required TResult Function(HighlightLoaded value) loaded,
+    required TResult Function(HighlightError value) error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case HighlightInitial():
+        return initial(_that);
+      case HighlightLoading():
+        return loading(_that);
+      case HighlightLoaded():
+        return loaded(_that);
+      case HighlightError():
+        return error(_that);
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(HighlightInitial value)? initial,
+    TResult? Function(HighlightLoading value)? loading,
+    TResult? Function(HighlightLoaded value)? loaded,
+    TResult? Function(HighlightError value)? error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case HighlightInitial() when initial != null:
+        return initial(_that);
+      case HighlightLoading() when loading != null:
+        return loading(_that);
+      case HighlightLoaded() when loaded != null:
+        return loaded(_that);
+      case HighlightError() when error != null:
+        return error(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initial,
+    TResult Function()? loading,
+    TResult Function(List<Highlight> items, String? nextCursor)? loaded,
+    TResult Function(String code, String message)? error,
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case HighlightInitial() when initial != null:
+        return initial();
+      case HighlightLoading() when loading != null:
+        return loading();
+      case HighlightLoaded() when loaded != null:
+        return loaded(_that.items, _that.nextCursor);
+      case HighlightError() when error != null:
+        return error(_that.code, _that.message);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initial,
+    required TResult Function() loading,
+    required TResult Function(List<Highlight> items, String? nextCursor) loaded,
+    required TResult Function(String code, String message) error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case HighlightInitial():
+        return initial();
+      case HighlightLoading():
+        return loading();
+      case HighlightLoaded():
+        return loaded(_that.items, _that.nextCursor);
+      case HighlightError():
+        return error(_that.code, _that.message);
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? initial,
+    TResult? Function()? loading,
+    TResult? Function(List<Highlight> items, String? nextCursor)? loaded,
+    TResult? Function(String code, String message)? error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case HighlightInitial() when initial != null:
+        return initial();
+      case HighlightLoading() when loading != null:
+        return loading();
+      case HighlightLoaded() when loaded != null:
+        return loaded(_that.items, _that.nextCursor);
+      case HighlightError() when error != null:
+        return error(_that.code, _that.message);
+      case _:
+        return null;
+    }
+  }
 }
 
 /// @nodoc
-abstract class $HighlightStateCopyWith<$Res> {
-  factory $HighlightStateCopyWith(
-          HighlightState value, $Res Function(HighlightState) then) =
-      _$HighlightStateCopyWithImpl<$Res, HighlightState>;
-}
 
-/// @nodoc
-class _$HighlightStateCopyWithImpl<$Res, $Val extends HighlightState>
-    implements $HighlightStateCopyWith<$Res> {
-  _$HighlightStateCopyWithImpl(this._value, this._then);
+class HighlightInitial implements HighlightState {
+  const HighlightInitial();
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is HighlightInitial);
+  }
 
-  /// Create a copy of HighlightState
-  /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-abstract class _$$HighlightInitialImplCopyWith<$Res> {
-  factory _$$HighlightInitialImplCopyWith(_$HighlightInitialImpl value,
-          $Res Function(_$HighlightInitialImpl) then) =
-      __$$HighlightInitialImplCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$$HighlightInitialImplCopyWithImpl<$Res>
-    extends _$HighlightStateCopyWithImpl<$Res, _$HighlightInitialImpl>
-    implements _$$HighlightInitialImplCopyWith<$Res> {
-  __$$HighlightInitialImplCopyWithImpl(_$HighlightInitialImpl _value,
-      $Res Function(_$HighlightInitialImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of HighlightState
-  /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-
-class _$HighlightInitialImpl implements HighlightInitial {
-  const _$HighlightInitialImpl();
+  @override
+  int get hashCode => runtimeType.hashCode;
 
   @override
   String toString() {
     return 'HighlightState.initial()';
   }
+}
+
+/// @nodoc
+
+class HighlightLoading implements HighlightState {
+  const HighlightLoading();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$HighlightInitialImpl);
+        (other.runtimeType == runtimeType && other is HighlightLoading);
   }
 
   @override
   int get hashCode => runtimeType.hashCode;
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() loading,
-    required TResult Function(List<Highlight> items, String? nextCursor) loaded,
-    required TResult Function(String code, String message) error,
-  }) {
-    return initial();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
-    TResult? Function()? loading,
-    TResult? Function(List<Highlight> items, String? nextCursor)? loaded,
-    TResult? Function(String code, String message)? error,
-  }) {
-    return initial?.call();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? loading,
-    TResult Function(List<Highlight> items, String? nextCursor)? loaded,
-    TResult Function(String code, String message)? error,
-    required TResult orElse(),
-  }) {
-    if (initial != null) {
-      return initial();
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(HighlightInitial value) initial,
-    required TResult Function(HighlightLoading value) loading,
-    required TResult Function(HighlightLoaded value) loaded,
-    required TResult Function(HighlightError value) error,
-  }) {
-    return initial(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(HighlightInitial value)? initial,
-    TResult? Function(HighlightLoading value)? loading,
-    TResult? Function(HighlightLoaded value)? loaded,
-    TResult? Function(HighlightError value)? error,
-  }) {
-    return initial?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(HighlightInitial value)? initial,
-    TResult Function(HighlightLoading value)? loading,
-    TResult Function(HighlightLoaded value)? loaded,
-    TResult Function(HighlightError value)? error,
-    required TResult orElse(),
-  }) {
-    if (initial != null) {
-      return initial(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class HighlightInitial implements HighlightState {
-  const factory HighlightInitial() = _$HighlightInitialImpl;
-}
-
-/// @nodoc
-abstract class _$$HighlightLoadingImplCopyWith<$Res> {
-  factory _$$HighlightLoadingImplCopyWith(_$HighlightLoadingImpl value,
-          $Res Function(_$HighlightLoadingImpl) then) =
-      __$$HighlightLoadingImplCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$$HighlightLoadingImplCopyWithImpl<$Res>
-    extends _$HighlightStateCopyWithImpl<$Res, _$HighlightLoadingImpl>
-    implements _$$HighlightLoadingImplCopyWith<$Res> {
-  __$$HighlightLoadingImplCopyWithImpl(_$HighlightLoadingImpl _value,
-      $Res Function(_$HighlightLoadingImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of HighlightState
-  /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-
-class _$HighlightLoadingImpl implements HighlightLoading {
-  const _$HighlightLoadingImpl();
 
   @override
   String toString() {
     return 'HighlightState.loading()';
   }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$HighlightLoadingImpl);
-  }
-
-  @override
-  int get hashCode => runtimeType.hashCode;
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() loading,
-    required TResult Function(List<Highlight> items, String? nextCursor) loaded,
-    required TResult Function(String code, String message) error,
-  }) {
-    return loading();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
-    TResult? Function()? loading,
-    TResult? Function(List<Highlight> items, String? nextCursor)? loaded,
-    TResult? Function(String code, String message)? error,
-  }) {
-    return loading?.call();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? loading,
-    TResult Function(List<Highlight> items, String? nextCursor)? loaded,
-    TResult Function(String code, String message)? error,
-    required TResult orElse(),
-  }) {
-    if (loading != null) {
-      return loading();
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(HighlightInitial value) initial,
-    required TResult Function(HighlightLoading value) loading,
-    required TResult Function(HighlightLoaded value) loaded,
-    required TResult Function(HighlightError value) error,
-  }) {
-    return loading(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(HighlightInitial value)? initial,
-    TResult? Function(HighlightLoading value)? loading,
-    TResult? Function(HighlightLoaded value)? loaded,
-    TResult? Function(HighlightError value)? error,
-  }) {
-    return loading?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(HighlightInitial value)? initial,
-    TResult Function(HighlightLoading value)? loading,
-    TResult Function(HighlightLoaded value)? loaded,
-    TResult Function(HighlightError value)? error,
-    required TResult orElse(),
-  }) {
-    if (loading != null) {
-      return loading(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class HighlightLoading implements HighlightState {
-  const factory HighlightLoading() = _$HighlightLoadingImpl;
-}
-
-/// @nodoc
-abstract class _$$HighlightLoadedImplCopyWith<$Res> {
-  factory _$$HighlightLoadedImplCopyWith(_$HighlightLoadedImpl value,
-          $Res Function(_$HighlightLoadedImpl) then) =
-      __$$HighlightLoadedImplCopyWithImpl<$Res>;
-  @useResult
-  $Res call({List<Highlight> items, String? nextCursor});
-}
-
-/// @nodoc
-class __$$HighlightLoadedImplCopyWithImpl<$Res>
-    extends _$HighlightStateCopyWithImpl<$Res, _$HighlightLoadedImpl>
-    implements _$$HighlightLoadedImplCopyWith<$Res> {
-  __$$HighlightLoadedImplCopyWithImpl(
-      _$HighlightLoadedImpl _value, $Res Function(_$HighlightLoadedImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of HighlightState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? items = null,
-    Object? nextCursor = freezed,
-  }) {
-    return _then(_$HighlightLoadedImpl(
-      items: null == items
-          ? _value._items
-          : items // ignore: cast_nullable_to_non_nullable
-              as List<Highlight>,
-      nextCursor: freezed == nextCursor
-          ? _value.nextCursor
-          : nextCursor // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ));
-  }
 }
 
 /// @nodoc
 
-class _$HighlightLoadedImpl implements HighlightLoaded {
-  const _$HighlightLoadedImpl(
-      {required final List<Highlight> items, this.nextCursor})
+class HighlightLoaded implements HighlightState {
+  const HighlightLoaded({required final List<Highlight> items, this.nextCursor})
       : _items = items;
 
   final List<Highlight> _items;
-  @override
   List<Highlight> get items {
     if (_items is EqualUnmodifiableListView) return _items;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_items);
   }
 
-  @override
   final String? nextCursor;
 
-  @override
-  String toString() {
-    return 'HighlightState.loaded(items: $items, nextCursor: $nextCursor)';
-  }
+  /// Create a copy of HighlightState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $HighlightLoadedCopyWith<HighlightLoaded> get copyWith =>
+      _$HighlightLoadedCopyWithImpl<HighlightLoaded>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$HighlightLoadedImpl &&
+            other is HighlightLoaded &&
             const DeepCollectionEquality().equals(other._items, _items) &&
             (identical(other.nextCursor, nextCursor) ||
                 other.nextCursor == nextCursor));
@@ -398,163 +317,70 @@ class _$HighlightLoadedImpl implements HighlightLoaded {
   int get hashCode => Object.hash(
       runtimeType, const DeepCollectionEquality().hash(_items), nextCursor);
 
-  /// Create a copy of HighlightState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$HighlightLoadedImplCopyWith<_$HighlightLoadedImpl> get copyWith =>
-      __$$HighlightLoadedImplCopyWithImpl<_$HighlightLoadedImpl>(
-          this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() loading,
-    required TResult Function(List<Highlight> items, String? nextCursor) loaded,
-    required TResult Function(String code, String message) error,
-  }) {
-    return loaded(items, nextCursor);
+  String toString() {
+    return 'HighlightState.loaded(items: $items, nextCursor: $nextCursor)';
   }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
-    TResult? Function()? loading,
-    TResult? Function(List<Highlight> items, String? nextCursor)? loaded,
-    TResult? Function(String code, String message)? error,
-  }) {
-    return loaded?.call(items, nextCursor);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? loading,
-    TResult Function(List<Highlight> items, String? nextCursor)? loaded,
-    TResult Function(String code, String message)? error,
-    required TResult orElse(),
-  }) {
-    if (loaded != null) {
-      return loaded(items, nextCursor);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(HighlightInitial value) initial,
-    required TResult Function(HighlightLoading value) loading,
-    required TResult Function(HighlightLoaded value) loaded,
-    required TResult Function(HighlightError value) error,
-  }) {
-    return loaded(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(HighlightInitial value)? initial,
-    TResult? Function(HighlightLoading value)? loading,
-    TResult? Function(HighlightLoaded value)? loaded,
-    TResult? Function(HighlightError value)? error,
-  }) {
-    return loaded?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(HighlightInitial value)? initial,
-    TResult Function(HighlightLoading value)? loading,
-    TResult Function(HighlightLoaded value)? loaded,
-    TResult Function(HighlightError value)? error,
-    required TResult orElse(),
-  }) {
-    if (loaded != null) {
-      return loaded(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class HighlightLoaded implements HighlightState {
-  const factory HighlightLoaded(
-      {required final List<Highlight> items,
-      final String? nextCursor}) = _$HighlightLoadedImpl;
-
-  List<Highlight> get items;
-  String? get nextCursor;
-
-  /// Create a copy of HighlightState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$HighlightLoadedImplCopyWith<_$HighlightLoadedImpl> get copyWith =>
-      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$$HighlightErrorImplCopyWith<$Res> {
-  factory _$$HighlightErrorImplCopyWith(_$HighlightErrorImpl value,
-          $Res Function(_$HighlightErrorImpl) then) =
-      __$$HighlightErrorImplCopyWithImpl<$Res>;
+abstract mixin class $HighlightLoadedCopyWith<$Res>
+    implements $HighlightStateCopyWith<$Res> {
+  factory $HighlightLoadedCopyWith(
+          HighlightLoaded value, $Res Function(HighlightLoaded) _then) =
+      _$HighlightLoadedCopyWithImpl;
   @useResult
-  $Res call({String code, String message});
+  $Res call({List<Highlight> items, String? nextCursor});
 }
 
 /// @nodoc
-class __$$HighlightErrorImplCopyWithImpl<$Res>
-    extends _$HighlightStateCopyWithImpl<$Res, _$HighlightErrorImpl>
-    implements _$$HighlightErrorImplCopyWith<$Res> {
-  __$$HighlightErrorImplCopyWithImpl(
-      _$HighlightErrorImpl _value, $Res Function(_$HighlightErrorImpl) _then)
-      : super(_value, _then);
+class _$HighlightLoadedCopyWithImpl<$Res>
+    implements $HighlightLoadedCopyWith<$Res> {
+  _$HighlightLoadedCopyWithImpl(this._self, this._then);
+
+  final HighlightLoaded _self;
+  final $Res Function(HighlightLoaded) _then;
 
   /// Create a copy of HighlightState
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
-  @override
   $Res call({
-    Object? code = null,
-    Object? message = null,
+    Object? items = null,
+    Object? nextCursor = freezed,
   }) {
-    return _then(_$HighlightErrorImpl(
-      code: null == code
-          ? _value.code
-          : code // ignore: cast_nullable_to_non_nullable
-              as String,
-      message: null == message
-          ? _value.message
-          : message // ignore: cast_nullable_to_non_nullable
-              as String,
+    return _then(HighlightLoaded(
+      items: null == items
+          ? _self._items
+          : items // ignore: cast_nullable_to_non_nullable
+              as List<Highlight>,
+      nextCursor: freezed == nextCursor
+          ? _self.nextCursor
+          : nextCursor // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
 
 /// @nodoc
 
-class _$HighlightErrorImpl implements HighlightError {
-  const _$HighlightErrorImpl({required this.code, required this.message});
+class HighlightError implements HighlightState {
+  const HighlightError({required this.code, required this.message});
 
-  @override
   final String code;
-  @override
   final String message;
 
-  @override
-  String toString() {
-    return 'HighlightState.error(code: $code, message: $message)';
-  }
+  /// Create a copy of HighlightState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $HighlightErrorCopyWith<HighlightError> get copyWith =>
+      _$HighlightErrorCopyWithImpl<HighlightError>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$HighlightErrorImpl &&
+            other is HighlightError &&
             (identical(other.code, code) || other.code == code) &&
             (identical(other.message, message) || other.message == message));
   }
@@ -562,101 +388,48 @@ class _$HighlightErrorImpl implements HighlightError {
   @override
   int get hashCode => Object.hash(runtimeType, code, message);
 
+  @override
+  String toString() {
+    return 'HighlightState.error(code: $code, message: $message)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $HighlightErrorCopyWith<$Res>
+    implements $HighlightStateCopyWith<$Res> {
+  factory $HighlightErrorCopyWith(
+          HighlightError value, $Res Function(HighlightError) _then) =
+      _$HighlightErrorCopyWithImpl;
+  @useResult
+  $Res call({String code, String message});
+}
+
+/// @nodoc
+class _$HighlightErrorCopyWithImpl<$Res>
+    implements $HighlightErrorCopyWith<$Res> {
+  _$HighlightErrorCopyWithImpl(this._self, this._then);
+
+  final HighlightError _self;
+  final $Res Function(HighlightError) _then;
+
   /// Create a copy of HighlightState
   /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
   @pragma('vm:prefer-inline')
-  _$$HighlightErrorImplCopyWith<_$HighlightErrorImpl> get copyWith =>
-      __$$HighlightErrorImplCopyWithImpl<_$HighlightErrorImpl>(
-          this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() loading,
-    required TResult Function(List<Highlight> items, String? nextCursor) loaded,
-    required TResult Function(String code, String message) error,
+  $Res call({
+    Object? code = null,
+    Object? message = null,
   }) {
-    return error(code, message);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
-    TResult? Function()? loading,
-    TResult? Function(List<Highlight> items, String? nextCursor)? loaded,
-    TResult? Function(String code, String message)? error,
-  }) {
-    return error?.call(code, message);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? loading,
-    TResult Function(List<Highlight> items, String? nextCursor)? loaded,
-    TResult Function(String code, String message)? error,
-    required TResult orElse(),
-  }) {
-    if (error != null) {
-      return error(code, message);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(HighlightInitial value) initial,
-    required TResult Function(HighlightLoading value) loading,
-    required TResult Function(HighlightLoaded value) loaded,
-    required TResult Function(HighlightError value) error,
-  }) {
-    return error(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(HighlightInitial value)? initial,
-    TResult? Function(HighlightLoading value)? loading,
-    TResult? Function(HighlightLoaded value)? loaded,
-    TResult? Function(HighlightError value)? error,
-  }) {
-    return error?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(HighlightInitial value)? initial,
-    TResult Function(HighlightLoading value)? loading,
-    TResult Function(HighlightLoaded value)? loaded,
-    TResult Function(HighlightError value)? error,
-    required TResult orElse(),
-  }) {
-    if (error != null) {
-      return error(this);
-    }
-    return orElse();
+    return _then(HighlightError(
+      code: null == code
+          ? _self.code
+          : code // ignore: cast_nullable_to_non_nullable
+              as String,
+      message: null == message
+          ? _self.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
   }
 }
 
-abstract class HighlightError implements HighlightState {
-  const factory HighlightError(
-      {required final String code,
-      required final String message}) = _$HighlightErrorImpl;
-
-  String get code;
-  String get message;
-
-  /// Create a copy of HighlightState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$HighlightErrorImplCopyWith<_$HighlightErrorImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
+// dart format on

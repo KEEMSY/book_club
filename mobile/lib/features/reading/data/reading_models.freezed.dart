@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,204 +9,34 @@ part of 'reading_models.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-ReadingSessionDto _$ReadingSessionDtoFromJson(Map<String, dynamic> json) {
-  return _ReadingSessionDto.fromJson(json);
-}
 
 /// @nodoc
 mixin _$ReadingSessionDto {
-  String get id => throw _privateConstructorUsedError;
-  String get userBookId => throw _privateConstructorUsedError;
-  DateTime get startedAt => throw _privateConstructorUsedError;
-  String get source => throw _privateConstructorUsedError;
-  DateTime? get endedAt => throw _privateConstructorUsedError;
-  int? get durationSec => throw _privateConstructorUsedError;
-
-  /// Serializes this ReadingSessionDto to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  String get id;
+  String get userBookId;
+  DateTime get startedAt;
+  String get source;
+  DateTime? get endedAt;
+  int? get durationSec;
 
   /// Create a copy of ReadingSessionDto
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
   $ReadingSessionDtoCopyWith<ReadingSessionDto> get copyWith =>
-      throw _privateConstructorUsedError;
-}
+      _$ReadingSessionDtoCopyWithImpl<ReadingSessionDto>(
+          this as ReadingSessionDto, _$identity);
 
-/// @nodoc
-abstract class $ReadingSessionDtoCopyWith<$Res> {
-  factory $ReadingSessionDtoCopyWith(
-          ReadingSessionDto value, $Res Function(ReadingSessionDto) then) =
-      _$ReadingSessionDtoCopyWithImpl<$Res, ReadingSessionDto>;
-  @useResult
-  $Res call(
-      {String id,
-      String userBookId,
-      DateTime startedAt,
-      String source,
-      DateTime? endedAt,
-      int? durationSec});
-}
-
-/// @nodoc
-class _$ReadingSessionDtoCopyWithImpl<$Res, $Val extends ReadingSessionDto>
-    implements $ReadingSessionDtoCopyWith<$Res> {
-  _$ReadingSessionDtoCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of ReadingSessionDto
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? userBookId = null,
-    Object? startedAt = null,
-    Object? source = null,
-    Object? endedAt = freezed,
-    Object? durationSec = freezed,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      userBookId: null == userBookId
-          ? _value.userBookId
-          : userBookId // ignore: cast_nullable_to_non_nullable
-              as String,
-      startedAt: null == startedAt
-          ? _value.startedAt
-          : startedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      source: null == source
-          ? _value.source
-          : source // ignore: cast_nullable_to_non_nullable
-              as String,
-      endedAt: freezed == endedAt
-          ? _value.endedAt
-          : endedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      durationSec: freezed == durationSec
-          ? _value.durationSec
-          : durationSec // ignore: cast_nullable_to_non_nullable
-              as int?,
-    ) as $Val);
-  }
-}
-
-/// @nodoc
-abstract class _$$ReadingSessionDtoImplCopyWith<$Res>
-    implements $ReadingSessionDtoCopyWith<$Res> {
-  factory _$$ReadingSessionDtoImplCopyWith(_$ReadingSessionDtoImpl value,
-          $Res Function(_$ReadingSessionDtoImpl) then) =
-      __$$ReadingSessionDtoImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {String id,
-      String userBookId,
-      DateTime startedAt,
-      String source,
-      DateTime? endedAt,
-      int? durationSec});
-}
-
-/// @nodoc
-class __$$ReadingSessionDtoImplCopyWithImpl<$Res>
-    extends _$ReadingSessionDtoCopyWithImpl<$Res, _$ReadingSessionDtoImpl>
-    implements _$$ReadingSessionDtoImplCopyWith<$Res> {
-  __$$ReadingSessionDtoImplCopyWithImpl(_$ReadingSessionDtoImpl _value,
-      $Res Function(_$ReadingSessionDtoImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of ReadingSessionDto
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? userBookId = null,
-    Object? startedAt = null,
-    Object? source = null,
-    Object? endedAt = freezed,
-    Object? durationSec = freezed,
-  }) {
-    return _then(_$ReadingSessionDtoImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      userBookId: null == userBookId
-          ? _value.userBookId
-          : userBookId // ignore: cast_nullable_to_non_nullable
-              as String,
-      startedAt: null == startedAt
-          ? _value.startedAt
-          : startedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      source: null == source
-          ? _value.source
-          : source // ignore: cast_nullable_to_non_nullable
-              as String,
-      endedAt: freezed == endedAt
-          ? _value.endedAt
-          : endedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      durationSec: freezed == durationSec
-          ? _value.durationSec
-          : durationSec // ignore: cast_nullable_to_non_nullable
-              as int?,
-    ));
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$ReadingSessionDtoImpl extends _ReadingSessionDto {
-  const _$ReadingSessionDtoImpl(
-      {required this.id,
-      required this.userBookId,
-      required this.startedAt,
-      required this.source,
-      this.endedAt,
-      this.durationSec})
-      : super._();
-
-  factory _$ReadingSessionDtoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ReadingSessionDtoImplFromJson(json);
-
-  @override
-  final String id;
-  @override
-  final String userBookId;
-  @override
-  final DateTime startedAt;
-  @override
-  final String source;
-  @override
-  final DateTime? endedAt;
-  @override
-  final int? durationSec;
-
-  @override
-  String toString() {
-    return 'ReadingSessionDto(id: $id, userBookId: $userBookId, startedAt: $startedAt, source: $source, endedAt: $endedAt, durationSec: $durationSec)';
-  }
+  /// Serializes this ReadingSessionDto to a JSON map.
+  Map<String, dynamic> toJson();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ReadingSessionDtoImpl &&
+            other is ReadingSessionDto &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.userBookId, userBookId) ||
                 other.userBookId == userBookId) &&
@@ -223,186 +53,398 @@ class _$ReadingSessionDtoImpl extends _ReadingSessionDto {
   int get hashCode => Object.hash(
       runtimeType, id, userBookId, startedAt, source, endedAt, durationSec);
 
-  /// Create a copy of ReadingSessionDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$ReadingSessionDtoImplCopyWith<_$ReadingSessionDtoImpl> get copyWith =>
-      __$$ReadingSessionDtoImplCopyWithImpl<_$ReadingSessionDtoImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ReadingSessionDtoImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _ReadingSessionDto extends ReadingSessionDto {
-  const factory _ReadingSessionDto(
-      {required final String id,
-      required final String userBookId,
-      required final DateTime startedAt,
-      required final String source,
-      final DateTime? endedAt,
-      final int? durationSec}) = _$ReadingSessionDtoImpl;
-  const _ReadingSessionDto._() : super._();
-
-  factory _ReadingSessionDto.fromJson(Map<String, dynamic> json) =
-      _$ReadingSessionDtoImpl.fromJson;
-
-  @override
-  String get id;
-  @override
-  String get userBookId;
-  @override
-  DateTime get startedAt;
-  @override
-  String get source;
-  @override
-  DateTime? get endedAt;
-  @override
-  int? get durationSec;
-
-  /// Create a copy of ReadingSessionDto
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ReadingSessionDtoImplCopyWith<_$ReadingSessionDtoImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-NextGradeThresholdsDto _$NextGradeThresholdsDtoFromJson(
-    Map<String, dynamic> json) {
-  return _NextGradeThresholdsDto.fromJson(json);
-}
-
-/// @nodoc
-mixin _$NextGradeThresholdsDto {
-  int get targetBooks => throw _privateConstructorUsedError;
-  int get targetSeconds => throw _privateConstructorUsedError;
-
-  /// Serializes this NextGradeThresholdsDto to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of NextGradeThresholdsDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $NextGradeThresholdsDtoCopyWith<NextGradeThresholdsDto> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $NextGradeThresholdsDtoCopyWith<$Res> {
-  factory $NextGradeThresholdsDtoCopyWith(NextGradeThresholdsDto value,
-          $Res Function(NextGradeThresholdsDto) then) =
-      _$NextGradeThresholdsDtoCopyWithImpl<$Res, NextGradeThresholdsDto>;
-  @useResult
-  $Res call({int targetBooks, int targetSeconds});
-}
-
-/// @nodoc
-class _$NextGradeThresholdsDtoCopyWithImpl<$Res,
-        $Val extends NextGradeThresholdsDto>
-    implements $NextGradeThresholdsDtoCopyWith<$Res> {
-  _$NextGradeThresholdsDtoCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of NextGradeThresholdsDto
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? targetBooks = null,
-    Object? targetSeconds = null,
-  }) {
-    return _then(_value.copyWith(
-      targetBooks: null == targetBooks
-          ? _value.targetBooks
-          : targetBooks // ignore: cast_nullable_to_non_nullable
-              as int,
-      targetSeconds: null == targetSeconds
-          ? _value.targetSeconds
-          : targetSeconds // ignore: cast_nullable_to_non_nullable
-              as int,
-    ) as $Val);
+  String toString() {
+    return 'ReadingSessionDto(id: $id, userBookId: $userBookId, startedAt: $startedAt, source: $source, endedAt: $endedAt, durationSec: $durationSec)';
   }
 }
 
 /// @nodoc
-abstract class _$$NextGradeThresholdsDtoImplCopyWith<$Res>
-    implements $NextGradeThresholdsDtoCopyWith<$Res> {
-  factory _$$NextGradeThresholdsDtoImplCopyWith(
-          _$NextGradeThresholdsDtoImpl value,
-          $Res Function(_$NextGradeThresholdsDtoImpl) then) =
-      __$$NextGradeThresholdsDtoImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $ReadingSessionDtoCopyWith<$Res> {
+  factory $ReadingSessionDtoCopyWith(
+          ReadingSessionDto value, $Res Function(ReadingSessionDto) _then) =
+      _$ReadingSessionDtoCopyWithImpl;
   @useResult
-  $Res call({int targetBooks, int targetSeconds});
+  $Res call(
+      {String id,
+      String userBookId,
+      DateTime startedAt,
+      String source,
+      DateTime? endedAt,
+      int? durationSec});
 }
 
 /// @nodoc
-class __$$NextGradeThresholdsDtoImplCopyWithImpl<$Res>
-    extends _$NextGradeThresholdsDtoCopyWithImpl<$Res,
-        _$NextGradeThresholdsDtoImpl>
-    implements _$$NextGradeThresholdsDtoImplCopyWith<$Res> {
-  __$$NextGradeThresholdsDtoImplCopyWithImpl(
-      _$NextGradeThresholdsDtoImpl _value,
-      $Res Function(_$NextGradeThresholdsDtoImpl) _then)
-      : super(_value, _then);
+class _$ReadingSessionDtoCopyWithImpl<$Res>
+    implements $ReadingSessionDtoCopyWith<$Res> {
+  _$ReadingSessionDtoCopyWithImpl(this._self, this._then);
 
-  /// Create a copy of NextGradeThresholdsDto
+  final ReadingSessionDto _self;
+  final $Res Function(ReadingSessionDto) _then;
+
+  /// Create a copy of ReadingSessionDto
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? targetBooks = null,
-    Object? targetSeconds = null,
+    Object? id = null,
+    Object? userBookId = null,
+    Object? startedAt = null,
+    Object? source = null,
+    Object? endedAt = freezed,
+    Object? durationSec = freezed,
   }) {
-    return _then(_$NextGradeThresholdsDtoImpl(
-      targetBooks: null == targetBooks
-          ? _value.targetBooks
-          : targetBooks // ignore: cast_nullable_to_non_nullable
-              as int,
-      targetSeconds: null == targetSeconds
-          ? _value.targetSeconds
-          : targetSeconds // ignore: cast_nullable_to_non_nullable
-              as int,
+    return _then(_self.copyWith(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      userBookId: null == userBookId
+          ? _self.userBookId
+          : userBookId // ignore: cast_nullable_to_non_nullable
+              as String,
+      startedAt: null == startedAt
+          ? _self.startedAt
+          : startedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      source: null == source
+          ? _self.source
+          : source // ignore: cast_nullable_to_non_nullable
+              as String,
+      endedAt: freezed == endedAt
+          ? _self.endedAt
+          : endedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      durationSec: freezed == durationSec
+          ? _self.durationSec
+          : durationSec // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [ReadingSessionDto].
+extension ReadingSessionDtoPatterns on ReadingSessionDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_ReadingSessionDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ReadingSessionDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_ReadingSessionDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ReadingSessionDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_ReadingSessionDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ReadingSessionDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String id, String userBookId, DateTime startedAt,
+            String source, DateTime? endedAt, int? durationSec)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ReadingSessionDto() when $default != null:
+        return $default(_that.id, _that.userBookId, _that.startedAt,
+            _that.source, _that.endedAt, _that.durationSec);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String id, String userBookId, DateTime startedAt,
+            String source, DateTime? endedAt, int? durationSec)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ReadingSessionDto():
+        return $default(_that.id, _that.userBookId, _that.startedAt,
+            _that.source, _that.endedAt, _that.durationSec);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String id, String userBookId, DateTime startedAt,
+            String source, DateTime? endedAt, int? durationSec)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ReadingSessionDto() when $default != null:
+        return $default(_that.id, _that.userBookId, _that.startedAt,
+            _that.source, _that.endedAt, _that.durationSec);
+      case _:
+        return null;
+    }
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$NextGradeThresholdsDtoImpl extends _NextGradeThresholdsDto {
-  const _$NextGradeThresholdsDtoImpl(
-      {required this.targetBooks, required this.targetSeconds})
+class _ReadingSessionDto extends ReadingSessionDto {
+  const _ReadingSessionDto(
+      {required this.id,
+      required this.userBookId,
+      required this.startedAt,
+      required this.source,
+      this.endedAt,
+      this.durationSec})
       : super._();
-
-  factory _$NextGradeThresholdsDtoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$NextGradeThresholdsDtoImplFromJson(json);
-
-  @override
-  final int targetBooks;
-  @override
-  final int targetSeconds;
+  factory _ReadingSessionDto.fromJson(Map<String, dynamic> json) =>
+      _$ReadingSessionDtoFromJson(json);
 
   @override
-  String toString() {
-    return 'NextGradeThresholdsDto(targetBooks: $targetBooks, targetSeconds: $targetSeconds)';
+  final String id;
+  @override
+  final String userBookId;
+  @override
+  final DateTime startedAt;
+  @override
+  final String source;
+  @override
+  final DateTime? endedAt;
+  @override
+  final int? durationSec;
+
+  /// Create a copy of ReadingSessionDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$ReadingSessionDtoCopyWith<_ReadingSessionDto> get copyWith =>
+      __$ReadingSessionDtoCopyWithImpl<_ReadingSessionDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$ReadingSessionDtoToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$NextGradeThresholdsDtoImpl &&
+            other is _ReadingSessionDto &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.userBookId, userBookId) ||
+                other.userBookId == userBookId) &&
+            (identical(other.startedAt, startedAt) ||
+                other.startedAt == startedAt) &&
+            (identical(other.source, source) || other.source == source) &&
+            (identical(other.endedAt, endedAt) || other.endedAt == endedAt) &&
+            (identical(other.durationSec, durationSec) ||
+                other.durationSec == durationSec));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, id, userBookId, startedAt, source, endedAt, durationSec);
+
+  @override
+  String toString() {
+    return 'ReadingSessionDto(id: $id, userBookId: $userBookId, startedAt: $startedAt, source: $source, endedAt: $endedAt, durationSec: $durationSec)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$ReadingSessionDtoCopyWith<$Res>
+    implements $ReadingSessionDtoCopyWith<$Res> {
+  factory _$ReadingSessionDtoCopyWith(
+          _ReadingSessionDto value, $Res Function(_ReadingSessionDto) _then) =
+      __$ReadingSessionDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      String userBookId,
+      DateTime startedAt,
+      String source,
+      DateTime? endedAt,
+      int? durationSec});
+}
+
+/// @nodoc
+class __$ReadingSessionDtoCopyWithImpl<$Res>
+    implements _$ReadingSessionDtoCopyWith<$Res> {
+  __$ReadingSessionDtoCopyWithImpl(this._self, this._then);
+
+  final _ReadingSessionDto _self;
+  final $Res Function(_ReadingSessionDto) _then;
+
+  /// Create a copy of ReadingSessionDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? userBookId = null,
+    Object? startedAt = null,
+    Object? source = null,
+    Object? endedAt = freezed,
+    Object? durationSec = freezed,
+  }) {
+    return _then(_ReadingSessionDto(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      userBookId: null == userBookId
+          ? _self.userBookId
+          : userBookId // ignore: cast_nullable_to_non_nullable
+              as String,
+      startedAt: null == startedAt
+          ? _self.startedAt
+          : startedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      source: null == source
+          ? _self.source
+          : source // ignore: cast_nullable_to_non_nullable
+              as String,
+      endedAt: freezed == endedAt
+          ? _self.endedAt
+          : endedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      durationSec: freezed == durationSec
+          ? _self.durationSec
+          : durationSec // ignore: cast_nullable_to_non_nullable
+              as int?,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$NextGradeThresholdsDto {
+  int get targetBooks;
+  int get targetSeconds;
+
+  /// Create a copy of NextGradeThresholdsDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $NextGradeThresholdsDtoCopyWith<NextGradeThresholdsDto> get copyWith =>
+      _$NextGradeThresholdsDtoCopyWithImpl<NextGradeThresholdsDto>(
+          this as NextGradeThresholdsDto, _$identity);
+
+  /// Serializes this NextGradeThresholdsDto to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is NextGradeThresholdsDto &&
             (identical(other.targetBooks, targetBooks) ||
                 other.targetBooks == targetBooks) &&
             (identical(other.targetSeconds, targetSeconds) ||
@@ -413,276 +455,324 @@ class _$NextGradeThresholdsDtoImpl extends _NextGradeThresholdsDto {
   @override
   int get hashCode => Object.hash(runtimeType, targetBooks, targetSeconds);
 
-  /// Create a copy of NextGradeThresholdsDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$NextGradeThresholdsDtoImplCopyWith<_$NextGradeThresholdsDtoImpl>
-      get copyWith => __$$NextGradeThresholdsDtoImplCopyWithImpl<
-          _$NextGradeThresholdsDtoImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$NextGradeThresholdsDtoImplToJson(
-      this,
-    );
+  String toString() {
+    return 'NextGradeThresholdsDto(targetBooks: $targetBooks, targetSeconds: $targetSeconds)';
   }
 }
 
-abstract class _NextGradeThresholdsDto extends NextGradeThresholdsDto {
-  const factory _NextGradeThresholdsDto(
-      {required final int targetBooks,
-      required final int targetSeconds}) = _$NextGradeThresholdsDtoImpl;
-  const _NextGradeThresholdsDto._() : super._();
+/// @nodoc
+abstract mixin class $NextGradeThresholdsDtoCopyWith<$Res> {
+  factory $NextGradeThresholdsDtoCopyWith(NextGradeThresholdsDto value,
+          $Res Function(NextGradeThresholdsDto) _then) =
+      _$NextGradeThresholdsDtoCopyWithImpl;
+  @useResult
+  $Res call({int targetBooks, int targetSeconds});
+}
 
-  factory _NextGradeThresholdsDto.fromJson(Map<String, dynamic> json) =
-      _$NextGradeThresholdsDtoImpl.fromJson;
+/// @nodoc
+class _$NextGradeThresholdsDtoCopyWithImpl<$Res>
+    implements $NextGradeThresholdsDtoCopyWith<$Res> {
+  _$NextGradeThresholdsDtoCopyWithImpl(this._self, this._then);
 
-  @override
-  int get targetBooks;
-  @override
-  int get targetSeconds;
+  final NextGradeThresholdsDto _self;
+  final $Res Function(NextGradeThresholdsDto) _then;
 
   /// Create a copy of NextGradeThresholdsDto
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$NextGradeThresholdsDtoImplCopyWith<_$NextGradeThresholdsDtoImpl>
-      get copyWith => throw _privateConstructorUsedError;
-}
-
-GradeSummaryDto _$GradeSummaryDtoFromJson(Map<String, dynamic> json) {
-  return _GradeSummaryDto.fromJson(json);
-}
-
-/// @nodoc
-mixin _$GradeSummaryDto {
-  int get grade => throw _privateConstructorUsedError;
-  int get totalBooks => throw _privateConstructorUsedError;
-  int get totalSeconds => throw _privateConstructorUsedError;
-  int get streakDays => throw _privateConstructorUsedError;
-  int get longestStreak => throw _privateConstructorUsedError;
-  NextGradeThresholdsDto? get nextGradeThresholds =>
-      throw _privateConstructorUsedError;
-  int get tier => throw _privateConstructorUsedError;
-
-  /// Serializes this GradeSummaryDto to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of GradeSummaryDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $GradeSummaryDtoCopyWith<GradeSummaryDto> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $GradeSummaryDtoCopyWith<$Res> {
-  factory $GradeSummaryDtoCopyWith(
-          GradeSummaryDto value, $Res Function(GradeSummaryDto) then) =
-      _$GradeSummaryDtoCopyWithImpl<$Res, GradeSummaryDto>;
-  @useResult
-  $Res call(
-      {int grade,
-      int totalBooks,
-      int totalSeconds,
-      int streakDays,
-      int longestStreak,
-      NextGradeThresholdsDto? nextGradeThresholds,
-      int tier});
-
-  $NextGradeThresholdsDtoCopyWith<$Res>? get nextGradeThresholds;
-}
-
-/// @nodoc
-class _$GradeSummaryDtoCopyWithImpl<$Res, $Val extends GradeSummaryDto>
-    implements $GradeSummaryDtoCopyWith<$Res> {
-  _$GradeSummaryDtoCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of GradeSummaryDto
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? grade = null,
-    Object? totalBooks = null,
-    Object? totalSeconds = null,
-    Object? streakDays = null,
-    Object? longestStreak = null,
-    Object? nextGradeThresholds = freezed,
-    Object? tier = null,
+    Object? targetBooks = null,
+    Object? targetSeconds = null,
   }) {
-    return _then(_value.copyWith(
-      grade: null == grade
-          ? _value.grade
-          : grade // ignore: cast_nullable_to_non_nullable
+    return _then(_self.copyWith(
+      targetBooks: null == targetBooks
+          ? _self.targetBooks
+          : targetBooks // ignore: cast_nullable_to_non_nullable
               as int,
-      totalBooks: null == totalBooks
-          ? _value.totalBooks
-          : totalBooks // ignore: cast_nullable_to_non_nullable
-              as int,
-      totalSeconds: null == totalSeconds
-          ? _value.totalSeconds
-          : totalSeconds // ignore: cast_nullable_to_non_nullable
-              as int,
-      streakDays: null == streakDays
-          ? _value.streakDays
-          : streakDays // ignore: cast_nullable_to_non_nullable
-              as int,
-      longestStreak: null == longestStreak
-          ? _value.longestStreak
-          : longestStreak // ignore: cast_nullable_to_non_nullable
-              as int,
-      nextGradeThresholds: freezed == nextGradeThresholds
-          ? _value.nextGradeThresholds
-          : nextGradeThresholds // ignore: cast_nullable_to_non_nullable
-              as NextGradeThresholdsDto?,
-      tier: null == tier
-          ? _value.tier
-          : tier // ignore: cast_nullable_to_non_nullable
-              as int,
-    ) as $Val);
-  }
-
-  /// Create a copy of GradeSummaryDto
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $NextGradeThresholdsDtoCopyWith<$Res>? get nextGradeThresholds {
-    if (_value.nextGradeThresholds == null) {
-      return null;
-    }
-
-    return $NextGradeThresholdsDtoCopyWith<$Res>(_value.nextGradeThresholds!,
-        (value) {
-      return _then(_value.copyWith(nextGradeThresholds: value) as $Val);
-    });
-  }
-}
-
-/// @nodoc
-abstract class _$$GradeSummaryDtoImplCopyWith<$Res>
-    implements $GradeSummaryDtoCopyWith<$Res> {
-  factory _$$GradeSummaryDtoImplCopyWith(_$GradeSummaryDtoImpl value,
-          $Res Function(_$GradeSummaryDtoImpl) then) =
-      __$$GradeSummaryDtoImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {int grade,
-      int totalBooks,
-      int totalSeconds,
-      int streakDays,
-      int longestStreak,
-      NextGradeThresholdsDto? nextGradeThresholds,
-      int tier});
-
-  @override
-  $NextGradeThresholdsDtoCopyWith<$Res>? get nextGradeThresholds;
-}
-
-/// @nodoc
-class __$$GradeSummaryDtoImplCopyWithImpl<$Res>
-    extends _$GradeSummaryDtoCopyWithImpl<$Res, _$GradeSummaryDtoImpl>
-    implements _$$GradeSummaryDtoImplCopyWith<$Res> {
-  __$$GradeSummaryDtoImplCopyWithImpl(
-      _$GradeSummaryDtoImpl _value, $Res Function(_$GradeSummaryDtoImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of GradeSummaryDto
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? grade = null,
-    Object? totalBooks = null,
-    Object? totalSeconds = null,
-    Object? streakDays = null,
-    Object? longestStreak = null,
-    Object? nextGradeThresholds = freezed,
-    Object? tier = null,
-  }) {
-    return _then(_$GradeSummaryDtoImpl(
-      grade: null == grade
-          ? _value.grade
-          : grade // ignore: cast_nullable_to_non_nullable
-              as int,
-      totalBooks: null == totalBooks
-          ? _value.totalBooks
-          : totalBooks // ignore: cast_nullable_to_non_nullable
-              as int,
-      totalSeconds: null == totalSeconds
-          ? _value.totalSeconds
-          : totalSeconds // ignore: cast_nullable_to_non_nullable
-              as int,
-      streakDays: null == streakDays
-          ? _value.streakDays
-          : streakDays // ignore: cast_nullable_to_non_nullable
-              as int,
-      longestStreak: null == longestStreak
-          ? _value.longestStreak
-          : longestStreak // ignore: cast_nullable_to_non_nullable
-              as int,
-      nextGradeThresholds: freezed == nextGradeThresholds
-          ? _value.nextGradeThresholds
-          : nextGradeThresholds // ignore: cast_nullable_to_non_nullable
-              as NextGradeThresholdsDto?,
-      tier: null == tier
-          ? _value.tier
-          : tier // ignore: cast_nullable_to_non_nullable
+      targetSeconds: null == targetSeconds
+          ? _self.targetSeconds
+          : targetSeconds // ignore: cast_nullable_to_non_nullable
               as int,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [NextGradeThresholdsDto].
+extension NextGradeThresholdsDtoPatterns on NextGradeThresholdsDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_NextGradeThresholdsDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _NextGradeThresholdsDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_NextGradeThresholdsDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _NextGradeThresholdsDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_NextGradeThresholdsDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _NextGradeThresholdsDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(int targetBooks, int targetSeconds)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _NextGradeThresholdsDto() when $default != null:
+        return $default(_that.targetBooks, _that.targetSeconds);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(int targetBooks, int targetSeconds) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _NextGradeThresholdsDto():
+        return $default(_that.targetBooks, _that.targetSeconds);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(int targetBooks, int targetSeconds)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _NextGradeThresholdsDto() when $default != null:
+        return $default(_that.targetBooks, _that.targetSeconds);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$GradeSummaryDtoImpl extends _GradeSummaryDto {
-  const _$GradeSummaryDtoImpl(
-      {required this.grade,
-      required this.totalBooks,
-      required this.totalSeconds,
-      required this.streakDays,
-      required this.longestStreak,
-      this.nextGradeThresholds,
-      this.tier = 1})
+class _NextGradeThresholdsDto extends NextGradeThresholdsDto {
+  const _NextGradeThresholdsDto(
+      {required this.targetBooks, required this.targetSeconds})
       : super._();
-
-  factory _$GradeSummaryDtoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$GradeSummaryDtoImplFromJson(json);
-
-  @override
-  final int grade;
-  @override
-  final int totalBooks;
-  @override
-  final int totalSeconds;
-  @override
-  final int streakDays;
-  @override
-  final int longestStreak;
-  @override
-  final NextGradeThresholdsDto? nextGradeThresholds;
-  @override
-  @JsonKey()
-  final int tier;
+  factory _NextGradeThresholdsDto.fromJson(Map<String, dynamic> json) =>
+      _$NextGradeThresholdsDtoFromJson(json);
 
   @override
-  String toString() {
-    return 'GradeSummaryDto(grade: $grade, totalBooks: $totalBooks, totalSeconds: $totalSeconds, streakDays: $streakDays, longestStreak: $longestStreak, nextGradeThresholds: $nextGradeThresholds, tier: $tier)';
+  final int targetBooks;
+  @override
+  final int targetSeconds;
+
+  /// Create a copy of NextGradeThresholdsDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$NextGradeThresholdsDtoCopyWith<_NextGradeThresholdsDto> get copyWith =>
+      __$NextGradeThresholdsDtoCopyWithImpl<_NextGradeThresholdsDto>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$NextGradeThresholdsDtoToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$GradeSummaryDtoImpl &&
+            other is _NextGradeThresholdsDto &&
+            (identical(other.targetBooks, targetBooks) ||
+                other.targetBooks == targetBooks) &&
+            (identical(other.targetSeconds, targetSeconds) ||
+                other.targetSeconds == targetSeconds));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, targetBooks, targetSeconds);
+
+  @override
+  String toString() {
+    return 'NextGradeThresholdsDto(targetBooks: $targetBooks, targetSeconds: $targetSeconds)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$NextGradeThresholdsDtoCopyWith<$Res>
+    implements $NextGradeThresholdsDtoCopyWith<$Res> {
+  factory _$NextGradeThresholdsDtoCopyWith(_NextGradeThresholdsDto value,
+          $Res Function(_NextGradeThresholdsDto) _then) =
+      __$NextGradeThresholdsDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call({int targetBooks, int targetSeconds});
+}
+
+/// @nodoc
+class __$NextGradeThresholdsDtoCopyWithImpl<$Res>
+    implements _$NextGradeThresholdsDtoCopyWith<$Res> {
+  __$NextGradeThresholdsDtoCopyWithImpl(this._self, this._then);
+
+  final _NextGradeThresholdsDto _self;
+  final $Res Function(_NextGradeThresholdsDto) _then;
+
+  /// Create a copy of NextGradeThresholdsDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? targetBooks = null,
+    Object? targetSeconds = null,
+  }) {
+    return _then(_NextGradeThresholdsDto(
+      targetBooks: null == targetBooks
+          ? _self.targetBooks
+          : targetBooks // ignore: cast_nullable_to_non_nullable
+              as int,
+      targetSeconds: null == targetSeconds
+          ? _self.targetSeconds
+          : targetSeconds // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$GradeSummaryDto {
+  int get grade;
+  int get totalBooks;
+  int get totalSeconds;
+  int get streakDays;
+  int get longestStreak;
+  NextGradeThresholdsDto? get nextGradeThresholds;
+  int get tier;
+
+  /// Create a copy of GradeSummaryDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $GradeSummaryDtoCopyWith<GradeSummaryDto> get copyWith =>
+      _$GradeSummaryDtoCopyWithImpl<GradeSummaryDto>(
+          this as GradeSummaryDto, _$identity);
+
+  /// Serializes this GradeSummaryDto to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is GradeSummaryDto &&
             (identical(other.grade, grade) || other.grade == grade) &&
             (identical(other.totalBooks, totalBooks) ||
                 other.totalBooks == totalBooks) &&
@@ -702,250 +792,490 @@ class _$GradeSummaryDtoImpl extends _GradeSummaryDto {
   int get hashCode => Object.hash(runtimeType, grade, totalBooks, totalSeconds,
       streakDays, longestStreak, nextGradeThresholds, tier);
 
-  /// Create a copy of GradeSummaryDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$GradeSummaryDtoImplCopyWith<_$GradeSummaryDtoImpl> get copyWith =>
-      __$$GradeSummaryDtoImplCopyWithImpl<_$GradeSummaryDtoImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$GradeSummaryDtoImplToJson(
-      this,
-    );
+  String toString() {
+    return 'GradeSummaryDto(grade: $grade, totalBooks: $totalBooks, totalSeconds: $totalSeconds, streakDays: $streakDays, longestStreak: $longestStreak, nextGradeThresholds: $nextGradeThresholds, tier: $tier)';
   }
 }
 
-abstract class _GradeSummaryDto extends GradeSummaryDto {
-  const factory _GradeSummaryDto(
-      {required final int grade,
-      required final int totalBooks,
-      required final int totalSeconds,
-      required final int streakDays,
-      required final int longestStreak,
-      final NextGradeThresholdsDto? nextGradeThresholds,
-      final int tier}) = _$GradeSummaryDtoImpl;
-  const _GradeSummaryDto._() : super._();
-
-  factory _GradeSummaryDto.fromJson(Map<String, dynamic> json) =
-      _$GradeSummaryDtoImpl.fromJson;
-
-  @override
-  int get grade;
-  @override
-  int get totalBooks;
-  @override
-  int get totalSeconds;
-  @override
-  int get streakDays;
-  @override
-  int get longestStreak;
-  @override
-  NextGradeThresholdsDto? get nextGradeThresholds;
-  @override
-  int get tier;
-
-  /// Create a copy of GradeSummaryDto
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$GradeSummaryDtoImplCopyWith<_$GradeSummaryDtoImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-SessionCompletionDto _$SessionCompletionDtoFromJson(Map<String, dynamic> json) {
-  return _SessionCompletionDto.fromJson(json);
-}
-
 /// @nodoc
-mixin _$SessionCompletionDto {
-  ReadingSessionDto get session => throw _privateConstructorUsedError;
-  GradeSummaryDto get grade => throw _privateConstructorUsedError;
-  int get streakDays => throw _privateConstructorUsedError;
-  bool get gradeUp => throw _privateConstructorUsedError;
-
-  /// Serializes this SessionCompletionDto to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of SessionCompletionDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $SessionCompletionDtoCopyWith<SessionCompletionDto> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $SessionCompletionDtoCopyWith<$Res> {
-  factory $SessionCompletionDtoCopyWith(SessionCompletionDto value,
-          $Res Function(SessionCompletionDto) then) =
-      _$SessionCompletionDtoCopyWithImpl<$Res, SessionCompletionDto>;
+abstract mixin class $GradeSummaryDtoCopyWith<$Res> {
+  factory $GradeSummaryDtoCopyWith(
+          GradeSummaryDto value, $Res Function(GradeSummaryDto) _then) =
+      _$GradeSummaryDtoCopyWithImpl;
   @useResult
   $Res call(
-      {ReadingSessionDto session,
-      GradeSummaryDto grade,
+      {int grade,
+      int totalBooks,
+      int totalSeconds,
       int streakDays,
-      bool gradeUp});
+      int longestStreak,
+      NextGradeThresholdsDto? nextGradeThresholds,
+      int tier});
 
-  $ReadingSessionDtoCopyWith<$Res> get session;
-  $GradeSummaryDtoCopyWith<$Res> get grade;
+  $NextGradeThresholdsDtoCopyWith<$Res>? get nextGradeThresholds;
 }
 
 /// @nodoc
-class _$SessionCompletionDtoCopyWithImpl<$Res,
-        $Val extends SessionCompletionDto>
-    implements $SessionCompletionDtoCopyWith<$Res> {
-  _$SessionCompletionDtoCopyWithImpl(this._value, this._then);
+class _$GradeSummaryDtoCopyWithImpl<$Res>
+    implements $GradeSummaryDtoCopyWith<$Res> {
+  _$GradeSummaryDtoCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final GradeSummaryDto _self;
+  final $Res Function(GradeSummaryDto) _then;
 
-  /// Create a copy of SessionCompletionDto
+  /// Create a copy of GradeSummaryDto
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? session = null,
     Object? grade = null,
+    Object? totalBooks = null,
+    Object? totalSeconds = null,
     Object? streakDays = null,
-    Object? gradeUp = null,
+    Object? longestStreak = null,
+    Object? nextGradeThresholds = freezed,
+    Object? tier = null,
   }) {
-    return _then(_value.copyWith(
-      session: null == session
-          ? _value.session
-          : session // ignore: cast_nullable_to_non_nullable
-              as ReadingSessionDto,
+    return _then(_self.copyWith(
       grade: null == grade
-          ? _value.grade
+          ? _self.grade
           : grade // ignore: cast_nullable_to_non_nullable
-              as GradeSummaryDto,
+              as int,
+      totalBooks: null == totalBooks
+          ? _self.totalBooks
+          : totalBooks // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalSeconds: null == totalSeconds
+          ? _self.totalSeconds
+          : totalSeconds // ignore: cast_nullable_to_non_nullable
+              as int,
       streakDays: null == streakDays
-          ? _value.streakDays
+          ? _self.streakDays
           : streakDays // ignore: cast_nullable_to_non_nullable
               as int,
-      gradeUp: null == gradeUp
-          ? _value.gradeUp
-          : gradeUp // ignore: cast_nullable_to_non_nullable
-              as bool,
-    ) as $Val);
-  }
-
-  /// Create a copy of SessionCompletionDto
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $ReadingSessionDtoCopyWith<$Res> get session {
-    return $ReadingSessionDtoCopyWith<$Res>(_value.session, (value) {
-      return _then(_value.copyWith(session: value) as $Val);
-    });
-  }
-
-  /// Create a copy of SessionCompletionDto
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $GradeSummaryDtoCopyWith<$Res> get grade {
-    return $GradeSummaryDtoCopyWith<$Res>(_value.grade, (value) {
-      return _then(_value.copyWith(grade: value) as $Val);
-    });
-  }
-}
-
-/// @nodoc
-abstract class _$$SessionCompletionDtoImplCopyWith<$Res>
-    implements $SessionCompletionDtoCopyWith<$Res> {
-  factory _$$SessionCompletionDtoImplCopyWith(_$SessionCompletionDtoImpl value,
-          $Res Function(_$SessionCompletionDtoImpl) then) =
-      __$$SessionCompletionDtoImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {ReadingSessionDto session,
-      GradeSummaryDto grade,
-      int streakDays,
-      bool gradeUp});
-
-  @override
-  $ReadingSessionDtoCopyWith<$Res> get session;
-  @override
-  $GradeSummaryDtoCopyWith<$Res> get grade;
-}
-
-/// @nodoc
-class __$$SessionCompletionDtoImplCopyWithImpl<$Res>
-    extends _$SessionCompletionDtoCopyWithImpl<$Res, _$SessionCompletionDtoImpl>
-    implements _$$SessionCompletionDtoImplCopyWith<$Res> {
-  __$$SessionCompletionDtoImplCopyWithImpl(_$SessionCompletionDtoImpl _value,
-      $Res Function(_$SessionCompletionDtoImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of SessionCompletionDto
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? session = null,
-    Object? grade = null,
-    Object? streakDays = null,
-    Object? gradeUp = null,
-  }) {
-    return _then(_$SessionCompletionDtoImpl(
-      session: null == session
-          ? _value.session
-          : session // ignore: cast_nullable_to_non_nullable
-              as ReadingSessionDto,
-      grade: null == grade
-          ? _value.grade
-          : grade // ignore: cast_nullable_to_non_nullable
-              as GradeSummaryDto,
-      streakDays: null == streakDays
-          ? _value.streakDays
-          : streakDays // ignore: cast_nullable_to_non_nullable
+      longestStreak: null == longestStreak
+          ? _self.longestStreak
+          : longestStreak // ignore: cast_nullable_to_non_nullable
               as int,
-      gradeUp: null == gradeUp
-          ? _value.gradeUp
-          : gradeUp // ignore: cast_nullable_to_non_nullable
-              as bool,
+      nextGradeThresholds: freezed == nextGradeThresholds
+          ? _self.nextGradeThresholds
+          : nextGradeThresholds // ignore: cast_nullable_to_non_nullable
+              as NextGradeThresholdsDto?,
+      tier: null == tier
+          ? _self.tier
+          : tier // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
+  }
+
+  /// Create a copy of GradeSummaryDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $NextGradeThresholdsDtoCopyWith<$Res>? get nextGradeThresholds {
+    if (_self.nextGradeThresholds == null) {
+      return null;
+    }
+
+    return $NextGradeThresholdsDtoCopyWith<$Res>(_self.nextGradeThresholds!,
+        (value) {
+      return _then(_self.copyWith(nextGradeThresholds: value));
+    });
+  }
+}
+
+/// Adds pattern-matching-related methods to [GradeSummaryDto].
+extension GradeSummaryDtoPatterns on GradeSummaryDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_GradeSummaryDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _GradeSummaryDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_GradeSummaryDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _GradeSummaryDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_GradeSummaryDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _GradeSummaryDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            int grade,
+            int totalBooks,
+            int totalSeconds,
+            int streakDays,
+            int longestStreak,
+            NextGradeThresholdsDto? nextGradeThresholds,
+            int tier)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _GradeSummaryDto() when $default != null:
+        return $default(
+            _that.grade,
+            _that.totalBooks,
+            _that.totalSeconds,
+            _that.streakDays,
+            _that.longestStreak,
+            _that.nextGradeThresholds,
+            _that.tier);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            int grade,
+            int totalBooks,
+            int totalSeconds,
+            int streakDays,
+            int longestStreak,
+            NextGradeThresholdsDto? nextGradeThresholds,
+            int tier)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _GradeSummaryDto():
+        return $default(
+            _that.grade,
+            _that.totalBooks,
+            _that.totalSeconds,
+            _that.streakDays,
+            _that.longestStreak,
+            _that.nextGradeThresholds,
+            _that.tier);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            int grade,
+            int totalBooks,
+            int totalSeconds,
+            int streakDays,
+            int longestStreak,
+            NextGradeThresholdsDto? nextGradeThresholds,
+            int tier)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _GradeSummaryDto() when $default != null:
+        return $default(
+            _that.grade,
+            _that.totalBooks,
+            _that.totalSeconds,
+            _that.streakDays,
+            _that.longestStreak,
+            _that.nextGradeThresholds,
+            _that.tier);
+      case _:
+        return null;
+    }
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$SessionCompletionDtoImpl extends _SessionCompletionDto {
-  const _$SessionCompletionDtoImpl(
-      {required this.session,
-      required this.grade,
+class _GradeSummaryDto extends GradeSummaryDto {
+  const _GradeSummaryDto(
+      {required this.grade,
+      required this.totalBooks,
+      required this.totalSeconds,
       required this.streakDays,
-      required this.gradeUp})
+      required this.longestStreak,
+      this.nextGradeThresholds,
+      this.tier = 1})
       : super._();
-
-  factory _$SessionCompletionDtoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$SessionCompletionDtoImplFromJson(json);
+  factory _GradeSummaryDto.fromJson(Map<String, dynamic> json) =>
+      _$GradeSummaryDtoFromJson(json);
 
   @override
-  final ReadingSessionDto session;
+  final int grade;
   @override
-  final GradeSummaryDto grade;
+  final int totalBooks;
+  @override
+  final int totalSeconds;
   @override
   final int streakDays;
   @override
-  final bool gradeUp;
+  final int longestStreak;
+  @override
+  final NextGradeThresholdsDto? nextGradeThresholds;
+  @override
+  @JsonKey()
+  final int tier;
+
+  /// Create a copy of GradeSummaryDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$GradeSummaryDtoCopyWith<_GradeSummaryDto> get copyWith =>
+      __$GradeSummaryDtoCopyWithImpl<_GradeSummaryDto>(this, _$identity);
 
   @override
-  String toString() {
-    return 'SessionCompletionDto(session: $session, grade: $grade, streakDays: $streakDays, gradeUp: $gradeUp)';
+  Map<String, dynamic> toJson() {
+    return _$GradeSummaryDtoToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$SessionCompletionDtoImpl &&
+            other is _GradeSummaryDto &&
+            (identical(other.grade, grade) || other.grade == grade) &&
+            (identical(other.totalBooks, totalBooks) ||
+                other.totalBooks == totalBooks) &&
+            (identical(other.totalSeconds, totalSeconds) ||
+                other.totalSeconds == totalSeconds) &&
+            (identical(other.streakDays, streakDays) ||
+                other.streakDays == streakDays) &&
+            (identical(other.longestStreak, longestStreak) ||
+                other.longestStreak == longestStreak) &&
+            (identical(other.nextGradeThresholds, nextGradeThresholds) ||
+                other.nextGradeThresholds == nextGradeThresholds) &&
+            (identical(other.tier, tier) || other.tier == tier));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, grade, totalBooks, totalSeconds,
+      streakDays, longestStreak, nextGradeThresholds, tier);
+
+  @override
+  String toString() {
+    return 'GradeSummaryDto(grade: $grade, totalBooks: $totalBooks, totalSeconds: $totalSeconds, streakDays: $streakDays, longestStreak: $longestStreak, nextGradeThresholds: $nextGradeThresholds, tier: $tier)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$GradeSummaryDtoCopyWith<$Res>
+    implements $GradeSummaryDtoCopyWith<$Res> {
+  factory _$GradeSummaryDtoCopyWith(
+          _GradeSummaryDto value, $Res Function(_GradeSummaryDto) _then) =
+      __$GradeSummaryDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {int grade,
+      int totalBooks,
+      int totalSeconds,
+      int streakDays,
+      int longestStreak,
+      NextGradeThresholdsDto? nextGradeThresholds,
+      int tier});
+
+  @override
+  $NextGradeThresholdsDtoCopyWith<$Res>? get nextGradeThresholds;
+}
+
+/// @nodoc
+class __$GradeSummaryDtoCopyWithImpl<$Res>
+    implements _$GradeSummaryDtoCopyWith<$Res> {
+  __$GradeSummaryDtoCopyWithImpl(this._self, this._then);
+
+  final _GradeSummaryDto _self;
+  final $Res Function(_GradeSummaryDto) _then;
+
+  /// Create a copy of GradeSummaryDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? grade = null,
+    Object? totalBooks = null,
+    Object? totalSeconds = null,
+    Object? streakDays = null,
+    Object? longestStreak = null,
+    Object? nextGradeThresholds = freezed,
+    Object? tier = null,
+  }) {
+    return _then(_GradeSummaryDto(
+      grade: null == grade
+          ? _self.grade
+          : grade // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalBooks: null == totalBooks
+          ? _self.totalBooks
+          : totalBooks // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalSeconds: null == totalSeconds
+          ? _self.totalSeconds
+          : totalSeconds // ignore: cast_nullable_to_non_nullable
+              as int,
+      streakDays: null == streakDays
+          ? _self.streakDays
+          : streakDays // ignore: cast_nullable_to_non_nullable
+              as int,
+      longestStreak: null == longestStreak
+          ? _self.longestStreak
+          : longestStreak // ignore: cast_nullable_to_non_nullable
+              as int,
+      nextGradeThresholds: freezed == nextGradeThresholds
+          ? _self.nextGradeThresholds
+          : nextGradeThresholds // ignore: cast_nullable_to_non_nullable
+              as NextGradeThresholdsDto?,
+      tier: null == tier
+          ? _self.tier
+          : tier // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+
+  /// Create a copy of GradeSummaryDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $NextGradeThresholdsDtoCopyWith<$Res>? get nextGradeThresholds {
+    if (_self.nextGradeThresholds == null) {
+      return null;
+    }
+
+    return $NextGradeThresholdsDtoCopyWith<$Res>(_self.nextGradeThresholds!,
+        (value) {
+      return _then(_self.copyWith(nextGradeThresholds: value));
+    });
+  }
+}
+
+/// @nodoc
+mixin _$SessionCompletionDto {
+  ReadingSessionDto get session;
+  GradeSummaryDto get grade;
+  int get streakDays;
+  bool get gradeUp;
+
+  /// Create a copy of SessionCompletionDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $SessionCompletionDtoCopyWith<SessionCompletionDto> get copyWith =>
+      _$SessionCompletionDtoCopyWithImpl<SessionCompletionDto>(
+          this as SessionCompletionDto, _$identity);
+
+  /// Serializes this SessionCompletionDto to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is SessionCompletionDto &&
             (identical(other.session, session) || other.session == session) &&
             (identical(other.grade, grade) || other.grade == grade) &&
             (identical(other.streakDays, streakDays) ||
@@ -958,191 +1288,414 @@ class _$SessionCompletionDtoImpl extends _SessionCompletionDto {
   int get hashCode =>
       Object.hash(runtimeType, session, grade, streakDays, gradeUp);
 
-  /// Create a copy of SessionCompletionDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$SessionCompletionDtoImplCopyWith<_$SessionCompletionDtoImpl>
-      get copyWith =>
-          __$$SessionCompletionDtoImplCopyWithImpl<_$SessionCompletionDtoImpl>(
-              this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$SessionCompletionDtoImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _SessionCompletionDto extends SessionCompletionDto {
-  const factory _SessionCompletionDto(
-      {required final ReadingSessionDto session,
-      required final GradeSummaryDto grade,
-      required final int streakDays,
-      required final bool gradeUp}) = _$SessionCompletionDtoImpl;
-  const _SessionCompletionDto._() : super._();
-
-  factory _SessionCompletionDto.fromJson(Map<String, dynamic> json) =
-      _$SessionCompletionDtoImpl.fromJson;
-
-  @override
-  ReadingSessionDto get session;
-  @override
-  GradeSummaryDto get grade;
-  @override
-  int get streakDays;
-  @override
-  bool get gradeUp;
-
-  /// Create a copy of SessionCompletionDto
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$SessionCompletionDtoImplCopyWith<_$SessionCompletionDtoImpl>
-      get copyWith => throw _privateConstructorUsedError;
-}
-
-HeatmapItemDto _$HeatmapItemDtoFromJson(Map<String, dynamic> json) {
-  return _HeatmapItemDto.fromJson(json);
-}
-
-/// @nodoc
-mixin _$HeatmapItemDto {
-  String get date => throw _privateConstructorUsedError;
-  int get totalSeconds => throw _privateConstructorUsedError;
-  int get sessionCount => throw _privateConstructorUsedError;
-
-  /// Serializes this HeatmapItemDto to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of HeatmapItemDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $HeatmapItemDtoCopyWith<HeatmapItemDto> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $HeatmapItemDtoCopyWith<$Res> {
-  factory $HeatmapItemDtoCopyWith(
-          HeatmapItemDto value, $Res Function(HeatmapItemDto) then) =
-      _$HeatmapItemDtoCopyWithImpl<$Res, HeatmapItemDto>;
-  @useResult
-  $Res call({String date, int totalSeconds, int sessionCount});
-}
-
-/// @nodoc
-class _$HeatmapItemDtoCopyWithImpl<$Res, $Val extends HeatmapItemDto>
-    implements $HeatmapItemDtoCopyWith<$Res> {
-  _$HeatmapItemDtoCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of HeatmapItemDto
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? date = null,
-    Object? totalSeconds = null,
-    Object? sessionCount = null,
-  }) {
-    return _then(_value.copyWith(
-      date: null == date
-          ? _value.date
-          : date // ignore: cast_nullable_to_non_nullable
-              as String,
-      totalSeconds: null == totalSeconds
-          ? _value.totalSeconds
-          : totalSeconds // ignore: cast_nullable_to_non_nullable
-              as int,
-      sessionCount: null == sessionCount
-          ? _value.sessionCount
-          : sessionCount // ignore: cast_nullable_to_non_nullable
-              as int,
-    ) as $Val);
+  String toString() {
+    return 'SessionCompletionDto(session: $session, grade: $grade, streakDays: $streakDays, gradeUp: $gradeUp)';
   }
 }
 
 /// @nodoc
-abstract class _$$HeatmapItemDtoImplCopyWith<$Res>
-    implements $HeatmapItemDtoCopyWith<$Res> {
-  factory _$$HeatmapItemDtoImplCopyWith(_$HeatmapItemDtoImpl value,
-          $Res Function(_$HeatmapItemDtoImpl) then) =
-      __$$HeatmapItemDtoImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $SessionCompletionDtoCopyWith<$Res> {
+  factory $SessionCompletionDtoCopyWith(SessionCompletionDto value,
+          $Res Function(SessionCompletionDto) _then) =
+      _$SessionCompletionDtoCopyWithImpl;
   @useResult
-  $Res call({String date, int totalSeconds, int sessionCount});
+  $Res call(
+      {ReadingSessionDto session,
+      GradeSummaryDto grade,
+      int streakDays,
+      bool gradeUp});
+
+  $ReadingSessionDtoCopyWith<$Res> get session;
+  $GradeSummaryDtoCopyWith<$Res> get grade;
 }
 
 /// @nodoc
-class __$$HeatmapItemDtoImplCopyWithImpl<$Res>
-    extends _$HeatmapItemDtoCopyWithImpl<$Res, _$HeatmapItemDtoImpl>
-    implements _$$HeatmapItemDtoImplCopyWith<$Res> {
-  __$$HeatmapItemDtoImplCopyWithImpl(
-      _$HeatmapItemDtoImpl _value, $Res Function(_$HeatmapItemDtoImpl) _then)
-      : super(_value, _then);
+class _$SessionCompletionDtoCopyWithImpl<$Res>
+    implements $SessionCompletionDtoCopyWith<$Res> {
+  _$SessionCompletionDtoCopyWithImpl(this._self, this._then);
 
-  /// Create a copy of HeatmapItemDto
+  final SessionCompletionDto _self;
+  final $Res Function(SessionCompletionDto) _then;
+
+  /// Create a copy of SessionCompletionDto
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? date = null,
-    Object? totalSeconds = null,
-    Object? sessionCount = null,
+    Object? session = null,
+    Object? grade = null,
+    Object? streakDays = null,
+    Object? gradeUp = null,
   }) {
-    return _then(_$HeatmapItemDtoImpl(
-      date: null == date
-          ? _value.date
-          : date // ignore: cast_nullable_to_non_nullable
-              as String,
-      totalSeconds: null == totalSeconds
-          ? _value.totalSeconds
-          : totalSeconds // ignore: cast_nullable_to_non_nullable
+    return _then(_self.copyWith(
+      session: null == session
+          ? _self.session
+          : session // ignore: cast_nullable_to_non_nullable
+              as ReadingSessionDto,
+      grade: null == grade
+          ? _self.grade
+          : grade // ignore: cast_nullable_to_non_nullable
+              as GradeSummaryDto,
+      streakDays: null == streakDays
+          ? _self.streakDays
+          : streakDays // ignore: cast_nullable_to_non_nullable
               as int,
-      sessionCount: null == sessionCount
-          ? _value.sessionCount
-          : sessionCount // ignore: cast_nullable_to_non_nullable
-              as int,
+      gradeUp: null == gradeUp
+          ? _self.gradeUp
+          : gradeUp // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
+  }
+
+  /// Create a copy of SessionCompletionDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ReadingSessionDtoCopyWith<$Res> get session {
+    return $ReadingSessionDtoCopyWith<$Res>(_self.session, (value) {
+      return _then(_self.copyWith(session: value));
+    });
+  }
+
+  /// Create a copy of SessionCompletionDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $GradeSummaryDtoCopyWith<$Res> get grade {
+    return $GradeSummaryDtoCopyWith<$Res>(_self.grade, (value) {
+      return _then(_self.copyWith(grade: value));
+    });
+  }
+}
+
+/// Adds pattern-matching-related methods to [SessionCompletionDto].
+extension SessionCompletionDtoPatterns on SessionCompletionDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_SessionCompletionDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionCompletionDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_SessionCompletionDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionCompletionDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_SessionCompletionDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionCompletionDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(ReadingSessionDto session, GradeSummaryDto grade,
+            int streakDays, bool gradeUp)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SessionCompletionDto() when $default != null:
+        return $default(
+            _that.session, _that.grade, _that.streakDays, _that.gradeUp);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(ReadingSessionDto session, GradeSummaryDto grade,
+            int streakDays, bool gradeUp)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionCompletionDto():
+        return $default(
+            _that.session, _that.grade, _that.streakDays, _that.gradeUp);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(ReadingSessionDto session, GradeSummaryDto grade,
+            int streakDays, bool gradeUp)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SessionCompletionDto() when $default != null:
+        return $default(
+            _that.session, _that.grade, _that.streakDays, _that.gradeUp);
+      case _:
+        return null;
+    }
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$HeatmapItemDtoImpl extends _HeatmapItemDto {
-  const _$HeatmapItemDtoImpl(
-      {required this.date,
-      required this.totalSeconds,
-      required this.sessionCount})
+class _SessionCompletionDto extends SessionCompletionDto {
+  const _SessionCompletionDto(
+      {required this.session,
+      required this.grade,
+      required this.streakDays,
+      required this.gradeUp})
       : super._();
-
-  factory _$HeatmapItemDtoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$HeatmapItemDtoImplFromJson(json);
-
-  @override
-  final String date;
-  @override
-  final int totalSeconds;
-  @override
-  final int sessionCount;
+  factory _SessionCompletionDto.fromJson(Map<String, dynamic> json) =>
+      _$SessionCompletionDtoFromJson(json);
 
   @override
-  String toString() {
-    return 'HeatmapItemDto(date: $date, totalSeconds: $totalSeconds, sessionCount: $sessionCount)';
+  final ReadingSessionDto session;
+  @override
+  final GradeSummaryDto grade;
+  @override
+  final int streakDays;
+  @override
+  final bool gradeUp;
+
+  /// Create a copy of SessionCompletionDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$SessionCompletionDtoCopyWith<_SessionCompletionDto> get copyWith =>
+      __$SessionCompletionDtoCopyWithImpl<_SessionCompletionDto>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$SessionCompletionDtoToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$HeatmapItemDtoImpl &&
+            other is _SessionCompletionDto &&
+            (identical(other.session, session) || other.session == session) &&
+            (identical(other.grade, grade) || other.grade == grade) &&
+            (identical(other.streakDays, streakDays) ||
+                other.streakDays == streakDays) &&
+            (identical(other.gradeUp, gradeUp) || other.gradeUp == gradeUp));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, session, grade, streakDays, gradeUp);
+
+  @override
+  String toString() {
+    return 'SessionCompletionDto(session: $session, grade: $grade, streakDays: $streakDays, gradeUp: $gradeUp)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$SessionCompletionDtoCopyWith<$Res>
+    implements $SessionCompletionDtoCopyWith<$Res> {
+  factory _$SessionCompletionDtoCopyWith(_SessionCompletionDto value,
+          $Res Function(_SessionCompletionDto) _then) =
+      __$SessionCompletionDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {ReadingSessionDto session,
+      GradeSummaryDto grade,
+      int streakDays,
+      bool gradeUp});
+
+  @override
+  $ReadingSessionDtoCopyWith<$Res> get session;
+  @override
+  $GradeSummaryDtoCopyWith<$Res> get grade;
+}
+
+/// @nodoc
+class __$SessionCompletionDtoCopyWithImpl<$Res>
+    implements _$SessionCompletionDtoCopyWith<$Res> {
+  __$SessionCompletionDtoCopyWithImpl(this._self, this._then);
+
+  final _SessionCompletionDto _self;
+  final $Res Function(_SessionCompletionDto) _then;
+
+  /// Create a copy of SessionCompletionDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? session = null,
+    Object? grade = null,
+    Object? streakDays = null,
+    Object? gradeUp = null,
+  }) {
+    return _then(_SessionCompletionDto(
+      session: null == session
+          ? _self.session
+          : session // ignore: cast_nullable_to_non_nullable
+              as ReadingSessionDto,
+      grade: null == grade
+          ? _self.grade
+          : grade // ignore: cast_nullable_to_non_nullable
+              as GradeSummaryDto,
+      streakDays: null == streakDays
+          ? _self.streakDays
+          : streakDays // ignore: cast_nullable_to_non_nullable
+              as int,
+      gradeUp: null == gradeUp
+          ? _self.gradeUp
+          : gradeUp // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ));
+  }
+
+  /// Create a copy of SessionCompletionDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ReadingSessionDtoCopyWith<$Res> get session {
+    return $ReadingSessionDtoCopyWith<$Res>(_self.session, (value) {
+      return _then(_self.copyWith(session: value));
+    });
+  }
+
+  /// Create a copy of SessionCompletionDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $GradeSummaryDtoCopyWith<$Res> get grade {
+    return $GradeSummaryDtoCopyWith<$Res>(_self.grade, (value) {
+      return _then(_self.copyWith(grade: value));
+    });
+  }
+}
+
+/// @nodoc
+mixin _$HeatmapItemDto {
+  String get date;
+  int get totalSeconds;
+  int get sessionCount;
+
+  /// Create a copy of HeatmapItemDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $HeatmapItemDtoCopyWith<HeatmapItemDto> get copyWith =>
+      _$HeatmapItemDtoCopyWithImpl<HeatmapItemDto>(
+          this as HeatmapItemDto, _$identity);
+
+  /// Serializes this HeatmapItemDto to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is HeatmapItemDto &&
             (identical(other.date, date) || other.date == date) &&
             (identical(other.totalSeconds, totalSeconds) ||
                 other.totalSeconds == totalSeconds) &&
@@ -1155,119 +1708,365 @@ class _$HeatmapItemDtoImpl extends _HeatmapItemDto {
   int get hashCode =>
       Object.hash(runtimeType, date, totalSeconds, sessionCount);
 
-  /// Create a copy of HeatmapItemDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$HeatmapItemDtoImplCopyWith<_$HeatmapItemDtoImpl> get copyWith =>
-      __$$HeatmapItemDtoImplCopyWithImpl<_$HeatmapItemDtoImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$HeatmapItemDtoImplToJson(
-      this,
-    );
+  String toString() {
+    return 'HeatmapItemDto(date: $date, totalSeconds: $totalSeconds, sessionCount: $sessionCount)';
   }
 }
 
-abstract class _HeatmapItemDto extends HeatmapItemDto {
-  const factory _HeatmapItemDto(
-      {required final String date,
-      required final int totalSeconds,
-      required final int sessionCount}) = _$HeatmapItemDtoImpl;
-  const _HeatmapItemDto._() : super._();
+/// @nodoc
+abstract mixin class $HeatmapItemDtoCopyWith<$Res> {
+  factory $HeatmapItemDtoCopyWith(
+          HeatmapItemDto value, $Res Function(HeatmapItemDto) _then) =
+      _$HeatmapItemDtoCopyWithImpl;
+  @useResult
+  $Res call({String date, int totalSeconds, int sessionCount});
+}
 
-  factory _HeatmapItemDto.fromJson(Map<String, dynamic> json) =
-      _$HeatmapItemDtoImpl.fromJson;
+/// @nodoc
+class _$HeatmapItemDtoCopyWithImpl<$Res>
+    implements $HeatmapItemDtoCopyWith<$Res> {
+  _$HeatmapItemDtoCopyWithImpl(this._self, this._then);
+
+  final HeatmapItemDto _self;
+  final $Res Function(HeatmapItemDto) _then;
+
+  /// Create a copy of HeatmapItemDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? date = null,
+    Object? totalSeconds = null,
+    Object? sessionCount = null,
+  }) {
+    return _then(_self.copyWith(
+      date: null == date
+          ? _self.date
+          : date // ignore: cast_nullable_to_non_nullable
+              as String,
+      totalSeconds: null == totalSeconds
+          ? _self.totalSeconds
+          : totalSeconds // ignore: cast_nullable_to_non_nullable
+              as int,
+      sessionCount: null == sessionCount
+          ? _self.sessionCount
+          : sessionCount // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [HeatmapItemDto].
+extension HeatmapItemDtoPatterns on HeatmapItemDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_HeatmapItemDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _HeatmapItemDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_HeatmapItemDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _HeatmapItemDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_HeatmapItemDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _HeatmapItemDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String date, int totalSeconds, int sessionCount)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _HeatmapItemDto() when $default != null:
+        return $default(_that.date, _that.totalSeconds, _that.sessionCount);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String date, int totalSeconds, int sessionCount) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _HeatmapItemDto():
+        return $default(_that.date, _that.totalSeconds, _that.sessionCount);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String date, int totalSeconds, int sessionCount)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _HeatmapItemDto() when $default != null:
+        return $default(_that.date, _that.totalSeconds, _that.sessionCount);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _HeatmapItemDto extends HeatmapItemDto {
+  const _HeatmapItemDto(
+      {required this.date,
+      required this.totalSeconds,
+      required this.sessionCount})
+      : super._();
+  factory _HeatmapItemDto.fromJson(Map<String, dynamic> json) =>
+      _$HeatmapItemDtoFromJson(json);
 
   @override
-  String get date;
+  final String date;
   @override
-  int get totalSeconds;
+  final int totalSeconds;
   @override
-  int get sessionCount;
+  final int sessionCount;
 
   /// Create a copy of HeatmapItemDto
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$HeatmapItemDtoImplCopyWith<_$HeatmapItemDtoImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  _$HeatmapItemDtoCopyWith<_HeatmapItemDto> get copyWith =>
+      __$HeatmapItemDtoCopyWithImpl<_HeatmapItemDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$HeatmapItemDtoToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _HeatmapItemDto &&
+            (identical(other.date, date) || other.date == date) &&
+            (identical(other.totalSeconds, totalSeconds) ||
+                other.totalSeconds == totalSeconds) &&
+            (identical(other.sessionCount, sessionCount) ||
+                other.sessionCount == sessionCount));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, date, totalSeconds, sessionCount);
+
+  @override
+  String toString() {
+    return 'HeatmapItemDto(date: $date, totalSeconds: $totalSeconds, sessionCount: $sessionCount)';
+  }
 }
 
-HeatmapResponseDto _$HeatmapResponseDtoFromJson(Map<String, dynamic> json) {
-  return _HeatmapResponseDto.fromJson(json);
+/// @nodoc
+abstract mixin class _$HeatmapItemDtoCopyWith<$Res>
+    implements $HeatmapItemDtoCopyWith<$Res> {
+  factory _$HeatmapItemDtoCopyWith(
+          _HeatmapItemDto value, $Res Function(_HeatmapItemDto) _then) =
+      __$HeatmapItemDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call({String date, int totalSeconds, int sessionCount});
+}
+
+/// @nodoc
+class __$HeatmapItemDtoCopyWithImpl<$Res>
+    implements _$HeatmapItemDtoCopyWith<$Res> {
+  __$HeatmapItemDtoCopyWithImpl(this._self, this._then);
+
+  final _HeatmapItemDto _self;
+  final $Res Function(_HeatmapItemDto) _then;
+
+  /// Create a copy of HeatmapItemDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? date = null,
+    Object? totalSeconds = null,
+    Object? sessionCount = null,
+  }) {
+    return _then(_HeatmapItemDto(
+      date: null == date
+          ? _self.date
+          : date // ignore: cast_nullable_to_non_nullable
+              as String,
+      totalSeconds: null == totalSeconds
+          ? _self.totalSeconds
+          : totalSeconds // ignore: cast_nullable_to_non_nullable
+              as int,
+      sessionCount: null == sessionCount
+          ? _self.sessionCount
+          : sessionCount // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
 }
 
 /// @nodoc
 mixin _$HeatmapResponseDto {
-  List<HeatmapItemDto> get items => throw _privateConstructorUsedError;
-
-  /// Serializes this HeatmapResponseDto to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  List<HeatmapItemDto> get items;
 
   /// Create a copy of HeatmapResponseDto
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $HeatmapResponseDtoCopyWith<HeatmapResponseDto> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $HeatmapResponseDtoCopyWith<$Res> {
-  factory $HeatmapResponseDtoCopyWith(
-          HeatmapResponseDto value, $Res Function(HeatmapResponseDto) then) =
-      _$HeatmapResponseDtoCopyWithImpl<$Res, HeatmapResponseDto>;
-  @useResult
-  $Res call({List<HeatmapItemDto> items});
-}
-
-/// @nodoc
-class _$HeatmapResponseDtoCopyWithImpl<$Res, $Val extends HeatmapResponseDto>
-    implements $HeatmapResponseDtoCopyWith<$Res> {
-  _$HeatmapResponseDtoCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of HeatmapResponseDto
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $HeatmapResponseDtoCopyWith<HeatmapResponseDto> get copyWith =>
+      _$HeatmapResponseDtoCopyWithImpl<HeatmapResponseDto>(
+          this as HeatmapResponseDto, _$identity);
+
+  /// Serializes this HeatmapResponseDto to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? items = null,
-  }) {
-    return _then(_value.copyWith(
-      items: null == items
-          ? _value.items
-          : items // ignore: cast_nullable_to_non_nullable
-              as List<HeatmapItemDto>,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is HeatmapResponseDto &&
+            const DeepCollectionEquality().equals(other.items, items));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(items));
+
+  @override
+  String toString() {
+    return 'HeatmapResponseDto(items: $items)';
   }
 }
 
 /// @nodoc
-abstract class _$$HeatmapResponseDtoImplCopyWith<$Res>
-    implements $HeatmapResponseDtoCopyWith<$Res> {
-  factory _$$HeatmapResponseDtoImplCopyWith(_$HeatmapResponseDtoImpl value,
-          $Res Function(_$HeatmapResponseDtoImpl) then) =
-      __$$HeatmapResponseDtoImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $HeatmapResponseDtoCopyWith<$Res> {
+  factory $HeatmapResponseDtoCopyWith(
+          HeatmapResponseDto value, $Res Function(HeatmapResponseDto) _then) =
+      _$HeatmapResponseDtoCopyWithImpl;
   @useResult
   $Res call({List<HeatmapItemDto> items});
 }
 
 /// @nodoc
-class __$$HeatmapResponseDtoImplCopyWithImpl<$Res>
-    extends _$HeatmapResponseDtoCopyWithImpl<$Res, _$HeatmapResponseDtoImpl>
-    implements _$$HeatmapResponseDtoImplCopyWith<$Res> {
-  __$$HeatmapResponseDtoImplCopyWithImpl(_$HeatmapResponseDtoImpl _value,
-      $Res Function(_$HeatmapResponseDtoImpl) _then)
-      : super(_value, _then);
+class _$HeatmapResponseDtoCopyWithImpl<$Res>
+    implements $HeatmapResponseDtoCopyWith<$Res> {
+  _$HeatmapResponseDtoCopyWithImpl(this._self, this._then);
+
+  final HeatmapResponseDto _self;
+  final $Res Function(HeatmapResponseDto) _then;
 
   /// Create a copy of HeatmapResponseDto
   /// with the given fields replaced by the non-null parameter values.
@@ -1276,23 +2075,179 @@ class __$$HeatmapResponseDtoImplCopyWithImpl<$Res>
   $Res call({
     Object? items = null,
   }) {
-    return _then(_$HeatmapResponseDtoImpl(
+    return _then(_self.copyWith(
       items: null == items
-          ? _value._items
+          ? _self.items
           : items // ignore: cast_nullable_to_non_nullable
               as List<HeatmapItemDto>,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [HeatmapResponseDto].
+extension HeatmapResponseDtoPatterns on HeatmapResponseDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_HeatmapResponseDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _HeatmapResponseDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_HeatmapResponseDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _HeatmapResponseDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_HeatmapResponseDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _HeatmapResponseDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(List<HeatmapItemDto> items)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _HeatmapResponseDto() when $default != null:
+        return $default(_that.items);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(List<HeatmapItemDto> items) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _HeatmapResponseDto():
+        return $default(_that.items);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(List<HeatmapItemDto> items)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _HeatmapResponseDto() when $default != null:
+        return $default(_that.items);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$HeatmapResponseDtoImpl implements _HeatmapResponseDto {
-  const _$HeatmapResponseDtoImpl({required final List<HeatmapItemDto> items})
+class _HeatmapResponseDto implements HeatmapResponseDto {
+  const _HeatmapResponseDto({required final List<HeatmapItemDto> items})
       : _items = items;
-
-  factory _$HeatmapResponseDtoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$HeatmapResponseDtoImplFromJson(json);
+  factory _HeatmapResponseDto.fromJson(Map<String, dynamic> json) =>
+      _$HeatmapResponseDtoFromJson(json);
 
   final List<HeatmapItemDto> _items;
   @override
@@ -1302,16 +2257,26 @@ class _$HeatmapResponseDtoImpl implements _HeatmapResponseDto {
     return EqualUnmodifiableListView(_items);
   }
 
+  /// Create a copy of HeatmapResponseDto
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'HeatmapResponseDto(items: $items)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$HeatmapResponseDtoCopyWith<_HeatmapResponseDto> get copyWith =>
+      __$HeatmapResponseDtoCopyWithImpl<_HeatmapResponseDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$HeatmapResponseDtoToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$HeatmapResponseDtoImpl &&
+            other is _HeatmapResponseDto &&
             const DeepCollectionEquality().equals(other._items, _items));
   }
 
@@ -1320,231 +2285,71 @@ class _$HeatmapResponseDtoImpl implements _HeatmapResponseDto {
   int get hashCode =>
       Object.hash(runtimeType, const DeepCollectionEquality().hash(_items));
 
-  /// Create a copy of HeatmapResponseDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$HeatmapResponseDtoImplCopyWith<_$HeatmapResponseDtoImpl> get copyWith =>
-      __$$HeatmapResponseDtoImplCopyWithImpl<_$HeatmapResponseDtoImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$HeatmapResponseDtoImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _HeatmapResponseDto implements HeatmapResponseDto {
-  const factory _HeatmapResponseDto(
-      {required final List<HeatmapItemDto> items}) = _$HeatmapResponseDtoImpl;
-
-  factory _HeatmapResponseDto.fromJson(Map<String, dynamic> json) =
-      _$HeatmapResponseDtoImpl.fromJson;
-
-  @override
-  List<HeatmapItemDto> get items;
-
-  /// Create a copy of HeatmapResponseDto
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$HeatmapResponseDtoImplCopyWith<_$HeatmapResponseDtoImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-GoalDto _$GoalDtoFromJson(Map<String, dynamic> json) {
-  return _GoalDto.fromJson(json);
-}
-
-/// @nodoc
-mixin _$GoalDto {
-  String get id => throw _privateConstructorUsedError;
-  String get period => throw _privateConstructorUsedError;
-  int get targetBooks => throw _privateConstructorUsedError;
-  int get targetSeconds => throw _privateConstructorUsedError;
-  DateTime get startDate => throw _privateConstructorUsedError;
-  DateTime get endDate => throw _privateConstructorUsedError;
-
-  /// Serializes this GoalDto to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of GoalDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $GoalDtoCopyWith<GoalDto> get copyWith => throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $GoalDtoCopyWith<$Res> {
-  factory $GoalDtoCopyWith(GoalDto value, $Res Function(GoalDto) then) =
-      _$GoalDtoCopyWithImpl<$Res, GoalDto>;
-  @useResult
-  $Res call(
-      {String id,
-      String period,
-      int targetBooks,
-      int targetSeconds,
-      DateTime startDate,
-      DateTime endDate});
-}
-
-/// @nodoc
-class _$GoalDtoCopyWithImpl<$Res, $Val extends GoalDto>
-    implements $GoalDtoCopyWith<$Res> {
-  _$GoalDtoCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of GoalDto
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? period = null,
-    Object? targetBooks = null,
-    Object? targetSeconds = null,
-    Object? startDate = null,
-    Object? endDate = null,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      period: null == period
-          ? _value.period
-          : period // ignore: cast_nullable_to_non_nullable
-              as String,
-      targetBooks: null == targetBooks
-          ? _value.targetBooks
-          : targetBooks // ignore: cast_nullable_to_non_nullable
-              as int,
-      targetSeconds: null == targetSeconds
-          ? _value.targetSeconds
-          : targetSeconds // ignore: cast_nullable_to_non_nullable
-              as int,
-      startDate: null == startDate
-          ? _value.startDate
-          : startDate // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      endDate: null == endDate
-          ? _value.endDate
-          : endDate // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-    ) as $Val);
+  String toString() {
+    return 'HeatmapResponseDto(items: $items)';
   }
 }
 
 /// @nodoc
-abstract class _$$GoalDtoImplCopyWith<$Res> implements $GoalDtoCopyWith<$Res> {
-  factory _$$GoalDtoImplCopyWith(
-          _$GoalDtoImpl value, $Res Function(_$GoalDtoImpl) then) =
-      __$$GoalDtoImplCopyWithImpl<$Res>;
+abstract mixin class _$HeatmapResponseDtoCopyWith<$Res>
+    implements $HeatmapResponseDtoCopyWith<$Res> {
+  factory _$HeatmapResponseDtoCopyWith(
+          _HeatmapResponseDto value, $Res Function(_HeatmapResponseDto) _then) =
+      __$HeatmapResponseDtoCopyWithImpl;
   @override
   @useResult
-  $Res call(
-      {String id,
-      String period,
-      int targetBooks,
-      int targetSeconds,
-      DateTime startDate,
-      DateTime endDate});
+  $Res call({List<HeatmapItemDto> items});
 }
 
 /// @nodoc
-class __$$GoalDtoImplCopyWithImpl<$Res>
-    extends _$GoalDtoCopyWithImpl<$Res, _$GoalDtoImpl>
-    implements _$$GoalDtoImplCopyWith<$Res> {
-  __$$GoalDtoImplCopyWithImpl(
-      _$GoalDtoImpl _value, $Res Function(_$GoalDtoImpl) _then)
-      : super(_value, _then);
+class __$HeatmapResponseDtoCopyWithImpl<$Res>
+    implements _$HeatmapResponseDtoCopyWith<$Res> {
+  __$HeatmapResponseDtoCopyWithImpl(this._self, this._then);
 
-  /// Create a copy of GoalDto
+  final _HeatmapResponseDto _self;
+  final $Res Function(_HeatmapResponseDto) _then;
+
+  /// Create a copy of HeatmapResponseDto
   /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
   @override
+  @pragma('vm:prefer-inline')
   $Res call({
-    Object? id = null,
-    Object? period = null,
-    Object? targetBooks = null,
-    Object? targetSeconds = null,
-    Object? startDate = null,
-    Object? endDate = null,
+    Object? items = null,
   }) {
-    return _then(_$GoalDtoImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      period: null == period
-          ? _value.period
-          : period // ignore: cast_nullable_to_non_nullable
-              as String,
-      targetBooks: null == targetBooks
-          ? _value.targetBooks
-          : targetBooks // ignore: cast_nullable_to_non_nullable
-              as int,
-      targetSeconds: null == targetSeconds
-          ? _value.targetSeconds
-          : targetSeconds // ignore: cast_nullable_to_non_nullable
-              as int,
-      startDate: null == startDate
-          ? _value.startDate
-          : startDate // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      endDate: null == endDate
-          ? _value.endDate
-          : endDate // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+    return _then(_HeatmapResponseDto(
+      items: null == items
+          ? _self._items
+          : items // ignore: cast_nullable_to_non_nullable
+              as List<HeatmapItemDto>,
     ));
   }
 }
 
 /// @nodoc
-@JsonSerializable()
-class _$GoalDtoImpl extends _GoalDto {
-  const _$GoalDtoImpl(
-      {required this.id,
-      required this.period,
-      required this.targetBooks,
-      required this.targetSeconds,
-      required this.startDate,
-      required this.endDate})
-      : super._();
+mixin _$GoalDto {
+  String get id;
+  String get period;
+  int get targetBooks;
+  int get targetSeconds;
+  DateTime get startDate;
+  DateTime get endDate;
 
-  factory _$GoalDtoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$GoalDtoImplFromJson(json);
+  /// Create a copy of GoalDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $GoalDtoCopyWith<GoalDto> get copyWith =>
+      _$GoalDtoCopyWithImpl<GoalDto>(this as GoalDto, _$identity);
 
-  @override
-  final String id;
-  @override
-  final String period;
-  @override
-  final int targetBooks;
-  @override
-  final int targetSeconds;
-  @override
-  final DateTime startDate;
-  @override
-  final DateTime endDate;
-
-  @override
-  String toString() {
-    return 'GoalDto(id: $id, period: $period, targetBooks: $targetBooks, targetSeconds: $targetSeconds, startDate: $startDate, endDate: $endDate)';
-  }
+  /// Serializes this GoalDto to a JSON map.
+  Map<String, dynamic> toJson();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$GoalDtoImpl &&
+            other is GoalDto &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.period, period) || other.period == period) &&
             (identical(other.targetBooks, targetBooks) ||
@@ -1561,223 +2366,395 @@ class _$GoalDtoImpl extends _GoalDto {
   int get hashCode => Object.hash(
       runtimeType, id, period, targetBooks, targetSeconds, startDate, endDate);
 
-  /// Create a copy of GoalDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$GoalDtoImplCopyWith<_$GoalDtoImpl> get copyWith =>
-      __$$GoalDtoImplCopyWithImpl<_$GoalDtoImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$GoalDtoImplToJson(
-      this,
-    );
+  String toString() {
+    return 'GoalDto(id: $id, period: $period, targetBooks: $targetBooks, targetSeconds: $targetSeconds, startDate: $startDate, endDate: $endDate)';
   }
 }
 
-abstract class _GoalDto extends GoalDto {
-  const factory _GoalDto(
-      {required final String id,
-      required final String period,
-      required final int targetBooks,
-      required final int targetSeconds,
-      required final DateTime startDate,
-      required final DateTime endDate}) = _$GoalDtoImpl;
-  const _GoalDto._() : super._();
+/// @nodoc
+abstract mixin class $GoalDtoCopyWith<$Res> {
+  factory $GoalDtoCopyWith(GoalDto value, $Res Function(GoalDto) _then) =
+      _$GoalDtoCopyWithImpl;
+  @useResult
+  $Res call(
+      {String id,
+      String period,
+      int targetBooks,
+      int targetSeconds,
+      DateTime startDate,
+      DateTime endDate});
+}
 
-  factory _GoalDto.fromJson(Map<String, dynamic> json) = _$GoalDtoImpl.fromJson;
+/// @nodoc
+class _$GoalDtoCopyWithImpl<$Res> implements $GoalDtoCopyWith<$Res> {
+  _$GoalDtoCopyWithImpl(this._self, this._then);
 
-  @override
-  String get id;
-  @override
-  String get period;
-  @override
-  int get targetBooks;
-  @override
-  int get targetSeconds;
-  @override
-  DateTime get startDate;
-  @override
-  DateTime get endDate;
+  final GoalDto _self;
+  final $Res Function(GoalDto) _then;
 
   /// Create a copy of GoalDto
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$GoalDtoImplCopyWith<_$GoalDtoImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-GoalProgressDto _$GoalProgressDtoFromJson(Map<String, dynamic> json) {
-  return _GoalProgressDto.fromJson(json);
-}
-
-/// @nodoc
-mixin _$GoalProgressDto {
-  GoalDto get goal => throw _privateConstructorUsedError;
-  int get booksDone => throw _privateConstructorUsedError;
-  int get secondsDone => throw _privateConstructorUsedError;
-  double get percent => throw _privateConstructorUsedError;
-
-  /// Serializes this GoalProgressDto to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of GoalProgressDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $GoalProgressDtoCopyWith<GoalProgressDto> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $GoalProgressDtoCopyWith<$Res> {
-  factory $GoalProgressDtoCopyWith(
-          GoalProgressDto value, $Res Function(GoalProgressDto) then) =
-      _$GoalProgressDtoCopyWithImpl<$Res, GoalProgressDto>;
-  @useResult
-  $Res call({GoalDto goal, int booksDone, int secondsDone, double percent});
-
-  $GoalDtoCopyWith<$Res> get goal;
-}
-
-/// @nodoc
-class _$GoalProgressDtoCopyWithImpl<$Res, $Val extends GoalProgressDto>
-    implements $GoalProgressDtoCopyWith<$Res> {
-  _$GoalProgressDtoCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of GoalProgressDto
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? goal = null,
-    Object? booksDone = null,
-    Object? secondsDone = null,
-    Object? percent = null,
+    Object? id = null,
+    Object? period = null,
+    Object? targetBooks = null,
+    Object? targetSeconds = null,
+    Object? startDate = null,
+    Object? endDate = null,
   }) {
-    return _then(_value.copyWith(
-      goal: null == goal
-          ? _value.goal
-          : goal // ignore: cast_nullable_to_non_nullable
-              as GoalDto,
-      booksDone: null == booksDone
-          ? _value.booksDone
-          : booksDone // ignore: cast_nullable_to_non_nullable
+    return _then(_self.copyWith(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      period: null == period
+          ? _self.period
+          : period // ignore: cast_nullable_to_non_nullable
+              as String,
+      targetBooks: null == targetBooks
+          ? _self.targetBooks
+          : targetBooks // ignore: cast_nullable_to_non_nullable
               as int,
-      secondsDone: null == secondsDone
-          ? _value.secondsDone
-          : secondsDone // ignore: cast_nullable_to_non_nullable
+      targetSeconds: null == targetSeconds
+          ? _self.targetSeconds
+          : targetSeconds // ignore: cast_nullable_to_non_nullable
               as int,
-      percent: null == percent
-          ? _value.percent
-          : percent // ignore: cast_nullable_to_non_nullable
-              as double,
-    ) as $Val);
-  }
-
-  /// Create a copy of GoalProgressDto
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $GoalDtoCopyWith<$Res> get goal {
-    return $GoalDtoCopyWith<$Res>(_value.goal, (value) {
-      return _then(_value.copyWith(goal: value) as $Val);
-    });
-  }
-}
-
-/// @nodoc
-abstract class _$$GoalProgressDtoImplCopyWith<$Res>
-    implements $GoalProgressDtoCopyWith<$Res> {
-  factory _$$GoalProgressDtoImplCopyWith(_$GoalProgressDtoImpl value,
-          $Res Function(_$GoalProgressDtoImpl) then) =
-      __$$GoalProgressDtoImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({GoalDto goal, int booksDone, int secondsDone, double percent});
-
-  @override
-  $GoalDtoCopyWith<$Res> get goal;
-}
-
-/// @nodoc
-class __$$GoalProgressDtoImplCopyWithImpl<$Res>
-    extends _$GoalProgressDtoCopyWithImpl<$Res, _$GoalProgressDtoImpl>
-    implements _$$GoalProgressDtoImplCopyWith<$Res> {
-  __$$GoalProgressDtoImplCopyWithImpl(
-      _$GoalProgressDtoImpl _value, $Res Function(_$GoalProgressDtoImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of GoalProgressDto
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? goal = null,
-    Object? booksDone = null,
-    Object? secondsDone = null,
-    Object? percent = null,
-  }) {
-    return _then(_$GoalProgressDtoImpl(
-      goal: null == goal
-          ? _value.goal
-          : goal // ignore: cast_nullable_to_non_nullable
-              as GoalDto,
-      booksDone: null == booksDone
-          ? _value.booksDone
-          : booksDone // ignore: cast_nullable_to_non_nullable
-              as int,
-      secondsDone: null == secondsDone
-          ? _value.secondsDone
-          : secondsDone // ignore: cast_nullable_to_non_nullable
-              as int,
-      percent: null == percent
-          ? _value.percent
-          : percent // ignore: cast_nullable_to_non_nullable
-              as double,
+      startDate: null == startDate
+          ? _self.startDate
+          : startDate // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      endDate: null == endDate
+          ? _self.endDate
+          : endDate // ignore: cast_nullable_to_non_nullable
+              as DateTime,
     ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [GoalDto].
+extension GoalDtoPatterns on GoalDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_GoalDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _GoalDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_GoalDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _GoalDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_GoalDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _GoalDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String id, String period, int targetBooks,
+            int targetSeconds, DateTime startDate, DateTime endDate)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _GoalDto() when $default != null:
+        return $default(_that.id, _that.period, _that.targetBooks,
+            _that.targetSeconds, _that.startDate, _that.endDate);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String id, String period, int targetBooks,
+            int targetSeconds, DateTime startDate, DateTime endDate)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _GoalDto():
+        return $default(_that.id, _that.period, _that.targetBooks,
+            _that.targetSeconds, _that.startDate, _that.endDate);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String id, String period, int targetBooks,
+            int targetSeconds, DateTime startDate, DateTime endDate)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _GoalDto() when $default != null:
+        return $default(_that.id, _that.period, _that.targetBooks,
+            _that.targetSeconds, _that.startDate, _that.endDate);
+      case _:
+        return null;
+    }
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$GoalProgressDtoImpl extends _GoalProgressDto {
-  const _$GoalProgressDtoImpl(
-      {required this.goal,
-      required this.booksDone,
-      required this.secondsDone,
-      required this.percent})
+class _GoalDto extends GoalDto {
+  const _GoalDto(
+      {required this.id,
+      required this.period,
+      required this.targetBooks,
+      required this.targetSeconds,
+      required this.startDate,
+      required this.endDate})
       : super._();
-
-  factory _$GoalProgressDtoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$GoalProgressDtoImplFromJson(json);
-
-  @override
-  final GoalDto goal;
-  @override
-  final int booksDone;
-  @override
-  final int secondsDone;
-  @override
-  final double percent;
+  factory _GoalDto.fromJson(Map<String, dynamic> json) =>
+      _$GoalDtoFromJson(json);
 
   @override
-  String toString() {
-    return 'GoalProgressDto(goal: $goal, booksDone: $booksDone, secondsDone: $secondsDone, percent: $percent)';
+  final String id;
+  @override
+  final String period;
+  @override
+  final int targetBooks;
+  @override
+  final int targetSeconds;
+  @override
+  final DateTime startDate;
+  @override
+  final DateTime endDate;
+
+  /// Create a copy of GoalDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$GoalDtoCopyWith<_GoalDto> get copyWith =>
+      __$GoalDtoCopyWithImpl<_GoalDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$GoalDtoToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$GoalProgressDtoImpl &&
+            other is _GoalDto &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.period, period) || other.period == period) &&
+            (identical(other.targetBooks, targetBooks) ||
+                other.targetBooks == targetBooks) &&
+            (identical(other.targetSeconds, targetSeconds) ||
+                other.targetSeconds == targetSeconds) &&
+            (identical(other.startDate, startDate) ||
+                other.startDate == startDate) &&
+            (identical(other.endDate, endDate) || other.endDate == endDate));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, id, period, targetBooks, targetSeconds, startDate, endDate);
+
+  @override
+  String toString() {
+    return 'GoalDto(id: $id, period: $period, targetBooks: $targetBooks, targetSeconds: $targetSeconds, startDate: $startDate, endDate: $endDate)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$GoalDtoCopyWith<$Res> implements $GoalDtoCopyWith<$Res> {
+  factory _$GoalDtoCopyWith(_GoalDto value, $Res Function(_GoalDto) _then) =
+      __$GoalDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      String period,
+      int targetBooks,
+      int targetSeconds,
+      DateTime startDate,
+      DateTime endDate});
+}
+
+/// @nodoc
+class __$GoalDtoCopyWithImpl<$Res> implements _$GoalDtoCopyWith<$Res> {
+  __$GoalDtoCopyWithImpl(this._self, this._then);
+
+  final _GoalDto _self;
+  final $Res Function(_GoalDto) _then;
+
+  /// Create a copy of GoalDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? period = null,
+    Object? targetBooks = null,
+    Object? targetSeconds = null,
+    Object? startDate = null,
+    Object? endDate = null,
+  }) {
+    return _then(_GoalDto(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      period: null == period
+          ? _self.period
+          : period // ignore: cast_nullable_to_non_nullable
+              as String,
+      targetBooks: null == targetBooks
+          ? _self.targetBooks
+          : targetBooks // ignore: cast_nullable_to_non_nullable
+              as int,
+      targetSeconds: null == targetSeconds
+          ? _self.targetSeconds
+          : targetSeconds // ignore: cast_nullable_to_non_nullable
+              as int,
+      startDate: null == startDate
+          ? _self.startDate
+          : startDate // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      endDate: null == endDate
+          ? _self.endDate
+          : endDate // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$GoalProgressDto {
+  GoalDto get goal;
+  int get booksDone;
+  int get secondsDone;
+  double get percent;
+
+  /// Create a copy of GoalProgressDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $GoalProgressDtoCopyWith<GoalProgressDto> get copyWith =>
+      _$GoalProgressDtoCopyWithImpl<GoalProgressDto>(
+          this as GoalProgressDto, _$identity);
+
+  /// Serializes this GoalProgressDto to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is GoalProgressDto &&
             (identical(other.goal, goal) || other.goal == goal) &&
             (identical(other.booksDone, booksDone) ||
                 other.booksDone == booksDone) &&
@@ -1791,291 +2768,389 @@ class _$GoalProgressDtoImpl extends _GoalProgressDto {
   int get hashCode =>
       Object.hash(runtimeType, goal, booksDone, secondsDone, percent);
 
-  /// Create a copy of GoalProgressDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$GoalProgressDtoImplCopyWith<_$GoalProgressDtoImpl> get copyWith =>
-      __$$GoalProgressDtoImplCopyWithImpl<_$GoalProgressDtoImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$GoalProgressDtoImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _GoalProgressDto extends GoalProgressDto {
-  const factory _GoalProgressDto(
-      {required final GoalDto goal,
-      required final int booksDone,
-      required final int secondsDone,
-      required final double percent}) = _$GoalProgressDtoImpl;
-  const _GoalProgressDto._() : super._();
-
-  factory _GoalProgressDto.fromJson(Map<String, dynamic> json) =
-      _$GoalProgressDtoImpl.fromJson;
-
-  @override
-  GoalDto get goal;
-  @override
-  int get booksDone;
-  @override
-  int get secondsDone;
-  @override
-  double get percent;
-
-  /// Create a copy of GoalProgressDto
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$GoalProgressDtoImplCopyWith<_$GoalProgressDtoImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-DailySessionDto _$DailySessionDtoFromJson(Map<String, dynamic> json) {
-  return _DailySessionDto.fromJson(json);
-}
-
-/// @nodoc
-mixin _$DailySessionDto {
-  String get sessionId => throw _privateConstructorUsedError;
-  DateTime get startedAt => throw _privateConstructorUsedError;
-  DateTime get endedAt => throw _privateConstructorUsedError;
-  int get durationSec => throw _privateConstructorUsedError;
-  String get source => throw _privateConstructorUsedError;
-  String get bookId => throw _privateConstructorUsedError;
-  String get bookTitle => throw _privateConstructorUsedError;
-  String get bookAuthor => throw _privateConstructorUsedError;
-  String? get bookCoverUrl => throw _privateConstructorUsedError;
-
-  /// Serializes this DailySessionDto to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of DailySessionDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $DailySessionDtoCopyWith<DailySessionDto> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $DailySessionDtoCopyWith<$Res> {
-  factory $DailySessionDtoCopyWith(
-          DailySessionDto value, $Res Function(DailySessionDto) then) =
-      _$DailySessionDtoCopyWithImpl<$Res, DailySessionDto>;
-  @useResult
-  $Res call(
-      {String sessionId,
-      DateTime startedAt,
-      DateTime endedAt,
-      int durationSec,
-      String source,
-      String bookId,
-      String bookTitle,
-      String bookAuthor,
-      String? bookCoverUrl});
-}
-
-/// @nodoc
-class _$DailySessionDtoCopyWithImpl<$Res, $Val extends DailySessionDto>
-    implements $DailySessionDtoCopyWith<$Res> {
-  _$DailySessionDtoCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of DailySessionDto
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? sessionId = null,
-    Object? startedAt = null,
-    Object? endedAt = null,
-    Object? durationSec = null,
-    Object? source = null,
-    Object? bookId = null,
-    Object? bookTitle = null,
-    Object? bookAuthor = null,
-    Object? bookCoverUrl = freezed,
-  }) {
-    return _then(_value.copyWith(
-      sessionId: null == sessionId
-          ? _value.sessionId
-          : sessionId // ignore: cast_nullable_to_non_nullable
-              as String,
-      startedAt: null == startedAt
-          ? _value.startedAt
-          : startedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      endedAt: null == endedAt
-          ? _value.endedAt
-          : endedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      durationSec: null == durationSec
-          ? _value.durationSec
-          : durationSec // ignore: cast_nullable_to_non_nullable
-              as int,
-      source: null == source
-          ? _value.source
-          : source // ignore: cast_nullable_to_non_nullable
-              as String,
-      bookId: null == bookId
-          ? _value.bookId
-          : bookId // ignore: cast_nullable_to_non_nullable
-              as String,
-      bookTitle: null == bookTitle
-          ? _value.bookTitle
-          : bookTitle // ignore: cast_nullable_to_non_nullable
-              as String,
-      bookAuthor: null == bookAuthor
-          ? _value.bookAuthor
-          : bookAuthor // ignore: cast_nullable_to_non_nullable
-              as String,
-      bookCoverUrl: freezed == bookCoverUrl
-          ? _value.bookCoverUrl
-          : bookCoverUrl // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ) as $Val);
+  String toString() {
+    return 'GoalProgressDto(goal: $goal, booksDone: $booksDone, secondsDone: $secondsDone, percent: $percent)';
   }
 }
 
 /// @nodoc
-abstract class _$$DailySessionDtoImplCopyWith<$Res>
-    implements $DailySessionDtoCopyWith<$Res> {
-  factory _$$DailySessionDtoImplCopyWith(_$DailySessionDtoImpl value,
-          $Res Function(_$DailySessionDtoImpl) then) =
-      __$$DailySessionDtoImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $GoalProgressDtoCopyWith<$Res> {
+  factory $GoalProgressDtoCopyWith(
+          GoalProgressDto value, $Res Function(GoalProgressDto) _then) =
+      _$GoalProgressDtoCopyWithImpl;
   @useResult
-  $Res call(
-      {String sessionId,
-      DateTime startedAt,
-      DateTime endedAt,
-      int durationSec,
-      String source,
-      String bookId,
-      String bookTitle,
-      String bookAuthor,
-      String? bookCoverUrl});
+  $Res call({GoalDto goal, int booksDone, int secondsDone, double percent});
+
+  $GoalDtoCopyWith<$Res> get goal;
 }
 
 /// @nodoc
-class __$$DailySessionDtoImplCopyWithImpl<$Res>
-    extends _$DailySessionDtoCopyWithImpl<$Res, _$DailySessionDtoImpl>
-    implements _$$DailySessionDtoImplCopyWith<$Res> {
-  __$$DailySessionDtoImplCopyWithImpl(
-      _$DailySessionDtoImpl _value, $Res Function(_$DailySessionDtoImpl) _then)
-      : super(_value, _then);
+class _$GoalProgressDtoCopyWithImpl<$Res>
+    implements $GoalProgressDtoCopyWith<$Res> {
+  _$GoalProgressDtoCopyWithImpl(this._self, this._then);
 
-  /// Create a copy of DailySessionDto
+  final GoalProgressDto _self;
+  final $Res Function(GoalProgressDto) _then;
+
+  /// Create a copy of GoalProgressDto
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? sessionId = null,
-    Object? startedAt = null,
-    Object? endedAt = null,
-    Object? durationSec = null,
-    Object? source = null,
-    Object? bookId = null,
-    Object? bookTitle = null,
-    Object? bookAuthor = null,
-    Object? bookCoverUrl = freezed,
+    Object? goal = null,
+    Object? booksDone = null,
+    Object? secondsDone = null,
+    Object? percent = null,
   }) {
-    return _then(_$DailySessionDtoImpl(
-      sessionId: null == sessionId
-          ? _value.sessionId
-          : sessionId // ignore: cast_nullable_to_non_nullable
-              as String,
-      startedAt: null == startedAt
-          ? _value.startedAt
-          : startedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      endedAt: null == endedAt
-          ? _value.endedAt
-          : endedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      durationSec: null == durationSec
-          ? _value.durationSec
-          : durationSec // ignore: cast_nullable_to_non_nullable
+    return _then(_self.copyWith(
+      goal: null == goal
+          ? _self.goal
+          : goal // ignore: cast_nullable_to_non_nullable
+              as GoalDto,
+      booksDone: null == booksDone
+          ? _self.booksDone
+          : booksDone // ignore: cast_nullable_to_non_nullable
               as int,
-      source: null == source
-          ? _value.source
-          : source // ignore: cast_nullable_to_non_nullable
-              as String,
-      bookId: null == bookId
-          ? _value.bookId
-          : bookId // ignore: cast_nullable_to_non_nullable
-              as String,
-      bookTitle: null == bookTitle
-          ? _value.bookTitle
-          : bookTitle // ignore: cast_nullable_to_non_nullable
-              as String,
-      bookAuthor: null == bookAuthor
-          ? _value.bookAuthor
-          : bookAuthor // ignore: cast_nullable_to_non_nullable
-              as String,
-      bookCoverUrl: freezed == bookCoverUrl
-          ? _value.bookCoverUrl
-          : bookCoverUrl // ignore: cast_nullable_to_non_nullable
-              as String?,
+      secondsDone: null == secondsDone
+          ? _self.secondsDone
+          : secondsDone // ignore: cast_nullable_to_non_nullable
+              as int,
+      percent: null == percent
+          ? _self.percent
+          : percent // ignore: cast_nullable_to_non_nullable
+              as double,
     ));
+  }
+
+  /// Create a copy of GoalProgressDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $GoalDtoCopyWith<$Res> get goal {
+    return $GoalDtoCopyWith<$Res>(_self.goal, (value) {
+      return _then(_self.copyWith(goal: value));
+    });
+  }
+}
+
+/// Adds pattern-matching-related methods to [GoalProgressDto].
+extension GoalProgressDtoPatterns on GoalProgressDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_GoalProgressDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _GoalProgressDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_GoalProgressDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _GoalProgressDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_GoalProgressDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _GoalProgressDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            GoalDto goal, int booksDone, int secondsDone, double percent)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _GoalProgressDto() when $default != null:
+        return $default(
+            _that.goal, _that.booksDone, _that.secondsDone, _that.percent);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            GoalDto goal, int booksDone, int secondsDone, double percent)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _GoalProgressDto():
+        return $default(
+            _that.goal, _that.booksDone, _that.secondsDone, _that.percent);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            GoalDto goal, int booksDone, int secondsDone, double percent)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _GoalProgressDto() when $default != null:
+        return $default(
+            _that.goal, _that.booksDone, _that.secondsDone, _that.percent);
+      case _:
+        return null;
+    }
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$DailySessionDtoImpl implements _DailySessionDto {
-  const _$DailySessionDtoImpl(
-      {required this.sessionId,
-      required this.startedAt,
-      required this.endedAt,
-      required this.durationSec,
-      required this.source,
-      required this.bookId,
-      required this.bookTitle,
-      required this.bookAuthor,
-      this.bookCoverUrl});
-
-  factory _$DailySessionDtoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$DailySessionDtoImplFromJson(json);
+class _GoalProgressDto extends GoalProgressDto {
+  const _GoalProgressDto(
+      {required this.goal,
+      required this.booksDone,
+      required this.secondsDone,
+      required this.percent})
+      : super._();
+  factory _GoalProgressDto.fromJson(Map<String, dynamic> json) =>
+      _$GoalProgressDtoFromJson(json);
 
   @override
-  final String sessionId;
+  final GoalDto goal;
   @override
-  final DateTime startedAt;
+  final int booksDone;
   @override
-  final DateTime endedAt;
+  final int secondsDone;
   @override
-  final int durationSec;
+  final double percent;
+
+  /// Create a copy of GoalProgressDto
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  final String source;
-  @override
-  final String bookId;
-  @override
-  final String bookTitle;
-  @override
-  final String bookAuthor;
-  @override
-  final String? bookCoverUrl;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$GoalProgressDtoCopyWith<_GoalProgressDto> get copyWith =>
+      __$GoalProgressDtoCopyWithImpl<_GoalProgressDto>(this, _$identity);
 
   @override
-  String toString() {
-    return 'DailySessionDto(sessionId: $sessionId, startedAt: $startedAt, endedAt: $endedAt, durationSec: $durationSec, source: $source, bookId: $bookId, bookTitle: $bookTitle, bookAuthor: $bookAuthor, bookCoverUrl: $bookCoverUrl)';
+  Map<String, dynamic> toJson() {
+    return _$GoalProgressDtoToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$DailySessionDtoImpl &&
+            other is _GoalProgressDto &&
+            (identical(other.goal, goal) || other.goal == goal) &&
+            (identical(other.booksDone, booksDone) ||
+                other.booksDone == booksDone) &&
+            (identical(other.secondsDone, secondsDone) ||
+                other.secondsDone == secondsDone) &&
+            (identical(other.percent, percent) || other.percent == percent));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, goal, booksDone, secondsDone, percent);
+
+  @override
+  String toString() {
+    return 'GoalProgressDto(goal: $goal, booksDone: $booksDone, secondsDone: $secondsDone, percent: $percent)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$GoalProgressDtoCopyWith<$Res>
+    implements $GoalProgressDtoCopyWith<$Res> {
+  factory _$GoalProgressDtoCopyWith(
+          _GoalProgressDto value, $Res Function(_GoalProgressDto) _then) =
+      __$GoalProgressDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call({GoalDto goal, int booksDone, int secondsDone, double percent});
+
+  @override
+  $GoalDtoCopyWith<$Res> get goal;
+}
+
+/// @nodoc
+class __$GoalProgressDtoCopyWithImpl<$Res>
+    implements _$GoalProgressDtoCopyWith<$Res> {
+  __$GoalProgressDtoCopyWithImpl(this._self, this._then);
+
+  final _GoalProgressDto _self;
+  final $Res Function(_GoalProgressDto) _then;
+
+  /// Create a copy of GoalProgressDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? goal = null,
+    Object? booksDone = null,
+    Object? secondsDone = null,
+    Object? percent = null,
+  }) {
+    return _then(_GoalProgressDto(
+      goal: null == goal
+          ? _self.goal
+          : goal // ignore: cast_nullable_to_non_nullable
+              as GoalDto,
+      booksDone: null == booksDone
+          ? _self.booksDone
+          : booksDone // ignore: cast_nullable_to_non_nullable
+              as int,
+      secondsDone: null == secondsDone
+          ? _self.secondsDone
+          : secondsDone // ignore: cast_nullable_to_non_nullable
+              as int,
+      percent: null == percent
+          ? _self.percent
+          : percent // ignore: cast_nullable_to_non_nullable
+              as double,
+    ));
+  }
+
+  /// Create a copy of GoalProgressDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $GoalDtoCopyWith<$Res> get goal {
+    return $GoalDtoCopyWith<$Res>(_self.goal, (value) {
+      return _then(_self.copyWith(goal: value));
+    });
+  }
+}
+
+/// @nodoc
+mixin _$DailySessionDto {
+  String get sessionId;
+  DateTime get startedAt;
+  DateTime get endedAt;
+  int get durationSec;
+  String get source;
+  String get bookId;
+  String get bookTitle;
+  String get bookAuthor;
+  String? get bookCoverUrl;
+
+  /// Create a copy of DailySessionDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $DailySessionDtoCopyWith<DailySessionDto> get copyWith =>
+      _$DailySessionDtoCopyWithImpl<DailySessionDto>(
+          this as DailySessionDto, _$identity);
+
+  /// Serializes this DailySessionDto to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is DailySessionDto &&
             (identical(other.sessionId, sessionId) ||
                 other.sessionId == sessionId) &&
             (identical(other.startedAt, startedAt) ||
@@ -2098,153 +3173,530 @@ class _$DailySessionDtoImpl implements _DailySessionDto {
   int get hashCode => Object.hash(runtimeType, sessionId, startedAt, endedAt,
       durationSec, source, bookId, bookTitle, bookAuthor, bookCoverUrl);
 
-  /// Create a copy of DailySessionDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$DailySessionDtoImplCopyWith<_$DailySessionDtoImpl> get copyWith =>
-      __$$DailySessionDtoImplCopyWithImpl<_$DailySessionDtoImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$DailySessionDtoImplToJson(
-      this,
-    );
+  String toString() {
+    return 'DailySessionDto(sessionId: $sessionId, startedAt: $startedAt, endedAt: $endedAt, durationSec: $durationSec, source: $source, bookId: $bookId, bookTitle: $bookTitle, bookAuthor: $bookAuthor, bookCoverUrl: $bookCoverUrl)';
   }
 }
 
-abstract class _DailySessionDto implements DailySessionDto {
-  const factory _DailySessionDto(
-      {required final String sessionId,
-      required final DateTime startedAt,
-      required final DateTime endedAt,
-      required final int durationSec,
-      required final String source,
-      required final String bookId,
-      required final String bookTitle,
-      required final String bookAuthor,
-      final String? bookCoverUrl}) = _$DailySessionDtoImpl;
+/// @nodoc
+abstract mixin class $DailySessionDtoCopyWith<$Res> {
+  factory $DailySessionDtoCopyWith(
+          DailySessionDto value, $Res Function(DailySessionDto) _then) =
+      _$DailySessionDtoCopyWithImpl;
+  @useResult
+  $Res call(
+      {String sessionId,
+      DateTime startedAt,
+      DateTime endedAt,
+      int durationSec,
+      String source,
+      String bookId,
+      String bookTitle,
+      String bookAuthor,
+      String? bookCoverUrl});
+}
 
-  factory _DailySessionDto.fromJson(Map<String, dynamic> json) =
-      _$DailySessionDtoImpl.fromJson;
+/// @nodoc
+class _$DailySessionDtoCopyWithImpl<$Res>
+    implements $DailySessionDtoCopyWith<$Res> {
+  _$DailySessionDtoCopyWithImpl(this._self, this._then);
+
+  final DailySessionDto _self;
+  final $Res Function(DailySessionDto) _then;
+
+  /// Create a copy of DailySessionDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? sessionId = null,
+    Object? startedAt = null,
+    Object? endedAt = null,
+    Object? durationSec = null,
+    Object? source = null,
+    Object? bookId = null,
+    Object? bookTitle = null,
+    Object? bookAuthor = null,
+    Object? bookCoverUrl = freezed,
+  }) {
+    return _then(_self.copyWith(
+      sessionId: null == sessionId
+          ? _self.sessionId
+          : sessionId // ignore: cast_nullable_to_non_nullable
+              as String,
+      startedAt: null == startedAt
+          ? _self.startedAt
+          : startedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      endedAt: null == endedAt
+          ? _self.endedAt
+          : endedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      durationSec: null == durationSec
+          ? _self.durationSec
+          : durationSec // ignore: cast_nullable_to_non_nullable
+              as int,
+      source: null == source
+          ? _self.source
+          : source // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookId: null == bookId
+          ? _self.bookId
+          : bookId // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookTitle: null == bookTitle
+          ? _self.bookTitle
+          : bookTitle // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookAuthor: null == bookAuthor
+          ? _self.bookAuthor
+          : bookAuthor // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookCoverUrl: freezed == bookCoverUrl
+          ? _self.bookCoverUrl
+          : bookCoverUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [DailySessionDto].
+extension DailySessionDtoPatterns on DailySessionDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_DailySessionDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _DailySessionDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_DailySessionDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _DailySessionDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_DailySessionDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _DailySessionDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String sessionId,
+            DateTime startedAt,
+            DateTime endedAt,
+            int durationSec,
+            String source,
+            String bookId,
+            String bookTitle,
+            String bookAuthor,
+            String? bookCoverUrl)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _DailySessionDto() when $default != null:
+        return $default(
+            _that.sessionId,
+            _that.startedAt,
+            _that.endedAt,
+            _that.durationSec,
+            _that.source,
+            _that.bookId,
+            _that.bookTitle,
+            _that.bookAuthor,
+            _that.bookCoverUrl);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String sessionId,
+            DateTime startedAt,
+            DateTime endedAt,
+            int durationSec,
+            String source,
+            String bookId,
+            String bookTitle,
+            String bookAuthor,
+            String? bookCoverUrl)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _DailySessionDto():
+        return $default(
+            _that.sessionId,
+            _that.startedAt,
+            _that.endedAt,
+            _that.durationSec,
+            _that.source,
+            _that.bookId,
+            _that.bookTitle,
+            _that.bookAuthor,
+            _that.bookCoverUrl);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String sessionId,
+            DateTime startedAt,
+            DateTime endedAt,
+            int durationSec,
+            String source,
+            String bookId,
+            String bookTitle,
+            String bookAuthor,
+            String? bookCoverUrl)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _DailySessionDto() when $default != null:
+        return $default(
+            _that.sessionId,
+            _that.startedAt,
+            _that.endedAt,
+            _that.durationSec,
+            _that.source,
+            _that.bookId,
+            _that.bookTitle,
+            _that.bookAuthor,
+            _that.bookCoverUrl);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _DailySessionDto implements DailySessionDto {
+  const _DailySessionDto(
+      {required this.sessionId,
+      required this.startedAt,
+      required this.endedAt,
+      required this.durationSec,
+      required this.source,
+      required this.bookId,
+      required this.bookTitle,
+      required this.bookAuthor,
+      this.bookCoverUrl});
+  factory _DailySessionDto.fromJson(Map<String, dynamic> json) =>
+      _$DailySessionDtoFromJson(json);
 
   @override
-  String get sessionId;
+  final String sessionId;
   @override
-  DateTime get startedAt;
+  final DateTime startedAt;
   @override
-  DateTime get endedAt;
+  final DateTime endedAt;
   @override
-  int get durationSec;
+  final int durationSec;
   @override
-  String get source;
+  final String source;
   @override
-  String get bookId;
+  final String bookId;
   @override
-  String get bookTitle;
+  final String bookTitle;
   @override
-  String get bookAuthor;
+  final String bookAuthor;
   @override
-  String? get bookCoverUrl;
+  final String? bookCoverUrl;
 
   /// Create a copy of DailySessionDto
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$DailySessionDtoImplCopyWith<_$DailySessionDtoImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  _$DailySessionDtoCopyWith<_DailySessionDto> get copyWith =>
+      __$DailySessionDtoCopyWithImpl<_DailySessionDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$DailySessionDtoToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _DailySessionDto &&
+            (identical(other.sessionId, sessionId) ||
+                other.sessionId == sessionId) &&
+            (identical(other.startedAt, startedAt) ||
+                other.startedAt == startedAt) &&
+            (identical(other.endedAt, endedAt) || other.endedAt == endedAt) &&
+            (identical(other.durationSec, durationSec) ||
+                other.durationSec == durationSec) &&
+            (identical(other.source, source) || other.source == source) &&
+            (identical(other.bookId, bookId) || other.bookId == bookId) &&
+            (identical(other.bookTitle, bookTitle) ||
+                other.bookTitle == bookTitle) &&
+            (identical(other.bookAuthor, bookAuthor) ||
+                other.bookAuthor == bookAuthor) &&
+            (identical(other.bookCoverUrl, bookCoverUrl) ||
+                other.bookCoverUrl == bookCoverUrl));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, sessionId, startedAt, endedAt,
+      durationSec, source, bookId, bookTitle, bookAuthor, bookCoverUrl);
+
+  @override
+  String toString() {
+    return 'DailySessionDto(sessionId: $sessionId, startedAt: $startedAt, endedAt: $endedAt, durationSec: $durationSec, source: $source, bookId: $bookId, bookTitle: $bookTitle, bookAuthor: $bookAuthor, bookCoverUrl: $bookCoverUrl)';
+  }
 }
 
-DailySessionsResponseDto _$DailySessionsResponseDtoFromJson(
-    Map<String, dynamic> json) {
-  return _DailySessionsResponseDto.fromJson(json);
+/// @nodoc
+abstract mixin class _$DailySessionDtoCopyWith<$Res>
+    implements $DailySessionDtoCopyWith<$Res> {
+  factory _$DailySessionDtoCopyWith(
+          _DailySessionDto value, $Res Function(_DailySessionDto) _then) =
+      __$DailySessionDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String sessionId,
+      DateTime startedAt,
+      DateTime endedAt,
+      int durationSec,
+      String source,
+      String bookId,
+      String bookTitle,
+      String bookAuthor,
+      String? bookCoverUrl});
+}
+
+/// @nodoc
+class __$DailySessionDtoCopyWithImpl<$Res>
+    implements _$DailySessionDtoCopyWith<$Res> {
+  __$DailySessionDtoCopyWithImpl(this._self, this._then);
+
+  final _DailySessionDto _self;
+  final $Res Function(_DailySessionDto) _then;
+
+  /// Create a copy of DailySessionDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? sessionId = null,
+    Object? startedAt = null,
+    Object? endedAt = null,
+    Object? durationSec = null,
+    Object? source = null,
+    Object? bookId = null,
+    Object? bookTitle = null,
+    Object? bookAuthor = null,
+    Object? bookCoverUrl = freezed,
+  }) {
+    return _then(_DailySessionDto(
+      sessionId: null == sessionId
+          ? _self.sessionId
+          : sessionId // ignore: cast_nullable_to_non_nullable
+              as String,
+      startedAt: null == startedAt
+          ? _self.startedAt
+          : startedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      endedAt: null == endedAt
+          ? _self.endedAt
+          : endedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      durationSec: null == durationSec
+          ? _self.durationSec
+          : durationSec // ignore: cast_nullable_to_non_nullable
+              as int,
+      source: null == source
+          ? _self.source
+          : source // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookId: null == bookId
+          ? _self.bookId
+          : bookId // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookTitle: null == bookTitle
+          ? _self.bookTitle
+          : bookTitle // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookAuthor: null == bookAuthor
+          ? _self.bookAuthor
+          : bookAuthor // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookCoverUrl: freezed == bookCoverUrl
+          ? _self.bookCoverUrl
+          : bookCoverUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
 }
 
 /// @nodoc
 mixin _$DailySessionsResponseDto {
-  String get date => throw _privateConstructorUsedError;
-  int get totalSeconds => throw _privateConstructorUsedError;
-  List<DailySessionDto> get sessions => throw _privateConstructorUsedError;
-
-  /// Serializes this DailySessionsResponseDto to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  String get date;
+  int get totalSeconds;
+  List<DailySessionDto> get sessions;
 
   /// Create a copy of DailySessionsResponseDto
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $DailySessionsResponseDtoCopyWith<DailySessionsResponseDto> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $DailySessionsResponseDtoCopyWith<$Res> {
-  factory $DailySessionsResponseDtoCopyWith(DailySessionsResponseDto value,
-          $Res Function(DailySessionsResponseDto) then) =
-      _$DailySessionsResponseDtoCopyWithImpl<$Res, DailySessionsResponseDto>;
-  @useResult
-  $Res call({String date, int totalSeconds, List<DailySessionDto> sessions});
-}
-
-/// @nodoc
-class _$DailySessionsResponseDtoCopyWithImpl<$Res,
-        $Val extends DailySessionsResponseDto>
-    implements $DailySessionsResponseDtoCopyWith<$Res> {
-  _$DailySessionsResponseDtoCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of DailySessionsResponseDto
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $DailySessionsResponseDtoCopyWith<DailySessionsResponseDto> get copyWith =>
+      _$DailySessionsResponseDtoCopyWithImpl<DailySessionsResponseDto>(
+          this as DailySessionsResponseDto, _$identity);
+
+  /// Serializes this DailySessionsResponseDto to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? date = null,
-    Object? totalSeconds = null,
-    Object? sessions = null,
-  }) {
-    return _then(_value.copyWith(
-      date: null == date
-          ? _value.date
-          : date // ignore: cast_nullable_to_non_nullable
-              as String,
-      totalSeconds: null == totalSeconds
-          ? _value.totalSeconds
-          : totalSeconds // ignore: cast_nullable_to_non_nullable
-              as int,
-      sessions: null == sessions
-          ? _value.sessions
-          : sessions // ignore: cast_nullable_to_non_nullable
-              as List<DailySessionDto>,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is DailySessionsResponseDto &&
+            (identical(other.date, date) || other.date == date) &&
+            (identical(other.totalSeconds, totalSeconds) ||
+                other.totalSeconds == totalSeconds) &&
+            const DeepCollectionEquality().equals(other.sessions, sessions));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, date, totalSeconds,
+      const DeepCollectionEquality().hash(sessions));
+
+  @override
+  String toString() {
+    return 'DailySessionsResponseDto(date: $date, totalSeconds: $totalSeconds, sessions: $sessions)';
   }
 }
 
 /// @nodoc
-abstract class _$$DailySessionsResponseDtoImplCopyWith<$Res>
-    implements $DailySessionsResponseDtoCopyWith<$Res> {
-  factory _$$DailySessionsResponseDtoImplCopyWith(
-          _$DailySessionsResponseDtoImpl value,
-          $Res Function(_$DailySessionsResponseDtoImpl) then) =
-      __$$DailySessionsResponseDtoImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $DailySessionsResponseDtoCopyWith<$Res> {
+  factory $DailySessionsResponseDtoCopyWith(DailySessionsResponseDto value,
+          $Res Function(DailySessionsResponseDto) _then) =
+      _$DailySessionsResponseDtoCopyWithImpl;
   @useResult
   $Res call({String date, int totalSeconds, List<DailySessionDto> sessions});
 }
 
 /// @nodoc
-class __$$DailySessionsResponseDtoImplCopyWithImpl<$Res>
-    extends _$DailySessionsResponseDtoCopyWithImpl<$Res,
-        _$DailySessionsResponseDtoImpl>
-    implements _$$DailySessionsResponseDtoImplCopyWith<$Res> {
-  __$$DailySessionsResponseDtoImplCopyWithImpl(
-      _$DailySessionsResponseDtoImpl _value,
-      $Res Function(_$DailySessionsResponseDtoImpl) _then)
-      : super(_value, _then);
+class _$DailySessionsResponseDtoCopyWithImpl<$Res>
+    implements $DailySessionsResponseDtoCopyWith<$Res> {
+  _$DailySessionsResponseDtoCopyWithImpl(this._self, this._then);
+
+  final DailySessionsResponseDto _self;
+  final $Res Function(DailySessionsResponseDto) _then;
 
   /// Create a copy of DailySessionsResponseDto
   /// with the given fields replaced by the non-null parameter values.
@@ -2255,34 +3707,196 @@ class __$$DailySessionsResponseDtoImplCopyWithImpl<$Res>
     Object? totalSeconds = null,
     Object? sessions = null,
   }) {
-    return _then(_$DailySessionsResponseDtoImpl(
+    return _then(_self.copyWith(
       date: null == date
-          ? _value.date
+          ? _self.date
           : date // ignore: cast_nullable_to_non_nullable
               as String,
       totalSeconds: null == totalSeconds
-          ? _value.totalSeconds
+          ? _self.totalSeconds
           : totalSeconds // ignore: cast_nullable_to_non_nullable
               as int,
       sessions: null == sessions
-          ? _value._sessions
+          ? _self.sessions
           : sessions // ignore: cast_nullable_to_non_nullable
               as List<DailySessionDto>,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [DailySessionsResponseDto].
+extension DailySessionsResponseDtoPatterns on DailySessionsResponseDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_DailySessionsResponseDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _DailySessionsResponseDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_DailySessionsResponseDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _DailySessionsResponseDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_DailySessionsResponseDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _DailySessionsResponseDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String date, int totalSeconds, List<DailySessionDto> sessions)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _DailySessionsResponseDto() when $default != null:
+        return $default(_that.date, _that.totalSeconds, _that.sessions);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String date, int totalSeconds, List<DailySessionDto> sessions)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _DailySessionsResponseDto():
+        return $default(_that.date, _that.totalSeconds, _that.sessions);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String date, int totalSeconds, List<DailySessionDto> sessions)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _DailySessionsResponseDto() when $default != null:
+        return $default(_that.date, _that.totalSeconds, _that.sessions);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$DailySessionsResponseDtoImpl implements _DailySessionsResponseDto {
-  const _$DailySessionsResponseDtoImpl(
+class _DailySessionsResponseDto implements DailySessionsResponseDto {
+  const _DailySessionsResponseDto(
       {required this.date,
       required this.totalSeconds,
       required final List<DailySessionDto> sessions})
       : _sessions = sessions;
-
-  factory _$DailySessionsResponseDtoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$DailySessionsResponseDtoImplFromJson(json);
+  factory _DailySessionsResponseDto.fromJson(Map<String, dynamic> json) =>
+      _$DailySessionsResponseDtoFromJson(json);
 
   @override
   final String date;
@@ -2296,16 +3910,27 @@ class _$DailySessionsResponseDtoImpl implements _DailySessionsResponseDto {
     return EqualUnmodifiableListView(_sessions);
   }
 
+  /// Create a copy of DailySessionsResponseDto
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'DailySessionsResponseDto(date: $date, totalSeconds: $totalSeconds, sessions: $sessions)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$DailySessionsResponseDtoCopyWith<_DailySessionsResponseDto> get copyWith =>
+      __$DailySessionsResponseDtoCopyWithImpl<_DailySessionsResponseDto>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$DailySessionsResponseDtoToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$DailySessionsResponseDtoImpl &&
+            other is _DailySessionsResponseDto &&
             (identical(other.date, date) || other.date == date) &&
             (identical(other.totalSeconds, totalSeconds) ||
                 other.totalSeconds == totalSeconds) &&
@@ -2317,171 +3942,78 @@ class _$DailySessionsResponseDtoImpl implements _DailySessionsResponseDto {
   int get hashCode => Object.hash(runtimeType, date, totalSeconds,
       const DeepCollectionEquality().hash(_sessions));
 
-  /// Create a copy of DailySessionsResponseDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$DailySessionsResponseDtoImplCopyWith<_$DailySessionsResponseDtoImpl>
-      get copyWith => __$$DailySessionsResponseDtoImplCopyWithImpl<
-          _$DailySessionsResponseDtoImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$DailySessionsResponseDtoImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _DailySessionsResponseDto implements DailySessionsResponseDto {
-  const factory _DailySessionsResponseDto(
-          {required final String date,
-          required final int totalSeconds,
-          required final List<DailySessionDto> sessions}) =
-      _$DailySessionsResponseDtoImpl;
-
-  factory _DailySessionsResponseDto.fromJson(Map<String, dynamic> json) =
-      _$DailySessionsResponseDtoImpl.fromJson;
-
-  @override
-  String get date;
-  @override
-  int get totalSeconds;
-  @override
-  List<DailySessionDto> get sessions;
-
-  /// Create a copy of DailySessionsResponseDto
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$DailySessionsResponseDtoImplCopyWith<_$DailySessionsResponseDtoImpl>
-      get copyWith => throw _privateConstructorUsedError;
-}
-
-StartSessionRequest _$StartSessionRequestFromJson(Map<String, dynamic> json) {
-  return _StartSessionRequest.fromJson(json);
-}
-
-/// @nodoc
-mixin _$StartSessionRequest {
-  String get userBookId => throw _privateConstructorUsedError;
-  String get device => throw _privateConstructorUsedError;
-
-  /// Serializes this StartSessionRequest to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of StartSessionRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $StartSessionRequestCopyWith<StartSessionRequest> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $StartSessionRequestCopyWith<$Res> {
-  factory $StartSessionRequestCopyWith(
-          StartSessionRequest value, $Res Function(StartSessionRequest) then) =
-      _$StartSessionRequestCopyWithImpl<$Res, StartSessionRequest>;
-  @useResult
-  $Res call({String userBookId, String device});
-}
-
-/// @nodoc
-class _$StartSessionRequestCopyWithImpl<$Res, $Val extends StartSessionRequest>
-    implements $StartSessionRequestCopyWith<$Res> {
-  _$StartSessionRequestCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of StartSessionRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? userBookId = null,
-    Object? device = null,
-  }) {
-    return _then(_value.copyWith(
-      userBookId: null == userBookId
-          ? _value.userBookId
-          : userBookId // ignore: cast_nullable_to_non_nullable
-              as String,
-      device: null == device
-          ? _value.device
-          : device // ignore: cast_nullable_to_non_nullable
-              as String,
-    ) as $Val);
+  String toString() {
+    return 'DailySessionsResponseDto(date: $date, totalSeconds: $totalSeconds, sessions: $sessions)';
   }
 }
 
 /// @nodoc
-abstract class _$$StartSessionRequestImplCopyWith<$Res>
-    implements $StartSessionRequestCopyWith<$Res> {
-  factory _$$StartSessionRequestImplCopyWith(_$StartSessionRequestImpl value,
-          $Res Function(_$StartSessionRequestImpl) then) =
-      __$$StartSessionRequestImplCopyWithImpl<$Res>;
+abstract mixin class _$DailySessionsResponseDtoCopyWith<$Res>
+    implements $DailySessionsResponseDtoCopyWith<$Res> {
+  factory _$DailySessionsResponseDtoCopyWith(_DailySessionsResponseDto value,
+          $Res Function(_DailySessionsResponseDto) _then) =
+      __$DailySessionsResponseDtoCopyWithImpl;
   @override
   @useResult
-  $Res call({String userBookId, String device});
+  $Res call({String date, int totalSeconds, List<DailySessionDto> sessions});
 }
 
 /// @nodoc
-class __$$StartSessionRequestImplCopyWithImpl<$Res>
-    extends _$StartSessionRequestCopyWithImpl<$Res, _$StartSessionRequestImpl>
-    implements _$$StartSessionRequestImplCopyWith<$Res> {
-  __$$StartSessionRequestImplCopyWithImpl(_$StartSessionRequestImpl _value,
-      $Res Function(_$StartSessionRequestImpl) _then)
-      : super(_value, _then);
+class __$DailySessionsResponseDtoCopyWithImpl<$Res>
+    implements _$DailySessionsResponseDtoCopyWith<$Res> {
+  __$DailySessionsResponseDtoCopyWithImpl(this._self, this._then);
 
-  /// Create a copy of StartSessionRequest
+  final _DailySessionsResponseDto _self;
+  final $Res Function(_DailySessionsResponseDto) _then;
+
+  /// Create a copy of DailySessionsResponseDto
   /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
   @override
+  @pragma('vm:prefer-inline')
   $Res call({
-    Object? userBookId = null,
-    Object? device = null,
+    Object? date = null,
+    Object? totalSeconds = null,
+    Object? sessions = null,
   }) {
-    return _then(_$StartSessionRequestImpl(
-      userBookId: null == userBookId
-          ? _value.userBookId
-          : userBookId // ignore: cast_nullable_to_non_nullable
+    return _then(_DailySessionsResponseDto(
+      date: null == date
+          ? _self.date
+          : date // ignore: cast_nullable_to_non_nullable
               as String,
-      device: null == device
-          ? _value.device
-          : device // ignore: cast_nullable_to_non_nullable
-              as String,
+      totalSeconds: null == totalSeconds
+          ? _self.totalSeconds
+          : totalSeconds // ignore: cast_nullable_to_non_nullable
+              as int,
+      sessions: null == sessions
+          ? _self._sessions
+          : sessions // ignore: cast_nullable_to_non_nullable
+              as List<DailySessionDto>,
     ));
   }
 }
 
 /// @nodoc
-@JsonSerializable()
-class _$StartSessionRequestImpl implements _StartSessionRequest {
-  const _$StartSessionRequestImpl(
-      {required this.userBookId, required this.device});
+mixin _$StartSessionRequest {
+  String get userBookId;
+  String get device;
 
-  factory _$StartSessionRequestImpl.fromJson(Map<String, dynamic> json) =>
-      _$$StartSessionRequestImplFromJson(json);
+  /// Create a copy of StartSessionRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $StartSessionRequestCopyWith<StartSessionRequest> get copyWith =>
+      _$StartSessionRequestCopyWithImpl<StartSessionRequest>(
+          this as StartSessionRequest, _$identity);
 
-  @override
-  final String userBookId;
-  @override
-  final String device;
-
-  @override
-  String toString() {
-    return 'StartSessionRequest(userBookId: $userBookId, device: $device)';
-  }
+  /// Serializes this StartSessionRequest to a JSON map.
+  Map<String, dynamic> toJson();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$StartSessionRequestImpl &&
+            other is StartSessionRequest &&
             (identical(other.userBookId, userBookId) ||
                 other.userBookId == userBookId) &&
             (identical(other.device, device) || other.device == device));
@@ -2491,167 +4023,316 @@ class _$StartSessionRequestImpl implements _StartSessionRequest {
   @override
   int get hashCode => Object.hash(runtimeType, userBookId, device);
 
-  /// Create a copy of StartSessionRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$StartSessionRequestImplCopyWith<_$StartSessionRequestImpl> get copyWith =>
-      __$$StartSessionRequestImplCopyWithImpl<_$StartSessionRequestImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$StartSessionRequestImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _StartSessionRequest implements StartSessionRequest {
-  const factory _StartSessionRequest(
-      {required final String userBookId,
-      required final String device}) = _$StartSessionRequestImpl;
-
-  factory _StartSessionRequest.fromJson(Map<String, dynamic> json) =
-      _$StartSessionRequestImpl.fromJson;
-
-  @override
-  String get userBookId;
-  @override
-  String get device;
-
-  /// Create a copy of StartSessionRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$StartSessionRequestImplCopyWith<_$StartSessionRequestImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-EndSessionRequest _$EndSessionRequestFromJson(Map<String, dynamic> json) {
-  return _EndSessionRequest.fromJson(json);
-}
-
-/// @nodoc
-mixin _$EndSessionRequest {
-  DateTime get endedAt => throw _privateConstructorUsedError;
-  int get pausedMs => throw _privateConstructorUsedError;
-
-  /// Serializes this EndSessionRequest to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of EndSessionRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $EndSessionRequestCopyWith<EndSessionRequest> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $EndSessionRequestCopyWith<$Res> {
-  factory $EndSessionRequestCopyWith(
-          EndSessionRequest value, $Res Function(EndSessionRequest) then) =
-      _$EndSessionRequestCopyWithImpl<$Res, EndSessionRequest>;
-  @useResult
-  $Res call({DateTime endedAt, int pausedMs});
-}
-
-/// @nodoc
-class _$EndSessionRequestCopyWithImpl<$Res, $Val extends EndSessionRequest>
-    implements $EndSessionRequestCopyWith<$Res> {
-  _$EndSessionRequestCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of EndSessionRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? endedAt = null,
-    Object? pausedMs = null,
-  }) {
-    return _then(_value.copyWith(
-      endedAt: null == endedAt
-          ? _value.endedAt
-          : endedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      pausedMs: null == pausedMs
-          ? _value.pausedMs
-          : pausedMs // ignore: cast_nullable_to_non_nullable
-              as int,
-    ) as $Val);
+  String toString() {
+    return 'StartSessionRequest(userBookId: $userBookId, device: $device)';
   }
 }
 
 /// @nodoc
-abstract class _$$EndSessionRequestImplCopyWith<$Res>
-    implements $EndSessionRequestCopyWith<$Res> {
-  factory _$$EndSessionRequestImplCopyWith(_$EndSessionRequestImpl value,
-          $Res Function(_$EndSessionRequestImpl) then) =
-      __$$EndSessionRequestImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $StartSessionRequestCopyWith<$Res> {
+  factory $StartSessionRequestCopyWith(
+          StartSessionRequest value, $Res Function(StartSessionRequest) _then) =
+      _$StartSessionRequestCopyWithImpl;
   @useResult
-  $Res call({DateTime endedAt, int pausedMs});
+  $Res call({String userBookId, String device});
 }
 
 /// @nodoc
-class __$$EndSessionRequestImplCopyWithImpl<$Res>
-    extends _$EndSessionRequestCopyWithImpl<$Res, _$EndSessionRequestImpl>
-    implements _$$EndSessionRequestImplCopyWith<$Res> {
-  __$$EndSessionRequestImplCopyWithImpl(_$EndSessionRequestImpl _value,
-      $Res Function(_$EndSessionRequestImpl) _then)
-      : super(_value, _then);
+class _$StartSessionRequestCopyWithImpl<$Res>
+    implements $StartSessionRequestCopyWith<$Res> {
+  _$StartSessionRequestCopyWithImpl(this._self, this._then);
 
-  /// Create a copy of EndSessionRequest
+  final StartSessionRequest _self;
+  final $Res Function(StartSessionRequest) _then;
+
+  /// Create a copy of StartSessionRequest
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? endedAt = null,
-    Object? pausedMs = null,
+    Object? userBookId = null,
+    Object? device = null,
   }) {
-    return _then(_$EndSessionRequestImpl(
-      endedAt: null == endedAt
-          ? _value.endedAt
-          : endedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      pausedMs: null == pausedMs
-          ? _value.pausedMs
-          : pausedMs // ignore: cast_nullable_to_non_nullable
-              as int,
+    return _then(_self.copyWith(
+      userBookId: null == userBookId
+          ? _self.userBookId
+          : userBookId // ignore: cast_nullable_to_non_nullable
+              as String,
+      device: null == device
+          ? _self.device
+          : device // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [StartSessionRequest].
+extension StartSessionRequestPatterns on StartSessionRequest {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_StartSessionRequest value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _StartSessionRequest() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_StartSessionRequest value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _StartSessionRequest():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_StartSessionRequest value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _StartSessionRequest() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String userBookId, String device)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _StartSessionRequest() when $default != null:
+        return $default(_that.userBookId, _that.device);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String userBookId, String device) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _StartSessionRequest():
+        return $default(_that.userBookId, _that.device);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String userBookId, String device)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _StartSessionRequest() when $default != null:
+        return $default(_that.userBookId, _that.device);
+      case _:
+        return null;
+    }
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$EndSessionRequestImpl implements _EndSessionRequest {
-  const _$EndSessionRequestImpl(
-      {required this.endedAt, required this.pausedMs});
-
-  factory _$EndSessionRequestImpl.fromJson(Map<String, dynamic> json) =>
-      _$$EndSessionRequestImplFromJson(json);
+class _StartSessionRequest implements StartSessionRequest {
+  const _StartSessionRequest({required this.userBookId, required this.device});
+  factory _StartSessionRequest.fromJson(Map<String, dynamic> json) =>
+      _$StartSessionRequestFromJson(json);
 
   @override
-  final DateTime endedAt;
+  final String userBookId;
   @override
-  final int pausedMs;
+  final String device;
+
+  /// Create a copy of StartSessionRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$StartSessionRequestCopyWith<_StartSessionRequest> get copyWith =>
+      __$StartSessionRequestCopyWithImpl<_StartSessionRequest>(
+          this, _$identity);
 
   @override
-  String toString() {
-    return 'EndSessionRequest(endedAt: $endedAt, pausedMs: $pausedMs)';
+  Map<String, dynamic> toJson() {
+    return _$StartSessionRequestToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$EndSessionRequestImpl &&
+            other is _StartSessionRequest &&
+            (identical(other.userBookId, userBookId) ||
+                other.userBookId == userBookId) &&
+            (identical(other.device, device) || other.device == device));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, userBookId, device);
+
+  @override
+  String toString() {
+    return 'StartSessionRequest(userBookId: $userBookId, device: $device)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$StartSessionRequestCopyWith<$Res>
+    implements $StartSessionRequestCopyWith<$Res> {
+  factory _$StartSessionRequestCopyWith(_StartSessionRequest value,
+          $Res Function(_StartSessionRequest) _then) =
+      __$StartSessionRequestCopyWithImpl;
+  @override
+  @useResult
+  $Res call({String userBookId, String device});
+}
+
+/// @nodoc
+class __$StartSessionRequestCopyWithImpl<$Res>
+    implements _$StartSessionRequestCopyWith<$Res> {
+  __$StartSessionRequestCopyWithImpl(this._self, this._then);
+
+  final _StartSessionRequest _self;
+  final $Res Function(_StartSessionRequest) _then;
+
+  /// Create a copy of StartSessionRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? userBookId = null,
+    Object? device = null,
+  }) {
+    return _then(_StartSessionRequest(
+      userBookId: null == userBookId
+          ? _self.userBookId
+          : userBookId // ignore: cast_nullable_to_non_nullable
+              as String,
+      device: null == device
+          ? _self.device
+          : device // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$EndSessionRequest {
+  DateTime get endedAt;
+  int get pausedMs;
+
+  /// Create a copy of EndSessionRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $EndSessionRequestCopyWith<EndSessionRequest> get copyWith =>
+      _$EndSessionRequestCopyWithImpl<EndSessionRequest>(
+          this as EndSessionRequest, _$identity);
+
+  /// Serializes this EndSessionRequest to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is EndSessionRequest &&
             (identical(other.endedAt, endedAt) || other.endedAt == endedAt) &&
             (identical(other.pausedMs, pausedMs) ||
                 other.pausedMs == pausedMs));
@@ -2661,199 +4342,317 @@ class _$EndSessionRequestImpl implements _EndSessionRequest {
   @override
   int get hashCode => Object.hash(runtimeType, endedAt, pausedMs);
 
-  /// Create a copy of EndSessionRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$EndSessionRequestImplCopyWith<_$EndSessionRequestImpl> get copyWith =>
-      __$$EndSessionRequestImplCopyWithImpl<_$EndSessionRequestImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$EndSessionRequestImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _EndSessionRequest implements EndSessionRequest {
-  const factory _EndSessionRequest(
-      {required final DateTime endedAt,
-      required final int pausedMs}) = _$EndSessionRequestImpl;
-
-  factory _EndSessionRequest.fromJson(Map<String, dynamic> json) =
-      _$EndSessionRequestImpl.fromJson;
-
-  @override
-  DateTime get endedAt;
-  @override
-  int get pausedMs;
-
-  /// Create a copy of EndSessionRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$EndSessionRequestImplCopyWith<_$EndSessionRequestImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-ManualSessionRequest _$ManualSessionRequestFromJson(Map<String, dynamic> json) {
-  return _ManualSessionRequest.fromJson(json);
-}
-
-/// @nodoc
-mixin _$ManualSessionRequest {
-  String get userBookId => throw _privateConstructorUsedError;
-  DateTime get startedAt => throw _privateConstructorUsedError;
-  DateTime get endedAt => throw _privateConstructorUsedError;
-  String? get note => throw _privateConstructorUsedError;
-
-  /// Serializes this ManualSessionRequest to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of ManualSessionRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $ManualSessionRequestCopyWith<ManualSessionRequest> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $ManualSessionRequestCopyWith<$Res> {
-  factory $ManualSessionRequestCopyWith(ManualSessionRequest value,
-          $Res Function(ManualSessionRequest) then) =
-      _$ManualSessionRequestCopyWithImpl<$Res, ManualSessionRequest>;
-  @useResult
-  $Res call(
-      {String userBookId, DateTime startedAt, DateTime endedAt, String? note});
-}
-
-/// @nodoc
-class _$ManualSessionRequestCopyWithImpl<$Res,
-        $Val extends ManualSessionRequest>
-    implements $ManualSessionRequestCopyWith<$Res> {
-  _$ManualSessionRequestCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of ManualSessionRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? userBookId = null,
-    Object? startedAt = null,
-    Object? endedAt = null,
-    Object? note = freezed,
-  }) {
-    return _then(_value.copyWith(
-      userBookId: null == userBookId
-          ? _value.userBookId
-          : userBookId // ignore: cast_nullable_to_non_nullable
-              as String,
-      startedAt: null == startedAt
-          ? _value.startedAt
-          : startedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      endedAt: null == endedAt
-          ? _value.endedAt
-          : endedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      note: freezed == note
-          ? _value.note
-          : note // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ) as $Val);
+  String toString() {
+    return 'EndSessionRequest(endedAt: $endedAt, pausedMs: $pausedMs)';
   }
 }
 
 /// @nodoc
-abstract class _$$ManualSessionRequestImplCopyWith<$Res>
-    implements $ManualSessionRequestCopyWith<$Res> {
-  factory _$$ManualSessionRequestImplCopyWith(_$ManualSessionRequestImpl value,
-          $Res Function(_$ManualSessionRequestImpl) then) =
-      __$$ManualSessionRequestImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $EndSessionRequestCopyWith<$Res> {
+  factory $EndSessionRequestCopyWith(
+          EndSessionRequest value, $Res Function(EndSessionRequest) _then) =
+      _$EndSessionRequestCopyWithImpl;
   @useResult
-  $Res call(
-      {String userBookId, DateTime startedAt, DateTime endedAt, String? note});
+  $Res call({DateTime endedAt, int pausedMs});
 }
 
 /// @nodoc
-class __$$ManualSessionRequestImplCopyWithImpl<$Res>
-    extends _$ManualSessionRequestCopyWithImpl<$Res, _$ManualSessionRequestImpl>
-    implements _$$ManualSessionRequestImplCopyWith<$Res> {
-  __$$ManualSessionRequestImplCopyWithImpl(_$ManualSessionRequestImpl _value,
-      $Res Function(_$ManualSessionRequestImpl) _then)
-      : super(_value, _then);
+class _$EndSessionRequestCopyWithImpl<$Res>
+    implements $EndSessionRequestCopyWith<$Res> {
+  _$EndSessionRequestCopyWithImpl(this._self, this._then);
 
-  /// Create a copy of ManualSessionRequest
+  final EndSessionRequest _self;
+  final $Res Function(EndSessionRequest) _then;
+
+  /// Create a copy of EndSessionRequest
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? userBookId = null,
-    Object? startedAt = null,
     Object? endedAt = null,
-    Object? note = freezed,
+    Object? pausedMs = null,
   }) {
-    return _then(_$ManualSessionRequestImpl(
-      userBookId: null == userBookId
-          ? _value.userBookId
-          : userBookId // ignore: cast_nullable_to_non_nullable
-              as String,
-      startedAt: null == startedAt
-          ? _value.startedAt
-          : startedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+    return _then(_self.copyWith(
       endedAt: null == endedAt
-          ? _value.endedAt
+          ? _self.endedAt
           : endedAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      note: freezed == note
-          ? _value.note
-          : note // ignore: cast_nullable_to_non_nullable
-              as String?,
+      pausedMs: null == pausedMs
+          ? _self.pausedMs
+          : pausedMs // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [EndSessionRequest].
+extension EndSessionRequestPatterns on EndSessionRequest {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_EndSessionRequest value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _EndSessionRequest() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_EndSessionRequest value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _EndSessionRequest():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_EndSessionRequest value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _EndSessionRequest() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(DateTime endedAt, int pausedMs)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _EndSessionRequest() when $default != null:
+        return $default(_that.endedAt, _that.pausedMs);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(DateTime endedAt, int pausedMs) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _EndSessionRequest():
+        return $default(_that.endedAt, _that.pausedMs);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(DateTime endedAt, int pausedMs)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _EndSessionRequest() when $default != null:
+        return $default(_that.endedAt, _that.pausedMs);
+      case _:
+        return null;
+    }
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$ManualSessionRequestImpl implements _ManualSessionRequest {
-  const _$ManualSessionRequestImpl(
-      {required this.userBookId,
-      required this.startedAt,
-      required this.endedAt,
-      this.note});
+class _EndSessionRequest implements EndSessionRequest {
+  const _EndSessionRequest({required this.endedAt, required this.pausedMs});
+  factory _EndSessionRequest.fromJson(Map<String, dynamic> json) =>
+      _$EndSessionRequestFromJson(json);
 
-  factory _$ManualSessionRequestImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ManualSessionRequestImplFromJson(json);
-
-  @override
-  final String userBookId;
-  @override
-  final DateTime startedAt;
   @override
   final DateTime endedAt;
   @override
-  final String? note;
+  final int pausedMs;
+
+  /// Create a copy of EndSessionRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$EndSessionRequestCopyWith<_EndSessionRequest> get copyWith =>
+      __$EndSessionRequestCopyWithImpl<_EndSessionRequest>(this, _$identity);
 
   @override
-  String toString() {
-    return 'ManualSessionRequest(userBookId: $userBookId, startedAt: $startedAt, endedAt: $endedAt, note: $note)';
+  Map<String, dynamic> toJson() {
+    return _$EndSessionRequestToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ManualSessionRequestImpl &&
+            other is _EndSessionRequest &&
+            (identical(other.endedAt, endedAt) || other.endedAt == endedAt) &&
+            (identical(other.pausedMs, pausedMs) ||
+                other.pausedMs == pausedMs));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, endedAt, pausedMs);
+
+  @override
+  String toString() {
+    return 'EndSessionRequest(endedAt: $endedAt, pausedMs: $pausedMs)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$EndSessionRequestCopyWith<$Res>
+    implements $EndSessionRequestCopyWith<$Res> {
+  factory _$EndSessionRequestCopyWith(
+          _EndSessionRequest value, $Res Function(_EndSessionRequest) _then) =
+      __$EndSessionRequestCopyWithImpl;
+  @override
+  @useResult
+  $Res call({DateTime endedAt, int pausedMs});
+}
+
+/// @nodoc
+class __$EndSessionRequestCopyWithImpl<$Res>
+    implements _$EndSessionRequestCopyWith<$Res> {
+  __$EndSessionRequestCopyWithImpl(this._self, this._then);
+
+  final _EndSessionRequest _self;
+  final $Res Function(_EndSessionRequest) _then;
+
+  /// Create a copy of EndSessionRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? endedAt = null,
+    Object? pausedMs = null,
+  }) {
+    return _then(_EndSessionRequest(
+      endedAt: null == endedAt
+          ? _self.endedAt
+          : endedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      pausedMs: null == pausedMs
+          ? _self.pausedMs
+          : pausedMs // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$ManualSessionRequest {
+  String get userBookId;
+  DateTime get startedAt;
+  DateTime get endedAt;
+  String? get note;
+
+  /// Create a copy of ManualSessionRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $ManualSessionRequestCopyWith<ManualSessionRequest> get copyWith =>
+      _$ManualSessionRequestCopyWithImpl<ManualSessionRequest>(
+          this as ManualSessionRequest, _$identity);
+
+  /// Serializes this ManualSessionRequest to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is ManualSessionRequest &&
             (identical(other.userBookId, userBookId) ||
                 other.userBookId == userBookId) &&
             (identical(other.startedAt, startedAt) ||
@@ -2867,189 +4666,360 @@ class _$ManualSessionRequestImpl implements _ManualSessionRequest {
   int get hashCode =>
       Object.hash(runtimeType, userBookId, startedAt, endedAt, note);
 
-  /// Create a copy of ManualSessionRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$ManualSessionRequestImplCopyWith<_$ManualSessionRequestImpl>
-      get copyWith =>
-          __$$ManualSessionRequestImplCopyWithImpl<_$ManualSessionRequestImpl>(
-              this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ManualSessionRequestImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _ManualSessionRequest implements ManualSessionRequest {
-  const factory _ManualSessionRequest(
-      {required final String userBookId,
-      required final DateTime startedAt,
-      required final DateTime endedAt,
-      final String? note}) = _$ManualSessionRequestImpl;
-
-  factory _ManualSessionRequest.fromJson(Map<String, dynamic> json) =
-      _$ManualSessionRequestImpl.fromJson;
-
-  @override
-  String get userBookId;
-  @override
-  DateTime get startedAt;
-  @override
-  DateTime get endedAt;
-  @override
-  String? get note;
-
-  /// Create a copy of ManualSessionRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ManualSessionRequestImplCopyWith<_$ManualSessionRequestImpl>
-      get copyWith => throw _privateConstructorUsedError;
-}
-
-CreateGoalRequest _$CreateGoalRequestFromJson(Map<String, dynamic> json) {
-  return _CreateGoalRequest.fromJson(json);
-}
-
-/// @nodoc
-mixin _$CreateGoalRequest {
-  String get period => throw _privateConstructorUsedError;
-  int get targetBooks => throw _privateConstructorUsedError;
-  int get targetSeconds => throw _privateConstructorUsedError;
-
-  /// Serializes this CreateGoalRequest to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of CreateGoalRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $CreateGoalRequestCopyWith<CreateGoalRequest> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $CreateGoalRequestCopyWith<$Res> {
-  factory $CreateGoalRequestCopyWith(
-          CreateGoalRequest value, $Res Function(CreateGoalRequest) then) =
-      _$CreateGoalRequestCopyWithImpl<$Res, CreateGoalRequest>;
-  @useResult
-  $Res call({String period, int targetBooks, int targetSeconds});
-}
-
-/// @nodoc
-class _$CreateGoalRequestCopyWithImpl<$Res, $Val extends CreateGoalRequest>
-    implements $CreateGoalRequestCopyWith<$Res> {
-  _$CreateGoalRequestCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of CreateGoalRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? period = null,
-    Object? targetBooks = null,
-    Object? targetSeconds = null,
-  }) {
-    return _then(_value.copyWith(
-      period: null == period
-          ? _value.period
-          : period // ignore: cast_nullable_to_non_nullable
-              as String,
-      targetBooks: null == targetBooks
-          ? _value.targetBooks
-          : targetBooks // ignore: cast_nullable_to_non_nullable
-              as int,
-      targetSeconds: null == targetSeconds
-          ? _value.targetSeconds
-          : targetSeconds // ignore: cast_nullable_to_non_nullable
-              as int,
-    ) as $Val);
+  String toString() {
+    return 'ManualSessionRequest(userBookId: $userBookId, startedAt: $startedAt, endedAt: $endedAt, note: $note)';
   }
 }
 
 /// @nodoc
-abstract class _$$CreateGoalRequestImplCopyWith<$Res>
-    implements $CreateGoalRequestCopyWith<$Res> {
-  factory _$$CreateGoalRequestImplCopyWith(_$CreateGoalRequestImpl value,
-          $Res Function(_$CreateGoalRequestImpl) then) =
-      __$$CreateGoalRequestImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $ManualSessionRequestCopyWith<$Res> {
+  factory $ManualSessionRequestCopyWith(ManualSessionRequest value,
+          $Res Function(ManualSessionRequest) _then) =
+      _$ManualSessionRequestCopyWithImpl;
   @useResult
-  $Res call({String period, int targetBooks, int targetSeconds});
+  $Res call(
+      {String userBookId, DateTime startedAt, DateTime endedAt, String? note});
 }
 
 /// @nodoc
-class __$$CreateGoalRequestImplCopyWithImpl<$Res>
-    extends _$CreateGoalRequestCopyWithImpl<$Res, _$CreateGoalRequestImpl>
-    implements _$$CreateGoalRequestImplCopyWith<$Res> {
-  __$$CreateGoalRequestImplCopyWithImpl(_$CreateGoalRequestImpl _value,
-      $Res Function(_$CreateGoalRequestImpl) _then)
-      : super(_value, _then);
+class _$ManualSessionRequestCopyWithImpl<$Res>
+    implements $ManualSessionRequestCopyWith<$Res> {
+  _$ManualSessionRequestCopyWithImpl(this._self, this._then);
 
-  /// Create a copy of CreateGoalRequest
+  final ManualSessionRequest _self;
+  final $Res Function(ManualSessionRequest) _then;
+
+  /// Create a copy of ManualSessionRequest
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? period = null,
-    Object? targetBooks = null,
-    Object? targetSeconds = null,
+    Object? userBookId = null,
+    Object? startedAt = null,
+    Object? endedAt = null,
+    Object? note = freezed,
   }) {
-    return _then(_$CreateGoalRequestImpl(
-      period: null == period
-          ? _value.period
-          : period // ignore: cast_nullable_to_non_nullable
+    return _then(_self.copyWith(
+      userBookId: null == userBookId
+          ? _self.userBookId
+          : userBookId // ignore: cast_nullable_to_non_nullable
               as String,
-      targetBooks: null == targetBooks
-          ? _value.targetBooks
-          : targetBooks // ignore: cast_nullable_to_non_nullable
-              as int,
-      targetSeconds: null == targetSeconds
-          ? _value.targetSeconds
-          : targetSeconds // ignore: cast_nullable_to_non_nullable
-              as int,
+      startedAt: null == startedAt
+          ? _self.startedAt
+          : startedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      endedAt: null == endedAt
+          ? _self.endedAt
+          : endedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      note: freezed == note
+          ? _self.note
+          : note // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [ManualSessionRequest].
+extension ManualSessionRequestPatterns on ManualSessionRequest {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_ManualSessionRequest value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ManualSessionRequest() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_ManualSessionRequest value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ManualSessionRequest():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_ManualSessionRequest value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ManualSessionRequest() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String userBookId, DateTime startedAt, DateTime endedAt,
+            String? note)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ManualSessionRequest() when $default != null:
+        return $default(
+            _that.userBookId, _that.startedAt, _that.endedAt, _that.note);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String userBookId, DateTime startedAt, DateTime endedAt,
+            String? note)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ManualSessionRequest():
+        return $default(
+            _that.userBookId, _that.startedAt, _that.endedAt, _that.note);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String userBookId, DateTime startedAt, DateTime endedAt,
+            String? note)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ManualSessionRequest() when $default != null:
+        return $default(
+            _that.userBookId, _that.startedAt, _that.endedAt, _that.note);
+      case _:
+        return null;
+    }
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$CreateGoalRequestImpl implements _CreateGoalRequest {
-  const _$CreateGoalRequestImpl(
-      {required this.period,
-      required this.targetBooks,
-      required this.targetSeconds});
-
-  factory _$CreateGoalRequestImpl.fromJson(Map<String, dynamic> json) =>
-      _$$CreateGoalRequestImplFromJson(json);
-
-  @override
-  final String period;
-  @override
-  final int targetBooks;
-  @override
-  final int targetSeconds;
+class _ManualSessionRequest implements ManualSessionRequest {
+  const _ManualSessionRequest(
+      {required this.userBookId,
+      required this.startedAt,
+      required this.endedAt,
+      this.note});
+  factory _ManualSessionRequest.fromJson(Map<String, dynamic> json) =>
+      _$ManualSessionRequestFromJson(json);
 
   @override
-  String toString() {
-    return 'CreateGoalRequest(period: $period, targetBooks: $targetBooks, targetSeconds: $targetSeconds)';
+  final String userBookId;
+  @override
+  final DateTime startedAt;
+  @override
+  final DateTime endedAt;
+  @override
+  final String? note;
+
+  /// Create a copy of ManualSessionRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$ManualSessionRequestCopyWith<_ManualSessionRequest> get copyWith =>
+      __$ManualSessionRequestCopyWithImpl<_ManualSessionRequest>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$ManualSessionRequestToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$CreateGoalRequestImpl &&
+            other is _ManualSessionRequest &&
+            (identical(other.userBookId, userBookId) ||
+                other.userBookId == userBookId) &&
+            (identical(other.startedAt, startedAt) ||
+                other.startedAt == startedAt) &&
+            (identical(other.endedAt, endedAt) || other.endedAt == endedAt) &&
+            (identical(other.note, note) || other.note == note));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, userBookId, startedAt, endedAt, note);
+
+  @override
+  String toString() {
+    return 'ManualSessionRequest(userBookId: $userBookId, startedAt: $startedAt, endedAt: $endedAt, note: $note)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$ManualSessionRequestCopyWith<$Res>
+    implements $ManualSessionRequestCopyWith<$Res> {
+  factory _$ManualSessionRequestCopyWith(_ManualSessionRequest value,
+          $Res Function(_ManualSessionRequest) _then) =
+      __$ManualSessionRequestCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String userBookId, DateTime startedAt, DateTime endedAt, String? note});
+}
+
+/// @nodoc
+class __$ManualSessionRequestCopyWithImpl<$Res>
+    implements _$ManualSessionRequestCopyWith<$Res> {
+  __$ManualSessionRequestCopyWithImpl(this._self, this._then);
+
+  final _ManualSessionRequest _self;
+  final $Res Function(_ManualSessionRequest) _then;
+
+  /// Create a copy of ManualSessionRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? userBookId = null,
+    Object? startedAt = null,
+    Object? endedAt = null,
+    Object? note = freezed,
+  }) {
+    return _then(_ManualSessionRequest(
+      userBookId: null == userBookId
+          ? _self.userBookId
+          : userBookId // ignore: cast_nullable_to_non_nullable
+              as String,
+      startedAt: null == startedAt
+          ? _self.startedAt
+          : startedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      endedAt: null == endedAt
+          ? _self.endedAt
+          : endedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      note: freezed == note
+          ? _self.note
+          : note // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$CreateGoalRequest {
+  String get period;
+  int get targetBooks;
+  int get targetSeconds;
+
+  /// Create a copy of CreateGoalRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $CreateGoalRequestCopyWith<CreateGoalRequest> get copyWith =>
+      _$CreateGoalRequestCopyWithImpl<CreateGoalRequest>(
+          this as CreateGoalRequest, _$identity);
+
+  /// Serializes this CreateGoalRequest to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is CreateGoalRequest &&
             (identical(other.period, period) || other.period == period) &&
             (identical(other.targetBooks, targetBooks) ||
                 other.targetBooks == targetBooks) &&
@@ -3062,288 +5032,343 @@ class _$CreateGoalRequestImpl implements _CreateGoalRequest {
   int get hashCode =>
       Object.hash(runtimeType, period, targetBooks, targetSeconds);
 
-  /// Create a copy of CreateGoalRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$CreateGoalRequestImplCopyWith<_$CreateGoalRequestImpl> get copyWith =>
-      __$$CreateGoalRequestImplCopyWithImpl<_$CreateGoalRequestImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$CreateGoalRequestImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _CreateGoalRequest implements CreateGoalRequest {
-  const factory _CreateGoalRequest(
-      {required final String period,
-      required final int targetBooks,
-      required final int targetSeconds}) = _$CreateGoalRequestImpl;
-
-  factory _CreateGoalRequest.fromJson(Map<String, dynamic> json) =
-      _$CreateGoalRequestImpl.fromJson;
-
-  @override
-  String get period;
-  @override
-  int get targetBooks;
-  @override
-  int get targetSeconds;
-
-  /// Create a copy of CreateGoalRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$CreateGoalRequestImplCopyWith<_$CreateGoalRequestImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-ReadingYearStatsDto _$ReadingYearStatsDtoFromJson(Map<String, dynamic> json) {
-  return _ReadingYearStatsDto.fromJson(json);
-}
-
-/// @nodoc
-mixin _$ReadingYearStatsDto {
-  int get year => throw _privateConstructorUsedError;
-  int get yearBooks => throw _privateConstructorUsedError;
-  int get yearSeconds => throw _privateConstructorUsedError;
-  String? get yearBestDayDate => throw _privateConstructorUsedError;
-  int? get yearBestDaySeconds => throw _privateConstructorUsedError;
-  int get totalBooks => throw _privateConstructorUsedError;
-  int get totalSeconds => throw _privateConstructorUsedError;
-  int get streakDays => throw _privateConstructorUsedError;
-  int get longestStreak => throw _privateConstructorUsedError;
-
-  /// Serializes this ReadingYearStatsDto to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of ReadingYearStatsDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $ReadingYearStatsDtoCopyWith<ReadingYearStatsDto> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $ReadingYearStatsDtoCopyWith<$Res> {
-  factory $ReadingYearStatsDtoCopyWith(
-          ReadingYearStatsDto value, $Res Function(ReadingYearStatsDto) then) =
-      _$ReadingYearStatsDtoCopyWithImpl<$Res, ReadingYearStatsDto>;
-  @useResult
-  $Res call(
-      {int year,
-      int yearBooks,
-      int yearSeconds,
-      String? yearBestDayDate,
-      int? yearBestDaySeconds,
-      int totalBooks,
-      int totalSeconds,
-      int streakDays,
-      int longestStreak});
-}
-
-/// @nodoc
-class _$ReadingYearStatsDtoCopyWithImpl<$Res, $Val extends ReadingYearStatsDto>
-    implements $ReadingYearStatsDtoCopyWith<$Res> {
-  _$ReadingYearStatsDtoCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of ReadingYearStatsDto
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? year = null,
-    Object? yearBooks = null,
-    Object? yearSeconds = null,
-    Object? yearBestDayDate = freezed,
-    Object? yearBestDaySeconds = freezed,
-    Object? totalBooks = null,
-    Object? totalSeconds = null,
-    Object? streakDays = null,
-    Object? longestStreak = null,
-  }) {
-    return _then(_value.copyWith(
-      year: null == year
-          ? _value.year
-          : year // ignore: cast_nullable_to_non_nullable
-              as int,
-      yearBooks: null == yearBooks
-          ? _value.yearBooks
-          : yearBooks // ignore: cast_nullable_to_non_nullable
-              as int,
-      yearSeconds: null == yearSeconds
-          ? _value.yearSeconds
-          : yearSeconds // ignore: cast_nullable_to_non_nullable
-              as int,
-      yearBestDayDate: freezed == yearBestDayDate
-          ? _value.yearBestDayDate
-          : yearBestDayDate // ignore: cast_nullable_to_non_nullable
-              as String?,
-      yearBestDaySeconds: freezed == yearBestDaySeconds
-          ? _value.yearBestDaySeconds
-          : yearBestDaySeconds // ignore: cast_nullable_to_non_nullable
-              as int?,
-      totalBooks: null == totalBooks
-          ? _value.totalBooks
-          : totalBooks // ignore: cast_nullable_to_non_nullable
-              as int,
-      totalSeconds: null == totalSeconds
-          ? _value.totalSeconds
-          : totalSeconds // ignore: cast_nullable_to_non_nullable
-              as int,
-      streakDays: null == streakDays
-          ? _value.streakDays
-          : streakDays // ignore: cast_nullable_to_non_nullable
-              as int,
-      longestStreak: null == longestStreak
-          ? _value.longestStreak
-          : longestStreak // ignore: cast_nullable_to_non_nullable
-              as int,
-    ) as $Val);
+  String toString() {
+    return 'CreateGoalRequest(period: $period, targetBooks: $targetBooks, targetSeconds: $targetSeconds)';
   }
 }
 
 /// @nodoc
-abstract class _$$ReadingYearStatsDtoImplCopyWith<$Res>
-    implements $ReadingYearStatsDtoCopyWith<$Res> {
-  factory _$$ReadingYearStatsDtoImplCopyWith(_$ReadingYearStatsDtoImpl value,
-          $Res Function(_$ReadingYearStatsDtoImpl) then) =
-      __$$ReadingYearStatsDtoImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $CreateGoalRequestCopyWith<$Res> {
+  factory $CreateGoalRequestCopyWith(
+          CreateGoalRequest value, $Res Function(CreateGoalRequest) _then) =
+      _$CreateGoalRequestCopyWithImpl;
   @useResult
-  $Res call(
-      {int year,
-      int yearBooks,
-      int yearSeconds,
-      String? yearBestDayDate,
-      int? yearBestDaySeconds,
-      int totalBooks,
-      int totalSeconds,
-      int streakDays,
-      int longestStreak});
+  $Res call({String period, int targetBooks, int targetSeconds});
 }
 
 /// @nodoc
-class __$$ReadingYearStatsDtoImplCopyWithImpl<$Res>
-    extends _$ReadingYearStatsDtoCopyWithImpl<$Res, _$ReadingYearStatsDtoImpl>
-    implements _$$ReadingYearStatsDtoImplCopyWith<$Res> {
-  __$$ReadingYearStatsDtoImplCopyWithImpl(_$ReadingYearStatsDtoImpl _value,
-      $Res Function(_$ReadingYearStatsDtoImpl) _then)
-      : super(_value, _then);
+class _$CreateGoalRequestCopyWithImpl<$Res>
+    implements $CreateGoalRequestCopyWith<$Res> {
+  _$CreateGoalRequestCopyWithImpl(this._self, this._then);
 
-  /// Create a copy of ReadingYearStatsDto
+  final CreateGoalRequest _self;
+  final $Res Function(CreateGoalRequest) _then;
+
+  /// Create a copy of CreateGoalRequest
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? year = null,
-    Object? yearBooks = null,
-    Object? yearSeconds = null,
-    Object? yearBestDayDate = freezed,
-    Object? yearBestDaySeconds = freezed,
-    Object? totalBooks = null,
-    Object? totalSeconds = null,
-    Object? streakDays = null,
-    Object? longestStreak = null,
+    Object? period = null,
+    Object? targetBooks = null,
+    Object? targetSeconds = null,
   }) {
-    return _then(_$ReadingYearStatsDtoImpl(
-      year: null == year
-          ? _value.year
-          : year // ignore: cast_nullable_to_non_nullable
+    return _then(_self.copyWith(
+      period: null == period
+          ? _self.period
+          : period // ignore: cast_nullable_to_non_nullable
+              as String,
+      targetBooks: null == targetBooks
+          ? _self.targetBooks
+          : targetBooks // ignore: cast_nullable_to_non_nullable
               as int,
-      yearBooks: null == yearBooks
-          ? _value.yearBooks
-          : yearBooks // ignore: cast_nullable_to_non_nullable
-              as int,
-      yearSeconds: null == yearSeconds
-          ? _value.yearSeconds
-          : yearSeconds // ignore: cast_nullable_to_non_nullable
-              as int,
-      yearBestDayDate: freezed == yearBestDayDate
-          ? _value.yearBestDayDate
-          : yearBestDayDate // ignore: cast_nullable_to_non_nullable
-              as String?,
-      yearBestDaySeconds: freezed == yearBestDaySeconds
-          ? _value.yearBestDaySeconds
-          : yearBestDaySeconds // ignore: cast_nullable_to_non_nullable
-              as int?,
-      totalBooks: null == totalBooks
-          ? _value.totalBooks
-          : totalBooks // ignore: cast_nullable_to_non_nullable
-              as int,
-      totalSeconds: null == totalSeconds
-          ? _value.totalSeconds
-          : totalSeconds // ignore: cast_nullable_to_non_nullable
-              as int,
-      streakDays: null == streakDays
-          ? _value.streakDays
-          : streakDays // ignore: cast_nullable_to_non_nullable
-              as int,
-      longestStreak: null == longestStreak
-          ? _value.longestStreak
-          : longestStreak // ignore: cast_nullable_to_non_nullable
+      targetSeconds: null == targetSeconds
+          ? _self.targetSeconds
+          : targetSeconds // ignore: cast_nullable_to_non_nullable
               as int,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [CreateGoalRequest].
+extension CreateGoalRequestPatterns on CreateGoalRequest {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_CreateGoalRequest value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _CreateGoalRequest() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_CreateGoalRequest value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _CreateGoalRequest():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_CreateGoalRequest value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _CreateGoalRequest() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String period, int targetBooks, int targetSeconds)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _CreateGoalRequest() when $default != null:
+        return $default(_that.period, _that.targetBooks, _that.targetSeconds);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String period, int targetBooks, int targetSeconds)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _CreateGoalRequest():
+        return $default(_that.period, _that.targetBooks, _that.targetSeconds);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String period, int targetBooks, int targetSeconds)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _CreateGoalRequest() when $default != null:
+        return $default(_that.period, _that.targetBooks, _that.targetSeconds);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$ReadingYearStatsDtoImpl extends _ReadingYearStatsDto {
-  const _$ReadingYearStatsDtoImpl(
-      {required this.year,
-      required this.yearBooks,
-      required this.yearSeconds,
-      this.yearBestDayDate,
-      this.yearBestDaySeconds,
-      required this.totalBooks,
-      required this.totalSeconds,
-      required this.streakDays,
-      required this.longestStreak})
-      : super._();
-
-  factory _$ReadingYearStatsDtoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ReadingYearStatsDtoImplFromJson(json);
+class _CreateGoalRequest implements CreateGoalRequest {
+  const _CreateGoalRequest(
+      {required this.period,
+      required this.targetBooks,
+      required this.targetSeconds});
+  factory _CreateGoalRequest.fromJson(Map<String, dynamic> json) =>
+      _$CreateGoalRequestFromJson(json);
 
   @override
-  final int year;
+  final String period;
   @override
-  final int yearBooks;
+  final int targetBooks;
   @override
-  final int yearSeconds;
+  final int targetSeconds;
+
+  /// Create a copy of CreateGoalRequest
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  final String? yearBestDayDate;
-  @override
-  final int? yearBestDaySeconds;
-  @override
-  final int totalBooks;
-  @override
-  final int totalSeconds;
-  @override
-  final int streakDays;
-  @override
-  final int longestStreak;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$CreateGoalRequestCopyWith<_CreateGoalRequest> get copyWith =>
+      __$CreateGoalRequestCopyWithImpl<_CreateGoalRequest>(this, _$identity);
 
   @override
-  String toString() {
-    return 'ReadingYearStatsDto(year: $year, yearBooks: $yearBooks, yearSeconds: $yearSeconds, yearBestDayDate: $yearBestDayDate, yearBestDaySeconds: $yearBestDaySeconds, totalBooks: $totalBooks, totalSeconds: $totalSeconds, streakDays: $streakDays, longestStreak: $longestStreak)';
+  Map<String, dynamic> toJson() {
+    return _$CreateGoalRequestToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ReadingYearStatsDtoImpl &&
+            other is _CreateGoalRequest &&
+            (identical(other.period, period) || other.period == period) &&
+            (identical(other.targetBooks, targetBooks) ||
+                other.targetBooks == targetBooks) &&
+            (identical(other.targetSeconds, targetSeconds) ||
+                other.targetSeconds == targetSeconds));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, period, targetBooks, targetSeconds);
+
+  @override
+  String toString() {
+    return 'CreateGoalRequest(period: $period, targetBooks: $targetBooks, targetSeconds: $targetSeconds)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$CreateGoalRequestCopyWith<$Res>
+    implements $CreateGoalRequestCopyWith<$Res> {
+  factory _$CreateGoalRequestCopyWith(
+          _CreateGoalRequest value, $Res Function(_CreateGoalRequest) _then) =
+      __$CreateGoalRequestCopyWithImpl;
+  @override
+  @useResult
+  $Res call({String period, int targetBooks, int targetSeconds});
+}
+
+/// @nodoc
+class __$CreateGoalRequestCopyWithImpl<$Res>
+    implements _$CreateGoalRequestCopyWith<$Res> {
+  __$CreateGoalRequestCopyWithImpl(this._self, this._then);
+
+  final _CreateGoalRequest _self;
+  final $Res Function(_CreateGoalRequest) _then;
+
+  /// Create a copy of CreateGoalRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? period = null,
+    Object? targetBooks = null,
+    Object? targetSeconds = null,
+  }) {
+    return _then(_CreateGoalRequest(
+      period: null == period
+          ? _self.period
+          : period // ignore: cast_nullable_to_non_nullable
+              as String,
+      targetBooks: null == targetBooks
+          ? _self.targetBooks
+          : targetBooks // ignore: cast_nullable_to_non_nullable
+              as int,
+      targetSeconds: null == targetSeconds
+          ? _self.targetSeconds
+          : targetSeconds // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$ReadingYearStatsDto {
+  int get year;
+  int get yearBooks;
+  int get yearSeconds;
+  String? get yearBestDayDate;
+  int? get yearBestDaySeconds;
+  int get totalBooks;
+  int get totalSeconds;
+  int get streakDays;
+  int get longestStreak;
+
+  /// Create a copy of ReadingYearStatsDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $ReadingYearStatsDtoCopyWith<ReadingYearStatsDto> get copyWith =>
+      _$ReadingYearStatsDtoCopyWithImpl<ReadingYearStatsDto>(
+          this as ReadingYearStatsDto, _$identity);
+
+  /// Serializes this ReadingYearStatsDto to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is ReadingYearStatsDto &&
             (identical(other.year, year) || other.year == year) &&
             (identical(other.yearBooks, yearBooks) ||
                 other.yearBooks == yearBooks) &&
@@ -3377,62 +5402,486 @@ class _$ReadingYearStatsDtoImpl extends _ReadingYearStatsDto {
       streakDays,
       longestStreak);
 
+  @override
+  String toString() {
+    return 'ReadingYearStatsDto(year: $year, yearBooks: $yearBooks, yearSeconds: $yearSeconds, yearBestDayDate: $yearBestDayDate, yearBestDaySeconds: $yearBestDaySeconds, totalBooks: $totalBooks, totalSeconds: $totalSeconds, streakDays: $streakDays, longestStreak: $longestStreak)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $ReadingYearStatsDtoCopyWith<$Res> {
+  factory $ReadingYearStatsDtoCopyWith(
+          ReadingYearStatsDto value, $Res Function(ReadingYearStatsDto) _then) =
+      _$ReadingYearStatsDtoCopyWithImpl;
+  @useResult
+  $Res call(
+      {int year,
+      int yearBooks,
+      int yearSeconds,
+      String? yearBestDayDate,
+      int? yearBestDaySeconds,
+      int totalBooks,
+      int totalSeconds,
+      int streakDays,
+      int longestStreak});
+}
+
+/// @nodoc
+class _$ReadingYearStatsDtoCopyWithImpl<$Res>
+    implements $ReadingYearStatsDtoCopyWith<$Res> {
+  _$ReadingYearStatsDtoCopyWithImpl(this._self, this._then);
+
+  final ReadingYearStatsDto _self;
+  final $Res Function(ReadingYearStatsDto) _then;
+
   /// Create a copy of ReadingYearStatsDto
   /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
   @pragma('vm:prefer-inline')
-  _$$ReadingYearStatsDtoImplCopyWith<_$ReadingYearStatsDtoImpl> get copyWith =>
-      __$$ReadingYearStatsDtoImplCopyWithImpl<_$ReadingYearStatsDtoImpl>(
+  @override
+  $Res call({
+    Object? year = null,
+    Object? yearBooks = null,
+    Object? yearSeconds = null,
+    Object? yearBestDayDate = freezed,
+    Object? yearBestDaySeconds = freezed,
+    Object? totalBooks = null,
+    Object? totalSeconds = null,
+    Object? streakDays = null,
+    Object? longestStreak = null,
+  }) {
+    return _then(_self.copyWith(
+      year: null == year
+          ? _self.year
+          : year // ignore: cast_nullable_to_non_nullable
+              as int,
+      yearBooks: null == yearBooks
+          ? _self.yearBooks
+          : yearBooks // ignore: cast_nullable_to_non_nullable
+              as int,
+      yearSeconds: null == yearSeconds
+          ? _self.yearSeconds
+          : yearSeconds // ignore: cast_nullable_to_non_nullable
+              as int,
+      yearBestDayDate: freezed == yearBestDayDate
+          ? _self.yearBestDayDate
+          : yearBestDayDate // ignore: cast_nullable_to_non_nullable
+              as String?,
+      yearBestDaySeconds: freezed == yearBestDaySeconds
+          ? _self.yearBestDaySeconds
+          : yearBestDaySeconds // ignore: cast_nullable_to_non_nullable
+              as int?,
+      totalBooks: null == totalBooks
+          ? _self.totalBooks
+          : totalBooks // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalSeconds: null == totalSeconds
+          ? _self.totalSeconds
+          : totalSeconds // ignore: cast_nullable_to_non_nullable
+              as int,
+      streakDays: null == streakDays
+          ? _self.streakDays
+          : streakDays // ignore: cast_nullable_to_non_nullable
+              as int,
+      longestStreak: null == longestStreak
+          ? _self.longestStreak
+          : longestStreak // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [ReadingYearStatsDto].
+extension ReadingYearStatsDtoPatterns on ReadingYearStatsDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_ReadingYearStatsDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ReadingYearStatsDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_ReadingYearStatsDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ReadingYearStatsDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_ReadingYearStatsDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ReadingYearStatsDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            int year,
+            int yearBooks,
+            int yearSeconds,
+            String? yearBestDayDate,
+            int? yearBestDaySeconds,
+            int totalBooks,
+            int totalSeconds,
+            int streakDays,
+            int longestStreak)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ReadingYearStatsDto() when $default != null:
+        return $default(
+            _that.year,
+            _that.yearBooks,
+            _that.yearSeconds,
+            _that.yearBestDayDate,
+            _that.yearBestDaySeconds,
+            _that.totalBooks,
+            _that.totalSeconds,
+            _that.streakDays,
+            _that.longestStreak);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            int year,
+            int yearBooks,
+            int yearSeconds,
+            String? yearBestDayDate,
+            int? yearBestDaySeconds,
+            int totalBooks,
+            int totalSeconds,
+            int streakDays,
+            int longestStreak)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ReadingYearStatsDto():
+        return $default(
+            _that.year,
+            _that.yearBooks,
+            _that.yearSeconds,
+            _that.yearBestDayDate,
+            _that.yearBestDaySeconds,
+            _that.totalBooks,
+            _that.totalSeconds,
+            _that.streakDays,
+            _that.longestStreak);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            int year,
+            int yearBooks,
+            int yearSeconds,
+            String? yearBestDayDate,
+            int? yearBestDaySeconds,
+            int totalBooks,
+            int totalSeconds,
+            int streakDays,
+            int longestStreak)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ReadingYearStatsDto() when $default != null:
+        return $default(
+            _that.year,
+            _that.yearBooks,
+            _that.yearSeconds,
+            _that.yearBestDayDate,
+            _that.yearBestDaySeconds,
+            _that.totalBooks,
+            _that.totalSeconds,
+            _that.streakDays,
+            _that.longestStreak);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _ReadingYearStatsDto extends ReadingYearStatsDto {
+  const _ReadingYearStatsDto(
+      {required this.year,
+      required this.yearBooks,
+      required this.yearSeconds,
+      this.yearBestDayDate,
+      this.yearBestDaySeconds,
+      required this.totalBooks,
+      required this.totalSeconds,
+      required this.streakDays,
+      required this.longestStreak})
+      : super._();
+  factory _ReadingYearStatsDto.fromJson(Map<String, dynamic> json) =>
+      _$ReadingYearStatsDtoFromJson(json);
+
+  @override
+  final int year;
+  @override
+  final int yearBooks;
+  @override
+  final int yearSeconds;
+  @override
+  final String? yearBestDayDate;
+  @override
+  final int? yearBestDaySeconds;
+  @override
+  final int totalBooks;
+  @override
+  final int totalSeconds;
+  @override
+  final int streakDays;
+  @override
+  final int longestStreak;
+
+  /// Create a copy of ReadingYearStatsDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$ReadingYearStatsDtoCopyWith<_ReadingYearStatsDto> get copyWith =>
+      __$ReadingYearStatsDtoCopyWithImpl<_ReadingYearStatsDto>(
           this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$ReadingYearStatsDtoImplToJson(
+    return _$ReadingYearStatsDtoToJson(
       this,
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _ReadingYearStatsDto &&
+            (identical(other.year, year) || other.year == year) &&
+            (identical(other.yearBooks, yearBooks) ||
+                other.yearBooks == yearBooks) &&
+            (identical(other.yearSeconds, yearSeconds) ||
+                other.yearSeconds == yearSeconds) &&
+            (identical(other.yearBestDayDate, yearBestDayDate) ||
+                other.yearBestDayDate == yearBestDayDate) &&
+            (identical(other.yearBestDaySeconds, yearBestDaySeconds) ||
+                other.yearBestDaySeconds == yearBestDaySeconds) &&
+            (identical(other.totalBooks, totalBooks) ||
+                other.totalBooks == totalBooks) &&
+            (identical(other.totalSeconds, totalSeconds) ||
+                other.totalSeconds == totalSeconds) &&
+            (identical(other.streakDays, streakDays) ||
+                other.streakDays == streakDays) &&
+            (identical(other.longestStreak, longestStreak) ||
+                other.longestStreak == longestStreak));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      year,
+      yearBooks,
+      yearSeconds,
+      yearBestDayDate,
+      yearBestDaySeconds,
+      totalBooks,
+      totalSeconds,
+      streakDays,
+      longestStreak);
+
+  @override
+  String toString() {
+    return 'ReadingYearStatsDto(year: $year, yearBooks: $yearBooks, yearSeconds: $yearSeconds, yearBestDayDate: $yearBestDayDate, yearBestDaySeconds: $yearBestDaySeconds, totalBooks: $totalBooks, totalSeconds: $totalSeconds, streakDays: $streakDays, longestStreak: $longestStreak)';
+  }
 }
 
-abstract class _ReadingYearStatsDto extends ReadingYearStatsDto {
-  const factory _ReadingYearStatsDto(
-      {required final int year,
-      required final int yearBooks,
-      required final int yearSeconds,
-      final String? yearBestDayDate,
-      final int? yearBestDaySeconds,
-      required final int totalBooks,
-      required final int totalSeconds,
-      required final int streakDays,
-      required final int longestStreak}) = _$ReadingYearStatsDtoImpl;
-  const _ReadingYearStatsDto._() : super._();
+/// @nodoc
+abstract mixin class _$ReadingYearStatsDtoCopyWith<$Res>
+    implements $ReadingYearStatsDtoCopyWith<$Res> {
+  factory _$ReadingYearStatsDtoCopyWith(_ReadingYearStatsDto value,
+          $Res Function(_ReadingYearStatsDto) _then) =
+      __$ReadingYearStatsDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {int year,
+      int yearBooks,
+      int yearSeconds,
+      String? yearBestDayDate,
+      int? yearBestDaySeconds,
+      int totalBooks,
+      int totalSeconds,
+      int streakDays,
+      int longestStreak});
+}
 
-  factory _ReadingYearStatsDto.fromJson(Map<String, dynamic> json) =
-      _$ReadingYearStatsDtoImpl.fromJson;
+/// @nodoc
+class __$ReadingYearStatsDtoCopyWithImpl<$Res>
+    implements _$ReadingYearStatsDtoCopyWith<$Res> {
+  __$ReadingYearStatsDtoCopyWithImpl(this._self, this._then);
 
-  @override
-  int get year;
-  @override
-  int get yearBooks;
-  @override
-  int get yearSeconds;
-  @override
-  String? get yearBestDayDate;
-  @override
-  int? get yearBestDaySeconds;
-  @override
-  int get totalBooks;
-  @override
-  int get totalSeconds;
-  @override
-  int get streakDays;
-  @override
-  int get longestStreak;
+  final _ReadingYearStatsDto _self;
+  final $Res Function(_ReadingYearStatsDto) _then;
 
   /// Create a copy of ReadingYearStatsDto
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ReadingYearStatsDtoImplCopyWith<_$ReadingYearStatsDtoImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? year = null,
+    Object? yearBooks = null,
+    Object? yearSeconds = null,
+    Object? yearBestDayDate = freezed,
+    Object? yearBestDaySeconds = freezed,
+    Object? totalBooks = null,
+    Object? totalSeconds = null,
+    Object? streakDays = null,
+    Object? longestStreak = null,
+  }) {
+    return _then(_ReadingYearStatsDto(
+      year: null == year
+          ? _self.year
+          : year // ignore: cast_nullable_to_non_nullable
+              as int,
+      yearBooks: null == yearBooks
+          ? _self.yearBooks
+          : yearBooks // ignore: cast_nullable_to_non_nullable
+              as int,
+      yearSeconds: null == yearSeconds
+          ? _self.yearSeconds
+          : yearSeconds // ignore: cast_nullable_to_non_nullable
+              as int,
+      yearBestDayDate: freezed == yearBestDayDate
+          ? _self.yearBestDayDate
+          : yearBestDayDate // ignore: cast_nullable_to_non_nullable
+              as String?,
+      yearBestDaySeconds: freezed == yearBestDaySeconds
+          ? _self.yearBestDaySeconds
+          : yearBestDaySeconds // ignore: cast_nullable_to_non_nullable
+              as int?,
+      totalBooks: null == totalBooks
+          ? _self.totalBooks
+          : totalBooks // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalSeconds: null == totalSeconds
+          ? _self.totalSeconds
+          : totalSeconds // ignore: cast_nullable_to_non_nullable
+              as int,
+      streakDays: null == streakDays
+          ? _self.streakDays
+          : streakDays // ignore: cast_nullable_to_non_nullable
+              as int,
+      longestStreak: null == longestStreak
+          ? _self.longestStreak
+          : longestStreak // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
 }
+
+// dart format on

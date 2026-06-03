@@ -41,7 +41,7 @@ enum AuthProvider {
 /// raw wire types. [provider] is a typed enum here; the DTO keeps it as a
 /// `String` so freezed/json_serializable deserialisation stays trivial.
 @freezed
-class AuthUser with _$AuthUser {
+abstract class AuthUser with _$AuthUser {
   const factory AuthUser({
     required String id,
     required String nickname,

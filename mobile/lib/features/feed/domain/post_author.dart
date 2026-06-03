@@ -9,7 +9,7 @@ part 'post_author.freezed.dart';
 /// (provider, createdAt) stay out so feed widgets don't depend on the auth
 /// domain.
 @freezed
-class PostAuthor with _$PostAuthor {
+abstract class PostAuthor with _$PostAuthor {
   const factory PostAuthor({
     required String id,
     required String nickname,

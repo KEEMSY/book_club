@@ -9,7 +9,7 @@ part 'notification_state.freezed.dart';
 /// [hasMore] is `true` when [nextCursor] is non-null — kept as a derived
 /// convenience so widgets don't inline the null-check everywhere.
 @freezed
-class NotificationState with _$NotificationState {
+abstract class NotificationState with _$NotificationState {
   const factory NotificationState({
     @Default([]) List<NotificationDto> items,
     String? nextCursor,
