@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
 import '../application/club_providers.dart';
 import '../domain/club.dart';
+import 'club_chat_screen.dart';
 import 'create_event_sheet.dart';
 
 // Club events provider — keyed by club id.
@@ -12,8 +13,69 @@ final _clubEventsProvider =
   (ref, clubId) => ref.watch(clubRepositoryProvider).listEvents(clubId),
 );
 
-class ClubDetailScreen extends ConsumerWidget {
+class ClubDetailScreen extends ConsumerStatefulWidget {
   const ClubDetailScreen({super.key, required this.club});
+
+  final Club club;
+
+  @override
+  ConsumerState<ClubDetailScreen> createState() => _ClubDetailScreenState();
+}
+
+class _ClubDetailScreenState extends ConsumerState<ClubDetailScreen>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.club.name),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.share_rounded),
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('초대 코드: ${widget.club.inviteCode}')),
+              );
+            },
+          ),
+        ],
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(text: '모임'),
+            Tab(text: '채팅'),
+          ],
+        ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _ClubEventsTab(club: widget.club),
+          ClubChatScreen(club: widget.club),
+        ],
+      ),
+    );
+  }
+}
+
+/// The original events content, extracted into its own widget so the tab
+/// structure stays clean and [ClubChatScreen] gets an equally sized sibling.
+class _ClubEventsTab extends ConsumerWidget {
+  const _ClubEventsTab({required this.club});
 
   final Club club;
 
@@ -23,108 +85,93 @@ class ClubDetailScreen extends ConsumerWidget {
     final spacing = theme.extension<AppSpacing>()!;
     final eventsAsync = ref.watch(_clubEventsProvider(club.id));
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(club.name),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.share_rounded),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('초대 코드: ${club.inviteCode}')),
-              );
-            },
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.all(spacing.lg),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (club.description != null) ...[
+                  Text(club.description!, style: theme.textTheme.bodyMedium),
+                  SizedBox(height: spacing.md),
+                ],
+                Text(
+                  '${club.memberCount}/${club.maxMembers}명 참여 중',
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
+                ),
+                SizedBox(height: spacing.lg),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '모임 일정',
+                      style: theme.textTheme.titleMedium
+                          ?.copyWith(fontWeight: FontWeight.w700),
+                    ),
+                    TextButton.icon(
+                      onPressed: () async {
+                        await CreateEventSheet.show(
+                          context,
+                          clubId: club.id,
+                        );
+                        ref.invalidate(_clubEventsProvider(club.id));
+                      },
+                      icon: const Icon(Icons.add, size: 18),
+                      label: const Text('일정 추가'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ],
-      ),
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(
+        ),
+        eventsAsync.when(
+          loading: () => const SliverToBoxAdapter(
+            child: Center(
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          ),
+          error: (_, __) => SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsets.all(spacing.lg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (club.description != null) ...[
-                    Text(club.description!, style: theme.textTheme.bodyMedium),
-                    SizedBox(height: spacing.md),
-                  ],
-                  Text(
-                    '${club.memberCount}/${club.maxMembers}명 참여 중',
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                    ),
-                  ),
-                  SizedBox(height: spacing.lg),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '모임 일정',
-                        style: theme.textTheme.titleMedium
-                            ?.copyWith(fontWeight: FontWeight.w700),
-                      ),
-                      TextButton.icon(
-                        onPressed: () async {
-                          await CreateEventSheet.show(
-                            context,
-                            clubId: club.id,
-                          );
-                          ref.invalidate(_clubEventsProvider(club.id));
-                        },
-                        icon: const Icon(Icons.add, size: 18),
-                        label: const Text('일정 추가'),
-                      ),
-                    ],
-                  ),
-                ],
+              child: Text(
+                '모임을 불러오지 못했어요',
+                style: theme.textTheme.bodyMedium,
               ),
             ),
           ),
-          eventsAsync.when(
-            loading: () => const SliverToBoxAdapter(
-              child: Center(
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
-            ),
-            error: (_, __) => SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.all(spacing.lg),
-                child: Text(
-                  '모임을 불러오지 못했어요',
-                  style: theme.textTheme.bodyMedium,
+          data: (events) => events.isEmpty
+              ? SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.all(spacing.lg),
+                    child: Text(
+                      '아직 예정된 모임이 없어요',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurface
+                            .withValues(alpha: 0.5),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                )
+              : SliverPadding(
+                  padding: EdgeInsets.symmetric(horizontal: spacing.md),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (_, i) => _EventCard(
+                        event: events[i],
+                        clubId: club.id,
+                      ),
+                      childCount: events.length,
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            data: (events) => events.isEmpty
-                ? SliverToBoxAdapter(
-                    child: Padding(
-                      padding: EdgeInsets.all(spacing.lg),
-                      child: Text(
-                        '아직 예정된 모임이 없어요',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurface
-                              .withValues(alpha: 0.5),
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  )
-                : SliverPadding(
-                    padding: EdgeInsets.symmetric(horizontal: spacing.md),
-                    sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (_, i) => _EventCard(
-                          event: events[i],
-                          clubId: club.id,
-                        ),
-                        childCount: events.length,
-                      ),
-                    ),
-                  ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

@@ -16,7 +16,7 @@ from app.core.config import get_settings
 
 
 @lru_cache(maxsize=1)
-def get_redis() -> aioredis.Redis:  # type: ignore[type-arg]
+def get_redis() -> aioredis.Redis:
     """Return the process-wide Redis client.
 
     The client is connection-pool-backed; each coroutine borrows a

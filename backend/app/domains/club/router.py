@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 
 from app.core.deps import get_current_user_id
 from app.domains.club.models import ReadingClub
@@ -13,10 +14,13 @@ from app.domains.club.schemas import (
     ClubEventListResponse,
     ClubEventPublic,
     ClubListResponse,
+    ClubMessagePublic,
     ClubPublic,
     CreateClubRequest,
     CreateEventRequest,
+    MessageListResponse,
     RSVPRequest,
+    SendMessageRequest,
 )
 from app.domains.club.service import ClubService
 
@@ -156,3 +160,58 @@ async def rsvp_event(
     service: Annotated[ClubService, Depends(get_club_service)],
 ) -> None:
     await service.rsvp(user_id=UUID(user_id), event_id=event_id, status=body.status)
+
+
+# --- chat messages ---
+
+
+@router.post(
+    "/{club_id}/messages",
+    response_model=ClubMessagePublic,
+    status_code=status.HTTP_201_CREATED,
+)
+async def send_message(
+    club_id: UUID,
+    body: SendMessageRequest,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> ClubMessagePublic:
+    return await service.send_message(
+        club_id=club_id,
+        user_id=UUID(user_id),
+        content=body.content,
+        media_url=body.media_url,
+    )
+
+
+@router.get("/{club_id}/messages", response_model=MessageListResponse)
+async def list_messages(
+    club_id: UUID,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+    cursor: Annotated[datetime | None, Query(description="ISO-8601 created_at of the oldest item on the previous page")] = None,
+    limit: Annotated[int, Query(ge=1, le=100)] = 50,
+) -> MessageListResponse:
+    return await service.list_messages(
+        club_id=club_id,
+        user_id=UUID(user_id),
+        cursor=cursor,
+        limit=limit,
+    )
+
+
+@router.post(
+    "/{club_id}/messages/{message_id}/read",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def mark_message_read(
+    club_id: UUID,
+    message_id: UUID,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> None:
+    await service.mark_read(
+        club_id=club_id,
+        user_id=UUID(user_id),
+        message_id=message_id,
+    )

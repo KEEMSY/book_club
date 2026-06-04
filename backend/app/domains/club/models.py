@@ -6,6 +6,7 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import DateTime, ForeignKey, Index, PrimaryKeyConstraint, SmallInteger, String, Text
+from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.db import Base
@@ -122,3 +123,65 @@ class EventRSVP(Base):
     )
 
     event: Mapped[ClubEvent] = relationship("ClubEvent", back_populates="rsvps")
+
+
+class ClubMessage(Base):
+    """A chat message posted in a reading club channel."""
+
+    __tablename__ = "club_messages"
+    __table_args__ = (
+        # Primary query pattern: paginate a club's chat in reverse-chronological order.
+        Index("ix_club_messages_club_id_created_at", "club_id", "created_at"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    club_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("reading_clubs.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+    media_url: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, default=lambda: datetime.now()
+    )
+    # Set when sender edits the message; NULL means never edited.
+    edited_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    # Soft-delete: set to the deletion timestamp; NULL means not deleted.
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    reads: Mapped[list[MessageRead]] = relationship(
+        "MessageRead", back_populates="message", cascade="all, delete-orphan"
+    )
+
+
+class MessageRead(Base):
+    """Tracks which users have read which club messages (read receipts)."""
+
+    __tablename__ = "message_reads"
+    __table_args__ = (
+        PrimaryKeyConstraint("message_id", "user_id", name="pk_message_reads"),
+    )
+
+    message_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("club_messages.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    read_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, default=lambda: datetime.now()
+    )
+
+    message: Mapped[ClubMessage] = relationship("ClubMessage", back_populates="reads")

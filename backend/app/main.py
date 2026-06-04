@@ -20,6 +20,7 @@ from app.domains.challenge.events import BadgeEarned
 from app.domains.challenge.providers import get_challenge_service_singleton
 from app.domains.challenge.router import router as challenge_router
 from app.domains.club.router import router as club_router
+from app.domains.club.ws_router import router as club_ws_router
 from app.domains.community.router import router as community_router
 from app.domains.discovery.providers import run_cf_retrain
 from app.domains.discovery.router import router as discovery_router
@@ -109,6 +110,7 @@ def create_app() -> FastAPI:
     app.include_router(discovery_router)
     app.include_router(admin_router)
     app.include_router(club_router)
+    app.include_router(club_ws_router)
 
     return app
 

@@ -7,7 +7,16 @@ from uuid import UUID, uuid4
 from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domains.club.models import ClubEvent, ClubMember, ClubRole, EventRSVP, ReadingClub
+from app.domains.auth.models import User
+from app.domains.club.models import (
+    ClubEvent,
+    ClubMember,
+    ClubMessage,
+    ClubRole,
+    EventRSVP,
+    MessageRead,
+    ReadingClub,
+)
 
 
 class ClubRepository:
@@ -162,3 +171,72 @@ class ClubRepository:
     async def my_rsvp(self, event_id: UUID, user_id: UUID) -> str | None:
         rsvp = await self._session.get(EventRSVP, (event_id, user_id))
         return rsvp.status if rsvp else None
+
+    # --- messages ---
+
+    async def create_message(
+        self,
+        *,
+        club_id: UUID,
+        user_id: UUID,
+        content: str,
+        media_url: str | None,
+    ) -> ClubMessage:
+        msg = ClubMessage(
+            id=uuid4(),
+            club_id=club_id,
+            user_id=user_id,
+            content=content,
+            media_url=media_url,
+            created_at=datetime.now(),
+        )
+        self._session.add(msg)
+        await self._session.flush()
+        return msg
+
+    async def list_messages(
+        self,
+        club_id: UUID,
+        *,
+        cursor: datetime | None,
+        limit: int,
+    ) -> list[tuple[ClubMessage, str, int]]:
+        """Return (message, author_nickname, read_count) tuples, newest-first."""
+        read_count_subq = (
+            select(func.count())
+            .select_from(MessageRead)
+            .where(MessageRead.message_id == ClubMessage.id)
+            .correlate(ClubMessage)
+            .scalar_subquery()
+        )
+        stmt = (
+            select(ClubMessage, User.nickname, read_count_subq.label("read_count"))
+            .join(User, User.id == ClubMessage.user_id)
+            .where(
+                ClubMessage.club_id == club_id,
+                ClubMessage.deleted_at.is_(None),
+            )
+            .order_by(ClubMessage.created_at.desc())
+            .limit(limit)
+        )
+        if cursor is not None:
+            stmt = stmt.where(ClubMessage.created_at < cursor)
+        rows = await self._session.execute(stmt)
+        return [(row.ClubMessage, row.nickname, row.read_count) for row in rows]
+
+    async def get_message(self, message_id: UUID) -> ClubMessage | None:
+        return await self._session.get(ClubMessage, message_id)
+
+    async def upsert_message_read(self, *, message_id: UUID, user_id: UUID) -> None:
+        existing = await self._session.get(MessageRead, (message_id, user_id))
+        if existing:
+            # Already marked as read; nothing to update — read_at is immutable.
+            return
+        self._session.add(
+            MessageRead(
+                message_id=message_id,
+                user_id=user_id,
+                read_at=datetime.now(),
+            )
+        )
+        await self._session.flush()

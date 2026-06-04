@@ -59,3 +59,27 @@ class ClubListResponse(BaseModel):
 
 class ClubEventListResponse(BaseModel):
     items: list[ClubEventPublic]
+
+
+# --- chat messages ---
+
+
+class ClubMessagePublic(BaseModel):
+    id: UUID
+    club_id: UUID
+    user_id: UUID
+    author_nickname: str
+    content: str
+    media_url: str | None
+    created_at: datetime
+    read_count: int
+
+
+class SendMessageRequest(BaseModel):
+    content: str = Field(min_length=1, max_length=2000)
+    media_url: str | None = None
+
+
+class MessageListResponse(BaseModel):
+    items: list[ClubMessagePublic]
+    next_cursor: str | None = None

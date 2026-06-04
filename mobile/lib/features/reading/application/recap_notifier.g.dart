@@ -6,7 +6,7 @@ part of 'recap_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$readingRecapHash() => r'afc62d12f803858f60cc3c9e3381b05fa4578376';
+String _$readingRecapHash() => r'f4dee2f79c07bc03096b2e6e61b081c3e58110ff';
 
 /// Copied from Dart SDK
 class _SystemHash {

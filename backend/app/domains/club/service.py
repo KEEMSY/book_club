@@ -1,12 +1,18 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime
 from uuid import UUID
 
 from app.core.exceptions import ConflictError, NotFoundError, PermissionDeniedError
 from app.domains.club.models import ClubEvent, ReadingClub
 from app.domains.club.repository import ClubRepository
-from app.domains.club.schemas import CreateClubRequest, CreateEventRequest
+from app.domains.club.schemas import (
+    ClubMessagePublic,
+    CreateClubRequest,
+    CreateEventRequest,
+    MessageListResponse,
+)
 
 
 @dataclass(slots=True)
@@ -80,3 +86,83 @@ class ClubService:
         if not await self.repo.is_member(event.club_id, user_id):
             raise PermissionDeniedError("not a member", code="NOT_MEMBER")
         await self.repo.upsert_rsvp(event_id=event_id, user_id=user_id, status=status)
+
+    # --- chat messages ---
+
+    async def send_message(
+        self,
+        *,
+        club_id: UUID,
+        user_id: UUID,
+        content: str,
+        media_url: str | None,
+    ) -> ClubMessagePublic:
+        if not await self.repo.is_member(club_id, user_id):
+            raise PermissionDeniedError("not a member", code="NOT_MEMBER")
+        msg = await self.repo.create_message(
+            club_id=club_id,
+            user_id=user_id,
+            content=content,
+            media_url=media_url,
+        )
+        # Fetch author nickname via a single-row message list query.
+        rows = await self.repo.list_messages(
+            club_id, cursor=None, limit=1
+        )
+        author_nickname = rows[0][1] if rows else ""
+        return ClubMessagePublic(
+            id=msg.id,
+            club_id=msg.club_id,
+            user_id=msg.user_id,
+            author_nickname=author_nickname,
+            content=msg.content,
+            media_url=msg.media_url,
+            created_at=msg.created_at,
+            read_count=0,
+        )
+
+    async def list_messages(
+        self,
+        *,
+        club_id: UUID,
+        user_id: UUID,
+        cursor: datetime | None,
+        limit: int = 50,
+    ) -> MessageListResponse:
+        if not await self.repo.is_member(club_id, user_id):
+            raise PermissionDeniedError("not a member", code="NOT_MEMBER")
+        # Fetch one extra row to detect whether a next page exists.
+        rows = await self.repo.list_messages(club_id, cursor=cursor, limit=limit + 1)
+        has_more = len(rows) > limit
+        page = rows[:limit]
+        items = [
+            ClubMessagePublic(
+                id=msg.id,
+                club_id=msg.club_id,
+                user_id=msg.user_id,
+                author_nickname=nickname,
+                content=msg.content,
+                media_url=msg.media_url,
+                created_at=msg.created_at,
+                read_count=read_count,
+            )
+            for msg, nickname, read_count in page
+        ]
+        next_cursor = page[-1][0].created_at.isoformat() if has_more else None
+        return MessageListResponse(items=items, next_cursor=next_cursor)
+
+    async def mark_read(
+        self,
+        *,
+        club_id: UUID,
+        user_id: UUID,
+        message_id: UUID,
+    ) -> None:
+        msg = await self.repo.get_message(message_id)
+        if not msg:
+            raise NotFoundError("message not found", code="MESSAGE_NOT_FOUND")
+        if msg.club_id != club_id:
+            raise NotFoundError("message not found", code="MESSAGE_NOT_FOUND")
+        if not await self.repo.is_member(club_id, user_id):
+            raise PermissionDeniedError("not a member", code="NOT_MEMBER")
+        await self.repo.upsert_message_read(message_id=message_id, user_id=user_id)

@@ -45,10 +45,40 @@ from sqlalchemy import (
     text,
 )
 from sqlalchemy import Enum as SAEnum
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.db import Base
+
+
+class UserEventLog(Base):
+    """Append-only audit log for user-level domain events.
+
+    Used by analytics pipelines and debugging; never mutated after insert.
+    ``payload`` stores event-specific context as a JSONB blob so the schema
+    stays stable as event shapes evolve.
+    """
+
+    __tablename__ = "user_event_logs"
+    __table_args__ = (
+        # Most queries filter by user and scan in reverse-chronological order.
+        Index("ix_user_event_logs_user_id_created_at", "user_id", "created_at"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    event_type: Mapped[str] = mapped_column(String(64), nullable=False)
+    payload: Mapped[dict[str, object] | None] = mapped_column(JSONB, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
 
 
 class ReadingSessionSource(enum.StrEnum):
