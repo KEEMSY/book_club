@@ -77,6 +77,19 @@ class NotificationRepository:
         await self._session.execute(stmt)
         await self._session.flush()
 
+    async def mark_read_all(self, user_id: UUID) -> None:
+        """Stamp read_at on every unread notification for *user_id*."""
+        stmt = (
+            update(Notification)
+            .where(
+                Notification.user_id == user_id,
+                Notification.read_at.is_(None),
+            )
+            .values(read_at=datetime.now(tz=UTC))
+        )
+        await self._session.execute(stmt)
+        await self._session.flush()
+
     async def unread_count(self, user_id: UUID) -> int:
         stmt = select(func.count(Notification.id)).where(
             Notification.user_id == user_id,

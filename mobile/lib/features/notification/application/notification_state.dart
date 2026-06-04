@@ -8,6 +8,8 @@ part 'notification_state.freezed.dart';
 ///
 /// [hasMore] is `true` when [nextCursor] is non-null — kept as a derived
 /// convenience so widgets don't inline the null-check everywhere.
+/// [wsConnected] reflects live WebSocket connectivity so the screen can
+/// surface a subtle indicator when real-time delivery is unavailable.
 @freezed
 abstract class NotificationState with _$NotificationState {
   const factory NotificationState({
@@ -16,6 +18,7 @@ abstract class NotificationState with _$NotificationState {
     @Default(0) int unreadCount,
     @Default(false) bool isLoading,
     @Default(false) bool hasMore,
+    @Default(false) bool wsConnected,
     String? error,
   }) = _NotificationState;
 }

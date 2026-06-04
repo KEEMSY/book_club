@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/notification/application/notification_notifier.dart';
 import '../../features/reading/application/reading_providers.dart';
 import 'app_mode_provider.dart';
 
@@ -130,7 +131,7 @@ class _AppBottomBar extends StatelessWidget {
 // Personal mode: 3-tab row
 // ---------------------------------------------------------------------------
 
-class _PersonalNavRow extends StatelessWidget {
+class _PersonalNavRow extends ConsumerWidget {
   const _PersonalNavRow({
     required this.tabIndex,
     required this.accent,
@@ -144,7 +145,12 @@ class _PersonalNavRow extends StatelessWidget {
   final void Function(int) onTabSelected;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Observe unread count so the home tab icon shows a live badge dot.
+    final int unreadCount = ref.watch(
+      notificationNotifierProvider.select((s) => s.unreadCount),
+    );
+
     return Row(
       children: <Widget>[
         _NavItem(
@@ -154,6 +160,7 @@ class _PersonalNavRow extends StatelessWidget {
           selected: tabIndex == 0,
           accent: accent,
           theme: theme,
+          badgeCount: unreadCount,
           onTap: () => onTabSelected(0),
         ),
         _NavItem(
@@ -188,6 +195,7 @@ class _NavItem extends StatelessWidget {
     required this.accent,
     required this.theme,
     required this.onTap,
+    this.badgeCount = 0,
   });
 
   final IconData icon;
@@ -197,6 +205,9 @@ class _NavItem extends StatelessWidget {
   final Color accent;
   final ThemeData theme;
   final VoidCallback onTap;
+
+  /// When > 0, a red dot badge is shown on the icon. Capped at 99.
+  final int badgeCount;
 
   @override
   Widget build(BuildContext context) {
@@ -221,8 +232,20 @@ class _NavItem extends StatelessWidget {
                         borderRadius: BorderRadius.circular(16),
                       )
                     : null,
-                child:
-                    Icon(selected ? selectedIcon : icon, color: fg, size: 22),
+                child: Badge(
+                  isLabelVisible: badgeCount > 0,
+                  label: Text(badgeCount > 99 ? '99+' : '$badgeCount'),
+                  backgroundColor: theme.colorScheme.error,
+                  textStyle: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.onError,
+                    fontSize: 9,
+                  ),
+                  child: Icon(
+                    selected ? selectedIcon : icon,
+                    color: fg,
+                    size: 22,
+                  ),
+                ),
               ),
               const SizedBox(height: 2),
               Text(

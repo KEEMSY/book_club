@@ -150,7 +150,13 @@ class NotificationService:
             )
 
     async def on_follow_received(self, event: object) -> None:
-        """Create an in-app notification when a user receives a new follower."""
+        """Create an in-app notification when a user receives a new follower.
+
+        Also pushes a real-time event to the followee's personal WebSocket
+        stream so the Flutter app can update its follower count badge without
+        polling when the user is online.
+        """
+        from app.core.ws_manager import ws_manager
         from app.domains.social.events import FollowReceived
 
         if not isinstance(event, FollowReceived):
@@ -167,6 +173,17 @@ class NotificationService:
             )
             tokens = await self.device_tokens.get_active_tokens(event.followee_id)
             await session.commit()
+
+        # Real-time personal-stream delivery (best-effort; Redis fan-out when
+        # multiple workers are running).
+        await ws_manager.send_user(
+            event.followee_id,
+            {
+                "type": "notification.follow_received",
+                "follower_id": str(event.follower_id),
+                "notification_id": str(notif.id),
+            },
+        )
 
         if tokens:
             await self.push.send_to_tokens(

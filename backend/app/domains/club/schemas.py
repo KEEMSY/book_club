@@ -80,6 +80,10 @@ class SendMessageRequest(BaseModel):
     media_url: str | None = None
 
 
+class EditMessageRequest(BaseModel):
+    content: str = Field(min_length=1, max_length=2000)
+
+
 class MessageListResponse(BaseModel):
     items: list[ClubMessagePublic]
     next_cursor: str | None = None

@@ -95,6 +95,29 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
         return () => context.push(AppRoutes.grade);
       case 'weekly_report':
         return () => context.push(AppRoutes.weeklyReport);
+      case 'comment' || 'reaction':
+        final postId = dto.data['post_id'];
+        if (postId != null) {
+          return () => context.push('/feed/post/$postId');
+        }
+      case 'club_chat' || 'chat_mention':
+        final clubId = dto.data['club_id'];
+        if (clubId != null) {
+          return () => context.push('/clubs/$clubId/chat');
+        }
+      case 'challenge_started' ||
+            'challenge_completed' ||
+            'challenge_joined' ||
+            'challenge_reminder':
+        final challengeId = dto.data['challenge_id'];
+        if (challengeId != null) {
+          return () => context.push('/challenges/$challengeId');
+        }
+      case 'club_joined' || 'club_invite':
+        final clubId = dto.data['club_id'];
+        if (clubId != null) {
+          return () => context.push('/clubs/$clubId');
+        }
     }
     return null;
   }
@@ -142,6 +165,20 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                   ],
                 ],
               ),
+              actions: [
+                if (state.unreadCount > 0)
+                  TextButton(
+                    onPressed: () => ref
+                        .read(notificationNotifierProvider.notifier)
+                        .markAllRead(),
+                    child: Text(
+                      '모두 읽음',
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                  ),
+              ],
             ),
             if (state.isLoading && state.items.isEmpty)
               const SliverFillRemaining(
@@ -229,8 +266,11 @@ class _EmptyOrError extends StatelessWidget {
 /// Unread items use `primaryContainer` tinted surface so they stand out
 /// without shouting — Airbnb's "subtle highlight on a light canvas" principle.
 class _NotificationCard extends StatelessWidget {
-  const _NotificationCard(
-      {required this.dto, required this.onTap, required this.onNavigate});
+  const _NotificationCard({
+    required this.dto,
+    required this.onTap,
+    required this.onNavigate,
+  });
 
   final NotificationDto dto;
   final VoidCallback onTap;
@@ -331,6 +371,16 @@ class _NtypeIcon extends StatelessWidget {
       'weekly_report' => ('📊', const Color(0xFFF3E5F5)),
       'follow_received' => ('👥', const Color(0xFFE3F2FD)),
       'badge_earned' => ('🏅', const Color(0xFFFFF8E1)),
+      // Chat / club types
+      'club_chat' || 'chat_mention' => ('💬', const Color(0xFFE8EAF6)),
+      // Challenge types
+      'challenge_started' ||
+      'challenge_completed' ||
+      'challenge_joined' =>
+        ('🏆', const Color(0xFFFFF3E0)),
+      'challenge_reminder' => ('⏰', const Color(0xFFFFF3E0)),
+      // Club activity
+      'club_joined' || 'club_invite' => ('📚', const Color(0xFFE8F5E9)),
       _ => ('🔔', theme.colorScheme.surfaceContainer),
     };
 

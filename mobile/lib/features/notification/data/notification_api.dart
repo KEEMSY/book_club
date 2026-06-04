@@ -28,6 +28,10 @@ abstract class NotificationApi {
   @POST('/notifications/{id}/read')
   Future<void> markRead(@Path('id') String id);
 
+  /// Marks every unread notification as read in a single request.
+  @PATCH('/me/notifications/read-all')
+  Future<void> markAllRead();
+
   @GET('/notifications/unread-count')
   Future<UnreadCountResponse> getUnreadCount();
 

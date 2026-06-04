@@ -54,6 +54,18 @@ async def mark_read(
     await svc.mark_read(notification_id, user_id=UUID(user_id))
 
 
+@router.patch(
+    "/me/notifications/read-all",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def mark_read_all(
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    svc: Annotated[NotificationRouterService, Depends(get_notification_router_service)],
+) -> None:
+    """Mark all unread notifications as read for the current user."""
+    await svc.mark_read_all(UUID(user_id))
+
+
 @router.get("/notifications/unread-count")
 async def unread_count(
     user_id: Annotated[str, Depends(get_current_user_id)],

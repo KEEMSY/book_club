@@ -227,6 +227,25 @@ class ClubRepository:
     async def get_message(self, message_id: UUID) -> ClubMessage | None:
         return await self._session.get(ClubMessage, message_id)
 
+    async def update_message_content(
+        self, *, message_id: UUID, content: str, edited_at: datetime
+    ) -> None:
+        msg = await self._session.get(ClubMessage, message_id)
+        if msg is None:
+            return
+        msg.content = content
+        msg.edited_at = edited_at
+        await self._session.flush()
+
+    async def soft_delete_message(
+        self, *, message_id: UUID, deleted_at: datetime
+    ) -> None:
+        msg = await self._session.get(ClubMessage, message_id)
+        if msg is None:
+            return
+        msg.deleted_at = deleted_at
+        await self._session.flush()
+
     async def upsert_message_read(self, *, message_id: UUID, user_id: UUID) -> None:
         existing = await self._session.get(MessageRead, (message_id, user_id))
         if existing:

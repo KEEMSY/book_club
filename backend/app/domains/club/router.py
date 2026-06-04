@@ -18,6 +18,7 @@ from app.domains.club.schemas import (
     ClubPublic,
     CreateClubRequest,
     CreateEventRequest,
+    EditMessageRequest,
     MessageListResponse,
     RSVPRequest,
     SendMessageRequest,
@@ -211,6 +212,42 @@ async def mark_message_read(
     service: Annotated[ClubService, Depends(get_club_service)],
 ) -> None:
     await service.mark_read(
+        club_id=club_id,
+        user_id=UUID(user_id),
+        message_id=message_id,
+    )
+
+
+@router.patch(
+    "/{club_id}/messages/{message_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def edit_message(
+    club_id: UUID,
+    message_id: UUID,
+    body: EditMessageRequest,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> None:
+    await service.edit_message(
+        club_id=club_id,
+        user_id=UUID(user_id),
+        message_id=message_id,
+        content=body.content,
+    )
+
+
+@router.delete(
+    "/{club_id}/messages/{message_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def delete_message(
+    club_id: UUID,
+    message_id: UUID,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> None:
+    await service.delete_message(
         club_id=club_id,
         user_id=UUID(user_id),
         message_id=message_id,

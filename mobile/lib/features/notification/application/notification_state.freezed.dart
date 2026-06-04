@@ -19,6 +19,7 @@ mixin _$NotificationState {
   int get unreadCount;
   bool get isLoading;
   bool get hasMore;
+  bool get wsConnected;
   String? get error;
 
   /// Create a copy of NotificationState
@@ -42,6 +43,8 @@ mixin _$NotificationState {
             (identical(other.isLoading, isLoading) ||
                 other.isLoading == isLoading) &&
             (identical(other.hasMore, hasMore) || other.hasMore == hasMore) &&
+            (identical(other.wsConnected, wsConnected) ||
+                other.wsConnected == wsConnected) &&
             (identical(other.error, error) || other.error == error));
   }
 
@@ -53,11 +56,12 @@ mixin _$NotificationState {
       unreadCount,
       isLoading,
       hasMore,
+      wsConnected,
       error);
 
   @override
   String toString() {
-    return 'NotificationState(items: $items, nextCursor: $nextCursor, unreadCount: $unreadCount, isLoading: $isLoading, hasMore: $hasMore, error: $error)';
+    return 'NotificationState(items: $items, nextCursor: $nextCursor, unreadCount: $unreadCount, isLoading: $isLoading, hasMore: $hasMore, wsConnected: $wsConnected, error: $error)';
   }
 }
 
@@ -73,6 +77,7 @@ abstract mixin class $NotificationStateCopyWith<$Res> {
       int unreadCount,
       bool isLoading,
       bool hasMore,
+      bool wsConnected,
       String? error});
 }
 
@@ -94,6 +99,7 @@ class _$NotificationStateCopyWithImpl<$Res>
     Object? unreadCount = null,
     Object? isLoading = null,
     Object? hasMore = null,
+    Object? wsConnected = null,
     Object? error = freezed,
   }) {
     return _then(_self.copyWith(
@@ -116,6 +122,10 @@ class _$NotificationStateCopyWithImpl<$Res>
       hasMore: null == hasMore
           ? _self.hasMore
           : hasMore // ignore: cast_nullable_to_non_nullable
+              as bool,
+      wsConnected: null == wsConnected
+          ? _self.wsConnected
+          : wsConnected // ignore: cast_nullable_to_non_nullable
               as bool,
       error: freezed == error
           ? _self.error
@@ -218,8 +228,14 @@ extension NotificationStatePatterns on NotificationState {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(List<NotificationDto> items, String? nextCursor,
-            int unreadCount, bool isLoading, bool hasMore, String? error)?
+    TResult Function(
+            List<NotificationDto> items,
+            String? nextCursor,
+            int unreadCount,
+            bool isLoading,
+            bool hasMore,
+            bool wsConnected,
+            String? error)?
         $default, {
     required TResult orElse(),
   }) {
@@ -227,7 +243,7 @@ extension NotificationStatePatterns on NotificationState {
     switch (_that) {
       case _NotificationState() when $default != null:
         return $default(_that.items, _that.nextCursor, _that.unreadCount,
-            _that.isLoading, _that.hasMore, _that.error);
+            _that.isLoading, _that.hasMore, _that.wsConnected, _that.error);
       case _:
         return orElse();
     }
@@ -248,15 +264,21 @@ extension NotificationStatePatterns on NotificationState {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(List<NotificationDto> items, String? nextCursor,
-            int unreadCount, bool isLoading, bool hasMore, String? error)
+    TResult Function(
+            List<NotificationDto> items,
+            String? nextCursor,
+            int unreadCount,
+            bool isLoading,
+            bool hasMore,
+            bool wsConnected,
+            String? error)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _NotificationState():
         return $default(_that.items, _that.nextCursor, _that.unreadCount,
-            _that.isLoading, _that.hasMore, _that.error);
+            _that.isLoading, _that.hasMore, _that.wsConnected, _that.error);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -276,15 +298,21 @@ extension NotificationStatePatterns on NotificationState {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(List<NotificationDto> items, String? nextCursor,
-            int unreadCount, bool isLoading, bool hasMore, String? error)?
+    TResult? Function(
+            List<NotificationDto> items,
+            String? nextCursor,
+            int unreadCount,
+            bool isLoading,
+            bool hasMore,
+            bool wsConnected,
+            String? error)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _NotificationState() when $default != null:
         return $default(_that.items, _that.nextCursor, _that.unreadCount,
-            _that.isLoading, _that.hasMore, _that.error);
+            _that.isLoading, _that.hasMore, _that.wsConnected, _that.error);
       case _:
         return null;
     }
@@ -300,6 +328,7 @@ class _NotificationState implements NotificationState {
       this.unreadCount = 0,
       this.isLoading = false,
       this.hasMore = false,
+      this.wsConnected = false,
       this.error})
       : _items = items;
 
@@ -324,6 +353,9 @@ class _NotificationState implements NotificationState {
   @JsonKey()
   final bool hasMore;
   @override
+  @JsonKey()
+  final bool wsConnected;
+  @override
   final String? error;
 
   /// Create a copy of NotificationState
@@ -347,6 +379,8 @@ class _NotificationState implements NotificationState {
             (identical(other.isLoading, isLoading) ||
                 other.isLoading == isLoading) &&
             (identical(other.hasMore, hasMore) || other.hasMore == hasMore) &&
+            (identical(other.wsConnected, wsConnected) ||
+                other.wsConnected == wsConnected) &&
             (identical(other.error, error) || other.error == error));
   }
 
@@ -358,11 +392,12 @@ class _NotificationState implements NotificationState {
       unreadCount,
       isLoading,
       hasMore,
+      wsConnected,
       error);
 
   @override
   String toString() {
-    return 'NotificationState(items: $items, nextCursor: $nextCursor, unreadCount: $unreadCount, isLoading: $isLoading, hasMore: $hasMore, error: $error)';
+    return 'NotificationState(items: $items, nextCursor: $nextCursor, unreadCount: $unreadCount, isLoading: $isLoading, hasMore: $hasMore, wsConnected: $wsConnected, error: $error)';
   }
 }
 
@@ -380,6 +415,7 @@ abstract mixin class _$NotificationStateCopyWith<$Res>
       int unreadCount,
       bool isLoading,
       bool hasMore,
+      bool wsConnected,
       String? error});
 }
 
@@ -401,6 +437,7 @@ class __$NotificationStateCopyWithImpl<$Res>
     Object? unreadCount = null,
     Object? isLoading = null,
     Object? hasMore = null,
+    Object? wsConnected = null,
     Object? error = freezed,
   }) {
     return _then(_NotificationState(
@@ -423,6 +460,10 @@ class __$NotificationStateCopyWithImpl<$Res>
       hasMore: null == hasMore
           ? _self.hasMore
           : hasMore // ignore: cast_nullable_to_non_nullable
+              as bool,
+      wsConnected: null == wsConnected
+          ? _self.wsConnected
+          : wsConnected // ignore: cast_nullable_to_non_nullable
               as bool,
       error: freezed == error
           ? _self.error

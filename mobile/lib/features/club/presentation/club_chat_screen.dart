@@ -1,15 +1,24 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../auth/application/auth_notifier.dart';
+import '../../auth/domain/auth_state.dart';
+import '../../book/application/library_notifier.dart';
+import '../../book/domain/book_status.dart';
+import '../../book/domain/user_book.dart';
+import '../../book/application/library_state.dart';
+import '../../feed/application/highlight_notifier.dart';
+import '../../feed/application/highlight_state.dart';
+import '../../feed/domain/highlight.dart';
 import '../application/club_chat_notifier.dart';
 import '../domain/club.dart';
 
-/// Entry point for the club chat tab.
-///
-/// Full bubble polish and media attachments are deferred to M24; this
-/// skeleton wires up [ClubChatNotifier] and provides the minimal interactive
-/// surface: message list + input bar.
+/// Full club chat tab — WebSocket real-time messaging with history pagination,
+/// reply quotes, highlight citations, and image attachment scaffolding.
 class ClubChatScreen extends ConsumerStatefulWidget {
   const ClubChatScreen({super.key, required this.club});
 
@@ -23,14 +32,32 @@ class _ClubChatScreenState extends ConsumerState<ClubChatScreen> {
   final _controller = TextEditingController();
   final _scrollController = ScrollController();
 
-  // TODO(sy): obtain token from authNotifierProvider once the auth bridge
-  // exposes a synchronous accessor (tracked in M24). Placeholder empty string
-  // connects without auth during local development only.
-  String get _token => '';
+  // Reply context — non-null while the user has tapped "답장".
+  ChatMessage? _replyTarget;
+
+  String get _token {
+    // Read the access token from auth state when available. The notifier
+    // exposes the raw token via AuthState.authenticated; fall back to empty
+    // for local development so the WS can connect without auth.
+    final authState = ref.read(authNotifierProvider);
+    return switch (authState) {
+      Authenticated(:final user) => user.id, // TODO(M24): use bearer token
+      _ => '',
+    };
+  }
+
+  String get _currentUserId {
+    final authState = ref.read(authNotifierProvider);
+    return switch (authState) {
+      Authenticated(:final user) => user.id,
+      _ => '',
+    };
+  }
 
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_onScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref
           .read(clubChatNotifierProvider(widget.club.id).notifier)
@@ -45,14 +72,44 @@ class _ClubChatScreenState extends ConsumerState<ClubChatScreen> {
     super.dispose();
   }
 
+  void _onScroll() {
+    // Reversed list: position 0 is the bottom (newest). maxScrollExtent is
+    // the top (oldest). Trigger history load when within 200px of the top.
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      final state = ref.read(clubChatNotifierProvider(widget.club.id));
+      if (state is ClubChatConnected && !state.isLoadingHistory) {
+        ref
+            .read(clubChatNotifierProvider(widget.club.id).notifier)
+            .loadHistory();
+      }
+    }
+  }
+
   void _send() {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
-    ref
-        .read(clubChatNotifierProvider(widget.club.id).notifier)
-        .send(text);
+
+    final notifier =
+        ref.read(clubChatNotifierProvider(widget.club.id).notifier);
+
+    if (_replyTarget != null) {
+      notifier.sendWithReply(
+        content: text,
+        replyToId: _replyTarget!.id,
+        replyToContent: _replyTarget!.content,
+        replyToAuthor: _replyTarget!.authorNickname,
+      );
+    } else {
+      notifier.send(text);
+    }
+
     _controller.clear();
-    // Scroll to bottom after the new message renders.
+    setState(() => _replyTarget = null);
+    _scrollToBottom();
+  }
+
+  void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
@@ -64,19 +121,147 @@ class _ClubChatScreenState extends ConsumerState<ClubChatScreen> {
     });
   }
 
+  void _onReply(ChatMessage message) {
+    setState(() => _replyTarget = message);
+    FocusScope.of(context).requestFocus(FocusNode());
+  }
+
+  void _onCopy(ChatMessage message) {
+    Clipboard.setData(ClipboardData(text: message.content));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('클립보드에 복사했어요.'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  Future<void> _onDelete(ChatMessage message) async {
+    await ref
+        .read(clubChatNotifierProvider(widget.club.id).notifier)
+        .deleteMessage(message.id);
+  }
+
+  void _showMessageMenu(BuildContext context, ChatMessage message) {
+    final isMe = message.userId == _currentUserId;
+
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.reply_rounded),
+              title: const Text('답장'),
+              onTap: () {
+                Navigator.pop(context);
+                _onReply(message);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.copy_rounded),
+              title: const Text('복사'),
+              onTap: () {
+                Navigator.pop(context);
+                _onCopy(message);
+              },
+            ),
+            if (isMe)
+              ListTile(
+                leading: Icon(
+                  Icons.delete_outline_rounded,
+                  color: Theme.of(context).colorScheme.error,
+                ),
+                title: Text(
+                  '삭제',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  _onDelete(message);
+                },
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _onPickImage() async {
+    // TODO(M24-R2): Upload to Cloudflare R2 and send media_url via WS.
+    // For now, open the picker to validate the permission flow.
+    final picker = ImagePicker();
+    await picker.pickImage(source: ImageSource.gallery);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('이미지 업로드는 다음 업데이트에서 지원됩니다.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  Future<void> _showHighlightSheet() async {
+    // Gather highlights from all reading books.
+    final libraryState = ref.read(libraryNotifierProvider);
+    final readingBooks = libraryState[BookStatus.reading];
+
+    if (readingBooks is! LibraryListLoaded || readingBooks.items.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('현재 읽고 있는 책이 없어요.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) => _HighlightPickerSheet(
+        books: readingBooks.items,
+        onHighlightSelected: (highlight) {
+          Navigator.pop(ctx);
+          ref
+              .read(clubChatNotifierProvider(widget.club.id).notifier)
+              .sendWithHighlight(
+                highlightId: highlight.id,
+                highlightQuote: highlight.quoteText,
+              );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
-    final chatState =
-        ref.watch(clubChatNotifierProvider(widget.club.id));
+    final chatState = ref.watch(clubChatNotifierProvider(widget.club.id));
 
     return Column(
       children: [
+        _ConnectionBanner(
+          state: chatState,
+          onRetry: () => ref
+              .read(clubChatNotifierProvider(widget.club.id).notifier)
+              .connect(_token),
+        ),
         Expanded(child: _buildBody(chatState, theme, spacing)),
+        if (_replyTarget != null) _ReplyPreview(
+          message: _replyTarget!,
+          onDismiss: () => setState(() => _replyTarget = null),
+        ),
         _InputBar(
           controller: _controller,
           onSend: _send,
+          onPickImage: _onPickImage,
+          onQuoteHighlight: _showHighlightSheet,
           enabled: chatState is ClubChatConnected,
         ),
       ],
@@ -125,117 +310,286 @@ class _ClubChatScreenState extends ConsumerState<ClubChatScreen> {
             ),
           ),
         ),
-      ClubChatConnected(:final messages) => messages.isEmpty
-          ? Center(
-              child: Text(
-                '아직 대화가 없어요.\n첫 메시지를 보내 보세요!',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color:
-                      theme.colorScheme.onSurface.withValues(alpha: 0.5),
+      ClubChatConnected(:final messages, :final isLoadingHistory) =>
+        messages.isEmpty
+            ? Center(
+                child: Text(
+                  '아직 대화가 없어요.\n첫 메시지를 보내 보세요!',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
+              )
+            : ListView.builder(
+                controller: _scrollController,
+                // Display newest message at the bottom by reversing the list.
+                reverse: true,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                itemCount: messages.length + (isLoadingHistory ? 1 : 0),
+                itemBuilder: (_, index) {
+                  // History spinner at the top (last item in reversed list).
+                  if (isLoadingHistory && index == messages.length) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      child: Center(
+                        child: SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ),
+                    );
+                  }
+
+                  // Reversed index: index 0 = last message.
+                  final msg = messages[messages.length - 1 - index];
+                  final isMe = msg.userId == _currentUserId;
+                  return _ChatBubble(
+                    message: msg,
+                    isMe: isMe,
+                    onLongPress: () => _showMessageMenu(context, msg),
+                  );
+                },
               ),
-            )
-          : ListView.builder(
-              controller: _scrollController,
-              // Display newest message at the bottom by reversing the list.
-              reverse: true,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 8,
-              ),
-              itemCount: messages.length,
-              itemBuilder: (_, index) {
-                // Reversed index: index 0 = last message.
-                final msg = messages[messages.length - 1 - index];
-                return _MessageBubble(
-                  message: msg,
-                  // Placeholder: no current-user context yet — M24 wires
-                  // the auth user id properly.
-                  isMe: false,
-                );
-              },
-            ),
     };
   }
 }
 
 // ---------------------------------------------------------------------------
-// Message bubble
+// Connection status banner
 // ---------------------------------------------------------------------------
 
-class _MessageBubble extends StatelessWidget {
-  const _MessageBubble({
+class _ConnectionBanner extends StatelessWidget {
+  const _ConnectionBanner({required this.state, required this.onRetry});
+
+  final ClubChatState state;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return switch (state) {
+      ClubChatConnecting() => Material(
+          color: Colors.amber.shade700,
+          child: const SafeArea(
+            bottom: false,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 12,
+                    height: 12,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 1.5,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    '연결 중...',
+                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ClubChatError() => GestureDetector(
+          onTap: onRetry,
+          child: Material(
+            color: Theme.of(context).colorScheme.error,
+            child: const SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.wifi_off_rounded,
+                      size: 14,
+                      color: Colors.white,
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      '연결 오류 — 재시도',
+                      style:
+                          TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ClubChatConnected() => const SizedBox.shrink(),
+    };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Chat bubble
+// ---------------------------------------------------------------------------
+
+class _ChatBubble extends StatelessWidget {
+  const _ChatBubble({
     required this.message,
     required this.isMe,
+    required this.onLongPress,
   });
 
   final ChatMessage message;
   final bool isMe;
+  final VoidCallback onLongPress;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    final bubbleColor = isMe
+        ? theme.colorScheme.primary
+        : theme.colorScheme.surfaceContainerHighest;
+    final textColor = isMe
+        ? theme.colorScheme.onPrimary
+        : theme.colorScheme.onSurface;
+
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 3),
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.sizeOf(context).width * 0.72,
-        ),
-        child: Column(
-          crossAxisAlignment:
-              isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-          children: [
-            if (!isMe)
-              Padding(
-                padding: const EdgeInsets.only(left: 4, bottom: 2),
-                child: Text(
-                  message.authorNickname,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.colorScheme.onSurface
-                        .withValues(alpha: 0.6),
-                  ),
+      child: GestureDetector(
+        onLongPress: onLongPress,
+        child: Container(
+          margin: const EdgeInsets.symmetric(vertical: 3),
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.sizeOf(context).width * 0.72,
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Avatar — only for other users, left side
+              if (!isMe) ...[
+                _Avatar(
+                  imageUrl: message.authorProfileImageUrl,
+                  nickname: message.authorNickname,
+                ),
+                const SizedBox(width: 6),
+              ],
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: isMe
+                      ? CrossAxisAlignment.end
+                      : CrossAxisAlignment.start,
+                  children: [
+                    if (!isMe)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 4, bottom: 2),
+                        child: Text(
+                          message.authorNickname,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.6),
+                          ),
+                        ),
+                      ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: bubbleColor,
+                        borderRadius: BorderRadius.only(
+                          topLeft: const Radius.circular(16),
+                          topRight: const Radius.circular(16),
+                          bottomLeft: Radius.circular(isMe ? 16 : 4),
+                          bottomRight: Radius.circular(isMe ? 4 : 16),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Reply quote chip
+                          if (message.replyToId != null)
+                            _ReplyChip(
+                              author: message.replyToAuthor ?? '',
+                              content: message.replyToContent ?? '',
+                              isMe: isMe,
+                            ),
+                          // Highlight citation card
+                          if (message.highlightId != null)
+                            _HighlightCard(
+                              quote: message.highlightQuote ?? '',
+                              isMe: isMe,
+                            ),
+                          // Media image
+                          if (message.mediaUrl != null)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 6),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: CachedNetworkImage(
+                                  imageUrl: message.mediaUrl!,
+                                  width: 200,
+                                  fit: BoxFit.cover,
+                                  placeholder: (_, __) => Container(
+                                    width: 200,
+                                    height: 120,
+                                    color: theme.colorScheme.surfaceContainerHigh,
+                                  ),
+                                  errorWidget: (_, __, ___) => const Icon(
+                                    Icons.broken_image_rounded,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          // Message text — hidden for pure highlight cards
+                          if (message.content.isNotEmpty)
+                            Text(
+                              message.content,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: textColor,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(top: 2, left: 4, right: 4),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (message.readCount > 0) ...[
+                            Text(
+                              '${message.readCount}',
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: theme.colorScheme.primary
+                                    .withValues(alpha: 0.8),
+                                fontSize: 9,
+                              ),
+                            ),
+                            const SizedBox(width: 2),
+                          ],
+                          Text(
+                            _formatTime(message.createdAt),
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.colorScheme.onSurface
+                                  .withValues(alpha: 0.45),
+                              fontSize: 10,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 8,
-              ),
-              decoration: BoxDecoration(
-                color: isMe
-                    ? theme.colorScheme.primary
-                    : theme.colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(16),
-                  topRight: const Radius.circular(16),
-                  bottomLeft: Radius.circular(isMe ? 16 : 4),
-                  bottomRight: Radius.circular(isMe ? 4 : 16),
-                ),
-              ),
-              child: Text(
-                message.content,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: isMe
-                      ? theme.colorScheme.onPrimary
-                      : theme.colorScheme.onSurface,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 2, left: 4, right: 4),
-              child: Text(
-                _formatTime(message.createdAt),
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color:
-                      theme.colorScheme.onSurface.withValues(alpha: 0.45),
-                  fontSize: 10,
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -250,6 +604,225 @@ class _MessageBubble extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
+// Avatar
+// ---------------------------------------------------------------------------
+
+class _Avatar extends StatelessWidget {
+  const _Avatar({required this.imageUrl, required this.nickname});
+
+  final String? imageUrl;
+  final String nickname;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    if (imageUrl != null) {
+      return CircleAvatar(
+        radius: 16,
+        backgroundImage: CachedNetworkImageProvider(imageUrl!),
+      );
+    }
+    // Fallback: first character of nickname in a colored circle.
+    return CircleAvatar(
+      radius: 16,
+      backgroundColor: theme.colorScheme.primaryContainer,
+      child: Text(
+        nickname.isNotEmpty ? nickname[0] : '?',
+        style: theme.textTheme.labelSmall?.copyWith(
+          color: theme.colorScheme.onPrimaryContainer,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Reply chip (inside bubble)
+// ---------------------------------------------------------------------------
+
+class _ReplyChip extends StatelessWidget {
+  const _ReplyChip({
+    required this.author,
+    required this.content,
+    required this.isMe,
+  });
+
+  final String author;
+  final String content;
+  final bool isMe;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final borderColor = isMe
+        ? theme.colorScheme.onPrimary.withValues(alpha: 0.4)
+        : theme.colorScheme.primary.withValues(alpha: 0.5);
+    final textColor = isMe
+        ? theme.colorScheme.onPrimary.withValues(alpha: 0.85)
+        : theme.colorScheme.onSurface.withValues(alpha: 0.75);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        border: Border(left: BorderSide(color: borderColor, width: 3)),
+        color: isMe
+            ? Colors.white.withValues(alpha: 0.10)
+            : theme.colorScheme.primary.withValues(alpha: 0.06),
+        borderRadius: const BorderRadius.only(
+          topRight: Radius.circular(4),
+          bottomRight: Radius.circular(4),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            author,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: isMe
+                  ? theme.colorScheme.onPrimary
+                  : theme.colorScheme.primary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            content,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodySmall?.copyWith(color: textColor),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Highlight citation card (inside bubble)
+// ---------------------------------------------------------------------------
+
+class _HighlightCard extends StatelessWidget {
+  const _HighlightCard({required this.quote, required this.isMe});
+
+  final String quote;
+  final bool isMe;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = isMe
+        ? theme.colorScheme.onPrimary.withValues(alpha: 0.9)
+        : theme.colorScheme.onSurface.withValues(alpha: 0.85);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 6),
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: isMe
+            ? Colors.white.withValues(alpha: 0.12)
+            : theme.colorScheme.primary.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            Icons.format_quote_rounded,
+            size: 14,
+            color: isMe
+                ? theme.colorScheme.onPrimary.withValues(alpha: 0.6)
+                : theme.colorScheme.primary.withValues(alpha: 0.7),
+          ),
+          const SizedBox(width: 4),
+          Expanded(
+            child: Text(
+              quote,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: textColor,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Reply preview bar (above input)
+// ---------------------------------------------------------------------------
+
+class _ReplyPreview extends StatelessWidget {
+  const _ReplyPreview({required this.message, required this.onDismiss});
+
+  final ChatMessage message;
+  final VoidCallback onDismiss;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 6, 8, 6),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHigh,
+        border: Border(
+          top: BorderSide(
+            color: theme.colorScheme.primary.withValues(alpha: 0.4),
+            width: 1,
+          ),
+          left: BorderSide(
+            color: theme.colorScheme.primary,
+            width: 3,
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  message.authorNickname,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  message.content,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.close_rounded, size: 18),
+            onPressed: onDismiss,
+            visualDensity: VisualDensity.compact,
+            padding: EdgeInsets.zero,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Input bar
 // ---------------------------------------------------------------------------
 
@@ -257,11 +830,15 @@ class _InputBar extends StatelessWidget {
   const _InputBar({
     required this.controller,
     required this.onSend,
+    required this.onPickImage,
+    required this.onQuoteHighlight,
     required this.enabled,
   });
 
   final TextEditingController controller;
   final VoidCallback onSend;
+  final VoidCallback onPickImage;
+  final VoidCallback onQuoteHighlight;
   final bool enabled;
 
   @override
@@ -271,7 +848,7 @@ class _InputBar extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
           border: Border(
@@ -283,6 +860,20 @@ class _InputBar extends StatelessWidget {
         ),
         child: Row(
           children: [
+            // Highlight quote button
+            IconButton(
+              icon: const Icon(Icons.format_quote_rounded, size: 20),
+              onPressed: enabled ? onQuoteHighlight : null,
+              tooltip: '하이라이트 인용',
+              visualDensity: VisualDensity.compact,
+            ),
+            // Image attachment button
+            IconButton(
+              icon: const Icon(Icons.image_outlined, size: 20),
+              onPressed: enabled ? onPickImage : null,
+              tooltip: '이미지 첨부',
+              visualDensity: VisualDensity.compact,
+            ),
             Expanded(
               child: TextField(
                 controller: controller,
@@ -307,7 +898,7 @@ class _InputBar extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 6),
+            const SizedBox(width: 4),
             IconButton.filled(
               onPressed: enabled ? onSend : null,
               icon: const Icon(Icons.send_rounded, size: 20),
@@ -318,6 +909,183 @@ class _InputBar extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Highlight picker bottom sheet
+// ---------------------------------------------------------------------------
+
+class _HighlightPickerSheet extends ConsumerStatefulWidget {
+  const _HighlightPickerSheet({
+    required this.books,
+    required this.onHighlightSelected,
+  });
+
+  final List<UserBook> books;
+  final void Function(Highlight) onHighlightSelected;
+
+  @override
+  ConsumerState<_HighlightPickerSheet> createState() =>
+      _HighlightPickerSheetState();
+}
+
+class _HighlightPickerSheetState
+    extends ConsumerState<_HighlightPickerSheet> {
+  late String _selectedUserBookId;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedUserBookId = widget.books.first.id;
+    _ensureLoaded();
+  }
+
+  void _ensureLoaded() {
+    final notifier = ref.read(
+      highlightNotifierProvider(_selectedUserBookId).notifier,
+    );
+    notifier.load();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final highlightState =
+        ref.watch(highlightNotifierProvider(_selectedUserBookId));
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.6,
+      minChildSize: 0.4,
+      maxChildSize: 0.9,
+      expand: false,
+      builder: (_, scrollController) => Column(
+        children: [
+          // Handle
+          const SizedBox(height: 8),
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: theme.colorScheme.outlineVariant,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              '하이라이트 인용',
+              style: theme.textTheme.titleMedium,
+            ),
+          ),
+          const SizedBox(height: 8),
+          // Book selector chips
+          if (widget.books.length > 1)
+            SizedBox(
+              height: 36,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: widget.books.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 8),
+                itemBuilder: (_, index) {
+                  final book = widget.books[index];
+                  final selected = book.id == _selectedUserBookId;
+                  return ChoiceChip(
+                    label: Text(
+                      book.book.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    selected: selected,
+                    onSelected: (_) {
+                      setState(() => _selectedUserBookId = book.id);
+                      _ensureLoaded();
+                    },
+                  );
+                },
+              ),
+            ),
+          const SizedBox(height: 8),
+          Expanded(
+            child: switch (highlightState) {
+              HighlightInitial() || HighlightLoading() => const Center(
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              HighlightError(:final message) => Center(
+                  child: Text(
+                    message,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                    ),
+                  ),
+                ),
+              HighlightLoaded(:final items) when items.isEmpty => Center(
+                  child: Text(
+                    '하이라이트가 없어요.',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                    ),
+                  ),
+                ),
+              HighlightLoaded(:final items) => ListView.separated(
+                  controller: scrollController,
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                  itemCount: items.length,
+                  separatorBuilder: (_, __) =>
+                      const Divider(height: 1),
+                  itemBuilder: (_, index) {
+                    final h = items[index];
+                    return InkWell(
+                      onTap: () => widget.onHighlightSelected(h),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              Icons.format_quote_rounded,
+                              size: 16,
+                              color: theme.colorScheme.primary
+                                  .withValues(alpha: 0.7),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    h.quoteText,
+                                    maxLines: 3,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: theme.textTheme.bodyMedium,
+                                  ),
+                                  if (h.pageNumber != null) ...[
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      '${h.pageNumber}p',
+                                      style: theme.textTheme.labelSmall
+                                          ?.copyWith(
+                                        color: theme.colorScheme.onSurface
+                                            .withValues(alpha: 0.45),
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+            },
+          ),
+        ],
       ),
     );
   }

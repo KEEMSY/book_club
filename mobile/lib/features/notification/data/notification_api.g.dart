@@ -71,6 +71,25 @@ class _NotificationApi implements NotificationApi {
   }
 
   @override
+  Future<void> markAllRead() async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<void>(
+      Options(method: 'PATCH', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/me/notifications/read-all',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    await _dio.fetch<void>(_options);
+  }
+
+  @override
   Future<UnreadCountResponse> getUnreadCount() async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};

@@ -68,6 +68,9 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["N802", "N803"]
 "migrations/**" = ["N999"]
+# FastAPI WebSocket handlers use Depends() in default arguments — this is the
+# correct FastAPI pattern for injecting session/auth into WebSocket endpoints.
+"app/domains/club/ws_router.py" = ["B008"]
 
 [tool.ruff.format]
 quote-style = "double"

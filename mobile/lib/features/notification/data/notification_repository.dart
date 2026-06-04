@@ -47,6 +47,9 @@ class NotificationRepository {
   /// in the local list don't surface errors to the user.
   Future<void> markRead(String id) => _call(() => _api.markRead(id));
 
+  /// Marks all unread notifications as read via a single PATCH request.
+  Future<void> markAllRead() => _call(() => _api.markAllRead());
+
   Future<int> getUnreadCount() async {
     final resp = await _call(() => _api.getUnreadCount());
     return resp.unreadCount;

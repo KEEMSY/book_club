@@ -40,6 +40,10 @@ class NotificationRouterService:
     async def mark_read(self, notification_id: UUID, *, user_id: UUID) -> None:
         await self.notifications.mark_read(notification_id, user_id)
 
+    async def mark_read_all(self, user_id: UUID) -> None:
+        """Mark every unread notification as read for *user_id*."""
+        await self.notifications.mark_read_all(user_id)
+
     async def unread_count(self, user_id: UUID) -> int:
         return await self.notifications.unread_count(user_id)
 

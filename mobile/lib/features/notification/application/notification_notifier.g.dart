@@ -7,20 +7,24 @@ part of 'notification_notifier.dart';
 // **************************************************************************
 
 String _$notificationNotifierHash() =>
-    r'd0e7d1c94f85f58fd01e8acb23fe74f4b00afc30';
+    r'7ec77220342533212535b34e02ada177e677da45';
 
-/// Manages the notification list with cursor-based pagination.
+/// Manages the notification list with cursor-based pagination and a
+/// persistent WebSocket connection for real-time delivery.
 ///
-/// [load] always replaces the list with the first page so pull-to-refresh
-/// and the initial mount both reset cleanly.
-/// [loadMore] appends the next page only when [NotificationState.hasMore].
-/// [markRead] optimistically patches the local item to avoid a full reload
-/// that would scroll-jump the user.
+/// Lifecycle:
+///   • [build] opens /ws/me immediately so the badge stays live without
+///     requiring the full notification screen to be mounted.
+///   • WS events of type `notification` are prepended to [items] and
+///     increment [unreadCount] so the bell badge updates instantly.
+///   • [load] / [loadMore] back-fill from the REST endpoint.
+///   • [markRead] / [markAllRead] optimistically patch local state.
+///   • [ref.onDispose] tears down the WS cleanly.
 ///
 /// Copied from [NotificationNotifier].
 @ProviderFor(NotificationNotifier)
-final notificationNotifierProvider = AutoDisposeNotifierProvider<
-    NotificationNotifier, NotificationState>.internal(
+final notificationNotifierProvider =
+    NotifierProvider<NotificationNotifier, NotificationState>.internal(
   NotificationNotifier.new,
   name: r'notificationNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -30,6 +34,6 @@ final notificationNotifierProvider = AutoDisposeNotifierProvider<
   allTransitiveDependencies: null,
 );
 
-typedef _$NotificationNotifier = AutoDisposeNotifier<NotificationState>;
+typedef _$NotificationNotifier = Notifier<NotificationState>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

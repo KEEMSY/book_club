@@ -42,7 +42,7 @@ class _CreateEventSheetState extends ConsumerState<CreateEventSheet> {
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
-          spacing.lg, spacing.lg, spacing.lg, spacing.lg + bottom),
+          spacing.lg, spacing.lg, spacing.lg, spacing.lg + bottom,),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,

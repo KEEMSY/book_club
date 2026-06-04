@@ -13,6 +13,17 @@ validation logic stays consistent.
 
 A 30-second ping/pong heartbeat keeps connections alive through NAT and
 load-balancer idle timeouts.
+
+Notification fan-out rules
+--------------------------
+- Club chat message: after broadcasting to connected club subscribers, each
+  club member who is *not* currently in the chat room (i.e. has no active
+  ``ws:club:{id}`` socket but may have a ``ws:user:{id}`` socket) receives a
+  ``chat.new_message`` push via their personal stream.  This lets the mobile
+  app show an unread badge even when the chat screen is closed.
+- Follow event: when a user is followed (FollowReceived), the followee
+  receives a ``notification.follow_received`` push on their personal stream so
+  the Flutter app can update counts in real time without polling.
 """
 
 from __future__ import annotations
@@ -23,8 +34,10 @@ import logging
 import uuid
 from typing import Any
 
-from fastapi import APIRouter, Query, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Depends, Query, WebSocket, WebSocketDisconnect
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.db import get_session
 from app.core.exceptions import AuthError
 from app.core.security import decode_token
 from app.core.ws_manager import ws_manager
@@ -61,17 +74,64 @@ async def _heartbeat(websocket: WebSocket) -> None:
             return
 
 
+async def _notify_offline_club_members(
+    club_id: uuid.UUID,
+    sender_user_id: str,
+    message: dict[str, Any],
+    session: AsyncSession,
+) -> None:
+    """Push a chat.new_message notification to club members not in the chat room.
+
+    Members who already have an active ``/ws/clubs/{club_id}`` connection
+    receive the message via the normal club broadcast.  Those who are absent
+    from the club socket pool but connected via ``/ws/me`` are notified here
+    so they get a real-time unread badge update.
+
+    Members with no WebSocket connection at all are not targeted here — they
+    will receive an FCM push via the notification service event pipeline.
+    """
+    from sqlalchemy import select
+
+    from app.domains.club.models import ClubMember
+
+    stmt = select(ClubMember.user_id).where(ClubMember.club_id == club_id)
+    result = await session.execute(stmt)
+    all_member_ids = {str(row) for row in result.scalars().all()}
+
+    # Members currently in the club chat room — they already got the message.
+    club_key = str(club_id)
+    in_room: set[str] = set()
+    for uid, sockets in ws_manager._user_sockets.items():
+        if uid in all_member_ids and ws_manager._club_sockets.get(club_key, set()) & sockets:
+            in_room.add(uid)
+
+    notification_payload: dict[str, Any] = {
+        "type": "chat.new_message",
+        "club_id": str(club_id),
+        "sender_id": sender_user_id,
+        "preview": str(message.get("content", ""))[:100],
+    }
+
+    offline_members = all_member_ids - in_room - {sender_user_id}
+    await asyncio.gather(
+        *(ws_manager.send_user(uid, notification_payload) for uid in offline_members),
+        return_exceptions=True,
+    )
+
+
 @router.websocket("/ws/clubs/{club_id}")
 async def club_chat_stream(
     websocket: WebSocket,
     club_id: uuid.UUID,
     token: str = Query(...),
+    session: AsyncSession = Depends(get_session),
 ) -> None:
     """Real-time chat stream for a reading club.
 
     The client must supply a valid JWT access token via ``?token=``.
     Messages received from the client are broadcast to all club members
     currently connected to any process (via Redis fan-out when available).
+    Members not in the chat room receive a personal-stream notification.
 
     Close codes:
     - 4001: missing or invalid token
@@ -113,6 +173,10 @@ async def club_chat_stream(
                 outbound["media_url"] = data["media_url"]
 
             await ws_manager.broadcast_club(club_id, outbound)
+
+            # Notify members who are not currently in the chat room so they
+            # can update their unread badge via the personal stream.
+            await _notify_offline_club_members(club_id, user_id, outbound, session)
     except WebSocketDisconnect:
         pass
     except Exception:
@@ -130,9 +194,10 @@ async def personal_notification_stream(
 ) -> None:
     """Personal notification stream for the authenticated user.
 
-    Used to deliver server-push events (new follower, badge earned, etc.)
-    without polling.  The client should treat this as read-only; any text
-    sent by the client is silently discarded so the contract stays simple.
+    Used to deliver server-push events (new follower, badge earned, chat
+    unread badge, etc.) without polling.  The client should treat this as
+    read-only; any text sent by the client is silently discarded so the
+    contract stays simple.
 
     Close codes:
     - 4001: missing or invalid token

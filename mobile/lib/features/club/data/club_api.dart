@@ -37,4 +37,17 @@ abstract class ClubApi {
     @Path('eventId') String eventId,
     @Body() Map<String, dynamic> body,
   );
+
+  @GET('/clubs/{clubId}/messages')
+  Future<Map<String, dynamic>> listMessages(
+    @Path('clubId') String clubId, {
+    @Query('cursor') String? cursor,
+    @Query('limit') int limit = 40,
+  });
+
+  @DELETE('/clubs/{clubId}/messages/{messageId}')
+  Future<void> deleteMessage(
+    @Path('clubId') String clubId,
+    @Path('messageId') String messageId,
+  );
 }

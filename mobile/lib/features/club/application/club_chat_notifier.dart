@@ -5,6 +5,9 @@ import 'dart:math';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
+import '../data/club_repository.dart';
+import 'club_providers.dart';
+
 part 'club_chat_notifier.g.dart';
 
 // ---------------------------------------------------------------------------
@@ -23,6 +26,12 @@ class ChatMessage {
     required this.createdAt,
     this.editedAt,
     required this.readCount,
+    this.replyToId,
+    this.replyToContent,
+    this.replyToAuthor,
+    this.highlightId,
+    this.highlightQuote,
+    this.isDeleted = false,
   });
 
   final String id;
@@ -35,6 +44,17 @@ class ChatMessage {
   final DateTime createdAt;
   final DateTime? editedAt;
   final int readCount;
+
+  // Reply / quote fields
+  final String? replyToId;
+  final String? replyToContent;
+  final String? replyToAuthor;
+
+  // Highlight citation fields
+  final String? highlightId;
+  final String? highlightQuote;
+
+  final bool isDeleted;
 
   factory ChatMessage.fromJson(Map<String, dynamic> json) => ChatMessage(
         id: json['id'] as String,
@@ -49,6 +69,12 @@ class ChatMessage {
             ? DateTime.parse(json['edited_at'] as String)
             : null,
         readCount: json['read_count'] as int? ?? 0,
+        replyToId: json['reply_to_id'] as String?,
+        replyToContent: json['reply_to_content'] as String?,
+        replyToAuthor: json['reply_to_author'] as String?,
+        highlightId: json['highlight_id'] as String?,
+        highlightQuote: json['highlight_quote'] as String?,
+        isDeleted: json['is_deleted'] as bool? ?? false,
       );
 }
 
@@ -65,12 +91,36 @@ class ClubChatConnecting extends ClubChatState {
 }
 
 class ClubChatConnected extends ClubChatState {
-  const ClubChatConnected({required this.messages});
+  const ClubChatConnected({
+    required this.messages,
+    this.hasMoreHistory = false,
+    this.isLoadingHistory = false,
+    this.oldestCursor,
+  });
 
   final List<ChatMessage> messages;
 
-  ClubChatConnected copyWith({List<ChatMessage>? messages}) =>
-      ClubChatConnected(messages: messages ?? this.messages);
+  /// True while a REST history fetch is in flight.
+  final bool isLoadingHistory;
+
+  /// True when the server indicated more older pages exist.
+  final bool hasMoreHistory;
+
+  /// Cursor for the next older page.
+  final String? oldestCursor;
+
+  ClubChatConnected copyWith({
+    List<ChatMessage>? messages,
+    bool? isLoadingHistory,
+    bool? hasMoreHistory,
+    String? oldestCursor,
+  }) =>
+      ClubChatConnected(
+        messages: messages ?? this.messages,
+        isLoadingHistory: isLoadingHistory ?? this.isLoadingHistory,
+        hasMoreHistory: hasMoreHistory ?? this.hasMoreHistory,
+        oldestCursor: oldestCursor ?? this.oldestCursor,
+      );
 }
 
 class ClubChatError extends ClubChatState {
@@ -108,6 +158,8 @@ class ClubChatNotifier extends _$ClubChatNotifier {
   int _retryCount = 0;
   String? _token;
 
+  ClubRepository get _repository => ref.read(clubRepositoryProvider);
+
   @override
   ClubChatState build(String clubId) {
     ref.onDispose(_cleanup);
@@ -139,6 +191,92 @@ class ClubChatNotifier extends _$ClubChatNotifier {
     _channel!.sink.add(payload);
   }
 
+  /// Sends a message quoting [replyToId].
+  void sendWithReply({
+    required String content,
+    required String replyToId,
+    required String replyToContent,
+    required String replyToAuthor,
+  }) {
+    final trimmed = content.trim();
+    if (trimmed.isEmpty) return;
+    if (_channel == null) return;
+
+    final payload = jsonEncode({
+      'type': 'chat.send',
+      'club_id': clubId,
+      'content': trimmed,
+      'reply_to_id': replyToId,
+      'reply_to_content': replyToContent,
+      'reply_to_author': replyToAuthor,
+    });
+    _channel!.sink.add(payload);
+  }
+
+  /// Sends a highlight citation card.
+  void sendWithHighlight({
+    required String highlightId,
+    required String highlightQuote,
+  }) {
+    if (_channel == null) return;
+
+    final payload = jsonEncode({
+      'type': 'chat.send',
+      'club_id': clubId,
+      'content': '',
+      'highlight_id': highlightId,
+      'highlight_quote': highlightQuote,
+    });
+    _channel!.sink.add(payload);
+  }
+
+  /// Soft-deletes a message via the REST API. Removes it optimistically from
+  /// local state; the WS broadcast will confirm shortly.
+  Future<void> deleteMessage(String messageId) async {
+    _removeMessageOptimistically(messageId);
+    await _repository.deleteMessage(clubId, messageId);
+  }
+
+  /// Loads older messages from the REST history endpoint.
+  ///
+  /// No-ops when already loading or there is no more history.
+  Future<void> loadHistory() async {
+    final current = state;
+    if (current is! ClubChatConnected) return;
+    if (current.isLoadingHistory) return;
+    if (current.messages.isNotEmpty && !current.hasMoreHistory) return;
+
+    state = current.copyWith(isLoadingHistory: true);
+
+    try {
+      final result = await _repository.listMessages(
+        clubId,
+        cursor: current.oldestCursor,
+      );
+
+      final connected = state;
+      if (connected is! ClubChatConnected) return;
+
+      // Prepend older messages, deduplicating by id.
+      final existingIds = connected.messages.map((m) => m.id).toSet();
+      final older = result.messages
+          .where((m) => !existingIds.contains(m.id))
+          .toList();
+
+      state = connected.copyWith(
+        messages: [...older, ...connected.messages],
+        isLoadingHistory: false,
+        hasMoreHistory: result.nextCursor != null,
+        oldestCursor: result.nextCursor ?? connected.oldestCursor,
+      );
+    } catch (_) {
+      final connected = state;
+      if (connected is ClubChatConnected) {
+        state = connected.copyWith(isLoadingHistory: false);
+      }
+    }
+  }
+
   // -------------------------------------------------------------------------
   // Connection lifecycle
   // -------------------------------------------------------------------------
@@ -161,7 +299,7 @@ class ClubChatNotifier extends _$ClubChatNotifier {
       );
       _retryCount = 0;
       _startPing();
-      state = const ClubChatConnected(messages: []);
+      state = const ClubChatConnected(messages: [], hasMoreHistory: true);
     } catch (e) {
       _scheduleReconnect();
     }
@@ -196,7 +334,14 @@ class ClubChatNotifier extends _$ClubChatNotifier {
               .whereType<Map<String, dynamic>>()
               .map(ChatMessage.fromJson)
               .toList();
-          state = ClubChatConnected(messages: msgs);
+          state = ClubChatConnected(messages: msgs, hasMoreHistory: true);
+        }
+
+      case 'chat.deleted':
+        final data = envelope['data'];
+        if (data is Map<String, dynamic>) {
+          final id = data['id'] as String?;
+          if (id != null) _removeMessageOptimistically(id);
         }
 
       default:
@@ -212,6 +357,16 @@ class ClubChatNotifier extends _$ClubChatNotifier {
     } else {
       state = ClubChatConnected(messages: [msg]);
     }
+  }
+
+  void _removeMessageOptimistically(String messageId) {
+    final current = state;
+    if (current is! ClubChatConnected) return;
+    state = current.copyWith(
+      messages: current.messages
+          .where((m) => m.id != messageId)
+          .toList(),
+    );
   }
 
   void _onError(Object error) {

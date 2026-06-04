@@ -1,3 +1,4 @@
+import '../../club/application/club_chat_notifier.dart';
 import '../domain/club.dart';
 import 'club_api.dart';
 
@@ -67,4 +68,23 @@ class ClubRepository {
 
   Future<void> rsvp(String clubId, String eventId, String status) =>
       _api.rsvp(clubId, eventId, {'status': status});
+
+  /// Fetches historical messages before [cursor]. Returns the messages in
+  /// chronological order (oldest first) and an optional [nextCursor] for the
+  /// next older page.
+  Future<({List<ChatMessage> messages, String? nextCursor})> listMessages(
+    String clubId, {
+    String? cursor,
+  }) async {
+    final data = await _api.listMessages(clubId, cursor: cursor);
+    final items = (data['items'] as List)
+        .whereType<Map<String, dynamic>>()
+        .map(ChatMessage.fromJson)
+        .toList();
+    final nextCursor = data['next_cursor'] as String?;
+    return (messages: items, nextCursor: nextCursor);
+  }
+
+  Future<void> deleteMessage(String clubId, String messageId) =>
+      _api.deleteMessage(clubId, messageId);
 }

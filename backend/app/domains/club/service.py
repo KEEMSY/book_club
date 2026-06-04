@@ -5,6 +5,7 @@ from datetime import datetime
 from uuid import UUID
 
 from app.core.exceptions import ConflictError, NotFoundError, PermissionDeniedError
+from app.core.ws_manager import ws_manager
 from app.domains.club.models import ClubEvent, ReadingClub
 from app.domains.club.repository import ClubRepository
 from app.domains.club.schemas import (
@@ -166,3 +167,55 @@ class ClubService:
         if not await self.repo.is_member(club_id, user_id):
             raise PermissionDeniedError("not a member", code="NOT_MEMBER")
         await self.repo.upsert_message_read(message_id=message_id, user_id=user_id)
+
+    async def edit_message(
+        self,
+        *,
+        club_id: UUID,
+        user_id: UUID,
+        message_id: UUID,
+        content: str,
+    ) -> None:
+        msg = await self.repo.get_message(message_id)
+        if not msg or msg.club_id != club_id or msg.deleted_at is not None:
+            raise NotFoundError("message not found", code="MESSAGE_NOT_FOUND")
+        if msg.user_id != user_id:
+            raise PermissionDeniedError("not the message author", code="PERMISSION_DENIED")
+        edited_at = datetime.now()
+        await self.repo.update_message_content(
+            message_id=message_id, content=content, edited_at=edited_at
+        )
+        await ws_manager.broadcast_club(
+            club_id,
+            {
+                "type": "chat.message_edited",
+                "club_id": str(club_id),
+                "message_id": str(message_id),
+                "content": content,
+                "edited_at": edited_at.isoformat(),
+            },
+        )
+
+    async def delete_message(
+        self,
+        *,
+        club_id: UUID,
+        user_id: UUID,
+        message_id: UUID,
+    ) -> None:
+        msg = await self.repo.get_message(message_id)
+        if not msg or msg.club_id != club_id or msg.deleted_at is not None:
+            raise NotFoundError("message not found", code="MESSAGE_NOT_FOUND")
+        if msg.user_id != user_id:
+            raise PermissionDeniedError("not the message author", code="PERMISSION_DENIED")
+        deleted_at = datetime.now()
+        await self.repo.soft_delete_message(message_id=message_id, deleted_at=deleted_at)
+        await ws_manager.broadcast_club(
+            club_id,
+            {
+                "type": "chat.message_deleted",
+                "club_id": str(club_id),
+                "message_id": str(message_id),
+                "deleted_at": deleted_at.isoformat(),
+            },
+        )
