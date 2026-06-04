@@ -57,13 +57,13 @@ abstract class ReadingApi {
   Future<ReadingSessionDto?> getActiveSession();
 
   @POST('/reading/bookmarks/{userBookId}')
-  Future<Map<String, dynamic>> createBookmark(
+  Future<dynamic> createBookmark(
     @Path('userBookId') String userBookId,
     @Body() Map<String, dynamic> body,
   );
 
   @GET('/reading/bookmarks/{userBookId}/latest')
-  Future<Map<String, dynamic>?> getLatestBookmark(
+  Future<dynamic> getLatestBookmark(
     @Path('userBookId') String userBookId,
   );
 

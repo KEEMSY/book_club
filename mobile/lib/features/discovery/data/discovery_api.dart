@@ -8,5 +8,5 @@ abstract class DiscoveryApi {
   factory DiscoveryApi(Dio dio) = _DiscoveryApi;
 
   @GET('/me/recommendations')
-  Future<Map<String, dynamic>> getRecommendations();
+  Future<dynamic> getRecommendations();
 }

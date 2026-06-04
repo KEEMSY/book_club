@@ -8,25 +8,25 @@ abstract class ClubApi {
   factory ClubApi(Dio dio) = _ClubApi;
 
   @GET('/clubs/me')
-  Future<Map<String, dynamic>> listMyClubs();
+  Future<dynamic> listMyClubs();
 
   @POST('/clubs')
-  Future<Map<String, dynamic>> createClub(@Body() Map<String, dynamic> body);
+  Future<dynamic> createClub(@Body() Map<String, dynamic> body);
 
   @GET('/clubs/{clubId}')
-  Future<Map<String, dynamic>> getClub(@Path('clubId') String clubId);
+  Future<dynamic> getClub(@Path('clubId') String clubId);
 
   @POST('/clubs/join')
-  Future<Map<String, dynamic>> joinClub(@Body() Map<String, dynamic> body);
+  Future<dynamic> joinClub(@Body() Map<String, dynamic> body);
 
   @DELETE('/clubs/{clubId}/leave')
   Future<void> leaveClub(@Path('clubId') String clubId);
 
   @GET('/clubs/{clubId}/events')
-  Future<Map<String, dynamic>> listEvents(@Path('clubId') String clubId);
+  Future<dynamic> listEvents(@Path('clubId') String clubId);
 
   @POST('/clubs/{clubId}/events')
-  Future<Map<String, dynamic>> createEvent(
+  Future<dynamic> createEvent(
     @Path('clubId') String clubId,
     @Body() Map<String, dynamic> body,
   );
@@ -39,7 +39,7 @@ abstract class ClubApi {
   );
 
   @GET('/clubs/{clubId}/messages')
-  Future<Map<String, dynamic>> listMessages(
+  Future<dynamic> listMessages(
     @Path('clubId') String clubId, {
     @Query('cursor') String? cursor,
     @Query('limit') int limit = 40,
