@@ -245,6 +245,7 @@ class FakeHighlightRepo:
         user_book_id: UUID,
         quote_text: str,
         page_number: int | None,
+        note_text: str | None = None,
     ) -> PostHighlight:
         h = PostHighlight(
             id=uuid4(),
@@ -252,6 +253,7 @@ class FakeHighlightRepo:
             user_book_id=user_book_id,
             quote_text=quote_text,
             page_number=page_number,
+            note_text=note_text,
             created_at=datetime.now(tz=UTC),
         )
         self.by_id[h.id] = h

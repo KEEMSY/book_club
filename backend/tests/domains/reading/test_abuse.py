@@ -30,6 +30,7 @@ from tests.domains.reading.test_service import (
     FakeDailyStatRepo,
     FakeGoalRepo,
     FakeReadingSessionRepo,
+    FakeReadingStatsRepository,
     FakeUserGradeRepo,
 )
 
@@ -53,6 +54,7 @@ def _build() -> tuple[
         bus=bus,
         stage_event=staged.append,
         bookmark_repo=FakeBookmarkRepo(),
+        stats_repo=FakeReadingStatsRepository(),  # type: ignore[arg-type]
     )
     return service, staged, bq, daily, grades
 

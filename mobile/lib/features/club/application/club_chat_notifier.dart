@@ -213,6 +213,24 @@ class ClubChatNotifier extends _$ClubChatNotifier {
     _channel!.sink.add(payload);
   }
 
+  /// Sends a message that includes an uploaded media URL.
+  ///
+  /// [content] may be empty when the user sends an image-only message.
+  void sendWithMedia({
+    required String mediaUrl,
+    String content = '',
+  }) {
+    if (_channel == null) return;
+
+    final payload = jsonEncode({
+      'type': 'chat.send',
+      'club_id': clubId,
+      'content': content.trim(),
+      'media_url': mediaUrl,
+    });
+    _channel!.sink.add(payload);
+  }
+
   /// Sends a highlight citation card.
   void sendWithHighlight({
     required String highlightId,

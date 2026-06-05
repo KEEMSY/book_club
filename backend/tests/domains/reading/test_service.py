@@ -279,6 +279,37 @@ class FakeBookmarkRepo:
         return max(matches, key=lambda r: r.created_at)
 
 
+class FakeReadingStatsRepository:
+    """No-op fake for ReadingStatsRepository — returns empty/None for all queries."""
+
+    async def avg_speed(self, user_id: UUID) -> tuple[float | None, float | None]:
+        return None, None
+
+    async def format_breakdown(self, user_id: UUID) -> dict[str, int]:
+        return {"paper": 0, "ebook": 0, "audio": 0}
+
+    async def monthly_hours(self, user_id: UUID, months: int = 12) -> list[dict[str, object]]:
+        return []
+
+    async def genre_breakdown(self, user_id: UUID, top_n: int = 5) -> list[dict[str, object]]:
+        return []
+
+    async def avg_completion_days(self, user_id: UUID) -> float | None:
+        return None
+
+    async def recap_most_time(self, user_id: UUID, from_date: date, to_date: date) -> None:
+        return None
+
+    async def recap_first_completed(self, user_id: UUID, from_date: date, to_date: date) -> None:
+        return None
+
+    async def recap_thickest(self, user_id: UUID, from_date: date, to_date: date) -> None:
+        return None
+
+    async def recap_most_highlighted(self, user_id: UUID, from_date: date, to_date: date) -> None:
+        return None
+
+
 def _build_service() -> tuple[ReadingService, LocalEventBus, list[object], FakeBookQuery]:
     sessions = FakeReadingSessionRepo()
     daily = FakeDailyStatRepo()
@@ -296,6 +327,7 @@ def _build_service() -> tuple[ReadingService, LocalEventBus, list[object], FakeB
         bus=bus,
         stage_event=staged.append,
         bookmark_repo=FakeBookmarkRepo(),
+        stats_repo=FakeReadingStatsRepository(),  # type: ignore[arg-type]
     )
     return service, bus, staged, book_query
 

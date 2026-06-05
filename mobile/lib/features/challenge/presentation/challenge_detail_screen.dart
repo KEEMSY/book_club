@@ -23,8 +23,9 @@ class ChallengeDetailScreen extends ConsumerWidget {
       error: (e, _) => Scaffold(
         appBar: AppBar(),
         body: _ErrorBody(
-            onRetry: () =>
-                ref.invalidate(challengeDetailProvider(challengeId))),
+          onRetry: () =>
+              ref.invalidate(challengeDetailProvider(challengeId)),
+        ),
       ),
       data: (challenge) => _ChallengeDetailBody(challenge: challenge),
     );

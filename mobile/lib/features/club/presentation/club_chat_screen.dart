@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../core/storage/secure_storage.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../auth/application/auth_notifier.dart';
 import '../../auth/domain/auth_state.dart';
@@ -13,8 +14,10 @@ import '../../book/domain/user_book.dart';
 import '../../book/application/library_state.dart';
 import '../../feed/application/highlight_notifier.dart';
 import '../../feed/application/highlight_state.dart';
+import '../../feed/data/image_uploader.dart';
 import '../../feed/domain/highlight.dart';
 import '../application/club_chat_notifier.dart';
+import '../application/club_providers.dart';
 import '../domain/club.dart';
 
 /// Full club chat tab — WebSocket real-time messaging with history pagination,
@@ -35,16 +38,8 @@ class _ClubChatScreenState extends ConsumerState<ClubChatScreen> {
   // Reply context — non-null while the user has tapped "답장".
   ChatMessage? _replyTarget;
 
-  String get _token {
-    // Read the access token from auth state when available. The notifier
-    // exposes the raw token via AuthState.authenticated; fall back to empty
-    // for local development so the WS can connect without auth.
-    final authState = ref.read(authNotifierProvider);
-    return switch (authState) {
-      Authenticated(:final user) => user.id, // TODO(M24): use bearer token
-      _ => '',
-    };
-  }
+  // True while an image is being uploaded to R2. Disables the input bar.
+  bool _isUploadingImage = false;
 
   String get _currentUserId {
     final authState = ref.read(authNotifierProvider);
@@ -54,15 +49,23 @@ class _ClubChatScreenState extends ConsumerState<ClubChatScreen> {
     };
   }
 
+  /// Reads the JWT access token from secure storage and connects the WS.
+  ///
+  /// The token is never held in widget state to avoid leaking it beyond the
+  /// lifetime of a single connect call.
+  Future<void> _connectWithToken() async {
+    final token = await ref.read(secureStorageProvider).readAccessToken();
+    if (!mounted) return;
+    ref
+        .read(clubChatNotifierProvider(widget.club.id).notifier)
+        .connect(token ?? '');
+  }
+
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref
-          .read(clubChatNotifierProvider(widget.club.id).notifier)
-          .connect(_token);
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _connectWithToken());
   }
 
   @override
@@ -191,18 +194,68 @@ class _ClubChatScreenState extends ConsumerState<ClubChatScreen> {
   }
 
   Future<void> _onPickImage() async {
-    // TODO(M24-R2): Upload to Cloudflare R2 and send media_url via WS.
-    // For now, open the picker to validate the permission flow.
     final picker = ImagePicker();
-    await picker.pickImage(source: ImageSource.gallery);
-    if (mounted) {
+    final picked = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 85,
+    );
+    if (picked == null || !mounted) return;
+
+    setState(() => _isUploadingImage = true);
+
+    try {
+      final bytes = await picked.readAsBytes();
+      final mimeType = _mimeTypeFromPath(picked.path);
+      final image = PickedImage(
+        bytes: bytes,
+        contentType: mimeType,
+        filename: picked.name,
+      );
+
+      final uploader = ref.read(chatImageUploaderProvider);
+      final key = await uploader.upload(image);
+
+      // key is the R2 object key; the backend generates a signed GET URL
+      // from it when materialising the message. We send the key as the
+      // media_url so the WS handler follows the same convention as posts.
+      if (!mounted) return;
+      ref
+          .read(clubChatNotifierProvider(widget.club.id).notifier)
+          .sendWithMedia(mediaUrl: key);
+
+      _scrollToBottom();
+    } on ImageUploadException catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('이미지 업로드는 다음 업데이트에서 지원됩니다.'),
-          duration: Duration(seconds: 2),
+        SnackBar(
+          content: Text(e.message),
+          duration: const Duration(seconds: 3),
         ),
       );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('이미지를 전송하지 못했어요. 다시 시도해주세요.'),
+          duration: Duration(seconds: 3),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isUploadingImage = false);
     }
+  }
+
+  /// Resolves a MIME type from [path]'s file extension.
+  ///
+  /// Defaults to `image/jpeg` for unrecognised or missing extensions — the
+  /// backend allows jpeg, png, and webp; unknown types are rejected server-side.
+  String _mimeTypeFromPath(String path) {
+    final ext = path.split('.').last.toLowerCase();
+    return switch (ext) {
+      'png' => 'image/png',
+      'webp' => 'image/webp',
+      _ => 'image/jpeg',
+    };
   }
 
   Future<void> _showHighlightSheet() async {
@@ -248,9 +301,7 @@ class _ClubChatScreenState extends ConsumerState<ClubChatScreen> {
       children: [
         _ConnectionBanner(
           state: chatState,
-          onRetry: () => ref
-              .read(clubChatNotifierProvider(widget.club.id).notifier)
-              .connect(_token),
+          onRetry: _connectWithToken,
         ),
         Expanded(child: _buildBody(chatState, theme, spacing)),
         if (_replyTarget != null) _ReplyPreview(
@@ -262,7 +313,8 @@ class _ClubChatScreenState extends ConsumerState<ClubChatScreen> {
           onSend: _send,
           onPickImage: _onPickImage,
           onQuoteHighlight: _showHighlightSheet,
-          enabled: chatState is ClubChatConnected,
+          enabled: chatState is ClubChatConnected && !_isUploadingImage,
+          isUploadingImage: _isUploadingImage,
         ),
       ],
     );
@@ -299,11 +351,7 @@ class _ClubChatScreenState extends ConsumerState<ClubChatScreen> {
                 ),
                 SizedBox(height: spacing.md),
                 FilledButton.tonal(
-                  onPressed: () => ref
-                      .read(
-                        clubChatNotifierProvider(widget.club.id).notifier,
-                      )
-                      .connect(_token),
+                  onPressed: _connectWithToken,
                   child: const Text('다시 연결'),
                 ),
               ],
@@ -833,6 +881,7 @@ class _InputBar extends StatelessWidget {
     required this.onPickImage,
     required this.onQuoteHighlight,
     required this.enabled,
+    this.isUploadingImage = false,
   });
 
   final TextEditingController controller;
@@ -840,6 +889,10 @@ class _InputBar extends StatelessWidget {
   final VoidCallback onPickImage;
   final VoidCallback onQuoteHighlight;
   final bool enabled;
+
+  /// True while an image upload is in flight — replaces the image icon with
+  /// a small circular progress indicator so the user knows work is ongoing.
+  final bool isUploadingImage;
 
   @override
   Widget build(BuildContext context) {
@@ -867,12 +920,21 @@ class _InputBar extends StatelessWidget {
               tooltip: '하이라이트 인용',
               visualDensity: VisualDensity.compact,
             ),
-            // Image attachment button
-            IconButton(
-              icon: const Icon(Icons.image_outlined, size: 20),
-              onPressed: enabled ? onPickImage : null,
-              tooltip: '이미지 첨부',
-              visualDensity: VisualDensity.compact,
+            // Image attachment button — shows a spinner while uploading.
+            SizedBox(
+              width: 40,
+              height: 40,
+              child: isUploadingImage
+                  ? const Padding(
+                      padding: EdgeInsets.all(10),
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : IconButton(
+                      icon: const Icon(Icons.image_outlined, size: 20),
+                      onPressed: enabled ? onPickImage : null,
+                      tooltip: '이미지 첨부',
+                      visualDensity: VisualDensity.compact,
+                    ),
             ),
             Expanded(
               child: TextField(

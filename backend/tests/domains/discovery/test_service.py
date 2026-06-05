@@ -101,7 +101,7 @@ async def test_deduplication_across_sources() -> None:
     result = await svc.get_recommendations(user_id=uuid4())
 
     ids = [r["id"] for r in result]
-    assert ids.count(shared_id) == 1
+    assert ids.count(str(shared_id)) == 1
     assert len(result) == 3
 
 

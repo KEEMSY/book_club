@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/fcm/fcm_service.dart';
 import '../../../core/network/dio_provider.dart';
 import '../data/auth_repository.dart';
 import '../data/social_login_port.dart';
@@ -21,6 +23,10 @@ part 'auth_notifier.g.dart';
 @riverpod
 class AuthNotifier extends _$AuthNotifier {
   AuthRepository get _repository => ref.read(authRepositoryProvider);
+
+  /// Subscription to FCM token-refresh events. Cancelled on logout so we
+  /// don't send stale tokens for a signed-out user.
+  StreamSubscription<String>? _fcmTokenRefreshSub;
 
   @override
   AuthState build() {
@@ -68,6 +74,8 @@ class AuthNotifier extends _$AuthNotifier {
   }
 
   Future<void> logout() async {
+    await _fcmTokenRefreshSub?.cancel();
+    _fcmTokenRefreshSub = null;
     await _repository.logout();
     _setState(const AuthState.unauthenticated());
   }
@@ -77,12 +85,15 @@ class AuthNotifier extends _$AuthNotifier {
     try {
       final AuthUser user = await doLogin();
       _setState(AuthState.authenticated(user));
-      // TODO(M6): 실 FCM 토큰 등록. 현재 dev-placeholder로 백엔드 연결 확인.
-      // ignore: discarded_futures
-      _repository.registerDeviceToken(
-        token: 'dev-placeholder-token',
-        platform: kIsWeb ? 'web' : (Platform.isIOS ? 'ios' : 'aos'),
-      );
+      // Register FCM token immediately after login, then keep it fresh on
+      // each token-refresh event emitted by the Firebase SDK.
+      // TODO(setup): Activate after Firebase.initializeApp() is called in
+      // main.dart and platform config files are in place
+      // (GoogleService-Info.plist / google-services.json).
+      unawaited(_registerFcmToken());
+      await _fcmTokenRefreshSub?.cancel();
+      _fcmTokenRefreshSub =
+          FcmService.instance.tokenRefreshStream.listen(_onFcmTokenRefresh);
     } on SocialLoginCancelled {
       _setState(const AuthState.unauthenticated());
     } on SocialLoginFailed catch (e) {
@@ -106,6 +117,28 @@ class AuthNotifier extends _$AuthNotifier {
         ),
       );
     }
+  }
+
+  /// Fetches the FCM token and registers it with the backend. Best-effort:
+  /// failures are swallowed here; [AuthRepository.registerDeviceToken] already
+  /// swallows them internally as well.
+  Future<void> _registerFcmToken() async {
+    await FcmService.instance.requestPermission();
+    final String? token = await FcmService.instance.getToken();
+    if (token == null) return;
+    await _repository.registerDeviceToken(
+      token: token,
+      platform: kIsWeb ? 'web' : (Platform.isIOS ? 'ios' : 'aos'),
+    );
+  }
+
+  /// Called by the FCM SDK when the device is assigned a new registration
+  /// token (e.g. after app reinstall or token expiry).
+  Future<void> _onFcmTokenRefresh(String newToken) async {
+    await _repository.registerDeviceToken(
+      token: newToken,
+      platform: kIsWeb ? 'web' : (Platform.isIOS ? 'ios' : 'aos'),
+    );
   }
 
   String _readableSocialMessage(SocialLoginFailed e) {
