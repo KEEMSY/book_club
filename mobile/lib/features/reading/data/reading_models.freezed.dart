@@ -6706,4 +6706,1774 @@ class __$ReadingRecapDtoCopyWithImpl<$Res>
   }
 }
 
+/// @nodoc
+mixin _$ReadingSpeedStatsDto {
+  double? get avgMinutesPerPage;
+  double? get avgPagesPerHour;
+
+  /// Create a copy of ReadingSpeedStatsDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $ReadingSpeedStatsDtoCopyWith<ReadingSpeedStatsDto> get copyWith =>
+      _$ReadingSpeedStatsDtoCopyWithImpl<ReadingSpeedStatsDto>(
+          this as ReadingSpeedStatsDto, _$identity);
+
+  /// Serializes this ReadingSpeedStatsDto to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is ReadingSpeedStatsDto &&
+            (identical(other.avgMinutesPerPage, avgMinutesPerPage) ||
+                other.avgMinutesPerPage == avgMinutesPerPage) &&
+            (identical(other.avgPagesPerHour, avgPagesPerHour) ||
+                other.avgPagesPerHour == avgPagesPerHour));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, avgMinutesPerPage, avgPagesPerHour);
+
+  @override
+  String toString() {
+    return 'ReadingSpeedStatsDto(avgMinutesPerPage: $avgMinutesPerPage, avgPagesPerHour: $avgPagesPerHour)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $ReadingSpeedStatsDtoCopyWith<$Res> {
+  factory $ReadingSpeedStatsDtoCopyWith(ReadingSpeedStatsDto value,
+          $Res Function(ReadingSpeedStatsDto) _then) =
+      _$ReadingSpeedStatsDtoCopyWithImpl;
+  @useResult
+  $Res call({double? avgMinutesPerPage, double? avgPagesPerHour});
+}
+
+/// @nodoc
+class _$ReadingSpeedStatsDtoCopyWithImpl<$Res>
+    implements $ReadingSpeedStatsDtoCopyWith<$Res> {
+  _$ReadingSpeedStatsDtoCopyWithImpl(this._self, this._then);
+
+  final ReadingSpeedStatsDto _self;
+  final $Res Function(ReadingSpeedStatsDto) _then;
+
+  /// Create a copy of ReadingSpeedStatsDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? avgMinutesPerPage = freezed,
+    Object? avgPagesPerHour = freezed,
+  }) {
+    return _then(_self.copyWith(
+      avgMinutesPerPage: freezed == avgMinutesPerPage
+          ? _self.avgMinutesPerPage
+          : avgMinutesPerPage // ignore: cast_nullable_to_non_nullable
+              as double?,
+      avgPagesPerHour: freezed == avgPagesPerHour
+          ? _self.avgPagesPerHour
+          : avgPagesPerHour // ignore: cast_nullable_to_non_nullable
+              as double?,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [ReadingSpeedStatsDto].
+extension ReadingSpeedStatsDtoPatterns on ReadingSpeedStatsDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_ReadingSpeedStatsDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ReadingSpeedStatsDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_ReadingSpeedStatsDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ReadingSpeedStatsDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_ReadingSpeedStatsDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ReadingSpeedStatsDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(double? avgMinutesPerPage, double? avgPagesPerHour)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ReadingSpeedStatsDto() when $default != null:
+        return $default(_that.avgMinutesPerPage, _that.avgPagesPerHour);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(double? avgMinutesPerPage, double? avgPagesPerHour)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ReadingSpeedStatsDto():
+        return $default(_that.avgMinutesPerPage, _that.avgPagesPerHour);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(double? avgMinutesPerPage, double? avgPagesPerHour)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ReadingSpeedStatsDto() when $default != null:
+        return $default(_that.avgMinutesPerPage, _that.avgPagesPerHour);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _ReadingSpeedStatsDto implements ReadingSpeedStatsDto {
+  const _ReadingSpeedStatsDto({this.avgMinutesPerPage, this.avgPagesPerHour});
+  factory _ReadingSpeedStatsDto.fromJson(Map<String, dynamic> json) =>
+      _$ReadingSpeedStatsDtoFromJson(json);
+
+  @override
+  final double? avgMinutesPerPage;
+  @override
+  final double? avgPagesPerHour;
+
+  /// Create a copy of ReadingSpeedStatsDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$ReadingSpeedStatsDtoCopyWith<_ReadingSpeedStatsDto> get copyWith =>
+      __$ReadingSpeedStatsDtoCopyWithImpl<_ReadingSpeedStatsDto>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$ReadingSpeedStatsDtoToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _ReadingSpeedStatsDto &&
+            (identical(other.avgMinutesPerPage, avgMinutesPerPage) ||
+                other.avgMinutesPerPage == avgMinutesPerPage) &&
+            (identical(other.avgPagesPerHour, avgPagesPerHour) ||
+                other.avgPagesPerHour == avgPagesPerHour));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, avgMinutesPerPage, avgPagesPerHour);
+
+  @override
+  String toString() {
+    return 'ReadingSpeedStatsDto(avgMinutesPerPage: $avgMinutesPerPage, avgPagesPerHour: $avgPagesPerHour)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$ReadingSpeedStatsDtoCopyWith<$Res>
+    implements $ReadingSpeedStatsDtoCopyWith<$Res> {
+  factory _$ReadingSpeedStatsDtoCopyWith(_ReadingSpeedStatsDto value,
+          $Res Function(_ReadingSpeedStatsDto) _then) =
+      __$ReadingSpeedStatsDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call({double? avgMinutesPerPage, double? avgPagesPerHour});
+}
+
+/// @nodoc
+class __$ReadingSpeedStatsDtoCopyWithImpl<$Res>
+    implements _$ReadingSpeedStatsDtoCopyWith<$Res> {
+  __$ReadingSpeedStatsDtoCopyWithImpl(this._self, this._then);
+
+  final _ReadingSpeedStatsDto _self;
+  final $Res Function(_ReadingSpeedStatsDto) _then;
+
+  /// Create a copy of ReadingSpeedStatsDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? avgMinutesPerPage = freezed,
+    Object? avgPagesPerHour = freezed,
+  }) {
+    return _then(_ReadingSpeedStatsDto(
+      avgMinutesPerPage: freezed == avgMinutesPerPage
+          ? _self.avgMinutesPerPage
+          : avgMinutesPerPage // ignore: cast_nullable_to_non_nullable
+              as double?,
+      avgPagesPerHour: freezed == avgPagesPerHour
+          ? _self.avgPagesPerHour
+          : avgPagesPerHour // ignore: cast_nullable_to_non_nullable
+              as double?,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$FormatBreakdownDto {
+  int get paper;
+  int get ebook;
+  int get audio;
+
+  /// Create a copy of FormatBreakdownDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $FormatBreakdownDtoCopyWith<FormatBreakdownDto> get copyWith =>
+      _$FormatBreakdownDtoCopyWithImpl<FormatBreakdownDto>(
+          this as FormatBreakdownDto, _$identity);
+
+  /// Serializes this FormatBreakdownDto to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is FormatBreakdownDto &&
+            (identical(other.paper, paper) || other.paper == paper) &&
+            (identical(other.ebook, ebook) || other.ebook == ebook) &&
+            (identical(other.audio, audio) || other.audio == audio));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, paper, ebook, audio);
+
+  @override
+  String toString() {
+    return 'FormatBreakdownDto(paper: $paper, ebook: $ebook, audio: $audio)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $FormatBreakdownDtoCopyWith<$Res> {
+  factory $FormatBreakdownDtoCopyWith(
+          FormatBreakdownDto value, $Res Function(FormatBreakdownDto) _then) =
+      _$FormatBreakdownDtoCopyWithImpl;
+  @useResult
+  $Res call({int paper, int ebook, int audio});
+}
+
+/// @nodoc
+class _$FormatBreakdownDtoCopyWithImpl<$Res>
+    implements $FormatBreakdownDtoCopyWith<$Res> {
+  _$FormatBreakdownDtoCopyWithImpl(this._self, this._then);
+
+  final FormatBreakdownDto _self;
+  final $Res Function(FormatBreakdownDto) _then;
+
+  /// Create a copy of FormatBreakdownDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? paper = null,
+    Object? ebook = null,
+    Object? audio = null,
+  }) {
+    return _then(_self.copyWith(
+      paper: null == paper
+          ? _self.paper
+          : paper // ignore: cast_nullable_to_non_nullable
+              as int,
+      ebook: null == ebook
+          ? _self.ebook
+          : ebook // ignore: cast_nullable_to_non_nullable
+              as int,
+      audio: null == audio
+          ? _self.audio
+          : audio // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [FormatBreakdownDto].
+extension FormatBreakdownDtoPatterns on FormatBreakdownDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_FormatBreakdownDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _FormatBreakdownDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_FormatBreakdownDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _FormatBreakdownDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_FormatBreakdownDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _FormatBreakdownDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(int paper, int ebook, int audio)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _FormatBreakdownDto() when $default != null:
+        return $default(_that.paper, _that.ebook, _that.audio);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(int paper, int ebook, int audio) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _FormatBreakdownDto():
+        return $default(_that.paper, _that.ebook, _that.audio);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(int paper, int ebook, int audio)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _FormatBreakdownDto() when $default != null:
+        return $default(_that.paper, _that.ebook, _that.audio);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _FormatBreakdownDto implements FormatBreakdownDto {
+  const _FormatBreakdownDto(
+      {required this.paper, required this.ebook, required this.audio});
+  factory _FormatBreakdownDto.fromJson(Map<String, dynamic> json) =>
+      _$FormatBreakdownDtoFromJson(json);
+
+  @override
+  final int paper;
+  @override
+  final int ebook;
+  @override
+  final int audio;
+
+  /// Create a copy of FormatBreakdownDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$FormatBreakdownDtoCopyWith<_FormatBreakdownDto> get copyWith =>
+      __$FormatBreakdownDtoCopyWithImpl<_FormatBreakdownDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$FormatBreakdownDtoToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _FormatBreakdownDto &&
+            (identical(other.paper, paper) || other.paper == paper) &&
+            (identical(other.ebook, ebook) || other.ebook == ebook) &&
+            (identical(other.audio, audio) || other.audio == audio));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, paper, ebook, audio);
+
+  @override
+  String toString() {
+    return 'FormatBreakdownDto(paper: $paper, ebook: $ebook, audio: $audio)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$FormatBreakdownDtoCopyWith<$Res>
+    implements $FormatBreakdownDtoCopyWith<$Res> {
+  factory _$FormatBreakdownDtoCopyWith(
+          _FormatBreakdownDto value, $Res Function(_FormatBreakdownDto) _then) =
+      __$FormatBreakdownDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call({int paper, int ebook, int audio});
+}
+
+/// @nodoc
+class __$FormatBreakdownDtoCopyWithImpl<$Res>
+    implements _$FormatBreakdownDtoCopyWith<$Res> {
+  __$FormatBreakdownDtoCopyWithImpl(this._self, this._then);
+
+  final _FormatBreakdownDto _self;
+  final $Res Function(_FormatBreakdownDto) _then;
+
+  /// Create a copy of FormatBreakdownDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? paper = null,
+    Object? ebook = null,
+    Object? audio = null,
+  }) {
+    return _then(_FormatBreakdownDto(
+      paper: null == paper
+          ? _self.paper
+          : paper // ignore: cast_nullable_to_non_nullable
+              as int,
+      ebook: null == ebook
+          ? _self.ebook
+          : ebook // ignore: cast_nullable_to_non_nullable
+              as int,
+      audio: null == audio
+          ? _self.audio
+          : audio // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$MonthlyHoursDto {
+  String get month;
+  double get hours;
+
+  /// Create a copy of MonthlyHoursDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $MonthlyHoursDtoCopyWith<MonthlyHoursDto> get copyWith =>
+      _$MonthlyHoursDtoCopyWithImpl<MonthlyHoursDto>(
+          this as MonthlyHoursDto, _$identity);
+
+  /// Serializes this MonthlyHoursDto to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is MonthlyHoursDto &&
+            (identical(other.month, month) || other.month == month) &&
+            (identical(other.hours, hours) || other.hours == hours));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, month, hours);
+
+  @override
+  String toString() {
+    return 'MonthlyHoursDto(month: $month, hours: $hours)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $MonthlyHoursDtoCopyWith<$Res> {
+  factory $MonthlyHoursDtoCopyWith(
+          MonthlyHoursDto value, $Res Function(MonthlyHoursDto) _then) =
+      _$MonthlyHoursDtoCopyWithImpl;
+  @useResult
+  $Res call({String month, double hours});
+}
+
+/// @nodoc
+class _$MonthlyHoursDtoCopyWithImpl<$Res>
+    implements $MonthlyHoursDtoCopyWith<$Res> {
+  _$MonthlyHoursDtoCopyWithImpl(this._self, this._then);
+
+  final MonthlyHoursDto _self;
+  final $Res Function(MonthlyHoursDto) _then;
+
+  /// Create a copy of MonthlyHoursDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? month = null,
+    Object? hours = null,
+  }) {
+    return _then(_self.copyWith(
+      month: null == month
+          ? _self.month
+          : month // ignore: cast_nullable_to_non_nullable
+              as String,
+      hours: null == hours
+          ? _self.hours
+          : hours // ignore: cast_nullable_to_non_nullable
+              as double,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [MonthlyHoursDto].
+extension MonthlyHoursDtoPatterns on MonthlyHoursDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_MonthlyHoursDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _MonthlyHoursDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_MonthlyHoursDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _MonthlyHoursDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_MonthlyHoursDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _MonthlyHoursDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String month, double hours)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _MonthlyHoursDto() when $default != null:
+        return $default(_that.month, _that.hours);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String month, double hours) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _MonthlyHoursDto():
+        return $default(_that.month, _that.hours);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String month, double hours)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _MonthlyHoursDto() when $default != null:
+        return $default(_that.month, _that.hours);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _MonthlyHoursDto implements MonthlyHoursDto {
+  const _MonthlyHoursDto({required this.month, required this.hours});
+  factory _MonthlyHoursDto.fromJson(Map<String, dynamic> json) =>
+      _$MonthlyHoursDtoFromJson(json);
+
+  @override
+  final String month;
+  @override
+  final double hours;
+
+  /// Create a copy of MonthlyHoursDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$MonthlyHoursDtoCopyWith<_MonthlyHoursDto> get copyWith =>
+      __$MonthlyHoursDtoCopyWithImpl<_MonthlyHoursDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$MonthlyHoursDtoToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _MonthlyHoursDto &&
+            (identical(other.month, month) || other.month == month) &&
+            (identical(other.hours, hours) || other.hours == hours));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, month, hours);
+
+  @override
+  String toString() {
+    return 'MonthlyHoursDto(month: $month, hours: $hours)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$MonthlyHoursDtoCopyWith<$Res>
+    implements $MonthlyHoursDtoCopyWith<$Res> {
+  factory _$MonthlyHoursDtoCopyWith(
+          _MonthlyHoursDto value, $Res Function(_MonthlyHoursDto) _then) =
+      __$MonthlyHoursDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call({String month, double hours});
+}
+
+/// @nodoc
+class __$MonthlyHoursDtoCopyWithImpl<$Res>
+    implements _$MonthlyHoursDtoCopyWith<$Res> {
+  __$MonthlyHoursDtoCopyWithImpl(this._self, this._then);
+
+  final _MonthlyHoursDto _self;
+  final $Res Function(_MonthlyHoursDto) _then;
+
+  /// Create a copy of MonthlyHoursDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? month = null,
+    Object? hours = null,
+  }) {
+    return _then(_MonthlyHoursDto(
+      month: null == month
+          ? _self.month
+          : month // ignore: cast_nullable_to_non_nullable
+              as String,
+      hours: null == hours
+          ? _self.hours
+          : hours // ignore: cast_nullable_to_non_nullable
+              as double,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$GenreBreakdownDto {
+  String get genre;
+  int get count;
+
+  /// Create a copy of GenreBreakdownDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $GenreBreakdownDtoCopyWith<GenreBreakdownDto> get copyWith =>
+      _$GenreBreakdownDtoCopyWithImpl<GenreBreakdownDto>(
+          this as GenreBreakdownDto, _$identity);
+
+  /// Serializes this GenreBreakdownDto to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is GenreBreakdownDto &&
+            (identical(other.genre, genre) || other.genre == genre) &&
+            (identical(other.count, count) || other.count == count));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, genre, count);
+
+  @override
+  String toString() {
+    return 'GenreBreakdownDto(genre: $genre, count: $count)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $GenreBreakdownDtoCopyWith<$Res> {
+  factory $GenreBreakdownDtoCopyWith(
+          GenreBreakdownDto value, $Res Function(GenreBreakdownDto) _then) =
+      _$GenreBreakdownDtoCopyWithImpl;
+  @useResult
+  $Res call({String genre, int count});
+}
+
+/// @nodoc
+class _$GenreBreakdownDtoCopyWithImpl<$Res>
+    implements $GenreBreakdownDtoCopyWith<$Res> {
+  _$GenreBreakdownDtoCopyWithImpl(this._self, this._then);
+
+  final GenreBreakdownDto _self;
+  final $Res Function(GenreBreakdownDto) _then;
+
+  /// Create a copy of GenreBreakdownDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? genre = null,
+    Object? count = null,
+  }) {
+    return _then(_self.copyWith(
+      genre: null == genre
+          ? _self.genre
+          : genre // ignore: cast_nullable_to_non_nullable
+              as String,
+      count: null == count
+          ? _self.count
+          : count // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [GenreBreakdownDto].
+extension GenreBreakdownDtoPatterns on GenreBreakdownDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_GenreBreakdownDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _GenreBreakdownDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_GenreBreakdownDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _GenreBreakdownDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_GenreBreakdownDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _GenreBreakdownDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String genre, int count)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _GenreBreakdownDto() when $default != null:
+        return $default(_that.genre, _that.count);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String genre, int count) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _GenreBreakdownDto():
+        return $default(_that.genre, _that.count);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String genre, int count)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _GenreBreakdownDto() when $default != null:
+        return $default(_that.genre, _that.count);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _GenreBreakdownDto implements GenreBreakdownDto {
+  const _GenreBreakdownDto({required this.genre, required this.count});
+  factory _GenreBreakdownDto.fromJson(Map<String, dynamic> json) =>
+      _$GenreBreakdownDtoFromJson(json);
+
+  @override
+  final String genre;
+  @override
+  final int count;
+
+  /// Create a copy of GenreBreakdownDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$GenreBreakdownDtoCopyWith<_GenreBreakdownDto> get copyWith =>
+      __$GenreBreakdownDtoCopyWithImpl<_GenreBreakdownDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$GenreBreakdownDtoToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _GenreBreakdownDto &&
+            (identical(other.genre, genre) || other.genre == genre) &&
+            (identical(other.count, count) || other.count == count));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, genre, count);
+
+  @override
+  String toString() {
+    return 'GenreBreakdownDto(genre: $genre, count: $count)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$GenreBreakdownDtoCopyWith<$Res>
+    implements $GenreBreakdownDtoCopyWith<$Res> {
+  factory _$GenreBreakdownDtoCopyWith(
+          _GenreBreakdownDto value, $Res Function(_GenreBreakdownDto) _then) =
+      __$GenreBreakdownDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call({String genre, int count});
+}
+
+/// @nodoc
+class __$GenreBreakdownDtoCopyWithImpl<$Res>
+    implements _$GenreBreakdownDtoCopyWith<$Res> {
+  __$GenreBreakdownDtoCopyWithImpl(this._self, this._then);
+
+  final _GenreBreakdownDto _self;
+  final $Res Function(_GenreBreakdownDto) _then;
+
+  /// Create a copy of GenreBreakdownDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? genre = null,
+    Object? count = null,
+  }) {
+    return _then(_GenreBreakdownDto(
+      genre: null == genre
+          ? _self.genre
+          : genre // ignore: cast_nullable_to_non_nullable
+              as String,
+      count: null == count
+          ? _self.count
+          : count // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$ReadingStatsDto {
+  ReadingSpeedStatsDto get speed;
+  FormatBreakdownDto get formatBreakdown;
+  List<MonthlyHoursDto> get monthlyHours;
+  List<GenreBreakdownDto> get genreBreakdown;
+  double? get avgCompletionDays;
+
+  /// Create a copy of ReadingStatsDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $ReadingStatsDtoCopyWith<ReadingStatsDto> get copyWith =>
+      _$ReadingStatsDtoCopyWithImpl<ReadingStatsDto>(
+          this as ReadingStatsDto, _$identity);
+
+  /// Serializes this ReadingStatsDto to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is ReadingStatsDto &&
+            (identical(other.speed, speed) || other.speed == speed) &&
+            (identical(other.formatBreakdown, formatBreakdown) ||
+                other.formatBreakdown == formatBreakdown) &&
+            const DeepCollectionEquality()
+                .equals(other.monthlyHours, monthlyHours) &&
+            const DeepCollectionEquality()
+                .equals(other.genreBreakdown, genreBreakdown) &&
+            (identical(other.avgCompletionDays, avgCompletionDays) ||
+                other.avgCompletionDays == avgCompletionDays));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      speed,
+      formatBreakdown,
+      const DeepCollectionEquality().hash(monthlyHours),
+      const DeepCollectionEquality().hash(genreBreakdown),
+      avgCompletionDays);
+
+  @override
+  String toString() {
+    return 'ReadingStatsDto(speed: $speed, formatBreakdown: $formatBreakdown, monthlyHours: $monthlyHours, genreBreakdown: $genreBreakdown, avgCompletionDays: $avgCompletionDays)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $ReadingStatsDtoCopyWith<$Res> {
+  factory $ReadingStatsDtoCopyWith(
+          ReadingStatsDto value, $Res Function(ReadingStatsDto) _then) =
+      _$ReadingStatsDtoCopyWithImpl;
+  @useResult
+  $Res call(
+      {ReadingSpeedStatsDto speed,
+      FormatBreakdownDto formatBreakdown,
+      List<MonthlyHoursDto> monthlyHours,
+      List<GenreBreakdownDto> genreBreakdown,
+      double? avgCompletionDays});
+
+  $ReadingSpeedStatsDtoCopyWith<$Res> get speed;
+  $FormatBreakdownDtoCopyWith<$Res> get formatBreakdown;
+}
+
+/// @nodoc
+class _$ReadingStatsDtoCopyWithImpl<$Res>
+    implements $ReadingStatsDtoCopyWith<$Res> {
+  _$ReadingStatsDtoCopyWithImpl(this._self, this._then);
+
+  final ReadingStatsDto _self;
+  final $Res Function(ReadingStatsDto) _then;
+
+  /// Create a copy of ReadingStatsDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? speed = null,
+    Object? formatBreakdown = null,
+    Object? monthlyHours = null,
+    Object? genreBreakdown = null,
+    Object? avgCompletionDays = freezed,
+  }) {
+    return _then(_self.copyWith(
+      speed: null == speed
+          ? _self.speed
+          : speed // ignore: cast_nullable_to_non_nullable
+              as ReadingSpeedStatsDto,
+      formatBreakdown: null == formatBreakdown
+          ? _self.formatBreakdown
+          : formatBreakdown // ignore: cast_nullable_to_non_nullable
+              as FormatBreakdownDto,
+      monthlyHours: null == monthlyHours
+          ? _self.monthlyHours
+          : monthlyHours // ignore: cast_nullable_to_non_nullable
+              as List<MonthlyHoursDto>,
+      genreBreakdown: null == genreBreakdown
+          ? _self.genreBreakdown
+          : genreBreakdown // ignore: cast_nullable_to_non_nullable
+              as List<GenreBreakdownDto>,
+      avgCompletionDays: freezed == avgCompletionDays
+          ? _self.avgCompletionDays
+          : avgCompletionDays // ignore: cast_nullable_to_non_nullable
+              as double?,
+    ));
+  }
+
+  /// Create a copy of ReadingStatsDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ReadingSpeedStatsDtoCopyWith<$Res> get speed {
+    return $ReadingSpeedStatsDtoCopyWith<$Res>(_self.speed, (value) {
+      return _then(_self.copyWith(speed: value));
+    });
+  }
+
+  /// Create a copy of ReadingStatsDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $FormatBreakdownDtoCopyWith<$Res> get formatBreakdown {
+    return $FormatBreakdownDtoCopyWith<$Res>(_self.formatBreakdown, (value) {
+      return _then(_self.copyWith(formatBreakdown: value));
+    });
+  }
+}
+
+/// Adds pattern-matching-related methods to [ReadingStatsDto].
+extension ReadingStatsDtoPatterns on ReadingStatsDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_ReadingStatsDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ReadingStatsDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_ReadingStatsDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ReadingStatsDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_ReadingStatsDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ReadingStatsDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            ReadingSpeedStatsDto speed,
+            FormatBreakdownDto formatBreakdown,
+            List<MonthlyHoursDto> monthlyHours,
+            List<GenreBreakdownDto> genreBreakdown,
+            double? avgCompletionDays)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ReadingStatsDto() when $default != null:
+        return $default(_that.speed, _that.formatBreakdown, _that.monthlyHours,
+            _that.genreBreakdown, _that.avgCompletionDays);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            ReadingSpeedStatsDto speed,
+            FormatBreakdownDto formatBreakdown,
+            List<MonthlyHoursDto> monthlyHours,
+            List<GenreBreakdownDto> genreBreakdown,
+            double? avgCompletionDays)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ReadingStatsDto():
+        return $default(_that.speed, _that.formatBreakdown, _that.monthlyHours,
+            _that.genreBreakdown, _that.avgCompletionDays);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            ReadingSpeedStatsDto speed,
+            FormatBreakdownDto formatBreakdown,
+            List<MonthlyHoursDto> monthlyHours,
+            List<GenreBreakdownDto> genreBreakdown,
+            double? avgCompletionDays)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ReadingStatsDto() when $default != null:
+        return $default(_that.speed, _that.formatBreakdown, _that.monthlyHours,
+            _that.genreBreakdown, _that.avgCompletionDays);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _ReadingStatsDto extends ReadingStatsDto {
+  const _ReadingStatsDto(
+      {required this.speed,
+      required this.formatBreakdown,
+      required final List<MonthlyHoursDto> monthlyHours,
+      required final List<GenreBreakdownDto> genreBreakdown,
+      this.avgCompletionDays})
+      : _monthlyHours = monthlyHours,
+        _genreBreakdown = genreBreakdown,
+        super._();
+  factory _ReadingStatsDto.fromJson(Map<String, dynamic> json) =>
+      _$ReadingStatsDtoFromJson(json);
+
+  @override
+  final ReadingSpeedStatsDto speed;
+  @override
+  final FormatBreakdownDto formatBreakdown;
+  final List<MonthlyHoursDto> _monthlyHours;
+  @override
+  List<MonthlyHoursDto> get monthlyHours {
+    if (_monthlyHours is EqualUnmodifiableListView) return _monthlyHours;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_monthlyHours);
+  }
+
+  final List<GenreBreakdownDto> _genreBreakdown;
+  @override
+  List<GenreBreakdownDto> get genreBreakdown {
+    if (_genreBreakdown is EqualUnmodifiableListView) return _genreBreakdown;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_genreBreakdown);
+  }
+
+  @override
+  final double? avgCompletionDays;
+
+  /// Create a copy of ReadingStatsDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$ReadingStatsDtoCopyWith<_ReadingStatsDto> get copyWith =>
+      __$ReadingStatsDtoCopyWithImpl<_ReadingStatsDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$ReadingStatsDtoToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _ReadingStatsDto &&
+            (identical(other.speed, speed) || other.speed == speed) &&
+            (identical(other.formatBreakdown, formatBreakdown) ||
+                other.formatBreakdown == formatBreakdown) &&
+            const DeepCollectionEquality()
+                .equals(other._monthlyHours, _monthlyHours) &&
+            const DeepCollectionEquality()
+                .equals(other._genreBreakdown, _genreBreakdown) &&
+            (identical(other.avgCompletionDays, avgCompletionDays) ||
+                other.avgCompletionDays == avgCompletionDays));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      speed,
+      formatBreakdown,
+      const DeepCollectionEquality().hash(_monthlyHours),
+      const DeepCollectionEquality().hash(_genreBreakdown),
+      avgCompletionDays);
+
+  @override
+  String toString() {
+    return 'ReadingStatsDto(speed: $speed, formatBreakdown: $formatBreakdown, monthlyHours: $monthlyHours, genreBreakdown: $genreBreakdown, avgCompletionDays: $avgCompletionDays)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$ReadingStatsDtoCopyWith<$Res>
+    implements $ReadingStatsDtoCopyWith<$Res> {
+  factory _$ReadingStatsDtoCopyWith(
+          _ReadingStatsDto value, $Res Function(_ReadingStatsDto) _then) =
+      __$ReadingStatsDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {ReadingSpeedStatsDto speed,
+      FormatBreakdownDto formatBreakdown,
+      List<MonthlyHoursDto> monthlyHours,
+      List<GenreBreakdownDto> genreBreakdown,
+      double? avgCompletionDays});
+
+  @override
+  $ReadingSpeedStatsDtoCopyWith<$Res> get speed;
+  @override
+  $FormatBreakdownDtoCopyWith<$Res> get formatBreakdown;
+}
+
+/// @nodoc
+class __$ReadingStatsDtoCopyWithImpl<$Res>
+    implements _$ReadingStatsDtoCopyWith<$Res> {
+  __$ReadingStatsDtoCopyWithImpl(this._self, this._then);
+
+  final _ReadingStatsDto _self;
+  final $Res Function(_ReadingStatsDto) _then;
+
+  /// Create a copy of ReadingStatsDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? speed = null,
+    Object? formatBreakdown = null,
+    Object? monthlyHours = null,
+    Object? genreBreakdown = null,
+    Object? avgCompletionDays = freezed,
+  }) {
+    return _then(_ReadingStatsDto(
+      speed: null == speed
+          ? _self.speed
+          : speed // ignore: cast_nullable_to_non_nullable
+              as ReadingSpeedStatsDto,
+      formatBreakdown: null == formatBreakdown
+          ? _self.formatBreakdown
+          : formatBreakdown // ignore: cast_nullable_to_non_nullable
+              as FormatBreakdownDto,
+      monthlyHours: null == monthlyHours
+          ? _self._monthlyHours
+          : monthlyHours // ignore: cast_nullable_to_non_nullable
+              as List<MonthlyHoursDto>,
+      genreBreakdown: null == genreBreakdown
+          ? _self._genreBreakdown
+          : genreBreakdown // ignore: cast_nullable_to_non_nullable
+              as List<GenreBreakdownDto>,
+      avgCompletionDays: freezed == avgCompletionDays
+          ? _self.avgCompletionDays
+          : avgCompletionDays // ignore: cast_nullable_to_non_nullable
+              as double?,
+    ));
+  }
+
+  /// Create a copy of ReadingStatsDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ReadingSpeedStatsDtoCopyWith<$Res> get speed {
+    return $ReadingSpeedStatsDtoCopyWith<$Res>(_self.speed, (value) {
+      return _then(_self.copyWith(speed: value));
+    });
+  }
+
+  /// Create a copy of ReadingStatsDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $FormatBreakdownDtoCopyWith<$Res> get formatBreakdown {
+    return $FormatBreakdownDtoCopyWith<$Res>(_self.formatBreakdown, (value) {
+      return _then(_self.copyWith(formatBreakdown: value));
+    });
+  }
+}
+
 // dart format on

@@ -314,3 +314,80 @@ Map<String, dynamic> _$ReadingRecapDtoToJson(_ReadingRecapDto instance) =>
       'longest_streak_days': instance.longestStreakDays,
       'top_books': instance.topBooks.map((e) => e.toJson()).toList(),
     };
+
+_ReadingSpeedStatsDto _$ReadingSpeedStatsDtoFromJson(
+        Map<String, dynamic> json) =>
+    _ReadingSpeedStatsDto(
+      avgMinutesPerPage: (json['avg_minutes_per_page'] as num?)?.toDouble(),
+      avgPagesPerHour: (json['avg_pages_per_hour'] as num?)?.toDouble(),
+    );
+
+Map<String, dynamic> _$ReadingSpeedStatsDtoToJson(
+        _ReadingSpeedStatsDto instance) =>
+    <String, dynamic>{
+      'avg_minutes_per_page': instance.avgMinutesPerPage,
+      'avg_pages_per_hour': instance.avgPagesPerHour,
+    };
+
+_FormatBreakdownDto _$FormatBreakdownDtoFromJson(Map<String, dynamic> json) =>
+    _FormatBreakdownDto(
+      paper: (json['paper'] as num).toInt(),
+      ebook: (json['ebook'] as num).toInt(),
+      audio: (json['audio'] as num).toInt(),
+    );
+
+Map<String, dynamic> _$FormatBreakdownDtoToJson(_FormatBreakdownDto instance) =>
+    <String, dynamic>{
+      'paper': instance.paper,
+      'ebook': instance.ebook,
+      'audio': instance.audio,
+    };
+
+_MonthlyHoursDto _$MonthlyHoursDtoFromJson(Map<String, dynamic> json) =>
+    _MonthlyHoursDto(
+      month: json['month'] as String,
+      hours: (json['hours'] as num).toDouble(),
+    );
+
+Map<String, dynamic> _$MonthlyHoursDtoToJson(_MonthlyHoursDto instance) =>
+    <String, dynamic>{
+      'month': instance.month,
+      'hours': instance.hours,
+    };
+
+_GenreBreakdownDto _$GenreBreakdownDtoFromJson(Map<String, dynamic> json) =>
+    _GenreBreakdownDto(
+      genre: json['genre'] as String,
+      count: (json['count'] as num).toInt(),
+    );
+
+Map<String, dynamic> _$GenreBreakdownDtoToJson(_GenreBreakdownDto instance) =>
+    <String, dynamic>{
+      'genre': instance.genre,
+      'count': instance.count,
+    };
+
+_ReadingStatsDto _$ReadingStatsDtoFromJson(Map<String, dynamic> json) =>
+    _ReadingStatsDto(
+      speed:
+          ReadingSpeedStatsDto.fromJson(json['speed'] as Map<String, dynamic>),
+      formatBreakdown: FormatBreakdownDto.fromJson(
+          json['format_breakdown'] as Map<String, dynamic>),
+      monthlyHours: (json['monthly_hours'] as List<dynamic>)
+          .map((e) => MonthlyHoursDto.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      genreBreakdown: (json['genre_breakdown'] as List<dynamic>)
+          .map((e) => GenreBreakdownDto.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      avgCompletionDays: (json['avg_completion_days'] as num?)?.toDouble(),
+    );
+
+Map<String, dynamic> _$ReadingStatsDtoToJson(_ReadingStatsDto instance) =>
+    <String, dynamic>{
+      'speed': instance.speed.toJson(),
+      'format_breakdown': instance.formatBreakdown.toJson(),
+      'monthly_hours': instance.monthlyHours.map((e) => e.toJson()).toList(),
+      'genre_breakdown':
+          instance.genreBreakdown.map((e) => e.toJson()).toList(),
+      'avg_completion_days': instance.avgCompletionDays,
+    };

@@ -168,6 +168,8 @@ class _GradeBody extends StatelessWidget {
         SizedBox(height: spacing.md),
         _RecentCompletedSection(accent: accent),
         SizedBox(height: spacing.md),
+        _StatsEntryButton(accent: accent),
+        SizedBox(height: spacing.md),
         _InfoLink(),
       ],
     );
@@ -229,6 +231,52 @@ class _TotalCell extends StatelessWidget {
           const SizedBox(height: 4),
           Text(value, style: theme.textTheme.headlineMedium),
         ],
+      ),
+    );
+  }
+}
+
+/// Banner button that navigates to the full reading statistics screen.
+class _StatsEntryButton extends StatelessWidget {
+  const _StatsEntryButton({required this.accent});
+
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+    final AppShadows shadows = theme.extension<AppShadows>()!;
+    return InkWell(
+      onTap: () => context.push(AppRoutes.readingStats),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: spacing.lg,
+          vertical: spacing.md,
+        ),
+        decoration: BoxDecoration(
+          color: accent.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: accent.withValues(alpha: 0.3)),
+          boxShadow: shadows.elevated,
+        ),
+        child: Row(
+          children: <Widget>[
+            Icon(Icons.bar_chart_rounded, color: accent, size: 22),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                '독서 통계 보기',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: accent,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            Icon(Icons.arrow_forward_rounded, color: accent, size: 16),
+          ],
+        ),
       ),
     );
   }

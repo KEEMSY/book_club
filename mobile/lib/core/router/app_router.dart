@@ -26,6 +26,7 @@ import '../../features/reading/presentation/dashboard_screen.dart';
 import '../../features/reading/presentation/goal_screen.dart';
 import '../../features/reading/presentation/grade_screen.dart';
 import '../../features/reading/presentation/reading_recap_screen.dart';
+import '../../features/reading/presentation/reading_stats_screen.dart';
 import '../../features/reading/presentation/timer_screen.dart';
 import 'app_shell.dart';
 
@@ -71,6 +72,9 @@ class AppRoutes {
 
   // Reading recap — half-year card view, shown in June and December.
   static const readingRecap = '/reading/recap';
+
+  // M21 — full reading analytics screen.
+  static const readingStats = '/reading/stats';
 }
 
 /// Adapter that bridges a Riverpod [ValueNotifier]-free state stream into a
@@ -199,6 +203,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           final RecapKey key = state.extra! as RecapKey;
           return ReadingRecapScreen(recapKey: key);
         },
+      ),
+      GoRoute(
+        path: AppRoutes.readingStats,
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) => const ReadingStatsScreen(),
       ),
       GoRoute(
         path: AppRoutes.notifications,

@@ -76,7 +76,7 @@
 - [x] (design) 디자인 시스템 교체 — Claude → Apple (awesome-design-md/design-md/apple/DESIGN.md) · 네이밍 중립화(AppPalette·AppTypography 등)로 향후 디자인 시스템 교체 용이성 확보 — 맥락: M0 완료 후 사용자 요청 (2026-04-20)
 - [x] (design) 디자인 시스템 교체 — Apple → Airbnb (2030 여성 타겟, 감각적·직관적, 따뜻한 팔레트·세리프 헤드라인·감성 카드 UX) — 맥락: M1 백엔드 진행 중 사용자 디자인 피드백 반영 (2026-04-20)
 - [x] (auth) Kakao contract 재조정 — (a) schema `{ access_token }` rename + 어댑터 token 교환 스텝 skip 채택. 2 커밋(`61b941a` backend, `29e7fb2` mobile), 태그 `v0.0.2` (2026-04-22 hotfix)
-- [ ] (mobile/login) 로그인 화면 중앙 illustration 자리에 실제 에디토리얼 SVG 적용 — 현재 Rausch 10% 틴트 + 책 아이콘 placeholder. 2030 여성 타겟의 매거진 톤 강화 — 맥락: M1 Mobile 로그인 스크린 폴리시 후보 (2026-04-20)
+- [x] (mobile/login) 로그인 화면 중앙 illustration SVG 적용 — M22 `v0.1.3-m22` login_hero.svg + flutter_svg 구현 완료 (2026-06-05)
 - [x] (mobile/auth) Kakao 공식 브랜드 SVG 아이콘 교체 — `_KakaoMark` CustomPainter로 말풍선+눈 두 개 공식 마크 구현, Material `chat_bubble` 대체 (2026-04-26)
 - [x] (auth) retrofit + custom_lint 의존성 버전 정리 — 분석 결과: retrofit_generator 10.x + custom_lint 0.8.x 모두 freezed 3.x(build ^4.0.0) 필요. pubspec 코멘트를 정확한 차단 사유로 갱신, 해제는 freezed 2→3 마이그레이션 전용 태스크로 분리 (2026-04-26)
 - [x] (auth) FCM 디바이스 토큰 등록 M6에서 실 FCM 토큰으로 교체 — M6 Task 6.6(서명 키 + GoogleService-Info.plist) 완료 후 AuthRepository.registerDeviceToken 호출 변경 예정

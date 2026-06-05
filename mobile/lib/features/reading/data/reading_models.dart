@@ -6,6 +6,7 @@ import '../domain/heatmap_day.dart';
 import '../domain/reading_goal.dart';
 import '../domain/reading_recap.dart';
 import '../domain/reading_session.dart';
+import '../domain/reading_stats.dart';
 import '../domain/reading_year_stats.dart';
 
 part 'reading_models.freezed.dart';
@@ -388,6 +389,93 @@ abstract class ReadingRecapDto with _$ReadingRecapDto {
       totalSeconds: totalSeconds,
       longestStreakDays: longestStreakDays,
       topBooks: topBooks.map((b) => b.toDomain()).toList(growable: false),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// M21 Reading Stats DTOs
+// ---------------------------------------------------------------------------
+
+/// Mirror of `ReadingSpeedStatsPublic`.
+@freezed
+abstract class ReadingSpeedStatsDto with _$ReadingSpeedStatsDto {
+  const factory ReadingSpeedStatsDto({
+    double? avgMinutesPerPage,
+    double? avgPagesPerHour,
+  }) = _ReadingSpeedStatsDto;
+
+  factory ReadingSpeedStatsDto.fromJson(Map<String, dynamic> json) =>
+      _$ReadingSpeedStatsDtoFromJson(json);
+}
+
+/// Mirror of `FormatBreakdownPublic`.
+@freezed
+abstract class FormatBreakdownDto with _$FormatBreakdownDto {
+  const factory FormatBreakdownDto({
+    required int paper,
+    required int ebook,
+    required int audio,
+  }) = _FormatBreakdownDto;
+
+  factory FormatBreakdownDto.fromJson(Map<String, dynamic> json) =>
+      _$FormatBreakdownDtoFromJson(json);
+}
+
+/// Mirror of `MonthlyHoursPublic`.
+@freezed
+abstract class MonthlyHoursDto with _$MonthlyHoursDto {
+  const factory MonthlyHoursDto({
+    required String month,
+    required double hours,
+  }) = _MonthlyHoursDto;
+
+  factory MonthlyHoursDto.fromJson(Map<String, dynamic> json) =>
+      _$MonthlyHoursDtoFromJson(json);
+}
+
+/// Mirror of `GenreBreakdownPublic`.
+@freezed
+abstract class GenreBreakdownDto with _$GenreBreakdownDto {
+  const factory GenreBreakdownDto({
+    required String genre,
+    required int count,
+  }) = _GenreBreakdownDto;
+
+  factory GenreBreakdownDto.fromJson(Map<String, dynamic> json) =>
+      _$GenreBreakdownDtoFromJson(json);
+}
+
+/// Mirror of `ReadingStatsResponse` — envelope for `GET /me/reading-stats`.
+@freezed
+abstract class ReadingStatsDto with _$ReadingStatsDto {
+  const ReadingStatsDto._();
+
+  const factory ReadingStatsDto({
+    required ReadingSpeedStatsDto speed,
+    required FormatBreakdownDto formatBreakdown,
+    required List<MonthlyHoursDto> monthlyHours,
+    required List<GenreBreakdownDto> genreBreakdown,
+    double? avgCompletionDays,
+  }) = _ReadingStatsDto;
+
+  factory ReadingStatsDto.fromJson(Map<String, dynamic> json) =>
+      _$ReadingStatsDtoFromJson(json);
+
+  ReadingStats toDomain() {
+    return ReadingStats(
+      avgMinutesPerPage: speed.avgMinutesPerPage,
+      avgPagesPerHour: speed.avgPagesPerHour,
+      formatPaper: formatBreakdown.paper,
+      formatEbook: formatBreakdown.ebook,
+      formatAudio: formatBreakdown.audio,
+      monthlyHours: monthlyHours
+          .map((m) => MonthlyHours(month: m.month, hours: m.hours))
+          .toList(growable: false),
+      genreBreakdown: genreBreakdown
+          .map((g) => GenreCount(genre: g.genre, count: g.count))
+          .toList(growable: false),
+      avgCompletionDays: avgCompletionDays,
     );
   }
 }

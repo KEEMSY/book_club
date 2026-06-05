@@ -8,6 +8,7 @@ import '../domain/heatmap_day.dart';
 import '../domain/reading_goal.dart';
 import '../domain/reading_recap.dart';
 import '../domain/reading_session.dart';
+import '../domain/reading_stats.dart';
 import '../domain/reading_year_stats.dart';
 import 'reading_api.dart';
 import 'reading_models.dart';
@@ -186,6 +187,14 @@ class ReadingRepository {
   }) async {
     final ReadingRecapDto dto =
         await _call(() => _api.getRecap(year: year, half: half));
+    return dto.toDomain();
+  }
+
+  /// M21 — full reading analytics: speed, format breakdown, monthly hours,
+  /// genre distribution, avg completion time.
+  Future<ReadingStats> getReadingStats() async {
+    final ReadingStatsDto dto =
+        await _call(() => _api.getReadingStats());
     return dto.toDomain();
   }
 
