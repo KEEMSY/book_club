@@ -190,7 +190,10 @@ async def list_messages(
     club_id: UUID,
     user_id: Annotated[str, Depends(get_current_user_id)],
     service: Annotated[ClubService, Depends(get_club_service)],
-    cursor: Annotated[datetime | None, Query(description="ISO-8601 created_at of the oldest item on the previous page")] = None,
+    cursor: Annotated[
+        datetime | None,
+        Query(description="ISO-8601 created_at of the oldest item on the previous page"),
+    ] = None,
     limit: Annotated[int, Query(ge=1, le=100)] = 50,
 ) -> MessageListResponse:
     return await service.list_messages(

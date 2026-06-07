@@ -176,10 +176,10 @@ class ConnectionManager:
                 channel: str = raw["channel"]
                 data: str = raw["data"]
                 if channel.startswith(_CLUB_CHANNEL_PREFIX):
-                    club_id = channel[len(_CLUB_CHANNEL_PREFIX):]
+                    club_id = channel[len(_CLUB_CHANNEL_PREFIX) :]
                     await self._broadcast_local_club(club_id, data)
                 elif channel.startswith(_USER_CHANNEL_PREFIX):
-                    user_id = channel[len(_USER_CHANNEL_PREFIX):]
+                    user_id = channel[len(_USER_CHANNEL_PREFIX) :]
                     await self._send_local_user(user_id, data)
         except Exception as exc:
             logger.warning("Redis relay loop terminated: %s", exc)

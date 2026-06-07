@@ -107,9 +107,7 @@ class ClubService:
             media_url=media_url,
         )
         # Fetch author nickname via a single-row message list query.
-        rows = await self.repo.list_messages(
-            club_id, cursor=None, limit=1
-        )
+        rows = await self.repo.list_messages(club_id, cursor=None, limit=1)
         author_nickname = rows[0][1] if rows else ""
         return ClubMessagePublic(
             id=msg.id,

@@ -60,6 +60,7 @@ class GradeSummary:
     total_seconds: int
     streak_days: int
     longest_streak: int
+    streak_shields: int
     next_grade_thresholds: GradeThreshold | None
 
 
@@ -166,7 +167,10 @@ class UserGradeRepositoryPort(Protocol):
         streak_days: int | None = None,
         longest_streak: int | None = None,
         streak_last_date: date | None = None,
+        streak_shields: int | None = None,
     ) -> UserGrade: ...
+
+    async def update_streak_shields(self, user_id: UUID, *, shields: int) -> UserGrade: ...
 
 
 class GoalRepositoryPort(Protocol):
@@ -252,6 +256,32 @@ class ReadingRecap:
 
     period: str
     cards: list[RecapCardData]
+
+
+@dataclass(frozen=True, slots=True)
+class MonthlyRecap:
+    """Service-shape monthly recap returned by ``get_monthly_recap``."""
+
+    year: int
+    month: int
+    books_completed: int
+    total_hours: float
+    avg_daily_minutes: float
+    longest_streak: int
+    top_genre: str | None
+    prev_month_hours: float | None
+
+
+@dataclass(frozen=True, slots=True)
+class MilestoneData:
+    """One achieved milestone — type tag, timestamp, and the numeric value at achievement."""
+
+    # ``milestone_type`` is a string matching ``MilestoneType`` enum values in
+    # ``schemas.py``. Using a string here keeps ``ports.py`` free of Pydantic /
+    # StrEnum imports (CLAUDE.md §3.2).
+    milestone_type: str
+    achieved_at: datetime
+    value: int
 
 
 class ReadingBookQueryPort(Protocol):

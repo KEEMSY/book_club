@@ -237,9 +237,7 @@ class ClubRepository:
         msg.edited_at = edited_at
         await self._session.flush()
 
-    async def soft_delete_message(
-        self, *, message_id: UUID, deleted_at: datetime
-    ) -> None:
+    async def soft_delete_message(self, *, message_id: UUID, deleted_at: datetime) -> None:
         msg = await self._session.get(ClubMessage, message_id)
         if msg is None:
             return

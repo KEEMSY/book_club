@@ -110,6 +110,14 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
           return;
         }
 
+        // Capture shields before the session completion is applied so the
+        // summary screen can detect whether a shield was consumed.
+        final GradeState gradeStateBefore = ref.read(gradeNotifierProvider);
+        final int shieldsBefore = switch (gradeStateBefore) {
+          GradeLoaded(:final summary) => summary.streakShields,
+          _ => 0,
+        };
+
         final gradeNotifier = ref.read(gradeNotifierProvider.notifier);
         gradeNotifier.applySessionCompletion(next.completion);
         ref
@@ -132,7 +140,10 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
         nav
             .push(
           MaterialPageRoute<void>(
-            builder: (_) => SessionSummaryScreen(completion: next.completion),
+            builder: (_) => SessionSummaryScreen(
+              completion: next.completion,
+              shieldsBefore: shieldsBefore,
+            ),
           ),
         )
             .then((_) {

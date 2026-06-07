@@ -10,6 +10,8 @@ import '../../book/application/library_state.dart';
 import '../../book/domain/book_status.dart';
 import '../../book/domain/user_book.dart';
 import '../../book/presentation/widgets/book_cover.dart';
+import '../application/grade_notifier.dart';
+import '../application/grade_state.dart';
 import '../application/reading_providers.dart';
 import '../domain/bookmark.dart';
 import '../domain/reading_goal.dart';
@@ -20,18 +22,69 @@ import 'widgets/grade_badge.dart';
 ///
 /// Shows the total duration, streak, and a grade-up banner if the session
 /// pushed the user into the next tier. Tapping "계속" pops back to `/home`.
-class SessionSummaryScreen extends ConsumerWidget {
-  const SessionSummaryScreen({super.key, required this.completion});
+///
+/// [shieldsBefore] is the streak-shield count captured before the session
+/// ended. When the post-session server refresh returns a lower count, the
+/// screen shows a one-time snackbar informing the user that a shield was used.
+class SessionSummaryScreen extends ConsumerStatefulWidget {
+  const SessionSummaryScreen({
+    super.key,
+    required this.completion,
+    this.shieldsBefore = 0,
+  });
 
   final SessionCompletion completion;
 
+  /// Streak-shield count captured from the grade state just before the session
+  /// was ended. Defaults to 0 when the caller does not have the information
+  /// (e.g. background auto-end path).
+  final int shieldsBefore;
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SessionSummaryScreen> createState() =>
+      _SessionSummaryScreenState();
+}
+
+class _SessionSummaryScreenState extends ConsumerState<SessionSummaryScreen> {
+  bool _shieldSnackbarShown = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Request a fresh grade load so we get the authoritative post-session
+    // shield count from the server. The background refresh that
+    // applySessionCompletion() already kicked may still be in-flight — forcing
+    // a full load here ensures the listener below fires once the server truth
+    // lands.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(gradeNotifierProvider.notifier).refresh();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Listen for the grade to refresh and show a snackbar if a shield was
+    // consumed (post-session shields < pre-session shields).
+    ref.listen<GradeState>(gradeNotifierProvider, (_, next) {
+      if (_shieldSnackbarShown) return;
+      if (next is GradeLoaded &&
+          widget.shieldsBefore > 0 &&
+          next.summary.streakShields < widget.shieldsBefore) {
+        _shieldSnackbarShown = true;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('스트릭 쉴드가 사용됐어요 — 스트릭을 지켰어요! 🛡️'),
+            duration: Duration(seconds: 4),
+          ),
+        );
+      }
+    });
+
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
     final Color accent = ref.watch(gradePrimaryProvider);
-    final ReaderGrade currentGrade = _readerGradeFor(completion.grade);
-    final Duration elapsed = Duration(seconds: completion.durationSec);
+    final ReaderGrade currentGrade = _readerGradeFor(widget.completion.grade);
+    final Duration elapsed = Duration(seconds: widget.completion.durationSec);
 
     return Scaffold(
       // Inherit the theme canvas — Foggy on light, darkCanvas on dark.
@@ -54,7 +107,7 @@ class SessionSummaryScreen extends ConsumerWidget {
           child: Column(
             children: <Widget>[
               const Spacer(),
-              if (completion.gradeUp)
+              if (widget.completion.gradeUp)
                 _GradeUpCelebration(accent: accent, grade: currentGrade),
               SizedBox(height: spacing.md),
               Text('수고하셨어요', style: theme.textTheme.headlineLarge),
@@ -63,10 +116,10 @@ class SessionSummaryScreen extends ConsumerWidget {
                 formatElapsed(elapsed),
                 style: theme.textTheme.displayLarge?.copyWith(color: accent),
               ),
-              if (completion.userBookId.isNotEmpty) ...<Widget>[
+              if (widget.completion.userBookId.isNotEmpty) ...<Widget>[
                 SizedBox(height: spacing.lg),
                 _SessionBookCard(
-                  userBookId: completion.userBookId,
+                  userBookId: widget.completion.userBookId,
                   accent: accent,
                 ),
               ],
@@ -78,7 +131,7 @@ class SessionSummaryScreen extends ConsumerWidget {
                 ),
               ),
               SizedBox(height: spacing.xl),
-              _StreakRow(streak: completion.streakDays, accent: accent),
+              _StreakRow(streak: widget.completion.streakDays, accent: accent),
               const Spacer(),
               SizedBox(
                 width: double.infinity,
@@ -91,7 +144,7 @@ class SessionSummaryScreen extends ConsumerWidget {
                     shape: const StadiumBorder(),
                   ),
                   child: Text(
-                    completion.gradeUp ? '새 등급 확인하기' : '홈으로',
+                    widget.completion.gradeUp ? '새 등급 확인하기' : '홈으로',
                   ),
                 ),
               ),

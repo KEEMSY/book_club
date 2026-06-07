@@ -1479,7 +1479,7 @@ class _LibraryCaptureSheetState extends State<_LibraryCaptureSheet> {
               mimeType: 'image/png',
             ),
           ],
-          subject: '내 서재 — Book Club',
+          subject: '내 서재 — 골방',
         ),
       );
     } finally {
@@ -1628,7 +1628,7 @@ class _LibraryCaptureWidget extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Book Club',
+                  '골방',
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: theme.colorScheme.primary,
                     fontWeight: FontWeight.w700,

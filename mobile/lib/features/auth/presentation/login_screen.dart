@@ -104,7 +104,7 @@ class _Hero extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       children: <Widget>[
         Text(
-          'Book Club',
+          '골방',
           style: theme.textTheme.displayLarge,
         ),
         SizedBox(height: spacing.sm),
@@ -206,7 +206,7 @@ class _BottomCtas extends StatelessWidget {
           ],
           SizedBox(height: spacing.md),
           Text(
-            '로그인하면 Book Club 이용약관 및 개인정보처리방침에 동의합니다.',
+            '로그인하면 골방 이용약관 및 개인정보처리방침에 동의합니다.',
             textAlign: TextAlign.center,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,

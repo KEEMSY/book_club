@@ -131,10 +131,7 @@ class FcmPushAdapter:
             for batch_start in range(0, len(tokens), _BATCH_SIZE):
                 batch = tokens[batch_start : batch_start + _BATCH_SIZE]
                 results = await asyncio.gather(
-                    *(
-                        self._send_one(client, url, headers, t, title, body, data)
-                        for t in batch
-                    ),
+                    *(self._send_one(client, url, headers, t, title, body, data) for t in batch),
                     return_exceptions=True,
                 )
                 for result in results:

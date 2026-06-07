@@ -61,6 +61,7 @@ def _grade_summary(grade: int = 1, tier: int = 1) -> GradeSummary:
         total_seconds=0,
         streak_days=0,
         longest_streak=0,
+        streak_shields=0,
         next_grade_thresholds=GradeThreshold(target_books=3, target_seconds=10 * 3600),
     )
 

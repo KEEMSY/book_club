@@ -16,6 +16,7 @@ from uuid import UUID
 
 from app.domains.auth.models import User
 from app.domains.social.models import Block, Follow, Report
+from app.domains.social.repository import LeaderboardRow
 
 
 class SocialRepositoryPort(Protocol):
@@ -94,4 +95,8 @@ class SocialRepositoryPort(Protocol):
         limit: int,
     ) -> tuple[list[User], str | None]:
         """Nickname ILIKE search. Excludes actor and users who blocked actor."""
+        ...
+
+    async def get_weekly_leaderboard(self, user_id: UUID) -> list[LeaderboardRow]:
+        """Weekly reading minutes for user + their followings, sorted DESC."""
         ...

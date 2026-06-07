@@ -756,6 +756,7 @@ mixin _$GradeSummaryDto {
   int get longestStreak;
   NextGradeThresholdsDto? get nextGradeThresholds;
   int get tier;
+  int get streakShields;
 
   /// Create a copy of GradeSummaryDto
   /// with the given fields replaced by the non-null parameter values.
@@ -784,17 +785,19 @@ mixin _$GradeSummaryDto {
                 other.longestStreak == longestStreak) &&
             (identical(other.nextGradeThresholds, nextGradeThresholds) ||
                 other.nextGradeThresholds == nextGradeThresholds) &&
-            (identical(other.tier, tier) || other.tier == tier));
+            (identical(other.tier, tier) || other.tier == tier) &&
+            (identical(other.streakShields, streakShields) ||
+                other.streakShields == streakShields));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, grade, totalBooks, totalSeconds,
-      streakDays, longestStreak, nextGradeThresholds, tier);
+      streakDays, longestStreak, nextGradeThresholds, tier, streakShields);
 
   @override
   String toString() {
-    return 'GradeSummaryDto(grade: $grade, totalBooks: $totalBooks, totalSeconds: $totalSeconds, streakDays: $streakDays, longestStreak: $longestStreak, nextGradeThresholds: $nextGradeThresholds, tier: $tier)';
+    return 'GradeSummaryDto(grade: $grade, totalBooks: $totalBooks, totalSeconds: $totalSeconds, streakDays: $streakDays, longestStreak: $longestStreak, nextGradeThresholds: $nextGradeThresholds, tier: $tier, streakShields: $streakShields)';
   }
 }
 
@@ -811,7 +814,8 @@ abstract mixin class $GradeSummaryDtoCopyWith<$Res> {
       int streakDays,
       int longestStreak,
       NextGradeThresholdsDto? nextGradeThresholds,
-      int tier});
+      int tier,
+      int streakShields});
 
   $NextGradeThresholdsDtoCopyWith<$Res>? get nextGradeThresholds;
 }
@@ -836,6 +840,7 @@ class _$GradeSummaryDtoCopyWithImpl<$Res>
     Object? longestStreak = null,
     Object? nextGradeThresholds = freezed,
     Object? tier = null,
+    Object? streakShields = null,
   }) {
     return _then(_self.copyWith(
       grade: null == grade
@@ -865,6 +870,10 @@ class _$GradeSummaryDtoCopyWithImpl<$Res>
       tier: null == tier
           ? _self.tier
           : tier // ignore: cast_nullable_to_non_nullable
+              as int,
+      streakShields: null == streakShields
+          ? _self.streakShields
+          : streakShields // ignore: cast_nullable_to_non_nullable
               as int,
     ));
   }
@@ -985,7 +994,8 @@ extension GradeSummaryDtoPatterns on GradeSummaryDto {
             int streakDays,
             int longestStreak,
             NextGradeThresholdsDto? nextGradeThresholds,
-            int tier)?
+            int tier,
+            int streakShields)?
         $default, {
     required TResult orElse(),
   }) {
@@ -999,7 +1009,8 @@ extension GradeSummaryDtoPatterns on GradeSummaryDto {
             _that.streakDays,
             _that.longestStreak,
             _that.nextGradeThresholds,
-            _that.tier);
+            _that.tier,
+            _that.streakShields);
       case _:
         return orElse();
     }
@@ -1027,7 +1038,8 @@ extension GradeSummaryDtoPatterns on GradeSummaryDto {
             int streakDays,
             int longestStreak,
             NextGradeThresholdsDto? nextGradeThresholds,
-            int tier)
+            int tier,
+            int streakShields)
         $default,
   ) {
     final _that = this;
@@ -1040,7 +1052,8 @@ extension GradeSummaryDtoPatterns on GradeSummaryDto {
             _that.streakDays,
             _that.longestStreak,
             _that.nextGradeThresholds,
-            _that.tier);
+            _that.tier,
+            _that.streakShields);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -1067,7 +1080,8 @@ extension GradeSummaryDtoPatterns on GradeSummaryDto {
             int streakDays,
             int longestStreak,
             NextGradeThresholdsDto? nextGradeThresholds,
-            int tier)?
+            int tier,
+            int streakShields)?
         $default,
   ) {
     final _that = this;
@@ -1080,7 +1094,8 @@ extension GradeSummaryDtoPatterns on GradeSummaryDto {
             _that.streakDays,
             _that.longestStreak,
             _that.nextGradeThresholds,
-            _that.tier);
+            _that.tier,
+            _that.streakShields);
       case _:
         return null;
     }
@@ -1097,7 +1112,8 @@ class _GradeSummaryDto extends GradeSummaryDto {
       required this.streakDays,
       required this.longestStreak,
       this.nextGradeThresholds,
-      this.tier = 1})
+      this.tier = 1,
+      this.streakShields = 0})
       : super._();
   factory _GradeSummaryDto.fromJson(Map<String, dynamic> json) =>
       _$GradeSummaryDtoFromJson(json);
@@ -1117,6 +1133,9 @@ class _GradeSummaryDto extends GradeSummaryDto {
   @override
   @JsonKey()
   final int tier;
+  @override
+  @JsonKey()
+  final int streakShields;
 
   /// Create a copy of GradeSummaryDto
   /// with the given fields replaced by the non-null parameter values.
@@ -1149,17 +1168,19 @@ class _GradeSummaryDto extends GradeSummaryDto {
                 other.longestStreak == longestStreak) &&
             (identical(other.nextGradeThresholds, nextGradeThresholds) ||
                 other.nextGradeThresholds == nextGradeThresholds) &&
-            (identical(other.tier, tier) || other.tier == tier));
+            (identical(other.tier, tier) || other.tier == tier) &&
+            (identical(other.streakShields, streakShields) ||
+                other.streakShields == streakShields));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, grade, totalBooks, totalSeconds,
-      streakDays, longestStreak, nextGradeThresholds, tier);
+      streakDays, longestStreak, nextGradeThresholds, tier, streakShields);
 
   @override
   String toString() {
-    return 'GradeSummaryDto(grade: $grade, totalBooks: $totalBooks, totalSeconds: $totalSeconds, streakDays: $streakDays, longestStreak: $longestStreak, nextGradeThresholds: $nextGradeThresholds, tier: $tier)';
+    return 'GradeSummaryDto(grade: $grade, totalBooks: $totalBooks, totalSeconds: $totalSeconds, streakDays: $streakDays, longestStreak: $longestStreak, nextGradeThresholds: $nextGradeThresholds, tier: $tier, streakShields: $streakShields)';
   }
 }
 
@@ -1178,7 +1199,8 @@ abstract mixin class _$GradeSummaryDtoCopyWith<$Res>
       int streakDays,
       int longestStreak,
       NextGradeThresholdsDto? nextGradeThresholds,
-      int tier});
+      int tier,
+      int streakShields});
 
   @override
   $NextGradeThresholdsDtoCopyWith<$Res>? get nextGradeThresholds;
@@ -1204,6 +1226,7 @@ class __$GradeSummaryDtoCopyWithImpl<$Res>
     Object? longestStreak = null,
     Object? nextGradeThresholds = freezed,
     Object? tier = null,
+    Object? streakShields = null,
   }) {
     return _then(_GradeSummaryDto(
       grade: null == grade
@@ -1233,6 +1256,10 @@ class __$GradeSummaryDtoCopyWithImpl<$Res>
       tier: null == tier
           ? _self.tier
           : tier // ignore: cast_nullable_to_non_nullable
+              as int,
+      streakShields: null == streakShields
+          ? _self.streakShields
+          : streakShields // ignore: cast_nullable_to_non_nullable
               as int,
     ));
   }
@@ -8473,6 +8500,838 @@ class __$ReadingStatsDtoCopyWithImpl<$Res>
     return $FormatBreakdownDtoCopyWith<$Res>(_self.formatBreakdown, (value) {
       return _then(_self.copyWith(formatBreakdown: value));
     });
+  }
+}
+
+/// @nodoc
+mixin _$MonthlyRecapDto {
+  int get year;
+  int get month;
+  int get booksCompleted;
+  double get totalHours;
+  double get avgDailyMinutes;
+  int get longestStreak;
+  String? get topGenre;
+  double? get prevMonthHours;
+
+  /// Create a copy of MonthlyRecapDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $MonthlyRecapDtoCopyWith<MonthlyRecapDto> get copyWith =>
+      _$MonthlyRecapDtoCopyWithImpl<MonthlyRecapDto>(
+          this as MonthlyRecapDto, _$identity);
+
+  /// Serializes this MonthlyRecapDto to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is MonthlyRecapDto &&
+            (identical(other.year, year) || other.year == year) &&
+            (identical(other.month, month) || other.month == month) &&
+            (identical(other.booksCompleted, booksCompleted) ||
+                other.booksCompleted == booksCompleted) &&
+            (identical(other.totalHours, totalHours) ||
+                other.totalHours == totalHours) &&
+            (identical(other.avgDailyMinutes, avgDailyMinutes) ||
+                other.avgDailyMinutes == avgDailyMinutes) &&
+            (identical(other.longestStreak, longestStreak) ||
+                other.longestStreak == longestStreak) &&
+            (identical(other.topGenre, topGenre) ||
+                other.topGenre == topGenre) &&
+            (identical(other.prevMonthHours, prevMonthHours) ||
+                other.prevMonthHours == prevMonthHours));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, year, month, booksCompleted,
+      totalHours, avgDailyMinutes, longestStreak, topGenre, prevMonthHours);
+
+  @override
+  String toString() {
+    return 'MonthlyRecapDto(year: $year, month: $month, booksCompleted: $booksCompleted, totalHours: $totalHours, avgDailyMinutes: $avgDailyMinutes, longestStreak: $longestStreak, topGenre: $topGenre, prevMonthHours: $prevMonthHours)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $MonthlyRecapDtoCopyWith<$Res> {
+  factory $MonthlyRecapDtoCopyWith(
+          MonthlyRecapDto value, $Res Function(MonthlyRecapDto) _then) =
+      _$MonthlyRecapDtoCopyWithImpl;
+  @useResult
+  $Res call(
+      {int year,
+      int month,
+      int booksCompleted,
+      double totalHours,
+      double avgDailyMinutes,
+      int longestStreak,
+      String? topGenre,
+      double? prevMonthHours});
+}
+
+/// @nodoc
+class _$MonthlyRecapDtoCopyWithImpl<$Res>
+    implements $MonthlyRecapDtoCopyWith<$Res> {
+  _$MonthlyRecapDtoCopyWithImpl(this._self, this._then);
+
+  final MonthlyRecapDto _self;
+  final $Res Function(MonthlyRecapDto) _then;
+
+  /// Create a copy of MonthlyRecapDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? year = null,
+    Object? month = null,
+    Object? booksCompleted = null,
+    Object? totalHours = null,
+    Object? avgDailyMinutes = null,
+    Object? longestStreak = null,
+    Object? topGenre = freezed,
+    Object? prevMonthHours = freezed,
+  }) {
+    return _then(_self.copyWith(
+      year: null == year
+          ? _self.year
+          : year // ignore: cast_nullable_to_non_nullable
+              as int,
+      month: null == month
+          ? _self.month
+          : month // ignore: cast_nullable_to_non_nullable
+              as int,
+      booksCompleted: null == booksCompleted
+          ? _self.booksCompleted
+          : booksCompleted // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalHours: null == totalHours
+          ? _self.totalHours
+          : totalHours // ignore: cast_nullable_to_non_nullable
+              as double,
+      avgDailyMinutes: null == avgDailyMinutes
+          ? _self.avgDailyMinutes
+          : avgDailyMinutes // ignore: cast_nullable_to_non_nullable
+              as double,
+      longestStreak: null == longestStreak
+          ? _self.longestStreak
+          : longestStreak // ignore: cast_nullable_to_non_nullable
+              as int,
+      topGenre: freezed == topGenre
+          ? _self.topGenre
+          : topGenre // ignore: cast_nullable_to_non_nullable
+              as String?,
+      prevMonthHours: freezed == prevMonthHours
+          ? _self.prevMonthHours
+          : prevMonthHours // ignore: cast_nullable_to_non_nullable
+              as double?,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [MonthlyRecapDto].
+extension MonthlyRecapDtoPatterns on MonthlyRecapDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_MonthlyRecapDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _MonthlyRecapDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_MonthlyRecapDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _MonthlyRecapDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_MonthlyRecapDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _MonthlyRecapDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            int year,
+            int month,
+            int booksCompleted,
+            double totalHours,
+            double avgDailyMinutes,
+            int longestStreak,
+            String? topGenre,
+            double? prevMonthHours)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _MonthlyRecapDto() when $default != null:
+        return $default(
+            _that.year,
+            _that.month,
+            _that.booksCompleted,
+            _that.totalHours,
+            _that.avgDailyMinutes,
+            _that.longestStreak,
+            _that.topGenre,
+            _that.prevMonthHours);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            int year,
+            int month,
+            int booksCompleted,
+            double totalHours,
+            double avgDailyMinutes,
+            int longestStreak,
+            String? topGenre,
+            double? prevMonthHours)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _MonthlyRecapDto():
+        return $default(
+            _that.year,
+            _that.month,
+            _that.booksCompleted,
+            _that.totalHours,
+            _that.avgDailyMinutes,
+            _that.longestStreak,
+            _that.topGenre,
+            _that.prevMonthHours);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            int year,
+            int month,
+            int booksCompleted,
+            double totalHours,
+            double avgDailyMinutes,
+            int longestStreak,
+            String? topGenre,
+            double? prevMonthHours)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _MonthlyRecapDto() when $default != null:
+        return $default(
+            _that.year,
+            _that.month,
+            _that.booksCompleted,
+            _that.totalHours,
+            _that.avgDailyMinutes,
+            _that.longestStreak,
+            _that.topGenre,
+            _that.prevMonthHours);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _MonthlyRecapDto extends MonthlyRecapDto {
+  const _MonthlyRecapDto(
+      {required this.year,
+      required this.month,
+      required this.booksCompleted,
+      required this.totalHours,
+      required this.avgDailyMinutes,
+      required this.longestStreak,
+      this.topGenre,
+      this.prevMonthHours})
+      : super._();
+  factory _MonthlyRecapDto.fromJson(Map<String, dynamic> json) =>
+      _$MonthlyRecapDtoFromJson(json);
+
+  @override
+  final int year;
+  @override
+  final int month;
+  @override
+  final int booksCompleted;
+  @override
+  final double totalHours;
+  @override
+  final double avgDailyMinutes;
+  @override
+  final int longestStreak;
+  @override
+  final String? topGenre;
+  @override
+  final double? prevMonthHours;
+
+  /// Create a copy of MonthlyRecapDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$MonthlyRecapDtoCopyWith<_MonthlyRecapDto> get copyWith =>
+      __$MonthlyRecapDtoCopyWithImpl<_MonthlyRecapDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$MonthlyRecapDtoToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _MonthlyRecapDto &&
+            (identical(other.year, year) || other.year == year) &&
+            (identical(other.month, month) || other.month == month) &&
+            (identical(other.booksCompleted, booksCompleted) ||
+                other.booksCompleted == booksCompleted) &&
+            (identical(other.totalHours, totalHours) ||
+                other.totalHours == totalHours) &&
+            (identical(other.avgDailyMinutes, avgDailyMinutes) ||
+                other.avgDailyMinutes == avgDailyMinutes) &&
+            (identical(other.longestStreak, longestStreak) ||
+                other.longestStreak == longestStreak) &&
+            (identical(other.topGenre, topGenre) ||
+                other.topGenre == topGenre) &&
+            (identical(other.prevMonthHours, prevMonthHours) ||
+                other.prevMonthHours == prevMonthHours));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, year, month, booksCompleted,
+      totalHours, avgDailyMinutes, longestStreak, topGenre, prevMonthHours);
+
+  @override
+  String toString() {
+    return 'MonthlyRecapDto(year: $year, month: $month, booksCompleted: $booksCompleted, totalHours: $totalHours, avgDailyMinutes: $avgDailyMinutes, longestStreak: $longestStreak, topGenre: $topGenre, prevMonthHours: $prevMonthHours)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$MonthlyRecapDtoCopyWith<$Res>
+    implements $MonthlyRecapDtoCopyWith<$Res> {
+  factory _$MonthlyRecapDtoCopyWith(
+          _MonthlyRecapDto value, $Res Function(_MonthlyRecapDto) _then) =
+      __$MonthlyRecapDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {int year,
+      int month,
+      int booksCompleted,
+      double totalHours,
+      double avgDailyMinutes,
+      int longestStreak,
+      String? topGenre,
+      double? prevMonthHours});
+}
+
+/// @nodoc
+class __$MonthlyRecapDtoCopyWithImpl<$Res>
+    implements _$MonthlyRecapDtoCopyWith<$Res> {
+  __$MonthlyRecapDtoCopyWithImpl(this._self, this._then);
+
+  final _MonthlyRecapDto _self;
+  final $Res Function(_MonthlyRecapDto) _then;
+
+  /// Create a copy of MonthlyRecapDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? year = null,
+    Object? month = null,
+    Object? booksCompleted = null,
+    Object? totalHours = null,
+    Object? avgDailyMinutes = null,
+    Object? longestStreak = null,
+    Object? topGenre = freezed,
+    Object? prevMonthHours = freezed,
+  }) {
+    return _then(_MonthlyRecapDto(
+      year: null == year
+          ? _self.year
+          : year // ignore: cast_nullable_to_non_nullable
+              as int,
+      month: null == month
+          ? _self.month
+          : month // ignore: cast_nullable_to_non_nullable
+              as int,
+      booksCompleted: null == booksCompleted
+          ? _self.booksCompleted
+          : booksCompleted // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalHours: null == totalHours
+          ? _self.totalHours
+          : totalHours // ignore: cast_nullable_to_non_nullable
+              as double,
+      avgDailyMinutes: null == avgDailyMinutes
+          ? _self.avgDailyMinutes
+          : avgDailyMinutes // ignore: cast_nullable_to_non_nullable
+              as double,
+      longestStreak: null == longestStreak
+          ? _self.longestStreak
+          : longestStreak // ignore: cast_nullable_to_non_nullable
+              as int,
+      topGenre: freezed == topGenre
+          ? _self.topGenre
+          : topGenre // ignore: cast_nullable_to_non_nullable
+              as String?,
+      prevMonthHours: freezed == prevMonthHours
+          ? _self.prevMonthHours
+          : prevMonthHours // ignore: cast_nullable_to_non_nullable
+              as double?,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$MilestoneItemDto {
+  String get type;
+  DateTime get achievedAt;
+  double get value;
+
+  /// Create a copy of MilestoneItemDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $MilestoneItemDtoCopyWith<MilestoneItemDto> get copyWith =>
+      _$MilestoneItemDtoCopyWithImpl<MilestoneItemDto>(
+          this as MilestoneItemDto, _$identity);
+
+  /// Serializes this MilestoneItemDto to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is MilestoneItemDto &&
+            (identical(other.type, type) || other.type == type) &&
+            (identical(other.achievedAt, achievedAt) ||
+                other.achievedAt == achievedAt) &&
+            (identical(other.value, value) || other.value == value));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, type, achievedAt, value);
+
+  @override
+  String toString() {
+    return 'MilestoneItemDto(type: $type, achievedAt: $achievedAt, value: $value)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $MilestoneItemDtoCopyWith<$Res> {
+  factory $MilestoneItemDtoCopyWith(
+          MilestoneItemDto value, $Res Function(MilestoneItemDto) _then) =
+      _$MilestoneItemDtoCopyWithImpl;
+  @useResult
+  $Res call({String type, DateTime achievedAt, double value});
+}
+
+/// @nodoc
+class _$MilestoneItemDtoCopyWithImpl<$Res>
+    implements $MilestoneItemDtoCopyWith<$Res> {
+  _$MilestoneItemDtoCopyWithImpl(this._self, this._then);
+
+  final MilestoneItemDto _self;
+  final $Res Function(MilestoneItemDto) _then;
+
+  /// Create a copy of MilestoneItemDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? type = null,
+    Object? achievedAt = null,
+    Object? value = null,
+  }) {
+    return _then(_self.copyWith(
+      type: null == type
+          ? _self.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as String,
+      achievedAt: null == achievedAt
+          ? _self.achievedAt
+          : achievedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      value: null == value
+          ? _self.value
+          : value // ignore: cast_nullable_to_non_nullable
+              as double,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [MilestoneItemDto].
+extension MilestoneItemDtoPatterns on MilestoneItemDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_MilestoneItemDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _MilestoneItemDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_MilestoneItemDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _MilestoneItemDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_MilestoneItemDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _MilestoneItemDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String type, DateTime achievedAt, double value)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _MilestoneItemDto() when $default != null:
+        return $default(_that.type, _that.achievedAt, _that.value);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String type, DateTime achievedAt, double value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _MilestoneItemDto():
+        return $default(_that.type, _that.achievedAt, _that.value);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String type, DateTime achievedAt, double value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _MilestoneItemDto() when $default != null:
+        return $default(_that.type, _that.achievedAt, _that.value);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _MilestoneItemDto extends MilestoneItemDto {
+  const _MilestoneItemDto(
+      {required this.type, required this.achievedAt, required this.value})
+      : super._();
+  factory _MilestoneItemDto.fromJson(Map<String, dynamic> json) =>
+      _$MilestoneItemDtoFromJson(json);
+
+  @override
+  final String type;
+  @override
+  final DateTime achievedAt;
+  @override
+  final double value;
+
+  /// Create a copy of MilestoneItemDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$MilestoneItemDtoCopyWith<_MilestoneItemDto> get copyWith =>
+      __$MilestoneItemDtoCopyWithImpl<_MilestoneItemDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$MilestoneItemDtoToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _MilestoneItemDto &&
+            (identical(other.type, type) || other.type == type) &&
+            (identical(other.achievedAt, achievedAt) ||
+                other.achievedAt == achievedAt) &&
+            (identical(other.value, value) || other.value == value));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, type, achievedAt, value);
+
+  @override
+  String toString() {
+    return 'MilestoneItemDto(type: $type, achievedAt: $achievedAt, value: $value)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$MilestoneItemDtoCopyWith<$Res>
+    implements $MilestoneItemDtoCopyWith<$Res> {
+  factory _$MilestoneItemDtoCopyWith(
+          _MilestoneItemDto value, $Res Function(_MilestoneItemDto) _then) =
+      __$MilestoneItemDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call({String type, DateTime achievedAt, double value});
+}
+
+/// @nodoc
+class __$MilestoneItemDtoCopyWithImpl<$Res>
+    implements _$MilestoneItemDtoCopyWith<$Res> {
+  __$MilestoneItemDtoCopyWithImpl(this._self, this._then);
+
+  final _MilestoneItemDto _self;
+  final $Res Function(_MilestoneItemDto) _then;
+
+  /// Create a copy of MilestoneItemDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? type = null,
+    Object? achievedAt = null,
+    Object? value = null,
+  }) {
+    return _then(_MilestoneItemDto(
+      type: null == type
+          ? _self.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as String,
+      achievedAt: null == achievedAt
+          ? _self.achievedAt
+          : achievedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      value: null == value
+          ? _self.value
+          : value // ignore: cast_nullable_to_non_nullable
+              as double,
+    ));
   }
 }
 

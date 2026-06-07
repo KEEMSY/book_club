@@ -22,7 +22,9 @@ import '../domain/reading_year_stats.dart';
 import 'widgets/elapsed_formatter.dart';
 import 'widgets/grade_badge.dart';
 import 'widgets/grade_progress.dart';
+import 'widgets/milestone_toast.dart';
 import 'widgets/streak_card.dart';
+import 'widgets/streak_shield_badge.dart';
 
 String _gradeName(ReaderGrade g) {
   switch (g) {
@@ -72,6 +74,8 @@ class _GradeScreenState extends ConsumerState<GradeScreen> {
       ref
           .read(libraryNotifierProvider.notifier)
           .ensureLoaded(BookStatus.completed);
+      // M28 — show toast for any unacknowledged milestones.
+      if (mounted) checkAndShowMilestoneToasts(context, ref);
     });
   }
 
@@ -163,10 +167,22 @@ class _GradeBody extends StatelessWidget {
         _YearSummaryCard(accent: accent),
         SizedBox(height: spacing.md),
         StreakCard(streak: summary.streakDays, longest: summary.longestStreak),
+        if (summary.streakShields > 0) ...<Widget>[
+          SizedBox(height: spacing.sm),
+          Align(
+            alignment: Alignment.centerRight,
+            child: StreakShieldBadge(
+              streakShields: summary.streakShields,
+              accent: accent,
+            ),
+          ),
+        ],
         SizedBox(height: spacing.md),
         _TotalsCard(summary: summary),
         SizedBox(height: spacing.md),
         _RecentCompletedSection(accent: accent),
+        SizedBox(height: spacing.md),
+        _MonthlyRecapEntryButton(accent: accent),
         SizedBox(height: spacing.md),
         _StatsEntryButton(accent: accent),
         SizedBox(height: spacing.md),
@@ -231,6 +247,52 @@ class _TotalCell extends StatelessWidget {
           const SizedBox(height: 4),
           Text(value, style: theme.textTheme.headlineMedium),
         ],
+      ),
+    );
+  }
+}
+
+/// Banner button that navigates to the monthly recap card screen.
+class _MonthlyRecapEntryButton extends StatelessWidget {
+  const _MonthlyRecapEntryButton({required this.accent});
+
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final AppSpacing spacing = theme.extension<AppSpacing>()!;
+    final AppShadows shadows = theme.extension<AppShadows>()!;
+    return InkWell(
+      onTap: () => context.push(AppRoutes.monthlyRecap),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: spacing.lg,
+          vertical: spacing.md,
+        ),
+        decoration: BoxDecoration(
+          color: accent.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: accent.withValues(alpha: 0.3)),
+          boxShadow: shadows.elevated,
+        ),
+        child: Row(
+          children: <Widget>[
+            Icon(Icons.calendar_month_rounded, color: accent, size: 22),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                '이번 달 회고',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: accent,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            Icon(Icons.arrow_forward_rounded, color: accent, size: 16),
+          ],
+        ),
       ),
     );
   }

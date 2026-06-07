@@ -85,17 +85,9 @@ class AuthNotifier extends _$AuthNotifier {
     try {
       final AuthUser user = await doLogin();
       _setState(AuthState.authenticated(user));
-      // Register FCM token immediately after login, then keep it fresh on
-      // each token-refresh event emitted by the Firebase SDK.
-      // TODO(setup): Activate after Firebase.initializeApp() is called in
-      // main.dart and platform config files are in place
-      // (GoogleService-Info.plist / google-services.json).
-      unawaited(_registerFcmToken());
-      await _fcmTokenRefreshSub?.cancel();
-      _fcmTokenRefreshSub =
-          FcmService.instance.tokenRefreshStream.listen(_onFcmTokenRefresh);
     } on SocialLoginCancelled {
       _setState(const AuthState.unauthenticated());
+      return;
     } on SocialLoginFailed catch (e) {
       _setState(
         AuthState.failure(
@@ -103,8 +95,10 @@ class AuthNotifier extends _$AuthNotifier {
           message: _readableSocialMessage(e),
         ),
       );
+      return;
     } on AuthRepositoryException catch (e) {
       _setState(AuthState.failure(code: e.code, message: e.message));
+      return;
     } catch (e, st) {
       if (kDebugMode) {
         // ignore: avoid_print
@@ -116,6 +110,23 @@ class AuthNotifier extends _$AuthNotifier {
           message: '로그인 중 예상치 못한 오류가 발생했습니다.',
         ),
       );
+      return;
+    }
+    // FCM setup is best-effort. Firebase may not be initialised yet
+    // (GoogleService-Info.plist / google-services.json absent in dev).
+    // Failures here must NOT override the authenticated state already set above.
+    // TODO(setup): Call Firebase.initializeApp() in main.dart once platform
+    // config files are in place.
+    unawaited(_registerFcmToken());
+    try {
+      await _fcmTokenRefreshSub?.cancel();
+      _fcmTokenRefreshSub =
+          FcmService.instance.tokenRefreshStream.listen(_onFcmTokenRefresh);
+    } catch (e) {
+      if (kDebugMode) {
+        // ignore: avoid_print
+        print('AuthNotifier FCM subscription error (non-fatal): $e');
+      }
     }
   }
 

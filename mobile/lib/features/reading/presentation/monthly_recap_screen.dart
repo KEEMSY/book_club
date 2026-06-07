@@ -7,31 +7,31 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../core/theme/app_theme.dart';
-import '../../book/presentation/widgets/book_cover.dart';
-import '../application/recap_notifier.dart';
 import '../application/reading_providers.dart';
-import '../domain/reading_recap.dart';
+import '../application/recap_notifier.dart';
+import '../domain/monthly_recap.dart';
 
-/// Full-screen reading recap card for a given half-year period.
+/// Full-screen monthly recap card. Receives optional [year] and [month] via
+/// go_router `extra`; if both are null the backend returns the current month.
 ///
-/// Receives [recapKey] via go_router `extra`. Fetches data via
-/// [readingRecapProvider] and displays a gradient card with key stats and
-/// top books. A share button captures the card as an image and invokes
-/// [SharePlus.instance.share].
-class ReadingRecapScreen extends ConsumerStatefulWidget {
-  const ReadingRecapScreen({super.key, required this.recapKey});
+/// The UI mirrors the half-year [ReadingRecapScreen] style: gradient card,
+/// key stats, previous-month comparison arrow, and a share button.
+class MonthlyRecapScreen extends ConsumerStatefulWidget {
+  const MonthlyRecapScreen({super.key, this.year, this.month});
 
-  final RecapKey recapKey;
+  final int? year;
+  final int? month;
 
   @override
-  ConsumerState<ReadingRecapScreen> createState() => _ReadingRecapScreenState();
+  ConsumerState<MonthlyRecapScreen> createState() =>
+      _MonthlyRecapScreenState();
 }
 
-class _ReadingRecapScreenState extends ConsumerState<ReadingRecapScreen> {
+class _MonthlyRecapScreenState extends ConsumerState<MonthlyRecapScreen> {
   final GlobalKey _cardKey = GlobalKey();
   bool _sharing = false;
 
-  Future<void> _share(ReadingRecap recap) async {
+  Future<void> _share(MonthlyRecap recap) async {
     if (_sharing) return;
     setState(() => _sharing = true);
     try {
@@ -43,17 +43,24 @@ class _ReadingRecapScreenState extends ConsumerState<ReadingRecapScreen> {
       if (byteData == null) return;
       final Uint8List pngBytes = byteData.buffer.asUint8List();
 
-      final String halfLabel = recap.half == 1 ? '상반기' : '하반기';
-      final int hours = recap.totalSeconds ~/ 3600;
+      final int hours = recap.totalHours.floor();
+      final int minutes = ((recap.totalHours - hours) * 60).round();
+      final String timeLabel =
+          hours > 0 ? '$hours시간 $minutes분' : '$minutes분';
+
       final String text =
-          '${recap.year}년 $halfLabel 독서 회고\n'
-          '총 ${recap.totalBooks}권 · $hours시간 읽었어요 📚\n'
+          '${recap.fullLabel} 독서 회고\n'
+          '총 ${recap.booksCompleted}권 · $timeLabel 읽었어요 📚\n'
           '#북클럽 #독서기록';
 
       await SharePlus.instance.share(
         ShareParams(
           files: <XFile>[
-            XFile.fromData(pngBytes, mimeType: 'image/png', name: 'recap.png'),
+            XFile.fromData(
+              pngBytes,
+              mimeType: 'image/png',
+              name: 'monthly_recap.png',
+            ),
           ],
           text: text,
         ),
@@ -65,18 +72,20 @@ class _ReadingRecapScreenState extends ConsumerState<ReadingRecapScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final spacing = theme.extension<AppSpacing>()!;
+    final ThemeData theme = Theme.of(context);
     final Color accent = ref.watch(gradePrimaryProvider);
-    final AsyncValue<ReadingRecap> async =
-        ref.watch(readingRecapProvider(widget.recapKey));
+
+    final AsyncValue<MonthlyRecap> async = ref.watch(
+      monthlyRecapProvider(year: widget.year, month: widget.month),
+    );
+
+    final String title = widget.year != null && widget.month != null
+        ? '${widget.year}년 ${widget.month}월 회고'
+        : '이번 달 회고';
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          '${widget.recapKey.year}년 '
-          '${widget.recapKey.half == 1 ? '상반기' : '하반기'} 회고',
-        ),
+        title: Text(title, style: theme.textTheme.titleLarge),
         actions: <Widget>[
           if (async case AsyncData(:final value))
             _sharing
@@ -99,13 +108,17 @@ class _ReadingRecapScreenState extends ConsumerState<ReadingRecapScreen> {
         AsyncLoading() => const Center(child: CircularProgressIndicator()),
         AsyncError(:final error) => _ErrorView(
             error: error,
-            onRetry: () => ref.invalidate(readingRecapProvider(widget.recapKey)),
+            onRetry: () => ref.invalidate(
+              monthlyRecapProvider(year: widget.year, month: widget.month),
+            ),
           ),
         AsyncData(:final value) => SingleChildScrollView(
-            padding: EdgeInsets.all(spacing.lg),
+            padding: EdgeInsets.all(
+              Theme.of(context).extension<AppSpacing>()!.lg,
+            ),
             child: RepaintBoundary(
               key: _cardKey,
-              child: _RecapCard(recap: value, accent: accent),
+              child: _MonthlyRecapCard(recap: value, accent: accent),
             ),
           ),
         _ => const SizedBox.shrink(),
@@ -118,18 +131,19 @@ class _ReadingRecapScreenState extends ConsumerState<ReadingRecapScreen> {
 // Card widget — also the target for screenshot capture
 // ---------------------------------------------------------------------------
 
-class _RecapCard extends StatelessWidget {
-  const _RecapCard({required this.recap, required this.accent});
+class _MonthlyRecapCard extends StatelessWidget {
+  const _MonthlyRecapCard({required this.recap, required this.accent});
 
-  final ReadingRecap recap;
+  final MonthlyRecap recap;
   final Color accent;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final spacing = theme.extension<AppSpacing>()!;
-    final int hours = recap.totalSeconds ~/ 3600;
-    final int minutes = (recap.totalSeconds % 3600) ~/ 60;
+    final ThemeData theme = Theme.of(context);
+    final AppSpacing spacing = theme.extension<AppSpacing>()!;
+
+    final int hours = recap.totalHours.floor();
+    final int minutes = ((recap.totalHours - hours) * 60).round();
     final String timeLabel = hours > 0 ? '$hours시간 $minutes분' : '$minutes분';
 
     return Container(
@@ -157,7 +171,7 @@ class _RecapCard extends StatelessWidget {
         children: <Widget>[
           // Header
           Text(
-            '${recap.year}년 ${recap.halfLabel}',
+            recap.fullLabel,
             style: theme.textTheme.labelLarge?.copyWith(
               color: Colors.white.withValues(alpha: 0.80),
               letterSpacing: 1.2,
@@ -165,7 +179,7 @@ class _RecapCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            '독서 회고',
+            '월간 독서 회고',
             style: theme.textTheme.headlineMedium?.copyWith(
               color: Colors.white,
               fontWeight: FontWeight.w800,
@@ -176,29 +190,30 @@ class _RecapCard extends StatelessWidget {
           // Stats row
           Row(
             children: <Widget>[
-              _StatItem(label: '완독한 책', value: '${recap.totalBooks}권'),
+              _StatItem(label: '완독', value: '${recap.booksCompleted}권'),
               SizedBox(width: spacing.lg),
               _StatItem(label: '읽은 시간', value: timeLabel),
               SizedBox(width: spacing.lg),
-              _StatItem(
-                label: '최장 연속',
-                value: '${recap.longestStreakDays}일',
-              ),
+              _StatItem(label: '최장 스트릭', value: '${recap.longestStreak}일'),
             ],
           ),
+          SizedBox(height: spacing.md),
 
-          if (recap.topBooks.isNotEmpty) ...<Widget>[
-            SizedBox(height: spacing.xl),
-            Text(
-              '많이 읽은 책',
-              style: theme.textTheme.titleSmall?.copyWith(
-                color: Colors.white.withValues(alpha: 0.80),
-              ),
-            ),
+          // Average daily reading
+          _StatItem(
+            label: '하루 평균',
+            value: '${recap.avgDailyMinutes.round()}분',
+          ),
+
+          if (recap.topGenre != null) ...<Widget>[
             SizedBox(height: spacing.md),
-            ...recap.topBooks.take(3).map(
-                  (book) => _TopBookRow(book: book, spacing: spacing),
-                ),
+            _StatItem(label: '대표 장르', value: recap.topGenre!),
+          ],
+
+          // Previous-month comparison
+          if (recap.hoursDelta != null) ...<Widget>[
+            SizedBox(height: spacing.md),
+            _PrevMonthComparison(delta: recap.hoursDelta!),
           ],
 
           SizedBox(height: spacing.lg),
@@ -219,6 +234,10 @@ class _RecapCard extends StatelessWidget {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Shared sub-widgets
+// ---------------------------------------------------------------------------
+
 class _StatItem extends StatelessWidget {
   const _StatItem({required this.label, required this.value});
 
@@ -227,7 +246,7 @@ class _StatItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final ThemeData theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -250,64 +269,33 @@ class _StatItem extends StatelessWidget {
   }
 }
 
-class _TopBookRow extends StatelessWidget {
-  const _TopBookRow({required this.book, required this.spacing});
+/// Up/down arrow indicator comparing this month's hours to the previous month.
+class _PrevMonthComparison extends StatelessWidget {
+  const _PrevMonthComparison({required this.delta});
 
-  final RecapBook book;
-  final AppSpacing spacing;
+  final double delta;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final int minutes = book.readSeconds ~/ 60;
-    final String duration = minutes >= 60
-        ? '${minutes ~/ 60}시간 ${minutes % 60}분'
-        : '$minutes분';
+    final ThemeData theme = Theme.of(context);
+    final bool isUp = delta >= 0;
+    final IconData icon =
+        isUp ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded;
+    final String deltaText =
+        '${isUp ? '+' : ''}${delta.abs().toStringAsFixed(1)}시간';
+    final String label = isUp ? '지난 달보다 더 읽었어요' : '지난 달보다 덜 읽었어요';
 
-    return Padding(
-      padding: EdgeInsets.only(bottom: spacing.sm),
-      child: Row(
-        children: <Widget>[
-          BookCover(
-            coverUrl: book.coverUrl,
-            width: 36,
-            height: 50,
-            borderRadius: BorderRadius.circular(4),
+    return Row(
+      children: <Widget>[
+        Icon(icon, color: Colors.white.withValues(alpha: 0.85), size: 16),
+        const SizedBox(width: 4),
+        Text(
+          '$deltaText — $label',
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: Colors.white.withValues(alpha: 0.85),
           ),
-          SizedBox(width: spacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  book.title,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(
-                  book.author,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: Colors.white.withValues(alpha: 0.75),
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-          SizedBox(width: spacing.sm),
-          Text(
-            duration,
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: Colors.white.withValues(alpha: 0.80),
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -324,7 +312,7 @@ class _ErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final ThemeData theme = Theme.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),

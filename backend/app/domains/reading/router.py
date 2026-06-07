@@ -35,7 +35,11 @@ from app.domains.reading.schemas import (
     HeatmapDayPublic,
     HeatmapResponse,
     ManualSessionRequest,
+    MilestoneItem,
+    MilestonesResponse,
+    MilestoneType,
     MonthlyHoursPublic,
+    MonthlyRecapResponse,
     ReadingRecapResponse,
     ReadingSessionPublic,
     ReadingSpeedStatsPublic,
@@ -383,3 +387,54 @@ async def get_reading_recap(
         logger.warning("Redis write failed for %s", cache_key)
 
     return response
+
+
+@me_router.get("/me/recap/monthly", response_model=MonthlyRecapResponse)
+async def get_monthly_recap(
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ReadingService, Depends(get_reading_service)],
+    year: Annotated[int, Query(ge=2000, le=2100)] = 0,
+    month: Annotated[int, Query(ge=1, le=12)] = 0,
+) -> MonthlyRecapResponse:
+    """Monthly recap stats for the authenticated user.
+
+    ``year`` and ``month`` default to the current calendar month when omitted.
+    """
+    now = datetime.now(tz=UTC)
+    effective_year = year if year > 0 else now.year
+    effective_month = month if month > 0 else now.month
+
+    recap = await service.get_monthly_recap(
+        user_id=UUID(user_id),
+        year=effective_year,
+        month=effective_month,
+    )
+    return MonthlyRecapResponse(
+        year=recap.year,
+        month=recap.month,
+        books_completed=recap.books_completed,
+        total_hours=recap.total_hours,
+        avg_daily_minutes=recap.avg_daily_minutes,
+        longest_streak=recap.longest_streak,
+        top_genre=recap.top_genre,
+        prev_month_hours=recap.prev_month_hours,
+    )
+
+
+@me_router.get("/me/recap/milestones", response_model=MilestonesResponse)
+async def get_milestones(
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ReadingService, Depends(get_reading_service)],
+) -> MilestonesResponse:
+    """All achieved reading milestones for the authenticated user."""
+    milestone_data = await service.get_milestones(user_id=UUID(user_id))
+    return MilestonesResponse(
+        milestones=[
+            MilestoneItem(
+                type=MilestoneType(m.milestone_type),
+                achieved_at=m.achieved_at,
+                value=m.value,
+            )
+            for m in milestone_data
+        ]
+    )

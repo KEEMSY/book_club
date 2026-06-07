@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../domain/monthly_recap.dart';
 import '../domain/reading_recap.dart';
 import 'reading_providers.dart';
 
@@ -29,4 +30,33 @@ RecapKey? currentRecapKey() {
   if (now.month == 6) return (year: now.year, half: 1);
   if (now.month == 12) return (year: now.year, half: 2);
   return null;
+}
+
+// ---------------------------------------------------------------------------
+// M28 providers
+// ---------------------------------------------------------------------------
+
+/// Fetches the monthly recap for the given [year] and [month].
+///
+/// Both parameters are optional — omitting them requests the current month
+/// from the backend. autoDispose keeps the card data out of memory after
+/// the user navigates away.
+@riverpod
+Future<MonthlyRecap> monthlyRecap(
+  MonthlyRecapRef ref, {
+  int? year,
+  int? month,
+}) async {
+  final repo = ref.read(readingRepositoryProvider);
+  return repo.getMonthlyRecap(year: year, month: month);
+}
+
+/// Fetches all milestones achieved by the current user.
+///
+/// autoDispose — milestones are only displayed on the grade screen and the
+/// monthly recap, so caching them indefinitely is wasteful.
+@riverpod
+Future<List<MilestoneItem>> milestones(MilestonesRef ref) async {
+  final repo = ref.read(readingRepositoryProvider);
+  return repo.getMilestones();
 }

@@ -77,7 +77,9 @@ from app.domains.reading.ports import (
     GradeSummary,
     GradeThreshold,
     HeatmapDay,
+    MilestoneData,
     MonthlyHours,
+    MonthlyRecap,
     ReadingBookQueryPort,
     ReadingRecap,
     ReadingSessionRepositoryPort,
@@ -507,6 +509,40 @@ class ReadingService:
 
         return ReadingRecap(period=period, cards=cards)
 
+    async def get_monthly_recap(
+        self,
+        *,
+        user_id: UUID,
+        year: int,
+        month: int,
+    ) -> MonthlyRecap:
+        """Return aggregated stats for a single calendar month.
+
+        Queries are run sequentially on the shared AsyncSession (same
+        constraint as ``get_year_stats``).
+        """
+        stats = await self.stats_repo.get_monthly_stats(user_id, year, month)
+        total_seconds = int(str(stats["total_seconds"]))
+        days_read = int(str(stats["days_read"]))
+        # avg_daily_minutes counts only days with actual reading data
+        # to avoid a near-zero value for users who read every few days.
+        avg_daily_minutes = (total_seconds / 60.0 / days_read) if days_read > 0 else 0.0
+        prev_seconds = int(str(stats["prev_month_seconds"]))
+        return MonthlyRecap(
+            year=year,
+            month=month,
+            books_completed=int(str(stats["books_completed"])),
+            total_hours=round(total_seconds / 3600.0, 2),
+            avg_daily_minutes=round(avg_daily_minutes, 1),
+            longest_streak=int(str(stats["longest_streak"])),
+            top_genre=stats["top_genre"] if stats["top_genre"] else None,  # type: ignore[arg-type]
+            prev_month_hours=round(prev_seconds / 3600.0, 2) if prev_seconds > 0 else None,
+        )
+
+    async def get_milestones(self, *, user_id: UUID) -> list[MilestoneData]:
+        """Return all achieved milestones derived from existing reading data."""
+        return await self.stats_repo.get_achieved_milestones(user_id)
+
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
@@ -531,11 +567,12 @@ class ReadingService:
         total_books = await self.book_query.count_completed_books(user_id=user_id)
         # 3) grade + tier under AND semantics
         grade, tier = calculate_grade_tier(total_books=total_books, total_seconds=total_seconds)
-        # 4) streak
-        streak_days, longest_streak, last_date = update_streak(
+        # 4) streak — apply shield protection before committing a reset
+        streak_days, longest_streak, last_date, new_shields = _apply_streak_with_shield(
             previous_last_date=current.streak_last_date,
             previous_streak_days=current.streak_days,
             longest_streak=current.longest_streak,
+            streak_shields=current.streak_shields,
             session_date=session_date,
         )
         # 5) persist
@@ -548,6 +585,7 @@ class ReadingService:
             streak_days=streak_days,
             longest_streak=longest_streak,
             streak_last_date=last_date,
+            streak_shields=new_shields,
         )
         return GradeSummary(
             grade=grade,
@@ -556,6 +594,7 @@ class ReadingService:
             total_seconds=total_seconds,
             streak_days=streak_days,
             longest_streak=longest_streak,
+            streak_shields=new_shields,
             next_grade_thresholds=_next_threshold(grade),
         )
 
@@ -568,6 +607,7 @@ class ReadingService:
             total_seconds=row.total_seconds,
             streak_days=row.streak_days,
             longest_streak=row.longest_streak,
+            streak_shields=row.streak_shields,
             next_grade_thresholds=_next_threshold(row.grade),
         )
 
@@ -592,6 +632,65 @@ def _reconcile_duration(
     elapsed = (ended_at - started_at).total_seconds()
     adjusted = elapsed - (paused_ms / 1000.0)
     return max(0, int(min(elapsed, adjusted)))
+
+
+_MAX_STREAK_SHIELDS = 3
+_SHIELD_AWARD_INTERVAL = 7  # award one shield every N consecutive days
+
+
+def _apply_streak_with_shield(
+    *,
+    previous_last_date: date | None,
+    previous_streak_days: int,
+    longest_streak: int,
+    streak_shields: int,
+    session_date: date,
+) -> tuple[int, int, date, int]:
+    """Compute the new streak state, consuming a shield when a gap would reset.
+
+    Returns ``(new_streak_days, new_longest_streak, new_last_date, new_shields)``.
+
+    Shield rules:
+    - When a session would cause a streak reset (gap > 1 day) AND the user
+      holds at least one shield: decrement shields by 1 and keep the existing
+      streak counter + last_date rather than resetting.
+    - After each successful streak update, if the new streak_days is a
+      nonzero multiple of ``_SHIELD_AWARD_INTERVAL``, award one shield up
+      to ``_MAX_STREAK_SHIELDS``.
+    """
+    new_shields = streak_shields
+
+    # Detect a gap that would normally reset the streak.
+    gap_reset = previous_last_date is not None and session_date > previous_last_date + timedelta(
+        days=1
+    )
+
+    shield_consumed = False
+    if gap_reset and new_shields > 0:
+        # Absorb the gap with a shield: keep the existing streak counter and
+        # advance last_date to today.  The streak is not incremented because
+        # the user did not actually read on the intervening day(s); we only
+        # prevent the reset.
+        new_shields -= 1
+        shield_consumed = True
+        streak_days = previous_streak_days
+        new_longest = longest_streak
+        last_date = session_date
+    else:
+        streak_days, new_longest, last_date = update_streak(
+            previous_last_date=previous_last_date,
+            previous_streak_days=previous_streak_days,
+            longest_streak=longest_streak,
+            session_date=session_date,
+        )
+
+    # Award a shield when the streak genuinely reaches a multiple of the award
+    # interval.  Suppress when a shield was just consumed to prevent immediate
+    # shield recovery by sitting at an existing award threshold.
+    if not shield_consumed and streak_days > 0 and streak_days % _SHIELD_AWARD_INTERVAL == 0:
+        new_shields = min(_MAX_STREAK_SHIELDS, new_shields + 1)
+
+    return streak_days, new_longest, last_date, new_shields
 
 
 def _next_threshold(current_grade: int) -> GradeThreshold | None:

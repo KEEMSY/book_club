@@ -3,6 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import '../domain/goal_period.dart';
 import '../domain/grade_summary.dart';
 import '../domain/heatmap_day.dart';
+import '../domain/monthly_recap.dart';
 import '../domain/reading_goal.dart';
 import '../domain/reading_recap.dart';
 import '../domain/reading_session.dart';
@@ -78,6 +79,7 @@ abstract class GradeSummaryDto with _$GradeSummaryDto {
     required int longestStreak,
     NextGradeThresholdsDto? nextGradeThresholds,
     @Default(1) int tier,
+    @Default(0) int streakShields,
   }) = _GradeSummaryDto;
 
   factory GradeSummaryDto.fromJson(Map<String, dynamic> json) =>
@@ -92,6 +94,7 @@ abstract class GradeSummaryDto with _$GradeSummaryDto {
       longestStreak: longestStreak,
       nextGradeThresholds: nextGradeThresholds?.toDomain(),
       tier: tier,
+      streakShields: streakShields,
     );
   }
 }
@@ -476,6 +479,66 @@ abstract class ReadingStatsDto with _$ReadingStatsDto {
           .map((g) => GenreCount(genre: g.genre, count: g.count))
           .toList(growable: false),
       avgCompletionDays: avgCompletionDays,
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// M28 Monthly Recap DTOs
+// ---------------------------------------------------------------------------
+
+/// Mirror of `GET /me/recap/monthly` response.
+@freezed
+abstract class MonthlyRecapDto with _$MonthlyRecapDto {
+  const MonthlyRecapDto._();
+
+  const factory MonthlyRecapDto({
+    required int year,
+    required int month,
+    required int booksCompleted,
+    required double totalHours,
+    required double avgDailyMinutes,
+    required int longestStreak,
+    String? topGenre,
+    double? prevMonthHours,
+  }) = _MonthlyRecapDto;
+
+  factory MonthlyRecapDto.fromJson(Map<String, dynamic> json) =>
+      _$MonthlyRecapDtoFromJson(json);
+
+  MonthlyRecap toDomain() {
+    return MonthlyRecap(
+      year: year,
+      month: month,
+      booksCompleted: booksCompleted,
+      totalHours: totalHours,
+      avgDailyMinutes: avgDailyMinutes,
+      longestStreak: longestStreak,
+      topGenre: topGenre,
+      prevMonthHours: prevMonthHours,
+    );
+  }
+}
+
+/// Mirror of a single entry in `GET /me/recap/milestones` response.
+@freezed
+abstract class MilestoneItemDto with _$MilestoneItemDto {
+  const MilestoneItemDto._();
+
+  const factory MilestoneItemDto({
+    required String type,
+    required DateTime achievedAt,
+    required double value,
+  }) = _MilestoneItemDto;
+
+  factory MilestoneItemDto.fromJson(Map<String, dynamic> json) =>
+      _$MilestoneItemDtoFromJson(json);
+
+  MilestoneItem toDomain() {
+    return MilestoneItem(
+      type: MilestoneType.fromWire(type),
+      achievedAt: achievedAt,
+      value: value,
     );
   }
 }

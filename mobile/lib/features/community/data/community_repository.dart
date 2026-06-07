@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 
 import '../../feed/domain/post.dart';
 import '../../social/domain/user_summary.dart';
+import '../domain/leaderboard_entry.dart';
 import 'community_api.dart';
 
 /// Typed domain failure surfaced by [CommunityRepository].
@@ -75,6 +76,9 @@ class CommunityRepository {
           nextCursor: dto.nextCursor,
         );
       });
+
+  Future<List<LeaderboardEntry>> getWeeklyLeaderboard() =>
+      _call(() => _api.getWeeklyLeaderboard());
 
   Future<T> _call<T>(Future<T> Function() fn) async {
     try {

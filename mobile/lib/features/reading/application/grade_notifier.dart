@@ -44,6 +44,9 @@ class GradeNotifier extends _$GradeNotifier {
           ? completion.streakDays
           : previous?.longestStreak ?? completion.streakDays,
       nextGradeThresholds: previous?.nextGradeThresholds,
+      // Preserve shields from the pre-session snapshot; the background
+      // _refresh() will reconcile the authoritative count from the server.
+      streakShields: previous?.streakShields ?? 0,
     );
     state = GradeState.loaded(summary: next, recentGradeUp: completion.gradeUp);
     // Kick a background refresh to reconcile totals with server truth.

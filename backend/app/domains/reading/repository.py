@@ -21,8 +21,9 @@ Key design choices:
 
 from __future__ import annotations
 
+import calendar
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from uuid import UUID
 
 from sqlalchemy import and_, select, text
@@ -40,6 +41,7 @@ from app.domains.reading.models import (
     ReadingSessionSource,
     UserGrade,
 )
+from app.domains.reading.ports import MilestoneData
 
 
 @dataclass(frozen=True, slots=True)
@@ -242,6 +244,7 @@ class UserGradeRepository:
         streak_days: int | None = None,
         longest_streak: int | None = None,
         streak_last_date: date | None = None,
+        streak_shields: int | None = None,
     ) -> UserGrade:
         row = await self.get_or_init(user_id)
         if total_books is not None:
@@ -258,6 +261,16 @@ class UserGradeRepository:
             row.longest_streak = longest_streak
         if streak_last_date is not None:
             row.streak_last_date = streak_last_date
+        if streak_shields is not None:
+            row.streak_shields = streak_shields
+        await self._session.flush()
+        await self._session.refresh(row)
+        return row
+
+    async def update_streak_shields(self, user_id: UUID, *, shields: int) -> UserGrade:
+        """Set ``streak_shields`` to exactly ``shields`` (caller enforces max)."""
+        row = await self.get_or_init(user_id)
+        row.streak_shields = shields
         await self._session.flush()
         await self._session.refresh(row)
         return row
@@ -701,3 +714,220 @@ class ReadingStatsRepository:
             stat_int=int(row.highlight_count),
             stat_date=None,
         )
+
+    async def get_monthly_stats(
+        self,
+        user_id: UUID,
+        year: int,
+        month: int,
+    ) -> dict[str, object]:
+        """Aggregate stats for a single calendar month.
+
+        Returns a dict with keys:
+        - ``books_completed``    — completed user_books whose finished_at falls in the month
+        - ``total_seconds``      — sum of daily_reading_stats.total_seconds for the month
+        - ``days_read``          — count of distinct days with any reading data
+        - ``longest_streak``     — longest_streak from user_grades snapshot
+        - ``top_genre``          — top publisher (genre proxy) among the month's completed books
+        - ``prev_month_seconds`` — total_seconds for the previous calendar month
+        """
+        month_start = date(year, month, 1)
+        month_end = date(year, month, calendar.monthrange(year, month)[1])
+
+        books_completed = int(
+            (
+                await self._session.execute(
+                    text(
+                        """
+                        SELECT COUNT(*) FROM user_books
+                        WHERE user_id = :user_id
+                          AND status = 'completed'
+                          AND finished_at IS NOT NULL
+                          AND finished_at::date >= :start
+                          AND finished_at::date <= :end
+                        """
+                    ),
+                    {"user_id": user_id, "start": month_start, "end": month_end},
+                )
+            ).scalar_one()
+            or 0
+        )
+
+        daily_row = (
+            await self._session.execute(
+                text(
+                    """
+                    SELECT COALESCE(SUM(total_seconds), 0) AS total_sec,
+                           COUNT(*) AS days_read
+                    FROM daily_reading_stats
+                    WHERE user_id = :user_id
+                      AND date >= :start
+                      AND date <= :end
+                    """
+                ),
+                {"user_id": user_id, "start": month_start, "end": month_end},
+            )
+        ).one()
+        total_seconds = int(daily_row.total_sec or 0)
+        days_read = int(daily_row.days_read or 0)
+
+        # Longest streak from the snapshot (global; month-scoped streak
+        # reconstruction is out of scope — the snapshot value shows the
+        # user's all-time best next to their monthly activity).
+        grade_row = await self._session.get(UserGrade, user_id)
+        longest_streak = int(grade_row.longest_streak) if grade_row else 0
+
+        genre_result = (
+            await self._session.execute(
+                text(
+                    """
+                    SELECT COALESCE(b.publisher, '기타') AS genre, COUNT(*) AS cnt
+                    FROM user_books ub
+                    JOIN books b ON b.id = ub.book_id
+                    WHERE ub.user_id = :user_id
+                      AND ub.status = 'completed'
+                      AND ub.finished_at IS NOT NULL
+                      AND ub.finished_at::date >= :start
+                      AND ub.finished_at::date <= :end
+                    GROUP BY genre
+                    ORDER BY cnt DESC
+                    LIMIT 1
+                    """
+                ),
+                {"user_id": user_id, "start": month_start, "end": month_end},
+            )
+        ).one_or_none()
+        top_genre: str | None = str(genre_result.genre) if genre_result else None
+
+        if month == 1:
+            prev_year, prev_month = year - 1, 12
+        else:
+            prev_year, prev_month = year, month - 1
+        prev_start = date(prev_year, prev_month, 1)
+        prev_end = date(prev_year, prev_month, calendar.monthrange(prev_year, prev_month)[1])
+        prev_seconds = int(
+            (
+                await self._session.execute(
+                    text(
+                        """
+                        SELECT COALESCE(SUM(total_seconds), 0)
+                        FROM daily_reading_stats
+                        WHERE user_id = :user_id
+                          AND date >= :start
+                          AND date <= :end
+                        """
+                    ),
+                    {"user_id": user_id, "start": prev_start, "end": prev_end},
+                )
+            ).scalar_one()
+            or 0
+        )
+
+        return {
+            "books_completed": books_completed,
+            "total_seconds": total_seconds,
+            "days_read": days_read,
+            "longest_streak": longest_streak,
+            "top_genre": top_genre,
+            "prev_month_seconds": prev_seconds,
+        }
+
+    async def get_achieved_milestones(self, user_id: UUID) -> list[MilestoneData]:
+        """Compute achieved milestones from existing data.
+
+        Milestones are derived at query time — no dedicated table exists yet.
+        Book-count thresholds are resolved from the ordered list of completed
+        books; hour thresholds from a cumulative sum over daily_reading_stats;
+        streak thresholds from the user_grades snapshot.
+
+        Streak milestones report ``achieved_at = NOW()`` because only the
+        current snapshot is stored, not the history.  A future migration that
+        records streak-achieved events will replace this.
+        """
+        milestones: list[MilestoneData] = []
+
+        # ------ Book-count milestones ------
+        book_rows = (
+            await self._session.execute(
+                text(
+                    """
+                    SELECT finished_at
+                    FROM user_books
+                    WHERE user_id = :user_id
+                      AND status = 'completed'
+                      AND finished_at IS NOT NULL
+                    ORDER BY finished_at ASC
+                    """
+                ),
+                {"user_id": user_id},
+            )
+        ).all()
+        book_count = len(book_rows)
+
+        for threshold, label in (
+            (5, "BOOKS_5"),
+            (10, "BOOKS_10"),
+            (20, "BOOKS_20"),
+            (50, "BOOKS_50"),
+        ):
+            if book_count >= threshold:
+                raw_dt = book_rows[threshold - 1].finished_at
+                if isinstance(raw_dt, datetime):
+                    achieved_at = raw_dt if raw_dt.tzinfo else raw_dt.replace(tzinfo=UTC)
+                else:
+                    achieved_at = datetime(raw_dt.year, raw_dt.month, raw_dt.day, tzinfo=UTC)
+                milestones.append(
+                    MilestoneData(milestone_type=label, achieved_at=achieved_at, value=threshold)
+                )
+
+        # ------ Hour-count milestones ------
+        hours_rows = (
+            await self._session.execute(
+                text(
+                    """
+                    SELECT date,
+                           SUM(total_seconds) OVER (
+                               ORDER BY date ASC
+                               ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+                           ) AS cum_seconds
+                    FROM daily_reading_stats
+                    WHERE user_id = :user_id
+                    ORDER BY date ASC
+                    """
+                ),
+                {"user_id": user_id},
+            )
+        ).all()
+
+        for threshold_hours, label in (
+            (10, "HOURS_10"),
+            (50, "HOURS_50"),
+            (100, "HOURS_100"),
+        ):
+            threshold_sec = threshold_hours * 3600
+            for h_row in hours_rows:
+                if int(h_row.cum_seconds or 0) >= threshold_sec:
+                    d: date = h_row.date
+                    achieved_at = datetime(d.year, d.month, d.day, tzinfo=UTC)
+                    milestones.append(
+                        MilestoneData(
+                            milestone_type=label,
+                            achieved_at=achieved_at,
+                            value=threshold_hours,
+                        )
+                    )
+                    break  # only the first crossing counts
+
+        # ------ Streak milestones ------
+        # Only the current snapshot is available; report milestones as
+        # achieved now when the all-time longest_streak meets the threshold.
+        grade_row = await self._session.get(UserGrade, user_id)
+        if grade_row is not None:
+            now = datetime.now(tz=UTC)
+            for threshold_days, label in ((7, "STREAK_7"), (30, "STREAK_30")):
+                if grade_row.longest_streak >= threshold_days:
+                    milestones.append(
+                        MilestoneData(milestone_type=label, achieved_at=now, value=threshold_days)
+                    )
+
+        return milestones

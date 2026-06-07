@@ -86,4 +86,18 @@ abstract class ReadingApi {
   /// `GET /me/reading-stats` — M21 full analytics summary.
   @GET('/me/reading-stats')
   Future<ReadingStatsDto> getReadingStats();
+
+  /// `GET /me/recap/monthly` — M28 monthly recap card data.
+  ///
+  /// [year] and [month] are optional; the backend defaults to the current
+  /// calendar month when omitted.
+  @GET('/me/recap/monthly')
+  Future<MonthlyRecapDto> getMonthlyRecap({
+    @Query('year') int? year,
+    @Query('month') int? month,
+  });
+
+  /// `GET /me/recap/milestones` — M28 list of achieved milestones.
+  @GET('/me/recap/milestones')
+  Future<List<MilestoneItemDto>> getMilestones();
 }

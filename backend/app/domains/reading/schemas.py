@@ -85,6 +85,7 @@ class GradeSummaryPublic(BaseModel):
     total_seconds: int
     streak_days: int
     longest_streak: int
+    streak_shields: int
     next_grade_thresholds: GradeThresholdPublic | None
 
     @classmethod
@@ -116,6 +117,7 @@ class GradeSummaryPublic(BaseModel):
             total_seconds=s.total_seconds,
             streak_days=s.streak_days,
             longest_streak=s.longest_streak,
+            streak_shields=s.streak_shields,
             next_grade_thresholds=thresh,
         )
 
@@ -282,3 +284,44 @@ class RecapCard(BaseModel):
 class ReadingRecapResponse(BaseModel):
     period: str
     cards: list[RecapCard]
+
+
+# ---- monthly recap ----
+
+
+class MonthlyRecapResponse(BaseModel):
+    """Aggregated statistics for a single calendar month."""
+
+    year: int
+    month: int
+    books_completed: int
+    total_hours: float
+    avg_daily_minutes: float
+    longest_streak: int
+    top_genre: str | None
+    prev_month_hours: float | None
+
+
+# ---- milestones ----
+
+
+class MilestoneType(StrEnum):
+    BOOKS_5 = "BOOKS_5"
+    BOOKS_10 = "BOOKS_10"
+    BOOKS_20 = "BOOKS_20"
+    BOOKS_50 = "BOOKS_50"
+    HOURS_10 = "HOURS_10"
+    HOURS_50 = "HOURS_50"
+    HOURS_100 = "HOURS_100"
+    STREAK_7 = "STREAK_7"
+    STREAK_30 = "STREAK_30"
+
+
+class MilestoneItem(BaseModel):
+    type: MilestoneType
+    achieved_at: datetime
+    value: int
+
+
+class MilestonesResponse(BaseModel):
+    milestones: list[MilestoneItem]

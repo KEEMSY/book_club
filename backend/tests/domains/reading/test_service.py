@@ -147,6 +147,7 @@ class FakeUserGradeRepo:
                 streak_days=0,
                 longest_streak=0,
                 streak_last_date=None,
+                streak_shields=0,
             )
             self.rows[user_id] = row
         return row
@@ -162,6 +163,7 @@ class FakeUserGradeRepo:
         streak_days: int | None = None,
         longest_streak: int | None = None,
         streak_last_date: date | None = None,
+        streak_shields: int | None = None,
     ) -> UserGrade:
         row = await self.get_or_init(user_id)
         if total_books is not None:
@@ -178,6 +180,13 @@ class FakeUserGradeRepo:
             row.longest_streak = longest_streak
         if streak_last_date is not None:
             row.streak_last_date = streak_last_date
+        if streak_shields is not None:
+            row.streak_shields = streak_shields
+        return row
+
+    async def update_streak_shields(self, user_id: UUID, *, shields: int) -> UserGrade:
+        row = await self.get_or_init(user_id)
+        row.streak_shields = shields
         return row
 
 

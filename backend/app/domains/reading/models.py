@@ -195,6 +195,7 @@ class UserGrade(Base):
     streak_days: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     longest_streak: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     streak_last_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    streak_shields: Mapped[int] = mapped_column(Integer, nullable=False, server_default="0")
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,

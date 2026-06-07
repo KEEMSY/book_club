@@ -17,7 +17,7 @@
     <!-- Keeps the CPU alive while the timer counts seconds in the background. -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <application
-        android:label="Book Club"
+        android:label="골방"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

@@ -303,11 +303,7 @@ class ChallengeRepository:
         Callers must verify ownership before calling; no auth check is done here.
         """
         # Reset all badges the user owns first, then apply the ordered set.
-        reset_stmt = (
-            update(UserBadge)
-            .where(UserBadge.user_id == user_id)
-            .values(pin_order=0)
-        )
+        reset_stmt = update(UserBadge).where(UserBadge.user_id == user_id).values(pin_order=0)
         await self._session.execute(reset_stmt)
 
         for order, badge_id in enumerate(ordered_badge_ids):

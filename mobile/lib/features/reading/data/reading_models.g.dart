@@ -54,6 +54,7 @@ _GradeSummaryDto _$GradeSummaryDtoFromJson(Map<String, dynamic> json) =>
           : NextGradeThresholdsDto.fromJson(
               json['next_grade_thresholds'] as Map<String, dynamic>),
       tier: (json['tier'] as num?)?.toInt() ?? 1,
+      streakShields: (json['streak_shields'] as num?)?.toInt() ?? 0,
     );
 
 Map<String, dynamic> _$GradeSummaryDtoToJson(_GradeSummaryDto instance) =>
@@ -65,6 +66,7 @@ Map<String, dynamic> _$GradeSummaryDtoToJson(_GradeSummaryDto instance) =>
       'longest_streak': instance.longestStreak,
       'next_grade_thresholds': instance.nextGradeThresholds?.toJson(),
       'tier': instance.tier,
+      'streak_shields': instance.streakShields,
     };
 
 _SessionCompletionDto _$SessionCompletionDtoFromJson(
@@ -390,4 +392,42 @@ Map<String, dynamic> _$ReadingStatsDtoToJson(_ReadingStatsDto instance) =>
       'genre_breakdown':
           instance.genreBreakdown.map((e) => e.toJson()).toList(),
       'avg_completion_days': instance.avgCompletionDays,
+    };
+
+_MonthlyRecapDto _$MonthlyRecapDtoFromJson(Map<String, dynamic> json) =>
+    _MonthlyRecapDto(
+      year: (json['year'] as num).toInt(),
+      month: (json['month'] as num).toInt(),
+      booksCompleted: (json['books_completed'] as num).toInt(),
+      totalHours: (json['total_hours'] as num).toDouble(),
+      avgDailyMinutes: (json['avg_daily_minutes'] as num).toDouble(),
+      longestStreak: (json['longest_streak'] as num).toInt(),
+      topGenre: json['top_genre'] as String?,
+      prevMonthHours: (json['prev_month_hours'] as num?)?.toDouble(),
+    );
+
+Map<String, dynamic> _$MonthlyRecapDtoToJson(_MonthlyRecapDto instance) =>
+    <String, dynamic>{
+      'year': instance.year,
+      'month': instance.month,
+      'books_completed': instance.booksCompleted,
+      'total_hours': instance.totalHours,
+      'avg_daily_minutes': instance.avgDailyMinutes,
+      'longest_streak': instance.longestStreak,
+      'top_genre': instance.topGenre,
+      'prev_month_hours': instance.prevMonthHours,
+    };
+
+_MilestoneItemDto _$MilestoneItemDtoFromJson(Map<String, dynamic> json) =>
+    _MilestoneItemDto(
+      type: json['type'] as String,
+      achievedAt: DateTime.parse(json['achieved_at'] as String),
+      value: (json['value'] as num).toDouble(),
+    );
+
+Map<String, dynamic> _$MilestoneItemDtoToJson(_MilestoneItemDto instance) =>
+    <String, dynamic>{
+      'type': instance.type,
+      'achieved_at': instance.achievedAt.toIso8601String(),
+      'value': instance.value,
     };

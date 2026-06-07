@@ -22,13 +22,37 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from datetime import UTC, date, datetime, timedelta
 from uuid import UUID
 
 from app.core.exceptions import ConflictError
 from app.domains.social.events import FollowReceived
 from app.domains.social.ports import SocialRepositoryPort
-from app.domains.social.schemas import UserSummary, UserSummaryPage
+from app.domains.social.schemas import (
+    LeaderboardEntry,
+    LeaderboardResponse,
+    UserSummary,
+    UserSummaryPage,
+)
 from app.shared.event_bus import EventBus
+
+# Grade name labels indexed by (grade, tier).
+# grade 1-5 maps to Bronze/Silver/Gold/Platinum/Diamond;
+# tier 1-3 maps to I/II/III (I is highest within a grade).
+_GRADE_NAMES = {1: "Bronze", 2: "Silver", 3: "Gold", 4: "Platinum", 5: "Diamond"}
+_TIER_NAMES = {1: "I", 2: "II", 3: "III"}
+
+
+def _grade_tier_label(grade: int | None, tier: int | None) -> str | None:
+    """Convert numeric grade/tier to a human-readable label, e.g. 'Gold II'."""
+    if grade is None or tier is None:
+        return None
+    name = _GRADE_NAMES.get(grade)
+    rank = _TIER_NAMES.get(tier)
+    if name is None or rank is None:
+        return None
+    return f"{name} {rank}"
+
 
 _PAGE_MAX = 50
 _PAGE_MIN = 1
@@ -208,3 +232,42 @@ class SocialService:
             for u in users
         ]
         return UserSummaryPage(items=items, next_cursor=next_cursor)
+
+    async def get_weekly_leaderboard(self, user_id: UUID) -> LeaderboardResponse:
+        """Build a weekly reading leaderboard for the requesting user and their followings.
+
+        The window spans the last 7 calendar days (inclusive of today).
+        Ranking is dense: ties share a rank and the next rank is not skipped.
+        The requesting user always appears even when they have no reading time.
+        """
+        rows = await self.repo.get_weekly_leaderboard(user_id)
+
+        entries: list[LeaderboardEntry] = []
+        current_rank = 0
+        prev_minutes: int | None = None
+        for i, row in enumerate(rows):
+            # Dense ranking: only advance rank when the score changes.
+            if row.weekly_minutes != prev_minutes:
+                current_rank = i + 1
+                prev_minutes = row.weekly_minutes
+            entries.append(
+                LeaderboardEntry(
+                    rank=current_rank,
+                    user_id=row.user_id,
+                    nickname=row.nickname,
+                    profile_image_url=row.profile_image_url,
+                    grade_tier=_grade_tier_label(row.grade, row.tier),
+                    weekly_minutes=row.weekly_minutes,
+                    is_me=row.user_id == user_id,
+                )
+            )
+
+        now_utc = datetime.now(tz=UTC)
+        # week_start = 7 days ago (the beginning of the rolling window).
+        week_start: date = (now_utc - timedelta(days=6)).date()
+
+        return LeaderboardResponse(
+            entries=entries,
+            week_start=week_start,
+            generated_at=now_utc,
+        )

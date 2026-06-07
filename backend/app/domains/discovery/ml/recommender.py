@@ -109,9 +109,7 @@ class CollaborativeFilteringRecommender:
                 Book.cover_url,
             )
             .join(Book, Book.id == UserBook.book_id)
-            .where(
-                UserBook.status.in_(list(_STATUS_RATING.keys()))
-            )
+            .where(UserBook.status.in_(list(_STATUS_RATING.keys())))
         )
         result = await conn.execute(stmt)
         rows = result.all()
@@ -143,9 +141,7 @@ class CollaborativeFilteringRecommender:
 
         # Filter to books with enough signal.
         qualifying_books = [
-            bid
-            for bid, cnt in book_interaction_counts.items()
-            if cnt >= _MIN_BOOK_INTERACTIONS
+            bid for bid, cnt in book_interaction_counts.items() if cnt >= _MIN_BOOK_INTERACTIONS
         ]
 
         if len(qualifying_books) < 2:
@@ -160,7 +156,9 @@ class CollaborativeFilteringRecommender:
         n_books = len(book_ids)
 
         # Collect users that rated at least one qualifying book.
-        users = [uid for uid, ratings in user_ratings.items() if any(b in book_index for b in ratings)]
+        users = [
+            uid for uid, ratings in user_ratings.items() if any(b in book_index for b in ratings)
+        ]
         n_users = len(users)
 
         if n_users == 0:

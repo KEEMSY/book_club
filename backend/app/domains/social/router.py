@@ -16,7 +16,7 @@ from fastapi import APIRouter, Depends, Query, Response, status
 
 from app.core.deps import get_current_user_id
 from app.domains.social.providers import get_social_service
-from app.domains.social.schemas import ReportCreate, UserSummaryPage
+from app.domains.social.schemas import LeaderboardResponse, ReportCreate, UserSummaryPage
 from app.domains.social.service import SocialService
 
 router = APIRouter(prefix="/social", tags=["social"])
@@ -144,6 +144,20 @@ async def my_blocks(
     limit: Annotated[int, Query(ge=1, le=50)] = 20,
 ) -> UserSummaryPage:
     return await service.get_blocks(UUID(user_id), cursor, limit)
+
+
+# ---------------------------------------------------------------------------
+# Leaderboard
+# ---------------------------------------------------------------------------
+
+
+@router.get("/leaderboard/weekly", response_model=LeaderboardResponse)
+async def weekly_leaderboard(
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[SocialService, Depends(get_social_service)],
+) -> LeaderboardResponse:
+    """Return the weekly reading leaderboard for the current user and their followings."""
+    return await service.get_weekly_leaderboard(UUID(user_id))
 
 
 # ---------------------------------------------------------------------------

@@ -15,6 +15,7 @@ import '../../features/challenge/presentation/challenge_list_screen.dart';
 import '../../features/community/presentation/community_home_screen.dart';
 import '../../features/community/presentation/follower_list_screen.dart';
 import '../../features/community/presentation/following_list_screen.dart';
+import '../../features/community/presentation/leaderboard_screen.dart';
 import '../../features/community/presentation/profile_edit_screen.dart';
 import '../../features/community/presentation/user_profile_screen.dart';
 import '../../features/social/domain/user_summary.dart';
@@ -25,6 +26,7 @@ import '../../features/reading/application/recap_notifier.dart';
 import '../../features/reading/presentation/dashboard_screen.dart';
 import '../../features/reading/presentation/goal_screen.dart';
 import '../../features/reading/presentation/grade_screen.dart';
+import '../../features/reading/presentation/monthly_recap_screen.dart';
 import '../../features/reading/presentation/reading_recap_screen.dart';
 import '../../features/reading/presentation/reading_stats_screen.dart';
 import '../../features/reading/presentation/timer_screen.dart';
@@ -67,6 +69,9 @@ class AppRoutes {
   static String challengeDetail(String id) => '/community/challenges/$id';
   static const badges = '/community/badges';
 
+  // M27 destination — weekly social leaderboard.
+  static const leaderboard = '/community/leaderboard';
+
   // Profile edit — own profile only.
   static const profileEdit = '/profile/edit';
 
@@ -75,6 +80,9 @@ class AppRoutes {
 
   // M21 — full reading analytics screen.
   static const readingStats = '/reading/stats';
+
+  // M28 — monthly recap card.
+  static const monthlyRecap = '/reading/recap/monthly';
 }
 
 /// Adapter that bridges a Riverpod [ValueNotifier]-free state stream into a
@@ -209,6 +217,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootKey,
         builder: (context, state) => const ReadingStatsScreen(),
       ),
+      // M28 — monthly recap card. Optional (year, month) passed as extra Map.
+      GoRoute(
+        path: AppRoutes.monthlyRecap,
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) {
+          final Map<String, int>? extra =
+              state.extra as Map<String, int>?;
+          return MonthlyRecapScreen(
+            year: extra?['year'],
+            month: extra?['month'],
+          );
+        },
+      ),
       GoRoute(
         path: AppRoutes.notifications,
         parentNavigatorKey: _rootKey,
@@ -315,6 +336,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'badges',
                     builder: (context, state) => const BadgeCollectionScreen(),
+                  ),
+                  GoRoute(
+                    path: 'leaderboard',
+                    builder: (context, state) => const LeaderboardScreen(),
                   ),
                 ],
               ),

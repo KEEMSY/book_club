@@ -166,9 +166,7 @@ class MessageRead(Base):
     """Tracks which users have read which club messages (read receipts)."""
 
     __tablename__ = "message_reads"
-    __table_args__ = (
-        PrimaryKeyConstraint("message_id", "user_id", name="pk_message_reads"),
-    )
+    __table_args__ = (PrimaryKeyConstraint("message_id", "user_id", name="pk_message_reads"),)
 
     message_id: Mapped[uuid.UUID] = mapped_column(
         PGUUID(as_uuid=True),

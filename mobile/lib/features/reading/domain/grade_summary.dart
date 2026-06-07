@@ -33,6 +33,7 @@ abstract class GradeSummary with _$GradeSummary {
     required int longestStreak,
     NextGradeThresholds? nextGradeThresholds,
     @Default(1) int tier,
+    @Default(0) int streakShields,
   }) = _GradeSummary;
 
   ReaderGrade get readerGrade {

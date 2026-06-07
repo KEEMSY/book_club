@@ -17,16 +17,29 @@ Key choices:
 from __future__ import annotations
 
 import base64
+from dataclasses import dataclass
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import and_, delete, select
+from sqlalchemy import and_, delete, select, text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import ConflictError
 from app.domains.auth.models import User
 from app.domains.social.models import Block, Follow, Report
+
+
+@dataclass(frozen=True, slots=True)
+class LeaderboardRow:
+    """Intermediate result from the weekly leaderboard query."""
+
+    user_id: UUID
+    nickname: str
+    profile_image_url: str | None
+    grade: int | None
+    tier: int | None
+    weekly_minutes: int
 
 
 def _encode_cursor(dt: datetime) -> str:
@@ -46,6 +59,70 @@ class SocialRepository:
 
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
+
+    # ------------------------------------------------------------------
+    # Leaderboard
+    # ------------------------------------------------------------------
+
+    async def get_weekly_leaderboard(self, user_id: UUID) -> list[LeaderboardRow]:
+        """Return reading minutes for user + their followings over the last 7 days.
+
+        Aggregates ``daily_reading_stats`` (which already accumulates timer
+        sessions) rather than summing ``reading_sessions`` directly — avoids
+        re-counting any double-writes and keeps the query lean.  Users with
+        no activity in the window still appear when they are the requesting
+        user themselves (via the UNION with a zero-row fallback).
+
+        Returns rows sorted by weekly_minutes DESC so the service layer can
+        assign ranks without an additional sort.
+        """
+        stmt = text(
+            """
+            WITH candidate_ids AS (
+                -- The requesting user plus every user they follow.
+                SELECT :user_id::uuid AS id
+                UNION
+                SELECT followee_id AS id
+                FROM follows
+                WHERE follower_id = :user_id::uuid
+            ),
+            weekly_totals AS (
+                SELECT
+                    ci.id            AS user_id,
+                    COALESCE(SUM(drs.total_seconds), 0) AS total_seconds
+                FROM candidate_ids ci
+                LEFT JOIN daily_reading_stats drs
+                    ON drs.user_id = ci.id
+                    AND drs.date >= CURRENT_DATE - INTERVAL '6 days'
+                GROUP BY ci.id
+            )
+            SELECT
+                wt.user_id,
+                u.nickname,
+                u.profile_image_url,
+                ug.grade,
+                ug.tier,
+                (wt.total_seconds / 60)::int AS weekly_minutes
+            FROM weekly_totals wt
+            JOIN users u
+                ON u.id = wt.user_id
+                AND u.deleted_at IS NULL
+            LEFT JOIN user_grades ug ON ug.user_id = wt.user_id
+            ORDER BY weekly_minutes DESC, wt.user_id
+            """
+        )
+        rows = (await self._session.execute(stmt, {"user_id": str(user_id)})).all()
+        return [
+            LeaderboardRow(
+                user_id=UUID(str(row.user_id)),
+                nickname=str(row.nickname),
+                profile_image_url=str(row.profile_image_url) if row.profile_image_url else None,
+                grade=int(row.grade) if row.grade is not None else None,
+                tier=int(row.tier) if row.tier is not None else None,
+                weekly_minutes=int(row.weekly_minutes),
+            )
+            for row in rows
+        ]
 
     # ------------------------------------------------------------------
     # Follow

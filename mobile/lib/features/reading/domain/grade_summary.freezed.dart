@@ -329,6 +329,7 @@ mixin _$GradeSummary {
   int get longestStreak;
   NextGradeThresholds? get nextGradeThresholds;
   int get tier;
+  int get streakShields;
 
   /// Create a copy of GradeSummary
   /// with the given fields replaced by the non-null parameter values.
@@ -354,16 +355,18 @@ mixin _$GradeSummary {
                 other.longestStreak == longestStreak) &&
             (identical(other.nextGradeThresholds, nextGradeThresholds) ||
                 other.nextGradeThresholds == nextGradeThresholds) &&
-            (identical(other.tier, tier) || other.tier == tier));
+            (identical(other.tier, tier) || other.tier == tier) &&
+            (identical(other.streakShields, streakShields) ||
+                other.streakShields == streakShields));
   }
 
   @override
   int get hashCode => Object.hash(runtimeType, grade, totalBooks, totalSeconds,
-      streakDays, longestStreak, nextGradeThresholds, tier);
+      streakDays, longestStreak, nextGradeThresholds, tier, streakShields);
 
   @override
   String toString() {
-    return 'GradeSummary(grade: $grade, totalBooks: $totalBooks, totalSeconds: $totalSeconds, streakDays: $streakDays, longestStreak: $longestStreak, nextGradeThresholds: $nextGradeThresholds, tier: $tier)';
+    return 'GradeSummary(grade: $grade, totalBooks: $totalBooks, totalSeconds: $totalSeconds, streakDays: $streakDays, longestStreak: $longestStreak, nextGradeThresholds: $nextGradeThresholds, tier: $tier, streakShields: $streakShields)';
   }
 }
 
@@ -380,7 +383,8 @@ abstract mixin class $GradeSummaryCopyWith<$Res> {
       int streakDays,
       int longestStreak,
       NextGradeThresholds? nextGradeThresholds,
-      int tier});
+      int tier,
+      int streakShields});
 
   $NextGradeThresholdsCopyWith<$Res>? get nextGradeThresholds;
 }
@@ -404,6 +408,7 @@ class _$GradeSummaryCopyWithImpl<$Res> implements $GradeSummaryCopyWith<$Res> {
     Object? longestStreak = null,
     Object? nextGradeThresholds = freezed,
     Object? tier = null,
+    Object? streakShields = null,
   }) {
     return _then(_self.copyWith(
       grade: null == grade
@@ -433,6 +438,10 @@ class _$GradeSummaryCopyWithImpl<$Res> implements $GradeSummaryCopyWith<$Res> {
       tier: null == tier
           ? _self.tier
           : tier // ignore: cast_nullable_to_non_nullable
+              as int,
+      streakShields: null == streakShields
+          ? _self.streakShields
+          : streakShields // ignore: cast_nullable_to_non_nullable
               as int,
     ));
   }
@@ -553,7 +562,8 @@ extension GradeSummaryPatterns on GradeSummary {
             int streakDays,
             int longestStreak,
             NextGradeThresholds? nextGradeThresholds,
-            int tier)?
+            int tier,
+            int streakShields)?
         $default, {
     required TResult orElse(),
   }) {
@@ -567,7 +577,8 @@ extension GradeSummaryPatterns on GradeSummary {
             _that.streakDays,
             _that.longestStreak,
             _that.nextGradeThresholds,
-            _that.tier);
+            _that.tier,
+            _that.streakShields);
       case _:
         return orElse();
     }
@@ -595,7 +606,8 @@ extension GradeSummaryPatterns on GradeSummary {
             int streakDays,
             int longestStreak,
             NextGradeThresholds? nextGradeThresholds,
-            int tier)
+            int tier,
+            int streakShields)
         $default,
   ) {
     final _that = this;
@@ -608,7 +620,8 @@ extension GradeSummaryPatterns on GradeSummary {
             _that.streakDays,
             _that.longestStreak,
             _that.nextGradeThresholds,
-            _that.tier);
+            _that.tier,
+            _that.streakShields);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -635,7 +648,8 @@ extension GradeSummaryPatterns on GradeSummary {
             int streakDays,
             int longestStreak,
             NextGradeThresholds? nextGradeThresholds,
-            int tier)?
+            int tier,
+            int streakShields)?
         $default,
   ) {
     final _that = this;
@@ -648,7 +662,8 @@ extension GradeSummaryPatterns on GradeSummary {
             _that.streakDays,
             _that.longestStreak,
             _that.nextGradeThresholds,
-            _that.tier);
+            _that.tier,
+            _that.streakShields);
       case _:
         return null;
     }
@@ -665,7 +680,8 @@ class _GradeSummary extends GradeSummary {
       required this.streakDays,
       required this.longestStreak,
       this.nextGradeThresholds,
-      this.tier = 1})
+      this.tier = 1,
+      this.streakShields = 0})
       : super._();
 
   @override
@@ -683,6 +699,9 @@ class _GradeSummary extends GradeSummary {
   @override
   @JsonKey()
   final int tier;
+  @override
+  @JsonKey()
+  final int streakShields;
 
   /// Create a copy of GradeSummary
   /// with the given fields replaced by the non-null parameter values.
@@ -708,16 +727,18 @@ class _GradeSummary extends GradeSummary {
                 other.longestStreak == longestStreak) &&
             (identical(other.nextGradeThresholds, nextGradeThresholds) ||
                 other.nextGradeThresholds == nextGradeThresholds) &&
-            (identical(other.tier, tier) || other.tier == tier));
+            (identical(other.tier, tier) || other.tier == tier) &&
+            (identical(other.streakShields, streakShields) ||
+                other.streakShields == streakShields));
   }
 
   @override
   int get hashCode => Object.hash(runtimeType, grade, totalBooks, totalSeconds,
-      streakDays, longestStreak, nextGradeThresholds, tier);
+      streakDays, longestStreak, nextGradeThresholds, tier, streakShields);
 
   @override
   String toString() {
-    return 'GradeSummary(grade: $grade, totalBooks: $totalBooks, totalSeconds: $totalSeconds, streakDays: $streakDays, longestStreak: $longestStreak, nextGradeThresholds: $nextGradeThresholds, tier: $tier)';
+    return 'GradeSummary(grade: $grade, totalBooks: $totalBooks, totalSeconds: $totalSeconds, streakDays: $streakDays, longestStreak: $longestStreak, nextGradeThresholds: $nextGradeThresholds, tier: $tier, streakShields: $streakShields)';
   }
 }
 
@@ -736,7 +757,8 @@ abstract mixin class _$GradeSummaryCopyWith<$Res>
       int streakDays,
       int longestStreak,
       NextGradeThresholds? nextGradeThresholds,
-      int tier});
+      int tier,
+      int streakShields});
 
   @override
   $NextGradeThresholdsCopyWith<$Res>? get nextGradeThresholds;
@@ -762,6 +784,7 @@ class __$GradeSummaryCopyWithImpl<$Res>
     Object? longestStreak = null,
     Object? nextGradeThresholds = freezed,
     Object? tier = null,
+    Object? streakShields = null,
   }) {
     return _then(_GradeSummary(
       grade: null == grade
@@ -791,6 +814,10 @@ class __$GradeSummaryCopyWithImpl<$Res>
       tier: null == tier
           ? _self.tier
           : tier // ignore: cast_nullable_to_non_nullable
+              as int,
+      streakShields: null == streakShields
+          ? _self.streakShields
+          : streakShields // ignore: cast_nullable_to_non_nullable
               as int,
     ));
   }

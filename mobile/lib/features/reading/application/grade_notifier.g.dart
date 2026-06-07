@@ -6,7 +6,7 @@ part of 'grade_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$gradeNotifierHash() => r'10dc7a4301e422da143630324cb868f6aff1ea03';
+String _$gradeNotifierHash() => r'79020454ce9bd9a82a45f2e610b21b7a8d0c6095';
 
 /// Holds the current `GradeSummary` plus a `recentGradeUp` flag the
 /// dashboard toasts the user about once on the next `/home` render.

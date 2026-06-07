@@ -3,6 +3,7 @@ import 'package:retrofit/retrofit.dart';
 
 import '../../feed/data/feed_models.dart';
 import '../../social/domain/user_summary.dart';
+import '../domain/leaderboard_entry.dart';
 
 part 'community_api.g.dart';
 
@@ -40,4 +41,9 @@ abstract class CommunityApi {
     @Query('cursor') String? cursor,
     @Query('limit') int limit = 20,
   });
+
+  /// Returns the weekly social leaderboard ranked by reading time in the last
+  /// 7 days among the authenticated user's followees (plus the user themselves).
+  @GET('/social/leaderboard/weekly')
+  Future<List<LeaderboardEntry>> getWeeklyLeaderboard();
 }

@@ -156,9 +156,7 @@ async def club_chat_stream(
             try:
                 data: dict[str, Any] = json.loads(raw)
             except json.JSONDecodeError:
-                await websocket.send_text(
-                    json.dumps({"type": "error", "detail": "invalid JSON"})
-                )
+                await websocket.send_text(json.dumps({"type": "error", "detail": "invalid JSON"}))
                 continue
 
             # Relay the message to all club subscribers; stamp sender info so
@@ -180,7 +178,9 @@ async def club_chat_stream(
     except WebSocketDisconnect:
         pass
     except Exception:
-        logger.exception("Unexpected error in club_chat_stream for club=%s user=%s", club_id, user_id)
+        logger.exception(
+            "Unexpected error in club_chat_stream for club=%s user=%s", club_id, user_id
+        )
     finally:
         heartbeat_task.cancel()
         ws_manager.disconnect_club(club_id, websocket)

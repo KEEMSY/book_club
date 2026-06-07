@@ -6,6 +6,7 @@ These are the sole types the mobile client observes at the HTTP boundary
 
 from __future__ import annotations
 
+from datetime import date, datetime
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -45,3 +46,29 @@ class ReportCreate(BaseModel):
     """Body for POST /reports/{target_type}/{target_id}."""
 
     reason: str = Field(..., min_length=1, max_length=500)
+
+
+class LeaderboardEntry(BaseModel):
+    """One row in the weekly reading leaderboard."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    rank: int
+    user_id: UUID
+    nickname: str
+    profile_image_url: str | None
+    # Human-readable tier label derived from grade + tier (e.g. "Gold I").
+    # None when the user has no grade row yet.
+    grade_tier: str | None
+    weekly_minutes: int
+    # True when this entry belongs to the requesting user.
+    is_me: bool
+
+
+class LeaderboardResponse(BaseModel):
+    """Weekly leaderboard for the requesting user and their followings."""
+
+    entries: list[LeaderboardEntry]
+    # Monday of the rolling 7-day window used for this snapshot.
+    week_start: date
+    generated_at: datetime

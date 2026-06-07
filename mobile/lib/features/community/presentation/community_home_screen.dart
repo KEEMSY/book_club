@@ -48,6 +48,11 @@ class _CommunityHomeScreenState extends ConsumerState<CommunityHomeScreen>
         title: Text('커뮤니티', style: theme.textTheme.titleLarge),
         actions: <Widget>[
           IconButton(
+            icon: const Icon(Icons.leaderboard_outlined),
+            tooltip: '리더보드',
+            onPressed: () => context.push(AppRoutes.leaderboard),
+          ),
+          IconButton(
             icon: const Icon(Icons.emoji_events_outlined),
             tooltip: '챌린지',
             onPressed: () => context.push(AppRoutes.challenges),

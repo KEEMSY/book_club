@@ -5,6 +5,7 @@ import '../domain/bookmark.dart';
 import '../domain/goal_period.dart';
 import '../domain/grade_summary.dart';
 import '../domain/heatmap_day.dart';
+import '../domain/monthly_recap.dart';
 import '../domain/reading_goal.dart';
 import '../domain/reading_recap.dart';
 import '../domain/reading_session.dart';
@@ -196,6 +197,21 @@ class ReadingRepository {
     final ReadingStatsDto dto =
         await _call(() => _api.getReadingStats());
     return dto.toDomain();
+  }
+
+  /// M28 — monthly recap for the given [year] and [month].
+  /// Omitting both defaults to the current calendar month on the backend.
+  Future<MonthlyRecap> getMonthlyRecap({int? year, int? month}) async {
+    final MonthlyRecapDto dto =
+        await _call(() => _api.getMonthlyRecap(year: year, month: month));
+    return dto.toDomain();
+  }
+
+  /// M28 — all achieved milestones for the current user.
+  Future<List<MilestoneItem>> getMilestones() async {
+    final List<MilestoneItemDto> dtos =
+        await _call(() => _api.getMilestones());
+    return dtos.map((d) => d.toDomain()).toList(growable: false);
   }
 
   Future<T> _call<T>(Future<T> Function() fn) async {
