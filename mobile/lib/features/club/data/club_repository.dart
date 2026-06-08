@@ -169,7 +169,7 @@ class ClubRepository {
 
   Future<List<ClubRoom>> listRooms(String clubId) async {
     final data = await _api.listRooms(clubId);
-    final items = (data['items'] as List?) ?? data as List;
+    final items = (data as Map<String, dynamic>)['rooms'] as List? ?? [];
     return items
         .map((e) => ClubRoom.fromJson(e as Map<String, dynamic>))
         .toList();

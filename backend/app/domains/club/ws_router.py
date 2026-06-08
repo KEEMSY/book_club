@@ -38,9 +38,11 @@ from fastapi import APIRouter, Depends, Query, WebSocket, WebSocketDisconnect
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_session
-from app.core.exceptions import AuthError
+from app.core.exceptions import AuthError, PermissionDeniedError
 from app.core.security import decode_token
 from app.core.ws_manager import ws_manager
+from app.domains.club.repository import ClubRepository
+from app.domains.club.service import ClubService
 
 logger = logging.getLogger(__name__)
 
@@ -119,7 +121,7 @@ async def _notify_offline_club_members(
     )
 
 
-@router.websocket("/ws/clubs/{club_id}")
+@router.websocket("/ws/clubs/{club_id}/chat")
 async def club_chat_stream(
     websocket: WebSocket,
     club_id: uuid.UUID,
@@ -159,22 +161,37 @@ async def club_chat_stream(
                 await websocket.send_text(json.dumps({"type": "error", "detail": "invalid JSON"}))
                 continue
 
-            # Relay the message to all club subscribers; stamp sender info so
-            # the client does not need to look it up separately.
+            msg_type = data.get("type", "")
+            if msg_type == "ping":
+                await websocket.send_text(json.dumps({"type": "pong"}))
+                continue
+
+            service = ClubService(ClubRepository(session))
+            try:
+                msg = await service.send_message(
+                    club_id=club_id,
+                    user_id=uuid.UUID(user_id),
+                    content=data.get("content", ""),
+                    media_url=data.get("media_url"),
+                )
+            except PermissionDeniedError:
+                await websocket.send_text(
+                    json.dumps({"type": "error", "detail": "not a club member"})
+                )
+                continue
+
             outbound: dict[str, Any] = {
-                "type": "message",
-                "club_id": str(club_id),
-                "user_id": user_id,
-                "content": data.get("content", ""),
+                "type": "chat.message",
+                "data": msg.model_dump(mode="json"),
             }
-            if "media_url" in data:
-                outbound["media_url"] = data["media_url"]
 
             await ws_manager.broadcast_club(club_id, outbound)
 
             # Notify members who are not currently in the chat room so they
             # can update their unread badge via the personal stream.
-            await _notify_offline_club_members(club_id, user_id, outbound, session)
+            await _notify_offline_club_members(
+                club_id, user_id, msg.model_dump(mode="json"), session
+            )
     except WebSocketDisconnect:
         pass
     except Exception:
@@ -187,7 +204,7 @@ async def club_chat_stream(
         ws_manager.disconnect_user(user_id, websocket)
 
 
-@router.websocket("/ws/clubs/{club_id}/rooms/{room_id}")
+@router.websocket("/ws/clubs/{club_id}/rooms/{room_id}/chat")
 async def room_chat_stream(
     websocket: WebSocket,
     club_id: uuid.UUID,
@@ -268,15 +285,29 @@ async def room_chat_stream(
                 await websocket.send_text(json.dumps({"type": "error", "detail": "invalid JSON"}))
                 continue
 
+            msg_type = data.get("type", "")
+            if msg_type == "ping":
+                await websocket.send_text(json.dumps({"type": "pong"}))
+                continue
+
+            service = ClubService(ClubRepository(session))
+            try:
+                msg = await service.send_message(
+                    club_id=club_id,
+                    user_id=uuid.UUID(user_id),
+                    content=data.get("content", ""),
+                    media_url=data.get("media_url"),
+                )
+            except PermissionDeniedError:
+                await websocket.send_text(
+                    json.dumps({"type": "error", "detail": "not a club member"})
+                )
+                continue
+
             outbound: dict[str, Any] = {
-                "type": "message",
-                "club_id": str(club_id),
-                "room_id": str(room_id),
-                "user_id": user_id,
-                "content": data.get("content", ""),
+                "type": "chat.message",
+                "data": msg.model_dump(mode="json"),
             }
-            if "media_url" in data:
-                outbound["media_url"] = data["media_url"]
 
             await ws_manager.broadcast_room(room_id, outbound)
     except WebSocketDisconnect:
