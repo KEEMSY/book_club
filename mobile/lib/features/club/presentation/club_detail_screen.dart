@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../application/club_providers.dart';
 import '../domain/club.dart';
 import 'club_chat_screen.dart';
+import 'club_rooms_screen.dart';
 import 'create_event_sheet.dart';
 
-// Club events provider — keyed by club id.
+// Club events provider — keyed by club id (uses legacy ClubEvent from club.dart).
 final _clubEventsProvider =
     FutureProvider.autoDispose.family<List<ClubEvent>, String>(
-  (ref, clubId) => ref.watch(clubRepositoryProvider).listEvents(clubId),
+  (ref, clubId) => ref.watch(clubRepositoryProvider).listEventsFull(clubId),
 );
 
 class ClubDetailScreen extends ConsumerStatefulWidget {
@@ -29,7 +32,7 @@ class _ClubDetailScreenState extends ConsumerState<ClubDetailScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -58,6 +61,7 @@ class _ClubDetailScreenState extends ConsumerState<ClubDetailScreen>
           tabs: const [
             Tab(text: '모임'),
             Tab(text: '채팅'),
+            Tab(text: '채팅방'),
           ],
         ),
       ),
@@ -66,6 +70,7 @@ class _ClubDetailScreenState extends ConsumerState<ClubDetailScreen>
         children: [
           _ClubEventsTab(club: widget.club),
           ClubChatScreen(club: widget.club),
+          ClubRoomsBody(club: widget.club),
         ],
       ),
     );
@@ -112,16 +117,26 @@ class _ClubEventsTab extends ConsumerWidget {
                       style: theme.textTheme.titleMedium
                           ?.copyWith(fontWeight: FontWeight.w700),
                     ),
-                    TextButton.icon(
-                      onPressed: () async {
-                        await CreateEventSheet.show(
-                          context,
-                          clubId: club.id,
-                        );
-                        ref.invalidate(_clubEventsProvider(club.id));
-                      },
-                      icon: const Icon(Icons.add, size: 18),
-                      label: const Text('일정 추가'),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextButton(
+                          onPressed: () =>
+                              context.push(AppRoutes.clubEvents(club.id)),
+                          child: const Text('전체 보기'),
+                        ),
+                        TextButton.icon(
+                          onPressed: () async {
+                            await CreateEventSheet.show(
+                              context,
+                              clubId: club.id,
+                            );
+                            ref.invalidate(_clubEventsProvider(club.id));
+                          },
+                          icon: const Icon(Icons.add, size: 18),
+                          label: const Text('추가'),
+                        ),
+                      ],
                     ),
                   ],
                 ),

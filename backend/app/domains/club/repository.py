@@ -13,10 +13,12 @@ from app.domains.club.models import (
     ClubMember,
     ClubMessage,
     ClubRole,
-    EventRSVP,
+    ClubRoom,
+    EventAttendee,
     MessageRead,
     ReadingClub,
 )
+from app.domains.club.schemas import AttendeeCount, AttendeePublic
 
 
 class ClubRepository:
@@ -85,6 +87,14 @@ class ClubRepository:
         row = await self._session.execute(stmt)
         return row.scalar_one_or_none() is not None
 
+    async def get_member_role(self, club_id: UUID, user_id: UUID) -> str | None:
+        stmt = select(ClubMember.role).where(
+            ClubMember.club_id == club_id,
+            ClubMember.user_id == user_id,
+        )
+        row = await self._session.execute(stmt)
+        return row.scalar_one_or_none()
+
     async def join(self, club_id: UUID, user_id: UUID) -> None:
         self._session.add(
             ClubMember(
@@ -112,18 +122,18 @@ class ClubRepository:
         created_by: UUID,
         title: str,
         description: str | None,
-        event_type: str,
+        event_at: datetime,
         location: str | None,
-        scheduled_at: datetime,
+        max_attendees: int | None,
     ) -> ClubEvent:
         event = ClubEvent(
             id=uuid4(),
             club_id=club_id,
             title=title,
             description=description,
-            event_type=event_type,
+            event_at=event_at,
             location=location,
-            scheduled_at=scheduled_at,
+            max_attendees=max_attendees,
             created_by=created_by,
             created_at=datetime.now(),
         )
@@ -131,46 +141,107 @@ class ClubRepository:
         await self._session.flush()
         return event
 
-    async def list_events(self, club_id: UUID) -> list[ClubEvent]:
-        stmt = (
-            select(ClubEvent)
-            .where(ClubEvent.club_id == club_id)
-            .order_by(ClubEvent.scheduled_at.asc())
-        )
+    async def get_events(self, club_id: UUID, *, upcoming_only: bool = True) -> list[ClubEvent]:
+        stmt = select(ClubEvent).where(ClubEvent.club_id == club_id)
+        if upcoming_only:
+            stmt = stmt.where(ClubEvent.event_at >= datetime.now())
+        stmt = stmt.order_by(ClubEvent.event_at.asc())
         rows = await self._session.execute(stmt)
         return list(rows.scalars().all())
 
     async def get_event(self, event_id: UUID) -> ClubEvent | None:
         return await self._session.get(ClubEvent, event_id)
 
-    async def upsert_rsvp(self, *, event_id: UUID, user_id: UUID, status: str) -> EventRSVP:
-        existing = await self._session.get(EventRSVP, (event_id, user_id))
+    async def update_event(
+        self,
+        event_id: UUID,
+        *,
+        title: str | None = None,
+        description: str | None = None,
+        event_at: datetime | None = None,
+        location: str | None = None,
+        max_attendees: int | None = None,
+    ) -> ClubEvent | None:
+        event = await self._session.get(ClubEvent, event_id)
+        if event is None:
+            return None
+        if title is not None:
+            event.title = title
+        if description is not None:
+            event.description = description
+        if event_at is not None:
+            event.event_at = event_at
+        if location is not None:
+            event.location = location
+        if max_attendees is not None:
+            event.max_attendees = max_attendees
+        await self._session.flush()
+        return event
+
+    async def delete_event(self, event_id: UUID) -> None:
+        stmt = delete(ClubEvent).where(ClubEvent.id == event_id)
+        await self._session.execute(stmt)
+
+    async def upsert_rsvp(self, *, event_id: UUID, user_id: UUID, status: str) -> EventAttendee:
+        existing = await self._session.get(EventAttendee, (event_id, user_id))
         if existing:
             existing.status = status
             existing.responded_at = datetime.now()
+            await self._session.flush()
             return existing
-        rsvp = EventRSVP(
+        attendee = EventAttendee(
             event_id=event_id,
             user_id=user_id,
             status=status,
             responded_at=datetime.now(),
         )
-        self._session.add(rsvp)
+        self._session.add(attendee)
         await self._session.flush()
-        return rsvp
+        return attendee
 
-    async def rsvp_counts(self, event_id: UUID) -> dict[str, int]:
+    async def get_attendees(self, event_id: UUID) -> list[AttendeePublic]:
         stmt = (
-            select(EventRSVP.status, func.count().label("cnt"))
-            .where(EventRSVP.event_id == event_id)
-            .group_by(EventRSVP.status)
+            select(EventAttendee, User.nickname)
+            .join(User, User.id == EventAttendee.user_id)
+            .where(EventAttendee.event_id == event_id)
+            .order_by(EventAttendee.responded_at.asc())
         )
         rows = await self._session.execute(stmt)
-        return {r.status: r.cnt for r in rows}
+        return [
+            AttendeePublic(
+                user_id=row.EventAttendee.user_id,
+                nickname=row.nickname,
+                status=row.EventAttendee.status,
+                responded_at=row.EventAttendee.responded_at,
+            )
+            for row in rows
+        ]
+
+    async def get_attendee_counts(self, event_id: UUID) -> AttendeeCount:
+        stmt = (
+            select(EventAttendee.status, func.count().label("cnt"))
+            .where(EventAttendee.event_id == event_id)
+            .group_by(EventAttendee.status)
+        )
+        rows = await self._session.execute(stmt)
+        counts: dict[str, int] = {r.status: r.cnt for r in rows}
+        return AttendeeCount(
+            going=counts.get("going", 0),
+            maybe=counts.get("maybe", 0),
+            not_going=counts.get("not_going", 0),
+        )
+
+    async def get_my_rsvp_status(self, event_id: UUID, user_id: UUID) -> str | None:
+        attendee = await self._session.get(EventAttendee, (event_id, user_id))
+        return attendee.status if attendee else None
+
+    # Kept for backward compatibility — callers still reference rsvp_counts / my_rsvp.
+    async def rsvp_counts(self, event_id: UUID) -> dict[str, int]:
+        counts = await self.get_attendee_counts(event_id)
+        return {"going": counts.going, "maybe": counts.maybe, "not_going": counts.not_going}
 
     async def my_rsvp(self, event_id: UUID, user_id: UUID) -> str | None:
-        rsvp = await self._session.get(EventRSVP, (event_id, user_id))
-        return rsvp.status if rsvp else None
+        return await self.get_my_rsvp_status(event_id, user_id)
 
     # --- messages ---
 
@@ -181,10 +252,12 @@ class ClubRepository:
         user_id: UUID,
         content: str,
         media_url: str | None,
+        room_id: UUID | None = None,
     ) -> ClubMessage:
         msg = ClubMessage(
             id=uuid4(),
             club_id=club_id,
+            room_id=room_id,
             user_id=user_id,
             content=content,
             media_url=media_url,
@@ -200,8 +273,13 @@ class ClubRepository:
         *,
         cursor: datetime | None,
         limit: int,
+        room_id: UUID | None = None,
     ) -> list[tuple[ClubMessage, str, int]]:
-        """Return (message, author_nickname, read_count) tuples, newest-first."""
+        """Return (message, author_nickname, read_count) tuples, newest-first.
+
+        When *room_id* is provided only messages in that room are returned;
+        otherwise only club-wide messages (room_id IS NULL) are returned.
+        """
         read_count_subq = (
             select(func.count())
             .select_from(MessageRead)
@@ -219,6 +297,10 @@ class ClubRepository:
             .order_by(ClubMessage.created_at.desc())
             .limit(limit)
         )
+        if room_id is not None:
+            stmt = stmt.where(ClubMessage.room_id == room_id)
+        else:
+            stmt = stmt.where(ClubMessage.room_id.is_(None))
         if cursor is not None:
             stmt = stmt.where(ClubMessage.created_at < cursor)
         rows = await self._session.execute(stmt)
@@ -257,3 +339,62 @@ class ClubRepository:
             )
         )
         await self._session.flush()
+
+    # --- club rooms ---
+
+    async def create_room(
+        self,
+        *,
+        club_id: UUID,
+        name: str,
+        progress_gate: int,
+        created_by: UUID,
+    ) -> ClubRoom:
+        room = ClubRoom(
+            id=uuid4(),
+            club_id=club_id,
+            name=name,
+            progress_gate=progress_gate,
+            created_by=created_by,
+            created_at=datetime.now(),
+        )
+        self._session.add(room)
+        await self._session.flush()
+        return room
+
+    async def get_rooms(self, club_id: UUID) -> list[ClubRoom]:
+        stmt = (
+            select(ClubRoom)
+            .where(ClubRoom.club_id == club_id)
+            .order_by(ClubRoom.progress_gate.asc(), ClubRoom.created_at.asc())
+        )
+        rows = await self._session.execute(stmt)
+        return list(rows.scalars().all())
+
+    async def get_room(self, room_id: UUID) -> ClubRoom | None:
+        return await self._session.get(ClubRoom, room_id)
+
+    async def delete_room(self, room_id: UUID) -> None:
+        stmt = delete(ClubRoom).where(ClubRoom.id == room_id)
+        await self._session.execute(stmt)
+
+    async def get_user_progress_for_club(self, user_id: UUID, club_id: UUID) -> int:
+        """Return the caller's reading progress (0-100) for the club's current book.
+
+        Returns 0 when the club has no book, or the user has no library entry
+        for that book.  The ``user_books.progress`` column stores a 0-100
+        integer added in the M29 migration.
+        """
+        from app.domains.book.models import UserBook
+
+        club = await self._session.get(ReadingClub, club_id)
+        if club is None or club.book_id is None:
+            return 0
+
+        stmt = select(UserBook.progress).where(
+            UserBook.user_id == user_id,
+            UserBook.book_id == club.book_id,
+        )
+        result = await self._session.execute(stmt)
+        progress: int | None = result.scalar_one_or_none()
+        return progress if progress is not None else 0

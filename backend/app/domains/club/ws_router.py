@@ -187,6 +187,110 @@ async def club_chat_stream(
         ws_manager.disconnect_user(user_id, websocket)
 
 
+@router.websocket("/ws/clubs/{club_id}/rooms/{room_id}")
+async def room_chat_stream(
+    websocket: WebSocket,
+    club_id: uuid.UUID,
+    room_id: uuid.UUID,
+    token: str = Query(...),
+    session: AsyncSession = Depends(get_session),
+) -> None:
+    """Real-time chat stream for a progress-gated club room.
+
+    The client must supply a valid JWT access token via ``?token=``.
+    On connect the user's reading progress is checked against the room's
+    ``progress_gate``; insufficient progress results in a 4003 close.
+
+    Close codes:
+    - 4001: missing or invalid token
+    - 4003: progress below progress_gate (or user is not a club member)
+    """
+    try:
+        user_id = _authenticate_ws(token)
+    except AuthError as exc:
+        await websocket.close(code=4001, reason=str(exc))
+        return
+
+    # Verify progress gate before accepting the connection.
+    from sqlalchemy import select
+
+    from app.domains.book.models import UserBook
+    from app.domains.club.models import ClubMember, ClubRoom, ReadingClub
+
+    # Check club membership.
+    member_stmt = select(ClubMember.club_id).where(
+        ClubMember.club_id == club_id,
+        ClubMember.user_id == uuid.UUID(user_id),
+    )
+    member_result = await session.execute(member_stmt)
+    if member_result.scalar_one_or_none() is None:
+        await websocket.close(code=4003, reason="not a club member")
+        return
+
+    # Fetch the room.
+    room = await session.get(ClubRoom, room_id)
+    if room is None or room.club_id != club_id:
+        await websocket.close(code=4003, reason="room not found")
+        return
+
+    if room.progress_gate > 0:
+        # Resolve the club's book and compare the caller's progress against the gate.
+        club = await session.get(ReadingClub, club_id)
+        caller_progress = 0
+        if club is not None and club.book_id is not None:
+            progress_stmt = select(UserBook.progress).where(
+                UserBook.user_id == uuid.UUID(user_id),
+                UserBook.book_id == club.book_id,
+            )
+            progress_result = await session.execute(progress_stmt)
+            raw_progress: int | None = progress_result.scalar_one_or_none()
+            caller_progress = raw_progress if raw_progress is not None else 0
+
+        if caller_progress < room.progress_gate:
+            await websocket.close(
+                code=4003,
+                reason=f"progress {caller_progress} below gate {room.progress_gate}",
+            )
+            return
+
+    await websocket.accept()
+    ws_manager.connect_room(room_id, websocket)
+    ws_manager.connect_user(user_id, websocket)
+
+    heartbeat_task = asyncio.create_task(_heartbeat(websocket))
+
+    try:
+        while True:
+            raw = await websocket.receive_text()
+            try:
+                data: dict[str, Any] = json.loads(raw)
+            except json.JSONDecodeError:
+                await websocket.send_text(json.dumps({"type": "error", "detail": "invalid JSON"}))
+                continue
+
+            outbound: dict[str, Any] = {
+                "type": "message",
+                "club_id": str(club_id),
+                "room_id": str(room_id),
+                "user_id": user_id,
+                "content": data.get("content", ""),
+            }
+            if "media_url" in data:
+                outbound["media_url"] = data["media_url"]
+
+            await ws_manager.broadcast_room(room_id, outbound)
+    except WebSocketDisconnect:
+        pass
+    except Exception:
+        logger.exception(
+            "Unexpected error in room_chat_stream for room=%s user=%s", room_id, user_id
+        )
+    finally:
+        heartbeat_task.cancel()
+        ws_manager.disconnect_room(room_id, websocket)
+        ws_manager.disconnect_user(user_id, websocket)
+
+
 @router.websocket("/ws/me")
 async def personal_notification_stream(
     websocket: WebSocket,

@@ -1,10 +1,10 @@
 """Process-wide WebSocket connection manager with optional Redis fan-out.
 
 Architecture:
-- Local state: ``_club_sockets`` and ``_user_sockets`` hold live WebSocket
-  objects for connections handled by *this* process.
-- Redis pub/sub: when Redis is available, ``broadcast_club`` also publishes to
-  a per-club channel so that horizontally-scaled processes relay the message
+- Local state: ``_club_sockets``, ``_room_sockets``, and ``_user_sockets``
+  hold live WebSocket objects for connections handled by *this* process.
+- Redis pub/sub: when Redis is available, broadcast helpers also publish to
+  per-channel keys so that horizontally-scaled processes relay the message
   to their own local subscribers.  The background listener task is started
   lazily on first publish attempt.
 
@@ -13,6 +13,7 @@ Usage::
     from app.core.ws_manager import ws_manager
 
     await ws_manager.broadcast_club(club_id, {"type": "message", ...})
+    await ws_manager.broadcast_room(room_id, {"type": "message", ...})
     await ws_manager.send_user(user_id, {"type": "notification", ...})
 """
 
@@ -31,6 +32,7 @@ logger = logging.getLogger(__name__)
 
 # Redis channel prefixes — keep in sync with any consumer scripts.
 _CLUB_CHANNEL_PREFIX = "ws:club:"
+_ROOM_CHANNEL_PREFIX = "ws:room:"
 _USER_CHANNEL_PREFIX = "ws:user:"
 
 
@@ -45,6 +47,8 @@ class ConnectionManager:
     def __init__(self) -> None:
         # club_id (str) → set of active WebSocket connections in this process.
         self._club_sockets: dict[str, set[WebSocket]] = defaultdict(set)
+        # room_id (str) → set of active WebSocket connections in this process.
+        self._room_sockets: dict[str, set[WebSocket]] = defaultdict(set)
         # user_id (str) → set of active WebSocket connections in this process.
         self._user_sockets: dict[str, set[WebSocket]] = defaultdict(set)
         # Background task handle for the Redis pub/sub relay loop.
@@ -58,6 +62,10 @@ class ConnectionManager:
         """Register *websocket* as a subscriber for *club_id*."""
         self._club_sockets[str(club_id)].add(websocket)
 
+    def connect_room(self, room_id: UUID | str, websocket: WebSocket) -> None:
+        """Register *websocket* as a subscriber for a progress-gated *room_id*."""
+        self._room_sockets[str(room_id)].add(websocket)
+
     def connect_user(self, user_id: UUID | str, websocket: WebSocket) -> None:
         """Register *websocket* as the personal stream for *user_id*."""
         self._user_sockets[str(user_id)].add(websocket)
@@ -68,6 +76,13 @@ class ConnectionManager:
         self._club_sockets[key].discard(websocket)
         if not self._club_sockets[key]:
             del self._club_sockets[key]
+
+    def disconnect_room(self, room_id: UUID | str, websocket: WebSocket) -> None:
+        """Remove *websocket* from the *room_id* subscriber set."""
+        key = str(room_id)
+        self._room_sockets[key].discard(websocket)
+        if not self._room_sockets[key]:
+            del self._room_sockets[key]
 
     def disconnect_user(self, user_id: UUID | str, websocket: WebSocket) -> None:
         """Remove *websocket* from the *user_id* personal stream set."""
@@ -93,6 +108,19 @@ class ConnectionManager:
         payload = json.dumps(message, default=str)
         await self._broadcast_local_club(str(club_id), payload)
         await self._redis_publish(_CLUB_CHANNEL_PREFIX + str(club_id), payload)
+
+    async def broadcast_room(
+        self,
+        room_id: UUID | str,
+        message: dict[str, Any],
+    ) -> None:
+        """Send *message* to all subscribers of a progress-gated room.
+
+        Also publishes to the room Redis channel for cross-process fan-out.
+        """
+        payload = json.dumps(message, default=str)
+        await self._broadcast_local_room(str(room_id), payload)
+        await self._redis_publish(_ROOM_CHANNEL_PREFIX + str(room_id), payload)
 
     async def send_user(
         self,
@@ -122,6 +150,17 @@ class ConnectionManager:
                 dead.append(ws)
         for ws in dead:
             self._club_sockets[club_id].discard(ws)
+
+    async def _broadcast_local_room(self, room_id: str, payload: str) -> None:
+        sockets = list(self._room_sockets.get(room_id, set()))
+        dead: list[WebSocket] = []
+        for ws in sockets:
+            try:
+                await ws.send_text(payload)
+            except Exception:
+                dead.append(ws)
+        for ws in dead:
+            self._room_sockets[room_id].discard(ws)
 
     async def _send_local_user(self, user_id: str, payload: str) -> None:
         sockets = list(self._user_sockets.get(user_id, set()))
@@ -168,6 +207,7 @@ class ConnectionManager:
             pubsub = redis.pubsub()
             await pubsub.psubscribe(
                 _CLUB_CHANNEL_PREFIX + "*",
+                _ROOM_CHANNEL_PREFIX + "*",
                 _USER_CHANNEL_PREFIX + "*",
             )
             async for raw in pubsub.listen():
@@ -178,6 +218,9 @@ class ConnectionManager:
                 if channel.startswith(_CLUB_CHANNEL_PREFIX):
                     club_id = channel[len(_CLUB_CHANNEL_PREFIX) :]
                     await self._broadcast_local_club(club_id, data)
+                elif channel.startswith(_ROOM_CHANNEL_PREFIX):
+                    room_id = channel[len(_ROOM_CHANNEL_PREFIX) :]
+                    await self._broadcast_local_room(room_id, data)
                 elif channel.startswith(_USER_CHANNEL_PREFIX):
                     user_id = channel[len(_USER_CHANNEL_PREFIX) :]
                     await self._send_local_user(user_id, data)

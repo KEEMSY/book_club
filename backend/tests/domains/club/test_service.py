@@ -11,9 +11,13 @@ from uuid import UUID, uuid4
 
 import pytest
 from app.core.exceptions import ConflictError, NotFoundError, PermissionDeniedError
-from app.domains.club.schemas import CreateClubRequest, CreateEventRequest
+from app.domains.club.schemas import (
+    AttendeeCount,
+    ClubEventCreate,
+    ClubEventUpdate,
+    CreateClubRequest,
+)
 from app.domains.club.service import ClubService
-
 
 # ---------------------------------------------------------------------------
 # Plain-dataclass stand-ins that duck-type ReadingClub / ClubEvent
@@ -39,9 +43,9 @@ class _FakeEvent:
     club_id: UUID = field(default_factory=uuid4)
     title: str = "Test Event"
     description: str | None = None
-    event_type: str = "online"
     location: str | None = None
-    scheduled_at: datetime = field(default_factory=lambda: datetime.now(tz=UTC))
+    event_at: datetime = field(default_factory=lambda: datetime.now(tz=UTC))
+    max_attendees: int | None = None
     created_by: UUID = field(default_factory=uuid4)
     created_at: datetime = field(default_factory=lambda: datetime.now(tz=UTC))
 
@@ -55,8 +59,9 @@ class FakeClubRepository:
     def __init__(self) -> None:
         self._clubs: dict[UUID, _FakeClub] = {}
         self._by_code: dict[str, _FakeClub] = {}
-        self._members: dict[UUID, set[UUID]] = {}  # club_id → {user_id}
-        self._events: dict[UUID, _FakeEvent] = {}  # event_id → event
+        self._members: dict[UUID, dict[UUID, str]] = {}  # club_id → {user_id: role}
+        self._events: dict[UUID, _FakeEvent] = {}
+        self._rsvps: dict[tuple[UUID, UUID], str] = {}  # (event_id, user_id) → status
 
     async def create(
         self,
@@ -70,7 +75,7 @@ class FakeClubRepository:
         c = _FakeClub(owner_id=owner_id, name=name, max_members=max_members)
         self._clubs[c.id] = c
         self._by_code[c.invite_code] = c
-        self._members[c.id] = {owner_id}
+        self._members[c.id] = {owner_id: "owner"}
         return c
 
     async def get_by_id(self, club_id: UUID) -> _FakeClub | None:
@@ -80,19 +85,22 @@ class FakeClubRepository:
         return self._by_code.get(code)
 
     async def list_by_user(self, user_id: UUID) -> list[_FakeClub]:
-        return [c for c in self._clubs.values() if user_id in self._members.get(c.id, set())]
+        return [c for c in self._clubs.values() if user_id in self._members.get(c.id, {})]
 
     async def member_count(self, club_id: UUID) -> int:
-        return len(self._members.get(club_id, set()))
+        return len(self._members.get(club_id, {}))
 
     async def is_member(self, club_id: UUID, user_id: UUID) -> bool:
-        return user_id in self._members.get(club_id, set())
+        return user_id in self._members.get(club_id, {})
+
+    async def get_member_role(self, club_id: UUID, user_id: UUID) -> str | None:
+        return self._members.get(club_id, {}).get(user_id)
 
     async def join(self, club_id: UUID, user_id: UUID) -> None:
-        self._members.setdefault(club_id, set()).add(user_id)
+        self._members.setdefault(club_id, {})[user_id] = "member"
 
     async def leave(self, club_id: UUID, user_id: UUID) -> None:
-        self._members.get(club_id, set()).discard(user_id)
+        self._members.get(club_id, {}).pop(user_id, None)
 
     async def create_event(
         self,
@@ -101,22 +109,76 @@ class FakeClubRepository:
         created_by: UUID,
         title: str,
         description: str | None,
-        event_type: str,
+        event_at: datetime,
         location: str | None,
-        scheduled_at: datetime,
+        max_attendees: int | None,
     ) -> _FakeEvent:
-        ev = _FakeEvent(club_id=club_id, title=title, created_by=created_by)
+        ev = _FakeEvent(
+            club_id=club_id,
+            title=title,
+            created_by=created_by,
+            description=description,
+            event_at=event_at,
+            location=location,
+            max_attendees=max_attendees,
+        )
         self._events[ev.id] = ev
         return ev
+
+    async def get_events(
+        self, club_id: UUID, *, upcoming_only: bool = True
+    ) -> list[_FakeEvent]:
+        return [e for e in self._events.values() if e.club_id == club_id]
 
     async def get_event(self, event_id: UUID) -> _FakeEvent | None:
         return self._events.get(event_id)
 
-    async def list_events(self, club_id: UUID) -> list[_FakeEvent]:
-        return [e for e in self._events.values() if e.club_id == club_id]
+    async def update_event(
+        self,
+        event_id: UUID,
+        *,
+        title: str | None = None,
+        description: str | None = None,
+        event_at: datetime | None = None,
+        location: str | None = None,
+        max_attendees: int | None = None,
+    ) -> _FakeEvent | None:
+        ev = self._events.get(event_id)
+        if ev is None:
+            return None
+        if title is not None:
+            ev.title = title
+        if description is not None:
+            ev.description = description
+        if event_at is not None:
+            ev.event_at = event_at
+        if location is not None:
+            ev.location = location
+        if max_attendees is not None:
+            ev.max_attendees = max_attendees
+        return ev
+
+    async def delete_event(self, event_id: UUID) -> None:
+        self._events.pop(event_id, None)
 
     async def upsert_rsvp(self, *, event_id: UUID, user_id: UUID, status: str) -> None:
-        pass
+        self._rsvps[(event_id, user_id)] = status
+
+    async def get_attendees(self, event_id: UUID) -> list:  # type: ignore[type-arg]
+        return []
+
+    async def get_attendee_counts(self, event_id: UUID) -> AttendeeCount:
+        return AttendeeCount(going=0, maybe=0, not_going=0)
+
+    async def get_my_rsvp_status(self, event_id: UUID, user_id: UUID) -> str | None:
+        return self._rsvps.get((event_id, user_id))
+
+    # Kept for any code still calling old names.
+    async def rsvp_counts(self, event_id: UUID) -> dict[str, int]:
+        return {"going": 0, "maybe": 0, "not_going": 0}
+
+    async def my_rsvp(self, event_id: UUID, user_id: UUID) -> str | None:
+        return self._rsvps.get((event_id, user_id))
 
 
 def _svc() -> tuple[ClubService, FakeClubRepository]:
@@ -128,13 +190,13 @@ def _create_req(name: str = "My Club", max_members: int = 10) -> CreateClubReque
     return CreateClubRequest(name=name, description=None, book_id=None, max_members=max_members)
 
 
-def _event_req() -> CreateEventRequest:
-    return CreateEventRequest(
+def _event_data() -> ClubEventCreate:
+    return ClubEventCreate(
         title="Weekly Meeting",
         description=None,
-        event_type="online",
+        event_at=datetime.now(tz=UTC),
         location=None,
-        scheduled_at=datetime.now(tz=UTC),
+        max_attendees=None,
     )
 
 
@@ -239,36 +301,101 @@ async def test_leave_nonexistent_club_raises_not_found() -> None:
 
 
 @pytest.mark.asyncio
-async def test_create_event_non_member_raises_permission_denied() -> None:
+async def test_create_event_non_owner_raises_permission_denied() -> None:
     svc, repo = _svc()
+    owner = uuid4()
+    club = await svc.create_club(user_id=owner, req=_create_req())
+    # regular member (not owner) should be denied
+    member = uuid4()
+    await repo.join(club.id, member)
+
+    with pytest.raises(PermissionDeniedError):
+        await svc.create_event(user_id=member, club_id=club.id, data=_event_data())
+
+
+@pytest.mark.asyncio
+async def test_create_event_outsider_raises_permission_denied() -> None:
+    svc, _ = _svc()
     owner = uuid4()
     club = await svc.create_club(user_id=owner, req=_create_req())
     outsider = uuid4()
 
     with pytest.raises(PermissionDeniedError):
-        await svc.create_event(user_id=outsider, club_id=club.id, req=_event_req())
+        await svc.create_event(user_id=outsider, club_id=club.id, data=_event_data())
 
 
 @pytest.mark.asyncio
-async def test_create_event_member_succeeds() -> None:
-    svc, repo = _svc()
+async def test_create_event_owner_succeeds() -> None:
+    svc, _ = _svc()
     owner = uuid4()
     club = await svc.create_club(user_id=owner, req=_create_req())
 
-    event = await svc.create_event(user_id=owner, club_id=club.id, req=_event_req())
-    assert event.club_id == club.id
-    assert event.title == "Weekly Meeting"
+    result = await svc.create_event(user_id=owner, club_id=club.id, data=_event_data())
+    assert result.club_id == club.id
+    assert result.title == "Weekly Meeting"
+    assert result.attendee_counts.going == 0
 
 
 @pytest.mark.asyncio
 async def test_list_events_non_member_raises_permission_denied() -> None:
-    svc, repo = _svc()
+    svc, _ = _svc()
     owner = uuid4()
     club = await svc.create_club(user_id=owner, req=_create_req())
     outsider = uuid4()
 
     with pytest.raises(PermissionDeniedError):
-        await svc.list_events(user_id=outsider, club_id=club.id)
+        await svc.list_events(club_id=club.id, caller_user_id=outsider)
+
+
+@pytest.mark.asyncio
+async def test_list_events_member_succeeds() -> None:
+    svc, _ = _svc()
+    owner = uuid4()
+    club = await svc.create_club(user_id=owner, req=_create_req())
+    await svc.create_event(user_id=owner, club_id=club.id, data=_event_data())
+
+    events = await svc.list_events(club_id=club.id, caller_user_id=owner)
+    assert len(events) == 1
+    assert events[0].title == "Weekly Meeting"
+
+
+@pytest.mark.asyncio
+async def test_update_event_owner_succeeds() -> None:
+    svc, _ = _svc()
+    owner = uuid4()
+    club = await svc.create_club(user_id=owner, req=_create_req())
+    created = await svc.create_event(user_id=owner, club_id=club.id, data=_event_data())
+
+    patch = ClubEventUpdate(title="Renamed Meeting")
+    updated = await svc.update_event(event_id=created.id, user_id=owner, data=patch)
+    assert updated.title == "Renamed Meeting"
+
+
+@pytest.mark.asyncio
+async def test_update_event_non_owner_raises_permission_denied() -> None:
+    svc, repo = _svc()
+    owner = uuid4()
+    club = await svc.create_club(user_id=owner, req=_create_req())
+    created = await svc.create_event(user_id=owner, club_id=club.id, data=_event_data())
+
+    member = uuid4()
+    await repo.join(club.id, member)
+
+    with pytest.raises(PermissionDeniedError):
+        await svc.update_event(
+            event_id=created.id, user_id=member, data=ClubEventUpdate(title="Hack")
+        )
+
+
+@pytest.mark.asyncio
+async def test_delete_event_owner_succeeds() -> None:
+    svc, repo = _svc()
+    owner = uuid4()
+    club = await svc.create_club(user_id=owner, req=_create_req())
+    created = await svc.create_event(user_id=owner, club_id=club.id, data=_event_data())
+
+    await svc.delete_event(event_id=created.id, user_id=owner)
+    assert await repo.get_event(created.id) is None
 
 
 # ---------------------------------------------------------------------------
@@ -285,22 +412,22 @@ async def test_rsvp_nonexistent_event_raises_not_found() -> None:
 
 @pytest.mark.asyncio
 async def test_rsvp_non_member_raises_permission_denied() -> None:
-    svc, repo = _svc()
+    svc, _ = _svc()
     owner = uuid4()
     club = await svc.create_club(user_id=owner, req=_create_req())
-    event = await svc.create_event(user_id=owner, club_id=club.id, req=_event_req())
+    created = await svc.create_event(user_id=owner, club_id=club.id, data=_event_data())
     outsider = uuid4()
 
     with pytest.raises(PermissionDeniedError):
-        await svc.rsvp(user_id=outsider, event_id=event.id, status="going")
+        await svc.rsvp(user_id=outsider, event_id=created.id, status="going")
 
 
 @pytest.mark.asyncio
 async def test_rsvp_member_succeeds() -> None:
-    svc, repo = _svc()
+    svc, _ = _svc()
     owner = uuid4()
     club = await svc.create_club(user_id=owner, req=_create_req())
-    event = await svc.create_event(user_id=owner, club_id=club.id, req=_event_req())
+    created = await svc.create_event(user_id=owner, club_id=club.id, data=_event_data())
 
     # Should not raise
-    await svc.rsvp(user_id=owner, event_id=event.id, status="going")
+    await svc.rsvp(user_id=owner, event_id=created.id, status="going")

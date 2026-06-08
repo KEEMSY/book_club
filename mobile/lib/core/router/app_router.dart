@@ -20,6 +20,10 @@ import '../../features/community/presentation/profile_edit_screen.dart';
 import '../../features/community/presentation/user_profile_screen.dart';
 import '../../features/social/domain/user_summary.dart';
 import '../../features/feed/presentation/post_compose_screen.dart';
+import '../../features/club/presentation/club_events_screen.dart';
+import '../../features/club/presentation/club_room_chat_screen.dart';
+import '../../features/club/presentation/club_rooms_screen.dart';
+import '../../features/club/domain/club.dart';
 import '../../features/notification/presentation/notification_screen.dart';
 import '../../features/notification/presentation/weekly_report_screen.dart';
 import '../../features/reading/application/recap_notifier.dart';
@@ -83,6 +87,14 @@ class AppRoutes {
 
   // M28 — monthly recap card.
   static const monthlyRecap = '/reading/recap/monthly';
+
+  // M30 — offline reading meetup events list.
+  static String clubEvents(String clubId) => '/clubs/$clubId/events';
+
+  // M29 — chapter-gated chat rooms list and individual room chat.
+  static String clubRooms(String clubId) => '/clubs/$clubId/rooms';
+  static String clubRoomChat(String clubId, String roomId) =>
+      '/clubs/$clubId/rooms/$roomId/chat';
 }
 
 /// Adapter that bridges a Riverpod [ValueNotifier]-free state stream into a
@@ -227,6 +239,41 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return MonthlyRecapScreen(
             year: extra?['year'],
             month: extra?['month'],
+          );
+        },
+      ),
+      // M30 — club events list (offline reading meetup UI).
+      GoRoute(
+        path: '/clubs/:clubId/events',
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) {
+          final String clubId = state.pathParameters['clubId']!;
+          return ClubEventsScreen(clubId: clubId);
+        },
+      ),
+      // M29 — chapter-gated room list; Club object passed via extra.
+      GoRoute(
+        path: '/clubs/:clubId/rooms',
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) {
+          final Club club = state.extra! as Club;
+          return ClubRoomsScreen(club: club);
+        },
+      ),
+      // M29 — individual room chat screen.
+      GoRoute(
+        path: '/clubs/:clubId/rooms/:roomId/chat',
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) {
+          final String clubId = state.pathParameters['clubId']!;
+          final String roomId = state.pathParameters['roomId']!;
+          // Room name is optionally passed as extra String for AppBar display.
+          final String roomName =
+              state.extra as String? ?? '채팅방';
+          return ClubRoomChatScreen(
+            clubId: clubId,
+            roomId: roomId,
+            roomName: roomName,
           );
         },
       ),

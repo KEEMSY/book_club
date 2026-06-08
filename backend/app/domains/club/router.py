@@ -11,16 +11,21 @@ from app.domains.club.models import ReadingClub
 from app.domains.club.providers import get_club_service
 from app.domains.club.repository import ClubRepository
 from app.domains.club.schemas import (
+    AttendeeListResponse,
+    ClubEventCreate,
     ClubEventListResponse,
     ClubEventPublic,
+    ClubEventUpdate,
     ClubListResponse,
     ClubMessagePublic,
     ClubPublic,
+    ClubRoomCreate,
+    ClubRoomListResponse,
+    ClubRoomPublic,
     CreateClubRequest,
-    CreateEventRequest,
     EditMessageRequest,
     MessageListResponse,
-    RSVPRequest,
+    RsvpRequest,
     SendMessageRequest,
 )
 from app.domains.club.service import ClubService
@@ -101,22 +106,11 @@ async def leave_club(
 )
 async def create_event(
     club_id: UUID,
-    body: CreateEventRequest,
+    body: ClubEventCreate,
     user_id: Annotated[str, Depends(get_current_user_id)],
     service: Annotated[ClubService, Depends(get_club_service)],
 ) -> ClubEventPublic:
-    event = await service.create_event(user_id=UUID(user_id), club_id=club_id, req=body)
-    return ClubEventPublic(
-        id=event.id,
-        club_id=event.club_id,
-        title=event.title,
-        description=event.description,
-        event_type=event.event_type,
-        location=event.location,
-        scheduled_at=event.scheduled_at,
-        created_by=event.created_by,
-        created_at=event.created_at,
-    )
+    return await service.create_event(user_id=UUID(user_id), club_id=club_id, data=body)
 
 
 @router.get("/{club_id}/events", response_model=ClubEventListResponse)
@@ -124,29 +118,49 @@ async def list_events(
     club_id: UUID,
     user_id: Annotated[str, Depends(get_current_user_id)],
     service: Annotated[ClubService, Depends(get_club_service)],
+    upcoming_only: Annotated[bool, Query(description="Filter to future events only")] = True,
 ) -> ClubEventListResponse:
-    events = await service.list_events(user_id=UUID(user_id), club_id=club_id)
-    items = []
-    for e in events:
-        counts = await service.repo.rsvp_counts(e.id)
-        my = await service.repo.my_rsvp(e.id, UUID(user_id))
-        items.append(
-            ClubEventPublic(
-                id=e.id,
-                club_id=e.club_id,
-                title=e.title,
-                description=e.description,
-                event_type=e.event_type,
-                location=e.location,
-                scheduled_at=e.scheduled_at,
-                created_by=e.created_by,
-                created_at=e.created_at,
-                going_count=counts.get("going", 0),
-                maybe_count=counts.get("maybe", 0),
-                my_rsvp=my,
-            )
-        )
+    items = await service.list_events(
+        club_id=club_id, caller_user_id=UUID(user_id), upcoming_only=upcoming_only
+    )
     return ClubEventListResponse(items=items)
+
+
+@router.get("/{club_id}/events/{event_id}", response_model=ClubEventPublic)
+async def get_event(
+    club_id: UUID,
+    event_id: UUID,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> ClubEventPublic:
+    return await service.get_event(event_id=event_id, caller_user_id=UUID(user_id))
+
+
+@router.patch(
+    "/{club_id}/events/{event_id}",
+    response_model=ClubEventPublic,
+)
+async def update_event(
+    club_id: UUID,
+    event_id: UUID,
+    body: ClubEventUpdate,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> ClubEventPublic:
+    return await service.update_event(event_id=event_id, user_id=UUID(user_id), data=body)
+
+
+@router.delete(
+    "/{club_id}/events/{event_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def delete_event(
+    club_id: UUID,
+    event_id: UUID,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> None:
+    await service.delete_event(event_id=event_id, user_id=UUID(user_id))
 
 
 @router.post(
@@ -156,11 +170,24 @@ async def list_events(
 async def rsvp_event(
     club_id: UUID,
     event_id: UUID,
-    body: RSVPRequest,
+    body: RsvpRequest,
     user_id: Annotated[str, Depends(get_current_user_id)],
     service: Annotated[ClubService, Depends(get_club_service)],
 ) -> None:
     await service.rsvp(user_id=UUID(user_id), event_id=event_id, status=body.status)
+
+
+@router.get(
+    "/{club_id}/events/{event_id}/attendees",
+    response_model=AttendeeListResponse,
+)
+async def list_event_attendees(
+    club_id: UUID,
+    event_id: UUID,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> AttendeeListResponse:
+    return await service.get_attendees(event_id=event_id, caller_user_id=UUID(user_id))
 
 
 # --- chat messages ---
@@ -254,4 +281,54 @@ async def delete_message(
         club_id=club_id,
         user_id=UUID(user_id),
         message_id=message_id,
+    )
+
+
+# --- club rooms ---
+
+
+@router.post(
+    "/{club_id}/rooms",
+    response_model=ClubRoomPublic,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_room(
+    club_id: UUID,
+    body: ClubRoomCreate,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> ClubRoomPublic:
+    return await service.create_room(
+        club_id=club_id,
+        user_id=UUID(user_id),
+        req=body,
+    )
+
+
+@router.get("/{club_id}/rooms", response_model=ClubRoomListResponse)
+async def list_rooms(
+    club_id: UUID,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> ClubRoomListResponse:
+    return await service.list_rooms(
+        club_id=club_id,
+        caller_user_id=UUID(user_id),
+    )
+
+
+@router.delete(
+    "/{club_id}/rooms/{room_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def delete_room(
+    club_id: UUID,
+    room_id: UUID,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> None:
+    await service.delete_room(
+        club_id=club_id,
+        room_id=room_id,
+        user_id=UUID(user_id),
     )

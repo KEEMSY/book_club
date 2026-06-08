@@ -5,7 +5,16 @@ import secrets
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, Index, PrimaryKeyConstraint, SmallInteger, String, Text
+from sqlalchemy import (
+    CheckConstraint,
+    DateTime,
+    ForeignKey,
+    Index,
+    PrimaryKeyConstraint,
+    SmallInteger,
+    String,
+    Text,
+)
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -91,9 +100,9 @@ class ClubEvent(Base):
     )
     title: Mapped[str] = mapped_column(String(200), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
-    event_type: Mapped[str] = mapped_column(String(20), nullable=False)
-    location: Mapped[str | None] = mapped_column(Text, nullable=True)
-    scheduled_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    location: Mapped[str | None] = mapped_column(String(300), nullable=True)
+    event_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    max_attendees: Mapped[int | None] = mapped_column(SmallInteger, nullable=True)
     created_by: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
@@ -102,14 +111,20 @@ class ClubEvent(Base):
     )
 
     club: Mapped[ReadingClub] = relationship("ReadingClub", back_populates="events")
-    rsvps: Mapped[list[EventRSVP]] = relationship(
-        "EventRSVP", back_populates="event", cascade="all, delete-orphan"
+    attendees: Mapped[list[EventAttendee]] = relationship(
+        "EventAttendee", back_populates="event", cascade="all, delete-orphan"
     )
 
 
-class EventRSVP(Base):
-    __tablename__ = "event_rsvps"
-    __table_args__ = (PrimaryKeyConstraint("event_id", "user_id", name="pk_event_rsvps"),)
+class EventAttendee(Base):
+    __tablename__ = "event_attendees"
+    __table_args__ = (
+        PrimaryKeyConstraint("event_id", "user_id", name="pk_event_attendees"),
+        CheckConstraint(
+            "status IN ('going', 'maybe', 'not_going')",
+            name="ck_event_attendees_status",
+        ),
+    )
 
     event_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("club_events.id", ondelete="CASCADE"), nullable=False
@@ -117,16 +132,51 @@ class EventRSVP(Base):
     user_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
-    status: Mapped[str] = mapped_column(String(20), nullable=False)
+    status: Mapped[str] = mapped_column(String(12), nullable=False)
     responded_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, default=lambda: datetime.now()
     )
 
-    event: Mapped[ClubEvent] = relationship("ClubEvent", back_populates="rsvps")
+    event: Mapped[ClubEvent] = relationship("ClubEvent", back_populates="attendees")
+
+
+class ClubRoom(Base):
+    """A progress-gated chat room within a reading club.
+
+    Members whose ``user_books.progress`` value is below ``progress_gate``
+    cannot enter.  ``progress_gate = 0`` means anyone in the club can enter.
+    """
+
+    __tablename__ = "club_rooms"
+    __table_args__ = (Index("ix_club_rooms_club_id", "club_id"),)
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    club_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("reading_clubs.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    # 0 = open to all members; N = caller's progress must be >= N to enter.
+    progress_gate: Mapped[int] = mapped_column(SmallInteger, nullable=False, default=0)
+    created_by: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, default=lambda: datetime.now()
+    )
 
 
 class ClubMessage(Base):
-    """A chat message posted in a reading club channel."""
+    """A chat message posted in a reading club channel.
+
+    ``room_id`` is NULL for the club-wide channel and non-NULL for
+    messages scoped to a :class:`ClubRoom`.
+    """
 
     __tablename__ = "club_messages"
     __table_args__ = (
@@ -141,6 +191,11 @@ class ClubMessage(Base):
         PGUUID(as_uuid=True),
         ForeignKey("reading_clubs.id", ondelete="CASCADE"),
         nullable=False,
+    )
+    room_id: Mapped[uuid.UUID | None] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("club_rooms.id", ondelete="SET NULL"),
+        nullable=True,
     )
     user_id: Mapped[uuid.UUID] = mapped_column(
         PGUUID(as_uuid=True),

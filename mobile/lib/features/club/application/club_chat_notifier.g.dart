@@ -170,5 +170,203 @@ class _ClubChatNotifierProviderElement
   @override
   String get clubId => (origin as ClubChatNotifierProvider).clubId;
 }
+
+String _$clubRoomChatNotifierHash() =>
+    r'839c9ddb41e51b48dd554202983b336c8c8d255d';
+
+abstract class _$ClubRoomChatNotifier extends BuildlessNotifier<ClubChatState> {
+  late final String clubId;
+  late final String roomId;
+
+  ClubChatState build(
+    String clubId,
+    String roomId,
+  );
+}
+
+/// Real-time chat notifier scoped to a single chapter-gated room.
+///
+/// Mirrors [ClubChatNotifier] but connects to the room-specific WebSocket
+/// endpoint: `/ws/clubs/{clubId}/rooms/{roomId}/chat`.
+///
+/// Copied from [ClubRoomChatNotifier].
+@ProviderFor(ClubRoomChatNotifier)
+const clubRoomChatNotifierProvider = ClubRoomChatNotifierFamily();
+
+/// Real-time chat notifier scoped to a single chapter-gated room.
+///
+/// Mirrors [ClubChatNotifier] but connects to the room-specific WebSocket
+/// endpoint: `/ws/clubs/{clubId}/rooms/{roomId}/chat`.
+///
+/// Copied from [ClubRoomChatNotifier].
+class ClubRoomChatNotifierFamily extends Family<ClubChatState> {
+  /// Real-time chat notifier scoped to a single chapter-gated room.
+  ///
+  /// Mirrors [ClubChatNotifier] but connects to the room-specific WebSocket
+  /// endpoint: `/ws/clubs/{clubId}/rooms/{roomId}/chat`.
+  ///
+  /// Copied from [ClubRoomChatNotifier].
+  const ClubRoomChatNotifierFamily();
+
+  /// Real-time chat notifier scoped to a single chapter-gated room.
+  ///
+  /// Mirrors [ClubChatNotifier] but connects to the room-specific WebSocket
+  /// endpoint: `/ws/clubs/{clubId}/rooms/{roomId}/chat`.
+  ///
+  /// Copied from [ClubRoomChatNotifier].
+  ClubRoomChatNotifierProvider call(
+    String clubId,
+    String roomId,
+  ) {
+    return ClubRoomChatNotifierProvider(
+      clubId,
+      roomId,
+    );
+  }
+
+  @override
+  ClubRoomChatNotifierProvider getProviderOverride(
+    covariant ClubRoomChatNotifierProvider provider,
+  ) {
+    return call(
+      provider.clubId,
+      provider.roomId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'clubRoomChatNotifierProvider';
+}
+
+/// Real-time chat notifier scoped to a single chapter-gated room.
+///
+/// Mirrors [ClubChatNotifier] but connects to the room-specific WebSocket
+/// endpoint: `/ws/clubs/{clubId}/rooms/{roomId}/chat`.
+///
+/// Copied from [ClubRoomChatNotifier].
+class ClubRoomChatNotifierProvider
+    extends NotifierProviderImpl<ClubRoomChatNotifier, ClubChatState> {
+  /// Real-time chat notifier scoped to a single chapter-gated room.
+  ///
+  /// Mirrors [ClubChatNotifier] but connects to the room-specific WebSocket
+  /// endpoint: `/ws/clubs/{clubId}/rooms/{roomId}/chat`.
+  ///
+  /// Copied from [ClubRoomChatNotifier].
+  ClubRoomChatNotifierProvider(
+    String clubId,
+    String roomId,
+  ) : this._internal(
+          () => ClubRoomChatNotifier()
+            ..clubId = clubId
+            ..roomId = roomId,
+          from: clubRoomChatNotifierProvider,
+          name: r'clubRoomChatNotifierProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$clubRoomChatNotifierHash,
+          dependencies: ClubRoomChatNotifierFamily._dependencies,
+          allTransitiveDependencies:
+              ClubRoomChatNotifierFamily._allTransitiveDependencies,
+          clubId: clubId,
+          roomId: roomId,
+        );
+
+  ClubRoomChatNotifierProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.clubId,
+    required this.roomId,
+  }) : super.internal();
+
+  final String clubId;
+  final String roomId;
+
+  @override
+  ClubChatState runNotifierBuild(
+    covariant ClubRoomChatNotifier notifier,
+  ) {
+    return notifier.build(
+      clubId,
+      roomId,
+    );
+  }
+
+  @override
+  Override overrideWith(ClubRoomChatNotifier Function() create) {
+    return ProviderOverride(
+      origin: this,
+      override: ClubRoomChatNotifierProvider._internal(
+        () => create()
+          ..clubId = clubId
+          ..roomId = roomId,
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        clubId: clubId,
+        roomId: roomId,
+      ),
+    );
+  }
+
+  @override
+  NotifierProviderElement<ClubRoomChatNotifier, ClubChatState> createElement() {
+    return _ClubRoomChatNotifierProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is ClubRoomChatNotifierProvider &&
+        other.clubId == clubId &&
+        other.roomId == roomId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, clubId.hashCode);
+    hash = _SystemHash.combine(hash, roomId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin ClubRoomChatNotifierRef on NotifierProviderRef<ClubChatState> {
+  /// The parameter `clubId` of this provider.
+  String get clubId;
+
+  /// The parameter `roomId` of this provider.
+  String get roomId;
+}
+
+class _ClubRoomChatNotifierProviderElement
+    extends NotifierProviderElement<ClubRoomChatNotifier, ClubChatState>
+    with ClubRoomChatNotifierRef {
+  _ClubRoomChatNotifierProviderElement(super.provider);
+
+  @override
+  String get clubId => (origin as ClubRoomChatNotifierProvider).clubId;
+  @override
+  String get roomId => (origin as ClubRoomChatNotifierProvider).roomId;
+}
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

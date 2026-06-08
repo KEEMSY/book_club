@@ -6,12 +6,19 @@ from uuid import UUID
 
 from app.core.exceptions import ConflictError, NotFoundError, PermissionDeniedError
 from app.core.ws_manager import ws_manager
-from app.domains.club.models import ClubEvent, ReadingClub
+from app.domains.club.models import ClubRole, ReadingClub
 from app.domains.club.repository import ClubRepository
 from app.domains.club.schemas import (
+    AttendeeCount,
+    AttendeeListResponse,
+    ClubEventCreate,
+    ClubEventPublic,
+    ClubEventUpdate,
     ClubMessagePublic,
+    ClubRoomCreate,
+    ClubRoomListResponse,
+    ClubRoomPublic,
     CreateClubRequest,
-    CreateEventRequest,
     MessageListResponse,
 )
 
@@ -60,25 +67,140 @@ class ClubService:
             )
         await self.repo.leave(club_id, user_id)
 
+    async def _is_owner_or_manager(self, club_id: UUID, user_id: UUID) -> bool:
+        """Return True when the user is the club owner or has manager role."""
+        club = await self.repo.get_by_id(club_id)
+        if not club:
+            return False
+        if club.owner_id == user_id:
+            return True
+        role = await self.repo.get_member_role(club_id, user_id)
+        return role in (ClubRole.OWNER, "manager")
+
     async def create_event(
-        self, *, user_id: UUID, club_id: UUID, req: CreateEventRequest
-    ) -> ClubEvent:
-        if not await self.repo.is_member(club_id, user_id):
-            raise PermissionDeniedError("not a member", code="NOT_MEMBER")
-        return await self.repo.create_event(
+        self, *, user_id: UUID, club_id: UUID, data: ClubEventCreate
+    ) -> ClubEventPublic:
+        if not await self._is_owner_or_manager(club_id, user_id):
+            raise PermissionDeniedError(
+                "only owner or manager can create events", code="PERMISSION_DENIED"
+            )
+        event = await self.repo.create_event(
             club_id=club_id,
             created_by=user_id,
-            title=req.title,
-            description=req.description,
-            event_type=req.event_type,
-            location=req.location,
-            scheduled_at=req.scheduled_at,
+            title=data.title,
+            description=data.description,
+            event_at=data.event_at,
+            location=data.location,
+            max_attendees=data.max_attendees,
+        )
+        return ClubEventPublic(
+            id=event.id,
+            club_id=event.club_id,
+            title=event.title,
+            description=event.description,
+            event_at=event.event_at,
+            location=event.location,
+            max_attendees=event.max_attendees,
+            created_by=event.created_by,
+            created_at=event.created_at,
+            attendee_counts=AttendeeCount(going=0, maybe=0, not_going=0),
+            my_status=None,
         )
 
-    async def list_events(self, *, user_id: UUID, club_id: UUID) -> list[ClubEvent]:
-        if not await self.repo.is_member(club_id, user_id):
+    async def list_events(
+        self, *, club_id: UUID, caller_user_id: UUID, upcoming_only: bool = True
+    ) -> list[ClubEventPublic]:
+        if not await self.repo.is_member(club_id, caller_user_id):
             raise PermissionDeniedError("not a member", code="NOT_MEMBER")
-        return await self.repo.list_events(club_id)
+        events = await self.repo.get_events(club_id, upcoming_only=upcoming_only)
+        result: list[ClubEventPublic] = []
+        for event in events:
+            counts = await self.repo.get_attendee_counts(event.id)
+            my_status = await self.repo.get_my_rsvp_status(event.id, caller_user_id)
+            result.append(
+                ClubEventPublic(
+                    id=event.id,
+                    club_id=event.club_id,
+                    title=event.title,
+                    description=event.description,
+                    event_at=event.event_at,
+                    location=event.location,
+                    max_attendees=event.max_attendees,
+                    created_by=event.created_by,
+                    created_at=event.created_at,
+                    attendee_counts=counts,
+                    my_status=my_status,
+                )
+            )
+        return result
+
+    async def get_event(self, *, event_id: UUID, caller_user_id: UUID) -> ClubEventPublic:
+        event = await self.repo.get_event(event_id)
+        if not event:
+            raise NotFoundError("event not found", code="EVENT_NOT_FOUND")
+        if not await self.repo.is_member(event.club_id, caller_user_id):
+            raise PermissionDeniedError("not a member", code="NOT_MEMBER")
+        counts = await self.repo.get_attendee_counts(event.id)
+        my_status = await self.repo.get_my_rsvp_status(event.id, caller_user_id)
+        return ClubEventPublic(
+            id=event.id,
+            club_id=event.club_id,
+            title=event.title,
+            description=event.description,
+            event_at=event.event_at,
+            location=event.location,
+            max_attendees=event.max_attendees,
+            created_by=event.created_by,
+            created_at=event.created_at,
+            attendee_counts=counts,
+            my_status=my_status,
+        )
+
+    async def update_event(
+        self, *, event_id: UUID, user_id: UUID, data: ClubEventUpdate
+    ) -> ClubEventPublic:
+        event = await self.repo.get_event(event_id)
+        if not event:
+            raise NotFoundError("event not found", code="EVENT_NOT_FOUND")
+        if not await self._is_owner_or_manager(event.club_id, user_id):
+            raise PermissionDeniedError(
+                "only owner or manager can update events", code="PERMISSION_DENIED"
+            )
+        updated = await self.repo.update_event(
+            event_id,
+            title=data.title,
+            description=data.description,
+            event_at=data.event_at,
+            location=data.location,
+            max_attendees=data.max_attendees,
+        )
+        if not updated:
+            raise NotFoundError("event not found", code="EVENT_NOT_FOUND")
+        counts = await self.repo.get_attendee_counts(event_id)
+        my_status = await self.repo.get_my_rsvp_status(event_id, user_id)
+        return ClubEventPublic(
+            id=updated.id,
+            club_id=updated.club_id,
+            title=updated.title,
+            description=updated.description,
+            event_at=updated.event_at,
+            location=updated.location,
+            max_attendees=updated.max_attendees,
+            created_by=updated.created_by,
+            created_at=updated.created_at,
+            attendee_counts=counts,
+            my_status=my_status,
+        )
+
+    async def delete_event(self, *, event_id: UUID, user_id: UUID) -> None:
+        event = await self.repo.get_event(event_id)
+        if not event:
+            raise NotFoundError("event not found", code="EVENT_NOT_FOUND")
+        if not await self._is_owner_or_manager(event.club_id, user_id):
+            raise PermissionDeniedError(
+                "only owner or manager can delete events", code="PERMISSION_DENIED"
+            )
+        await self.repo.delete_event(event_id)
 
     async def rsvp(self, *, user_id: UUID, event_id: UUID, status: str) -> None:
         event = await self.repo.get_event(event_id)
@@ -87,6 +209,15 @@ class ClubService:
         if not await self.repo.is_member(event.club_id, user_id):
             raise PermissionDeniedError("not a member", code="NOT_MEMBER")
         await self.repo.upsert_rsvp(event_id=event_id, user_id=user_id, status=status)
+
+    async def get_attendees(self, *, event_id: UUID, caller_user_id: UUID) -> AttendeeListResponse:
+        event = await self.repo.get_event(event_id)
+        if not event:
+            raise NotFoundError("event not found", code="EVENT_NOT_FOUND")
+        if not await self.repo.is_member(event.club_id, caller_user_id):
+            raise PermissionDeniedError("not a member", code="NOT_MEMBER")
+        attendees = await self.repo.get_attendees(event_id)
+        return AttendeeListResponse(items=attendees)
 
     # --- chat messages ---
 
@@ -217,3 +348,72 @@ class ClubService:
                 "deleted_at": deleted_at.isoformat(),
             },
         )
+
+    # --- club rooms ---
+
+    async def create_room(
+        self,
+        *,
+        club_id: UUID,
+        user_id: UUID,
+        req: ClubRoomCreate,
+    ) -> ClubRoomPublic:
+        if not await self._is_owner_or_manager(club_id, user_id):
+            raise PermissionDeniedError(
+                "only owner or manager can create rooms", code="PERMISSION_DENIED"
+            )
+        room = await self.repo.create_room(
+            club_id=club_id,
+            name=req.name,
+            progress_gate=req.progress_gate,
+            created_by=user_id,
+        )
+        caller_progress = await self.repo.get_user_progress_for_club(user_id, club_id)
+        return ClubRoomPublic(
+            id=room.id,
+            club_id=room.club_id,
+            name=room.name,
+            progress_gate=room.progress_gate,
+            created_at=room.created_at,
+            can_enter=caller_progress >= room.progress_gate,
+        )
+
+    async def list_rooms(
+        self,
+        *,
+        club_id: UUID,
+        caller_user_id: UUID,
+    ) -> ClubRoomListResponse:
+        if not await self.repo.is_member(club_id, caller_user_id):
+            raise PermissionDeniedError("not a member", code="NOT_MEMBER")
+        rooms = await self.repo.get_rooms(club_id)
+        caller_progress = await self.repo.get_user_progress_for_club(caller_user_id, club_id)
+        return ClubRoomListResponse(
+            rooms=[
+                ClubRoomPublic(
+                    id=room.id,
+                    club_id=room.club_id,
+                    name=room.name,
+                    progress_gate=room.progress_gate,
+                    created_at=room.created_at,
+                    can_enter=caller_progress >= room.progress_gate,
+                )
+                for room in rooms
+            ]
+        )
+
+    async def delete_room(
+        self,
+        *,
+        club_id: UUID,
+        room_id: UUID,
+        user_id: UUID,
+    ) -> None:
+        room = await self.repo.get_room(room_id)
+        if not room or room.club_id != club_id:
+            raise NotFoundError("room not found", code="ROOM_NOT_FOUND")
+        if not await self._is_owner_or_manager(club_id, user_id):
+            raise PermissionDeniedError(
+                "only owner or manager can delete rooms", code="PERMISSION_DENIED"
+            )
+        await self.repo.delete_room(room_id)

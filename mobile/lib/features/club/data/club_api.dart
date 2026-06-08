@@ -50,4 +50,19 @@ abstract class ClubApi {
     @Path('clubId') String clubId,
     @Path('messageId') String messageId,
   );
+
+  @GET('/clubs/{clubId}/rooms')
+  Future<dynamic> listRooms(@Path('clubId') String clubId);
+
+  @POST('/clubs/{clubId}/rooms')
+  Future<dynamic> createRoom(
+    @Path('clubId') String clubId,
+    @Body() Map<String, dynamic> body,
+  );
+
+  @DELETE('/clubs/{clubId}/rooms/{roomId}')
+  Future<void> deleteRoom(
+    @Path('clubId') String clubId,
+    @Path('roomId') String roomId,
+  );
 }
