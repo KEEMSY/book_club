@@ -29,6 +29,7 @@ services:
       DATABASE_URL: postgresql+asyncpg://bookclub:bookclub@db:5432/bookclub
       REDIS_URL: redis://redis:6379/0
       S3_ENDPOINT_URL: http://minio:9000
+      S3_PUBLIC_ENDPOINT_URL: http://localhost:9000
     ports:
       - "8000:8000"
     volumes:

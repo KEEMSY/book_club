@@ -171,8 +171,12 @@ class ClubChatNotifier extends _$ClubChatNotifier {
   // -------------------------------------------------------------------------
 
   /// Opens the WebSocket connection authenticated with [token].
+  ///
+  /// No-ops when already in [ClubChatConnected] to prevent message list reset
+  /// on tab re-enter. Always updates the stored token for future reconnects.
   void connect(String token) {
     _token = token;
+    if (state is ClubChatConnected) return;
     _retryCount = 0;
     _doConnect();
   }
@@ -300,6 +304,13 @@ class ClubChatNotifier extends _$ClubChatNotifier {
   // -------------------------------------------------------------------------
 
   void _doConnect() {
+    // Cancel previous subscription and channel before creating a new one to
+    // prevent duplicate _onMessage handlers on reconnect.
+    _subscription?.cancel();
+    _subscription = null;
+    _channel?.sink.close();
+    _channel = null;
+
     state = const ClubChatConnecting();
 
     final uri = Uri.parse(
@@ -471,6 +482,7 @@ class ClubRoomChatNotifier extends _$ClubRoomChatNotifier {
 
   void connect(String token) {
     _token = token;
+    if (state is ClubChatConnected) return;
     _retryCount = 0;
     _doConnect();
   }
@@ -576,6 +588,11 @@ class ClubRoomChatNotifier extends _$ClubRoomChatNotifier {
   }
 
   void _doConnect() {
+    _subscription?.cancel();
+    _subscription = null;
+    _channel?.sink.close();
+    _channel = null;
+
     state = const ClubChatConnecting();
 
     final uri = Uri.parse(

@@ -35,6 +35,9 @@ class R2Client:
             config=Config(signature_version="s3v4", s3={"addressing_style": "path"}),
         )
         self._bucket = self._settings.s3_bucket
+        # Presigned URLs must use the public-facing endpoint so clients outside
+        # the Docker network (browser, mobile) can reach MinIO/R2 directly.
+        self._presign_endpoint = self._settings.s3_presign_endpoint_url
 
     def put_object(self, key: str, body: bytes, content_type: str) -> None:
         self._client.put_object(
@@ -53,7 +56,7 @@ class R2Client:
             Params=params,
             ExpiresIn=expires_in,
         )
-        return str(url)
+        return self._rewrite_endpoint(str(url))
 
     def presign_get(self, key: str, expires_in: int = 300) -> str:
         url = self._client.generate_presigned_url(
@@ -61,7 +64,14 @@ class R2Client:
             Params={"Bucket": self._bucket, "Key": key},
             ExpiresIn=expires_in,
         )
-        return str(url)
+        return self._rewrite_endpoint(str(url))
+
+    def _rewrite_endpoint(self, url: str) -> str:
+        internal = self._settings.s3_endpoint_url.rstrip("/")
+        public = self._presign_endpoint.rstrip("/")
+        if internal != public and url.startswith(internal):
+            return public + url[len(internal) :]
+        return url
 
     def delete(self, key: str) -> None:
         self._client.delete_object(Bucket=self._bucket, Key=key)

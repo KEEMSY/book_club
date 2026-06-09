@@ -32,10 +32,19 @@ class Settings(BaseSettings):
     redis_url: str = Field(default="redis://localhost:6379/0")
 
     s3_endpoint_url: str = Field(default="http://localhost:9000")
+    # Public-facing URL for presigned URLs. Defaults to s3_endpoint_url so
+    # production (Cloudflare R2) works without extra config. In Docker dev,
+    # s3_endpoint_url=http://minio:9000 (internal) but presigned PUTs must use
+    # http://localhost:9000 so the browser/app can reach MinIO directly.
+    s3_public_endpoint_url: str = Field(default="")
     s3_bucket: str = Field(default="bookclub-local")
     s3_access_key: str = Field(default="minio")
     s3_secret_key: str = Field(default="minio12345")
     s3_region: str = Field(default="auto")
+
+    @property
+    def s3_presign_endpoint_url(self) -> str:
+        return self.s3_public_endpoint_url or self.s3_endpoint_url
 
     jwt_secret: str = Field(default="change-me-in-production-this-is-not-secure-at-all")
     jwt_alg: str = Field(default="HS256")
