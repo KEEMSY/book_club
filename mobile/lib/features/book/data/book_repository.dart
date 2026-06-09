@@ -113,6 +113,16 @@ class BookRepository {
     return dto.toDomain();
   }
 
+  Future<UserBook> updateChapter({
+    required String userBookId,
+    required int chapter,
+  }) async {
+    final data = await _call(
+      () => _api.updateChapter(userBookId, {'current_chapter': chapter}),
+    );
+    return UserBookDto.fromJson(data as Map<String, dynamic>).toDomain();
+  }
+
   Future<void> removeFromLibrary(String userBookId) =>
       _call(() => _api.removeFromLibrary(userBookId));
 

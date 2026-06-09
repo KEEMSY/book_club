@@ -140,7 +140,7 @@ class ClubRoomPublic(BaseModel):
     name: str
     progress_gate: int
     created_at: datetime
-    # True when the caller's reading progress meets or exceeds progress_gate.
+    # True when the caller's current_chapter meets or exceeds progress_gate.
     can_enter: bool
 
 

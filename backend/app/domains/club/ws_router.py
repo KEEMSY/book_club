@@ -251,22 +251,22 @@ async def room_chat_stream(
         return
 
     if room.progress_gate > 0:
-        # Resolve the club's book and compare the caller's progress against the gate.
+        # Resolve the club's book and compare the caller's chapter against the gate.
         club = await session.get(ReadingClub, club_id)
-        caller_progress = 0
+        caller_chapter = 0
         if club is not None and club.book_id is not None:
-            progress_stmt = select(UserBook.progress).where(
+            chapter_stmt = select(UserBook.current_chapter).where(
                 UserBook.user_id == uuid.UUID(user_id),
                 UserBook.book_id == club.book_id,
             )
-            progress_result = await session.execute(progress_stmt)
-            raw_progress: int | None = progress_result.scalar_one_or_none()
-            caller_progress = raw_progress if raw_progress is not None else 0
+            chapter_result = await session.execute(chapter_stmt)
+            raw: int | None = chapter_result.scalar_one_or_none()
+            caller_chapter = raw if raw is not None else 0
 
-        if caller_progress < room.progress_gate:
+        if caller_chapter < room.progress_gate:
             await websocket.close(
                 code=4003,
-                reason=f"progress {caller_progress} below gate {room.progress_gate}",
+                reason=f"chapter {caller_chapter} below gate {room.progress_gate}",
             )
             return
 

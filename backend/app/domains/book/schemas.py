@@ -66,6 +66,10 @@ class UpdateStatusRequest(BaseModel):
     status: _LibraryStatus
 
 
+class UpdateChapterRequest(BaseModel):
+    current_chapter: int = Field(ge=0)
+
+
 class SubmitReviewRequest(BaseModel):
     rating: int = Field(ge=1, le=5)
     one_line_review: str | None = Field(default=None, max_length=200)
@@ -81,6 +85,7 @@ class UserBookPublic(BaseModel):
     finished_at: datetime | None
     rating: int | None
     one_line_review: str | None
+    current_chapter: int
 
     @classmethod
     def from_user_book(cls, ub: UserBook) -> UserBookPublic:
@@ -93,6 +98,7 @@ class UserBookPublic(BaseModel):
                 "finished_at": ub.finished_at,
                 "rating": ub.rating,
                 "one_line_review": ub.one_line_review,
+                "current_chapter": ub.current_chapter,
             }
         )
 

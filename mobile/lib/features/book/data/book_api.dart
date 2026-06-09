@@ -45,6 +45,12 @@ abstract class BookApi {
     @Body() Map<String, dynamic> body,
   );
 
+  @PATCH('/me/library/{user_book_id}/chapter')
+  Future<dynamic> updateChapter(
+    @Path('user_book_id') String userBookId,
+    @Body() Map<String, dynamic> body,
+  );
+
   @POST('/me/library/{user_book_id}/review')
   Future<UserBookDto> submitReview(
     @Path('user_book_id') String userBookId,

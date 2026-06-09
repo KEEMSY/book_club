@@ -368,14 +368,14 @@ class ClubService:
             progress_gate=req.progress_gate,
             created_by=user_id,
         )
-        caller_progress = await self.repo.get_user_progress_for_club(user_id, club_id)
+        caller_chapter = await self.repo.get_user_chapter_for_club(user_id, club_id)
         return ClubRoomPublic(
             id=room.id,
             club_id=room.club_id,
             name=room.name,
             progress_gate=room.progress_gate,
             created_at=room.created_at,
-            can_enter=caller_progress >= room.progress_gate,
+            can_enter=caller_chapter >= room.progress_gate,
         )
 
     async def list_rooms(
@@ -387,7 +387,7 @@ class ClubService:
         if not await self.repo.is_member(club_id, caller_user_id):
             raise PermissionDeniedError("not a member", code="NOT_MEMBER")
         rooms = await self.repo.get_rooms(club_id)
-        caller_progress = await self.repo.get_user_progress_for_club(caller_user_id, club_id)
+        caller_chapter = await self.repo.get_user_chapter_for_club(caller_user_id, club_id)
         return ClubRoomListResponse(
             rooms=[
                 ClubRoomPublic(
@@ -396,7 +396,7 @@ class ClubService:
                     name=room.name,
                     progress_gate=room.progress_gate,
                     created_at=room.created_at,
-                    can_enter=caller_progress >= room.progress_gate,
+                    can_enter=caller_chapter >= room.progress_gate,
                 )
                 for room in rooms
             ]

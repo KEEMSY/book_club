@@ -59,7 +59,37 @@ class _ClubRoomsBodyState extends ConsumerState<ClubRoomsBody> {
 
     return Stack(
       children: [
-        roomsAsync.when(
+        Column(
+          children: [
+            if (widget.club.bookId == null)
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(
+                  horizontal: spacing.md,
+                  vertical: spacing.sm,
+                ),
+                color: theme.colorScheme.tertiaryContainer,
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.info_outline_rounded,
+                      size: 16,
+                      color: theme.colorScheme.onTertiaryContainer,
+                    ),
+                    SizedBox(width: spacing.sm),
+                    Expanded(
+                      child: Text(
+                        '클럽에 책이 설정되어야 진도 채팅방을 만들 수 있어요',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.onTertiaryContainer,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            Expanded(
+              child: roomsAsync.when(
           loading: () =>
               const Center(child: CircularProgressIndicator(strokeWidth: 2)),
           error: (_, __) => Center(
@@ -108,9 +138,12 @@ class _ClubRoomsBodyState extends ConsumerState<ClubRoomsBody> {
                         : null,
                   ),
                 ),
-        ),
-        // FAB for owner — positioned in the bottom-right corner.
-        if (_isOwner)
+            ),
+          ),
+        ],
+      ),
+        // FAB for owner — only when the club has a book set.
+        if (_isOwner && widget.club.bookId != null)
           Positioned(
             right: spacing.md,
             bottom: spacing.md,
@@ -414,8 +447,8 @@ class _CreateRoomDialogState extends State<_CreateRoomDialog> {
           Slider(
             value: _progressGate,
             min: 0,
-            max: 100,
-            divisions: 20,
+            max: 999,
+            divisions: 100,
             label: '${_progressGate.toInt()}장',
             onChanged: (v) => setState(() => _progressGate = v),
           ),

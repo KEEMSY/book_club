@@ -56,6 +56,7 @@ abstract class UserBookDto with _$UserBookDto {
     DateTime? finishedAt,
     int? rating,
     String? oneLineReview,
+    @Default(0) int currentChapter,
   }) = _UserBookDto;
 
   factory UserBookDto.fromJson(Map<String, dynamic> json) =>
@@ -70,6 +71,7 @@ abstract class UserBookDto with _$UserBookDto {
       finishedAt: finishedAt,
       rating: rating,
       oneLineReview: oneLineReview,
+      currentChapter: currentChapter,
     );
   }
 }

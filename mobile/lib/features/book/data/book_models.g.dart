@@ -38,6 +38,7 @@ _UserBookDto _$UserBookDtoFromJson(Map<String, dynamic> json) => _UserBookDto(
           : DateTime.parse(json['finished_at'] as String),
       rating: (json['rating'] as num?)?.toInt(),
       oneLineReview: json['one_line_review'] as String?,
+      currentChapter: (json['current_chapter'] as num?)?.toInt() ?? 0,
     );
 
 Map<String, dynamic> _$UserBookDtoToJson(_UserBookDto instance) =>
@@ -49,6 +50,7 @@ Map<String, dynamic> _$UserBookDtoToJson(_UserBookDto instance) =>
       'finished_at': instance.finishedAt?.toIso8601String(),
       'rating': instance.rating,
       'one_line_review': instance.oneLineReview,
+      'current_chapter': instance.currentChapter,
     };
 
 _BookSearchResponse _$BookSearchResponseFromJson(Map<String, dynamic> json) =>

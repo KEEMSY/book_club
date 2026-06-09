@@ -31,6 +31,7 @@ from app.domains.book.schemas import (
     SearchBookItem,
     SearchBooksResponse,
     SubmitReviewRequest,
+    UpdateChapterRequest,
     UpdateStatusRequest,
     UserBookPublic,
 )
@@ -213,6 +214,21 @@ async def submit_review(
         user_book_id=user_book_id,
         rating=body.rating,
         one_line_review=body.one_line_review,
+    )
+    return UserBookPublic.from_user_book(ub)
+
+
+@router.patch("/me/library/{user_book_id}/chapter", response_model=UserBookPublic)
+async def update_chapter(
+    user_book_id: UUID,
+    body: UpdateChapterRequest,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[BookService, Depends(get_book_service)],
+) -> UserBookPublic:
+    ub = await service.update_chapter(
+        user_id=UUID(user_id),
+        user_book_id=user_book_id,
+        current_chapter=body.current_chapter,
     )
     return UserBookPublic.from_user_book(ub)
 

@@ -159,6 +159,7 @@ class UserBook(Base):
     # Reading progress as a percentage 0-100; updated by the reading domain
     # when the user records page progress.  Used by club_rooms progress_gate.
     progress: Mapped[int] = mapped_column(SmallInteger, nullable=False, server_default="0")
+    current_chapter: Mapped[int] = mapped_column(SmallInteger, nullable=False, server_default="0")
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()

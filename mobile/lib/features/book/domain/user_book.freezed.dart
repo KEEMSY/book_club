@@ -21,6 +21,7 @@ mixin _$UserBook {
   DateTime? get finishedAt;
   int? get rating;
   String? get oneLineReview;
+  int get currentChapter;
 
   /// Create a copy of UserBook
   /// with the given fields replaced by the non-null parameter values.
@@ -43,16 +44,18 @@ mixin _$UserBook {
                 other.finishedAt == finishedAt) &&
             (identical(other.rating, rating) || other.rating == rating) &&
             (identical(other.oneLineReview, oneLineReview) ||
-                other.oneLineReview == oneLineReview));
+                other.oneLineReview == oneLineReview) &&
+            (identical(other.currentChapter, currentChapter) ||
+                other.currentChapter == currentChapter));
   }
 
   @override
   int get hashCode => Object.hash(runtimeType, id, book, status, startedAt,
-      finishedAt, rating, oneLineReview);
+      finishedAt, rating, oneLineReview, currentChapter);
 
   @override
   String toString() {
-    return 'UserBook(id: $id, book: $book, status: $status, startedAt: $startedAt, finishedAt: $finishedAt, rating: $rating, oneLineReview: $oneLineReview)';
+    return 'UserBook(id: $id, book: $book, status: $status, startedAt: $startedAt, finishedAt: $finishedAt, rating: $rating, oneLineReview: $oneLineReview, currentChapter: $currentChapter)';
   }
 }
 
@@ -68,7 +71,8 @@ abstract mixin class $UserBookCopyWith<$Res> {
       DateTime? startedAt,
       DateTime? finishedAt,
       int? rating,
-      String? oneLineReview});
+      String? oneLineReview,
+      int currentChapter});
 
   $BookCopyWith<$Res> get book;
 }
@@ -92,6 +96,7 @@ class _$UserBookCopyWithImpl<$Res> implements $UserBookCopyWith<$Res> {
     Object? finishedAt = freezed,
     Object? rating = freezed,
     Object? oneLineReview = freezed,
+    Object? currentChapter = null,
   }) {
     return _then(_self.copyWith(
       id: null == id
@@ -122,6 +127,10 @@ class _$UserBookCopyWithImpl<$Res> implements $UserBookCopyWith<$Res> {
           ? _self.oneLineReview
           : oneLineReview // ignore: cast_nullable_to_non_nullable
               as String?,
+      currentChapter: null == currentChapter
+          ? _self.currentChapter
+          : currentChapter // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 
@@ -236,15 +245,23 @@ extension UserBookPatterns on UserBook {
             DateTime? startedAt,
             DateTime? finishedAt,
             int? rating,
-            String? oneLineReview)?
+            String? oneLineReview,
+            int currentChapter)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _UserBook() when $default != null:
-        return $default(_that.id, _that.book, _that.status, _that.startedAt,
-            _that.finishedAt, _that.rating, _that.oneLineReview);
+        return $default(
+            _that.id,
+            _that.book,
+            _that.status,
+            _that.startedAt,
+            _that.finishedAt,
+            _that.rating,
+            _that.oneLineReview,
+            _that.currentChapter);
       case _:
         return orElse();
     }
@@ -272,14 +289,22 @@ extension UserBookPatterns on UserBook {
             DateTime? startedAt,
             DateTime? finishedAt,
             int? rating,
-            String? oneLineReview)
+            String? oneLineReview,
+            int currentChapter)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _UserBook():
-        return $default(_that.id, _that.book, _that.status, _that.startedAt,
-            _that.finishedAt, _that.rating, _that.oneLineReview);
+        return $default(
+            _that.id,
+            _that.book,
+            _that.status,
+            _that.startedAt,
+            _that.finishedAt,
+            _that.rating,
+            _that.oneLineReview,
+            _that.currentChapter);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -306,14 +331,22 @@ extension UserBookPatterns on UserBook {
             DateTime? startedAt,
             DateTime? finishedAt,
             int? rating,
-            String? oneLineReview)?
+            String? oneLineReview,
+            int currentChapter)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _UserBook() when $default != null:
-        return $default(_that.id, _that.book, _that.status, _that.startedAt,
-            _that.finishedAt, _that.rating, _that.oneLineReview);
+        return $default(
+            _that.id,
+            _that.book,
+            _that.status,
+            _that.startedAt,
+            _that.finishedAt,
+            _that.rating,
+            _that.oneLineReview,
+            _that.currentChapter);
       case _:
         return null;
     }
@@ -330,7 +363,8 @@ class _UserBook implements UserBook {
       this.startedAt,
       this.finishedAt,
       this.rating,
-      this.oneLineReview});
+      this.oneLineReview,
+      this.currentChapter = 0});
 
   @override
   final String id;
@@ -346,6 +380,9 @@ class _UserBook implements UserBook {
   final int? rating;
   @override
   final String? oneLineReview;
+  @override
+  @JsonKey()
+  final int currentChapter;
 
   /// Create a copy of UserBook
   /// with the given fields replaced by the non-null parameter values.
@@ -369,16 +406,18 @@ class _UserBook implements UserBook {
                 other.finishedAt == finishedAt) &&
             (identical(other.rating, rating) || other.rating == rating) &&
             (identical(other.oneLineReview, oneLineReview) ||
-                other.oneLineReview == oneLineReview));
+                other.oneLineReview == oneLineReview) &&
+            (identical(other.currentChapter, currentChapter) ||
+                other.currentChapter == currentChapter));
   }
 
   @override
   int get hashCode => Object.hash(runtimeType, id, book, status, startedAt,
-      finishedAt, rating, oneLineReview);
+      finishedAt, rating, oneLineReview, currentChapter);
 
   @override
   String toString() {
-    return 'UserBook(id: $id, book: $book, status: $status, startedAt: $startedAt, finishedAt: $finishedAt, rating: $rating, oneLineReview: $oneLineReview)';
+    return 'UserBook(id: $id, book: $book, status: $status, startedAt: $startedAt, finishedAt: $finishedAt, rating: $rating, oneLineReview: $oneLineReview, currentChapter: $currentChapter)';
   }
 }
 
@@ -396,7 +435,8 @@ abstract mixin class _$UserBookCopyWith<$Res>
       DateTime? startedAt,
       DateTime? finishedAt,
       int? rating,
-      String? oneLineReview});
+      String? oneLineReview,
+      int currentChapter});
 
   @override
   $BookCopyWith<$Res> get book;
@@ -421,6 +461,7 @@ class __$UserBookCopyWithImpl<$Res> implements _$UserBookCopyWith<$Res> {
     Object? finishedAt = freezed,
     Object? rating = freezed,
     Object? oneLineReview = freezed,
+    Object? currentChapter = null,
   }) {
     return _then(_UserBook(
       id: null == id
@@ -451,6 +492,10 @@ class __$UserBookCopyWithImpl<$Res> implements _$UserBookCopyWith<$Res> {
           ? _self.oneLineReview
           : oneLineReview // ignore: cast_nullable_to_non_nullable
               as String?,
+      currentChapter: null == currentChapter
+          ? _self.currentChapter
+          : currentChapter // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 

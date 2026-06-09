@@ -118,6 +118,8 @@ class UserBookRepositoryPort(Protocol):
         limit: int = 20,
     ) -> list[ReviewRow]: ...
 
+    async def update_chapter(self, user_book_id: UUID, current_chapter: int) -> UserBook: ...
+
     async def list_for_user(
         self,
         user_id: UUID,

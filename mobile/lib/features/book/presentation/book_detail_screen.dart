@@ -280,6 +280,18 @@ class _ContentState extends ConsumerState<_Content> {
                       )
                   : null,
             ),
+            Builder(builder: (ctx) {
+              final ub = _resolveUserBook();
+              if (ub == null || ub.status != BookStatus.reading) {
+                return const SizedBox.shrink();
+              }
+              return _ChapterUpdateRow(
+                userBook: ub,
+                onUpdated: (updated) {
+                  ref.read(libraryNotifierProvider.notifier).upsert(updated);
+                },
+              );
+            }),
             SizedBox(height: spacing.xl),
             const Divider(height: 1),
             SizedBox(height: spacing.lg),
@@ -983,6 +995,116 @@ class _HighlightSection extends ConsumerWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (_) => AddHighlightSheet(userBookId: userBookId),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Chapter update row
+// ---------------------------------------------------------------------------
+
+class _ChapterUpdateRow extends ConsumerStatefulWidget {
+  const _ChapterUpdateRow({required this.userBook, required this.onUpdated});
+
+  final UserBook userBook;
+  final void Function(UserBook updated) onUpdated;
+
+  @override
+  ConsumerState<_ChapterUpdateRow> createState() => _ChapterUpdateRowState();
+}
+
+class _ChapterUpdateRowState extends ConsumerState<_ChapterUpdateRow> {
+  bool _loading = false;
+
+  Future<void> _showDialog() async {
+    final controller =
+        TextEditingController(text: widget.userBook.currentChapter.toString());
+    final result = await showDialog<int>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('현재 읽은 장'),
+        content: TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          autofocus: true,
+          decoration: const InputDecoration(
+            labelText: '장',
+            hintText: '예) 5',
+            suffixText: '장',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('취소'),
+          ),
+          FilledButton(
+            onPressed: () {
+              final n = int.tryParse(controller.text.trim());
+              if (n != null && n >= 0) Navigator.pop(context, n);
+            },
+            child: const Text('저장'),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (result == null || !mounted) return;
+
+    setState(() => _loading = true);
+    try {
+      final updated = await ref.read(bookRepositoryProvider).updateChapter(
+            userBookId: widget.userBook.id,
+            chapter: result,
+          );
+      widget.onUpdated(updated);
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('저장에 실패했어요. 다시 시도해 주세요.')),
+      );
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+
+    return Padding(
+      padding: EdgeInsets.only(top: spacing.sm),
+      child: Row(
+        children: [
+          Icon(
+            Icons.menu_book_outlined,
+            size: 18,
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+          ),
+          SizedBox(width: spacing.sm),
+          Expanded(
+            child: Text(
+              widget.userBook.currentChapter == 0
+                  ? '아직 읽은 장을 기록하지 않았어요'
+                  : '${widget.userBook.currentChapter}장까지 읽었어요',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+              ),
+            ),
+          ),
+          _loading
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : TextButton(
+                  onPressed: _showDialog,
+                  child: const Text('장 수정'),
+                ),
+        ],
+      ),
     );
   }
 }

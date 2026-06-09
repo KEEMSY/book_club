@@ -17,5 +17,6 @@ abstract class UserBook with _$UserBook {
     DateTime? finishedAt,
     int? rating,
     String? oneLineReview,
+    @Default(0) int currentChapter,
   }) = _UserBook;
 }

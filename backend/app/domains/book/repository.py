@@ -23,10 +23,11 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from uuid import UUID
 
-from sqlalchemy import and_, or_, select
+from sqlalchemy import and_, or_, select, update
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.core.exceptions import ConflictError, NotFoundError
 from app.domains.auth.models import User
@@ -184,6 +185,18 @@ class UserBookRepository:
             ) from exc
         await self._session.refresh(ub)
         return ub
+
+    async def update_chapter(self, user_book_id: UUID, current_chapter: int) -> UserBook:
+        stmt = (
+            update(UserBook)
+            .where(UserBook.id == user_book_id)
+            .values(current_chapter=current_chapter)
+            .returning(UserBook)
+            .options(selectinload(UserBook.book))
+        )
+        result = await self._session.execute(stmt)
+        await self._session.commit()
+        return result.scalar_one()
 
     async def delete(self, user_book_id: UUID) -> None:
         ub = await self.get_by_id(user_book_id)

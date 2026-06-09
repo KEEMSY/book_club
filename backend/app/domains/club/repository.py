@@ -378,23 +378,18 @@ class ClubRepository:
         stmt = delete(ClubRoom).where(ClubRoom.id == room_id)
         await self._session.execute(stmt)
 
-    async def get_user_progress_for_club(self, user_id: UUID, club_id: UUID) -> int:
-        """Return the caller's reading progress (0-100) for the club's current book.
-
-        Returns 0 when the club has no book, or the user has no library entry
-        for that book.  The ``user_books.progress`` column stores a 0-100
-        integer added in the M29 migration.
-        """
+    async def get_user_chapter_for_club(self, user_id: UUID, club_id: UUID) -> int:
+        """Return the caller's current_chapter for the club's book. Returns 0 if not found."""
         from app.domains.book.models import UserBook
 
         club = await self._session.get(ReadingClub, club_id)
         if club is None or club.book_id is None:
             return 0
 
-        stmt = select(UserBook.progress).where(
+        stmt = select(UserBook.current_chapter).where(
             UserBook.user_id == user_id,
             UserBook.book_id == club.book_id,
         )
         result = await self._session.execute(stmt)
-        progress: int | None = result.scalar_one_or_none()
-        return progress if progress is not None else 0
+        chapter: int | None = result.scalar_one_or_none()
+        return chapter if chapter is not None else 0

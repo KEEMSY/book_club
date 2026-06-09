@@ -219,6 +219,19 @@ class BookService:
             )
         return result
 
+    async def update_chapter(
+        self,
+        *,
+        user_id: UUID,
+        user_book_id: UUID,
+        current_chapter: int,
+    ) -> UserBook:
+        ub = await self.user_books.get_by_id(user_book_id)
+        # Return 404 (not 403) on ownership failure — CLAUDE.md §9.
+        if ub is None or ub.user_id != user_id:
+            raise NotFoundError("user_book not found", code="USER_BOOK_NOT_FOUND")
+        return await self.user_books.update_chapter(user_book_id, current_chapter)
+
     async def remove_from_library(
         self,
         *,

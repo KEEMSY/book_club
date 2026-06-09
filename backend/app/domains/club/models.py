@@ -143,7 +143,7 @@ class EventAttendee(Base):
 class ClubRoom(Base):
     """A progress-gated chat room within a reading club.
 
-    Members whose ``user_books.progress`` value is below ``progress_gate``
+    Members whose ``user_books.current_chapter`` value is below ``progress_gate``
     cannot enter.  ``progress_gate = 0`` means anyone in the club can enter.
     """
 
@@ -159,7 +159,7 @@ class ClubRoom(Base):
         nullable=False,
     )
     name: Mapped[str] = mapped_column(String(100), nullable=False)
-    # 0 = open to all members; N = caller's progress must be >= N to enter.
+    # 0 = open to all members; N = caller's current_chapter must be >= N to enter.
     progress_gate: Mapped[int] = mapped_column(SmallInteger, nullable=False, default=0)
     created_by: Mapped[uuid.UUID] = mapped_column(
         PGUUID(as_uuid=True),
