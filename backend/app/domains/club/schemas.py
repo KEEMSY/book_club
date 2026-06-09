@@ -26,6 +26,10 @@ class ClubPublic(BaseModel):
     created_at: datetime
 
 
+class SetClubBookRequest(BaseModel):
+    book_id: UUID | None
+
+
 class ClubEventCreate(BaseModel):
     title: str = Field(min_length=1, max_length=200)
     description: str | None = Field(default=None, max_length=1000)

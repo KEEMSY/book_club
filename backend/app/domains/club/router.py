@@ -27,6 +27,7 @@ from app.domains.club.schemas import (
     MessageListResponse,
     RsvpRequest,
     SendMessageRequest,
+    SetClubBookRequest,
 )
 from app.domains.club.service import ClubService
 
@@ -332,3 +333,18 @@ async def delete_room(
         room_id=room_id,
         user_id=UUID(user_id),
     )
+
+
+@router.patch("/{club_id}/book", response_model=ClubPublic)
+async def set_club_book(
+    club_id: UUID,
+    body: SetClubBookRequest,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> ClubPublic:
+    club = await service.set_book(
+        club_id=club_id,
+        user_id=UUID(user_id),
+        book_id=body.book_id,
+    )
+    return await _to_public(club, service.repo)

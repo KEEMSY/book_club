@@ -4,6 +4,10 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../auth/application/auth_notifier.dart';
+import '../../auth/domain/auth_state.dart';
+import '../../book/application/book_providers.dart';
+import '../../book/domain/book.dart';
 import '../application/club_providers.dart';
 import '../domain/club.dart';
 import 'club_chat_screen.dart';
@@ -108,6 +112,11 @@ class _ClubEventsTab extends ConsumerWidget {
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
+                SizedBox(height: spacing.md),
+                _ClubBookCard(club: club, onChanged: (updated) {
+                  // Refresh events tab to pick up updated club data.
+                  ref.invalidate(_clubEventsProvider(club.id));
+                }),
                 SizedBox(height: spacing.lg),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -346,6 +355,286 @@ class _RsvpChip extends StatelessWidget {
                 : theme.colorScheme.onSurface,
           ),
         ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Club book card
+// ---------------------------------------------------------------------------
+
+class _ClubBookCard extends ConsumerStatefulWidget {
+  const _ClubBookCard({required this.club, required this.onChanged});
+
+  final Club club;
+  final void Function(Club updated) onChanged;
+
+  @override
+  ConsumerState<_ClubBookCard> createState() => _ClubBookCardState();
+}
+
+class _ClubBookCardState extends ConsumerState<_ClubBookCard> {
+  bool get _isOwner {
+    final auth = ref.read(authNotifierProvider);
+    return switch (auth) {
+      Authenticated(:final user) => user.id == widget.club.ownerId,
+      _ => false,
+    };
+  }
+
+  Future<void> _openPicker() async {
+    final book = await _SetBookSheet.show(context);
+    if (book == null || !mounted) return;
+    try {
+      final updated = await ref
+          .read(clubRepositoryProvider)
+          .setClubBook(widget.club.id, bookId: book.id);
+      widget.onChanged(updated);
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('책 설정에 실패했어요. 다시 시도해 주세요.')),
+      );
+    }
+  }
+
+  Future<void> _clearBook() async {
+    try {
+      final updated = await ref
+          .read(clubRepositoryProvider)
+          .setClubBook(widget.club.id);
+      widget.onChanged(updated);
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('책 해제에 실패했어요. 다시 시도해 주세요.')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+    final radii = theme.extension<AppRadius>()!;
+    final hasBook = widget.club.bookId != null;
+
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: spacing.md,
+        vertical: spacing.sm,
+      ),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.all(Radius.circular(radii.md)),
+        border: Border.all(
+          color: theme.colorScheme.outlineVariant,
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.menu_book_rounded,
+            size: 20,
+            color: hasBook
+                ? theme.colorScheme.primary
+                : theme.colorScheme.onSurface.withValues(alpha: 0.4),
+          ),
+          SizedBox(width: spacing.sm),
+          Expanded(
+            child: Text(
+              hasBook ? '현재 책 설정됨' : '읽는 책 없음',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: hasBook
+                    ? theme.colorScheme.onSurface
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.5),
+              ),
+            ),
+          ),
+          if (_isOwner) ...[
+            TextButton(
+              onPressed: _openPicker,
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.symmetric(
+                  horizontal: spacing.sm,
+                  vertical: 4,
+                ),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: Text(hasBook ? '변경' : '책 설정'),
+            ),
+            if (hasBook)
+              TextButton(
+                onPressed: _clearBook,
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: spacing.sm,
+                    vertical: 4,
+                  ),
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  foregroundColor: theme.colorScheme.error,
+                ),
+                child: const Text('해제'),
+              ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Book picker bottom sheet
+// ---------------------------------------------------------------------------
+
+class _SetBookSheet extends ConsumerStatefulWidget {
+  const _SetBookSheet();
+
+  static Future<Book?> show(BuildContext context) =>
+      showModalBottomSheet<Book>(
+        context: context,
+        isScrollControlled: true,
+        showDragHandle: true,
+        builder: (_) => const _SetBookSheet(),
+      );
+
+  @override
+  ConsumerState<_SetBookSheet> createState() => _SetBookSheetState();
+}
+
+class _SetBookSheetState extends ConsumerState<_SetBookSheet> {
+  final _controller = TextEditingController();
+  List<Book> _results = [];
+  bool _loading = false;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _search(String q) async {
+    if (q.trim().isEmpty) {
+      setState(() => _results = []);
+      return;
+    }
+    setState(() => _loading = true);
+    try {
+      final result = await ref
+          .read(bookRepositoryProvider)
+          .search(query: q.trim(), size: 10);
+      if (mounted) setState(() => _results = result.items);
+    } catch (_) {
+      if (mounted) setState(() => _results = []);
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+    final bottom = MediaQuery.of(context).viewInsets.bottom;
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        spacing.md,
+        spacing.sm,
+        spacing.md,
+        spacing.md + bottom,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('읽는 책 설정', style: theme.textTheme.titleMedium),
+          SizedBox(height: spacing.md),
+          TextField(
+            controller: _controller,
+            autofocus: true,
+            decoration: InputDecoration(
+              hintText: '책 제목이나 저자를 검색하세요',
+              prefixIcon: const Icon(Icons.search_rounded),
+              suffixIcon: _loading
+                  ? const Padding(
+                      padding: EdgeInsets.all(12),
+                      child: SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    )
+                  : null,
+            ),
+            textInputAction: TextInputAction.search,
+            onSubmitted: _search,
+            onChanged: (v) {
+              if (v.isEmpty) setState(() => _results = []);
+            },
+          ),
+          if (_results.isNotEmpty) ...[
+            SizedBox(height: spacing.sm),
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.4,
+              ),
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: _results.length,
+                itemBuilder: (_, i) {
+                  final book = _results[i];
+                  return ListTile(
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 4,
+                      horizontal: spacing.sm,
+                    ),
+                    leading: book.coverUrl != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(4),
+                            child: Image.network(
+                              book.coverUrl!,
+                              width: 36,
+                              height: 52,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => const SizedBox(
+                                width: 36,
+                                height: 52,
+                              ),
+                            ),
+                          )
+                        : SizedBox(
+                            width: 36,
+                            height: 52,
+                            child: Icon(
+                              Icons.book_outlined,
+                              color: theme.colorScheme.onSurface
+                                  .withValues(alpha: 0.4),
+                            ),
+                          ),
+                    title: Text(
+                      book.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                    subtitle: Text(
+                      book.author,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.labelSmall,
+                    ),
+                    onTap: () => Navigator.pop(context, book),
+                  );
+                },
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }

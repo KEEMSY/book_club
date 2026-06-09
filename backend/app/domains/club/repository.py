@@ -95,6 +95,19 @@ class ClubRepository:
         row = await self._session.execute(stmt)
         return row.scalar_one_or_none()
 
+    async def set_book(self, club_id: UUID, book_id: UUID | None) -> ReadingClub:
+        from sqlalchemy import update
+
+        stmt = (
+            update(ReadingClub)
+            .where(ReadingClub.id == club_id)
+            .values(book_id=book_id)
+            .returning(ReadingClub)
+        )
+        result = await self._session.execute(stmt)
+        await self._session.commit()
+        return result.scalar_one()
+
     async def join(self, club_id: UUID, user_id: UUID) -> None:
         self._session.add(
             ClubMember(

@@ -189,4 +189,9 @@ class ClubRepository {
 
   Future<void> deleteRoom(String clubId, String roomId) =>
       _api.deleteRoom(clubId, roomId);
+
+  Future<Club> setClubBook(String clubId, {String? bookId}) async {
+    final data = await _api.setClubBook(clubId, {'book_id': bookId});
+    return Club.fromJson(data as Map<String, dynamic>);
+  }
 }

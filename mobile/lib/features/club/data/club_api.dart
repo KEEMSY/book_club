@@ -65,4 +65,10 @@ abstract class ClubApi {
     @Path('clubId') String clubId,
     @Path('roomId') String roomId,
   );
+
+  @PATCH('/clubs/{clubId}/book')
+  Future<dynamic> setClubBook(
+    @Path('clubId') String clubId,
+    @Body() Map<String, dynamic> body,
+  );
 }

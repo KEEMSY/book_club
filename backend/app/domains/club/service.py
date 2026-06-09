@@ -67,6 +67,16 @@ class ClubService:
             )
         await self.repo.leave(club_id, user_id)
 
+    async def set_book(self, *, club_id: UUID, user_id: UUID, book_id: UUID | None) -> ReadingClub:
+        club = await self.repo.get_by_id(club_id)
+        if not club:
+            raise NotFoundError("club not found", code="CLUB_NOT_FOUND")
+        if club.owner_id != user_id:
+            raise PermissionDeniedError(
+                "only the owner can set the club book", code="PERMISSION_DENIED"
+            )
+        return await self.repo.set_book(club_id, book_id)
+
     async def _is_owner_or_manager(self, club_id: UUID, user_id: UUID) -> bool:
         """Return True when the user is the club owner or has manager role."""
         club = await self.repo.get_by_id(club_id)
