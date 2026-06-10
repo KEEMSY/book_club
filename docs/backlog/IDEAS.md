@@ -13,6 +13,18 @@
 
 ## Phase 전환 리뷰 기록
 
+### Phase 7 전환 리뷰 (2026-06-10)
+
+- 리뷰 문서: `docs/plans/2026-06-07-phase7.md`
+- **완료 (M26)**: (reading) 스트릭 쉴드 — streak_shields 누적, 소진 로직, StreakShieldBadge UI
+- **완료 (M27)**: (social) 소셜 리더보드 — GET /social/leaderboard/weekly, LeaderboardScreen
+- **완료 (M28)**: (reading) 연중 회고 카드 확장 — MonthlyRecap, MonthlyRecapScreen
+- **완료 (M29)**: (club) 챕터별 진도 채팅방 게이트 — current_chapter B안, PATCH /me/library/{id}/chapter, club rooms slider 999
+- **완료 (M30)**: (community) 오프라인 독서 모임 연결 — ClubEventsScreen, RSVP, event CRUD
+- **완료 (추가)**: (club) 클럽 읽는 책 설정/변경 — PATCH /clubs/{id}/book, _ClubBookCard, _SetBookSheet
+- **보류 (Phase 8)**: (discovery) 딥러닝 추천 — 활성 사용자 1만 이상 확보 후 검토
+- **보류 (Phase 8)**: (engagement) 쉴드 유료화 — 수익화 실험 결정 후 인앱 결제 연동
+
 ### Phase 6 전환 리뷰 (2026-06-04)
 
 - 리뷰 문서: `docs/plans/2026-06-04-phase6.md`
