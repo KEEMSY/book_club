@@ -204,10 +204,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   Future<void> _startReading(BuildContext context) async {
-    final readingMap = ref.read(libraryNotifierProvider);
-    final readingState = readingMap[BookStatus.reading];
-    final List<UserBook> reading =
-        readingState is LibraryListLoaded ? readingState.items : <UserBook>[];
     if (!mounted) return;
     // Capture the router before the async gap to avoid BuildContext warnings.
     final GoRouter router = GoRouter.of(context);
@@ -215,7 +211,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final (String, int?)? result = await _StartReadingSheet.show(
       context,
       ref: ref,
-      books: reading,
     );
     if (result == null) return;
     if (!mounted) return;
@@ -1036,15 +1031,15 @@ class _StartReadingButton extends StatelessWidget {
 
 /// Bottom sheet shown when the user taps "지금 읽기 시작". Lets the user pick
 /// a book (or free session) and an optional countdown duration.
+///
+/// Watches [libraryNotifierProvider] directly so books appear even when the
+/// initial load races with the user tapping the button.
 class _StartReadingSheet extends ConsumerStatefulWidget {
-  const _StartReadingSheet({required this.books});
-
-  final List<UserBook> books;
+  const _StartReadingSheet();
 
   static Future<(String, int?)?> show(
     BuildContext context, {
     required WidgetRef ref,
-    required List<UserBook> books,
   }) {
     final container = ProviderScope.containerOf(context);
     return showModalBottomSheet<(String, int?)>(
@@ -1053,7 +1048,7 @@ class _StartReadingSheet extends ConsumerStatefulWidget {
       useSafeArea: true,
       builder: (_) => UncontrolledProviderScope(
         container: container,
-        child: _StartReadingSheet(books: books),
+        child: const _StartReadingSheet(),
       ),
     );
   }
@@ -1072,6 +1067,18 @@ class _StartReadingSheetState extends ConsumerState<_StartReadingSheet> {
   bool _showSearch = false;
   final TextEditingController _searchCtrl = TextEditingController();
   String? _addingBookId;
+
+  @override
+  void initState() {
+    super.initState();
+    // Kick off loading if not yet started. The build method watches the state
+    // reactively, so books appear as soon as the fetch completes.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref
+          .read(libraryNotifierProvider.notifier)
+          .ensureLoaded(BookStatus.reading);
+    });
+  }
 
   static const List<(String label, int? seconds)> _presets = <(String, int?)>[
     ('자유롭게', null),
@@ -1236,6 +1243,14 @@ class _StartReadingSheetState extends ConsumerState<_StartReadingSheet> {
     // keyboard inset so the sheet lifts above the keyboard
     final double keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
 
+    final libraryMap = ref.watch(libraryNotifierProvider);
+    final readingState = libraryMap[BookStatus.reading];
+    final bool isLoading = readingState is LibraryListLoading ||
+        readingState is LibraryListInitial;
+    final List<UserBook> books = readingState is LibraryListLoaded
+        ? readingState.items
+        : <UserBook>[];
+
     return Padding(
       padding: EdgeInsets.fromLTRB(
         spacing.lg,
@@ -1248,11 +1263,22 @@ class _StartReadingSheetState extends ConsumerState<_StartReadingSheet> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            widget.books.isEmpty ? '읽기를 시작할게요' : '어떤 책을 읽을까요?',
+            books.isEmpty && !isLoading ? '읽기를 시작할게요' : '어떤 책을 읽을까요?',
             style: theme.textTheme.titleLarge,
           ),
           SizedBox(height: spacing.md),
-          if (widget.books.isEmpty)
+          if (isLoading)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: Center(
+                child: SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              ),
+            )
+          else if (books.isEmpty)
             Padding(
               padding: EdgeInsets.only(bottom: spacing.sm),
               child: Text(
@@ -1263,7 +1289,7 @@ class _StartReadingSheetState extends ConsumerState<_StartReadingSheet> {
               ),
             )
           else ...<Widget>[
-            ...widget.books.map(
+            ...books.map(
               (book) => _BookTile(
                 book: book,
                 onTap: () => _start(book.id),
@@ -1365,7 +1391,7 @@ class _StartReadingSheetState extends ConsumerState<_StartReadingSheet> {
           // Primary when there are no books (only action); outlined/secondary otherwise.
           SizedBox(
             width: double.infinity,
-            child: widget.books.isEmpty
+            child: books.isEmpty
                 ? FilledButton.icon(
                     onPressed: () => _start(''),
                     icon: const Icon(Icons.play_circle_outline_rounded),
