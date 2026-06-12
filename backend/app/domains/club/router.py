@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Annotated
+from typing import Annotated, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, status
@@ -25,6 +25,7 @@ from app.domains.club.schemas import (
     CreateClubRequest,
     EditMessageRequest,
     MessageListResponse,
+    PublicClubListResponse,
     RsvpRequest,
     SendMessageRequest,
     SetClubBookRequest,
@@ -46,6 +47,7 @@ async def _to_public(club: ReadingClub, repo: ClubRepository) -> ClubPublic:
         invite_code=club.invite_code,
         max_members=club.max_members,
         member_count=count,
+        is_public=club.is_public,
         created_at=club.created_at,
     )
 
@@ -78,6 +80,41 @@ async def join_club(
 ) -> ClubPublic:
     invite_code = body.get("invite_code", "")
     club = await service.join_by_code(user_id=UUID(user_id), invite_code=str(invite_code))
+    return await _to_public(club, service.repo)
+
+
+@router.get("/public", response_model=PublicClubListResponse)
+async def list_public_clubs(
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+    search: Annotated[str | None, Query(max_length=100)] = None,
+    sort: Annotated[Literal["popular", "newest"], Query()] = "newest",
+    cursor: Annotated[
+        datetime | None,
+        Query(description="ISO-8601 created_at of the last item on the previous page"),
+    ] = None,
+    limit: Annotated[int, Query(ge=1, le=100)] = 20,
+) -> PublicClubListResponse:
+    clubs = await service.list_public_clubs(
+        search=search,
+        sort=sort,
+        cursor=cursor,
+        limit=limit + 1,
+    )
+    has_more = len(clubs) > limit
+    page = clubs[:limit]
+    items = [await _to_public(c, service.repo) for c in page]
+    next_cursor = page[-1].created_at.isoformat() if has_more else None
+    return PublicClubListResponse(items=items, next_cursor=next_cursor)
+
+
+@router.post("/{club_id}/join-public", response_model=ClubPublic, status_code=status.HTTP_200_OK)
+async def join_public_club(
+    club_id: UUID,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> ClubPublic:
+    club = await service.join_public(club_id=club_id, user_id=UUID(user_id))
     return await _to_public(club, service.repo)
 
 

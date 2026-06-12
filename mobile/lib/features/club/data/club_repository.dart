@@ -21,12 +21,14 @@ class ClubRepository {
     String? description,
     String? bookId,
     int maxMembers = 10,
+    bool isPublic = false,
   }) async {
     final data = await _api.createClub({
       'name': name,
       if (description != null) 'description': description,
       if (bookId != null) 'book_id': bookId,
       'max_members': maxMembers,
+      'is_public': isPublic,
     });
     return Club.fromJson(data);
   }
@@ -192,6 +194,27 @@ class ClubRepository {
 
   Future<Club> setClubBook(String clubId, {String? bookId}) async {
     final data = await _api.setClubBook(clubId, {'book_id': bookId});
+    return Club.fromJson(data as Map<String, dynamic>);
+  }
+
+  Future<List<Club>> listPublicClubs({
+    String? search,
+    String sort = 'newest',
+    String? cursor,
+  }) async {
+    final data = await _api.listPublicClubs(
+      search: search,
+      sort: sort,
+      cursor: cursor,
+    );
+    final items = (data['items'] as List? ?? []);
+    return items
+        .map((e) => Club.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<Club> joinPublicClub(String clubId) async {
+    final data = await _api.joinPublicClub(clubId);
     return Club.fromJson(data as Map<String, dynamic>);
   }
 }

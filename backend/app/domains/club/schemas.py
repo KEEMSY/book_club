@@ -11,6 +11,7 @@ class CreateClubRequest(BaseModel):
     description: str | None = Field(default=None, max_length=500)
     book_id: UUID | None = None
     max_members: int = Field(default=10, ge=2, le=50)
+    is_public: bool = False
 
 
 class ClubPublic(BaseModel):
@@ -23,6 +24,7 @@ class ClubPublic(BaseModel):
     invite_code: str
     max_members: int
     member_count: int
+    is_public: bool
     created_at: datetime
 
 
@@ -92,6 +94,11 @@ class CreateEventRequest(BaseModel):
 
 class ClubListResponse(BaseModel):
     items: list[ClubPublic]
+
+
+class PublicClubListResponse(BaseModel):
+    items: list[ClubPublic]
+    next_cursor: str | None = None
 
 
 class ClubEventListResponse(BaseModel):

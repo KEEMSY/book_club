@@ -23,6 +23,7 @@ import '../../features/feed/presentation/post_compose_screen.dart';
 import '../../features/club/presentation/club_events_screen.dart';
 import '../../features/club/presentation/club_room_chat_screen.dart';
 import '../../features/club/presentation/club_rooms_screen.dart';
+import '../../features/club/presentation/public_clubs_screen.dart';
 import '../../features/club/domain/club.dart';
 import '../../features/notification/presentation/notification_screen.dart';
 import '../../features/notification/presentation/weekly_report_screen.dart';
@@ -103,6 +104,9 @@ class AppRoutes {
   static String clubRooms(String clubId) => '/clubs/$clubId/rooms';
   static String clubRoomChat(String clubId, String roomId) =>
       '/clubs/$clubId/rooms/$roomId/chat';
+
+  // M32 — public club discovery screen.
+  static const publicClubs = '/discover/clubs';
 }
 
 /// Adapter that bridges a Riverpod [ValueNotifier]-free state stream into a
@@ -249,6 +253,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             month: extra?['month'],
           );
         },
+      ),
+      // M32 — public club discovery screen.
+      GoRoute(
+        path: AppRoutes.publicClubs,
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) => const PublicClubsScreen(),
       ),
       // M30 — club events list (offline reading meetup UI).
       GoRoute(

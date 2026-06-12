@@ -71,4 +71,15 @@ abstract class ClubApi {
     @Path('clubId') String clubId,
     @Body() Map<String, dynamic> body,
   );
+
+  @GET('/clubs/public')
+  Future<dynamic> listPublicClubs({
+    @Query('search') String? search,
+    @Query('sort') String sort = 'newest',
+    @Query('cursor') String? cursor,
+    @Query('limit') int limit = 20,
+  });
+
+  @POST('/clubs/{clubId}/join-public')
+  Future<dynamic> joinPublicClub(@Path('clubId') String clubId);
 }

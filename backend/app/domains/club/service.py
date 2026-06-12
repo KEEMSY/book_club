@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Literal
 from uuid import UUID
 
 from app.core.exceptions import ConflictError, NotFoundError, PermissionDeniedError
@@ -34,6 +35,7 @@ class ClubService:
             description=req.description,
             book_id=req.book_id,
             max_members=req.max_members,
+            is_public=req.is_public,
         )
 
     async def get_club(self, club_id: UUID) -> ReadingClub:
@@ -54,6 +56,34 @@ class ClubService:
             raise ConflictError("club is full", code="CLUB_FULL")
         if not await self.repo.is_member(club.id, user_id):
             await self.repo.join(club.id, user_id)
+        return club
+
+    async def list_public_clubs(
+        self,
+        *,
+        search: str | None,
+        sort: Literal["popular", "newest"],
+        cursor: datetime | None,
+        limit: int,
+    ) -> list[ReadingClub]:
+        return await self.repo.list_public(
+            search=search,
+            sort=sort,
+            cursor=cursor,
+            limit=limit,
+        )
+
+    async def join_public(self, *, club_id: UUID, user_id: UUID) -> ReadingClub:
+        club = await self.repo.get_by_id(club_id)
+        if not club:
+            raise NotFoundError("club not found", code="CLUB_NOT_FOUND")
+        if not club.is_public:
+            raise PermissionDeniedError("club is not public", code="CLUB_NOT_PUBLIC")
+        count = await self.repo.member_count(club_id)
+        if count >= club.max_members:
+            raise ConflictError("club is full", code="CLUB_FULL")
+        if not await self.repo.is_member(club_id, user_id):
+            await self.repo.join(club_id, user_id)
         return club
 
     async def leave_club(self, *, user_id: UUID, club_id: UUID) -> None:

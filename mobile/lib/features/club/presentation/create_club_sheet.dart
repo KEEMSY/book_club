@@ -21,6 +21,7 @@ class _CreateClubSheetState extends ConsumerState<CreateClubSheet> {
   final _nameCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
   bool _saving = false;
+  bool _isPublic = false;
 
   @override
   void dispose() {
@@ -56,6 +57,14 @@ class _CreateClubSheetState extends ConsumerState<CreateClubSheet> {
             maxLines: 3,
             decoration: const InputDecoration(labelText: '소개글 (선택)'),
           ),
+          SizedBox(height: spacing.sm),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: const Text('공개 클럽'),
+            subtitle: const Text('누구나 검색하고 가입할 수 있어요'),
+            value: _isPublic,
+            onChanged: (v) => setState(() => _isPublic = v),
+          ),
           SizedBox(height: spacing.lg),
           SizedBox(
             width: double.infinity,
@@ -87,6 +96,7 @@ class _CreateClubSheetState extends ConsumerState<CreateClubSheet> {
             name: name,
             description:
                 _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
+            isPublic: _isPublic,
           );
       if (mounted) Navigator.of(context).pop();
     } catch (_) {

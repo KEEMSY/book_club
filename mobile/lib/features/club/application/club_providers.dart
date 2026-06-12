@@ -22,3 +22,11 @@ final chatImageUploaderProvider = Provider<ImageUploader>((ref) {
 final myClubsProvider = FutureProvider.autoDispose<List<Club>>((ref) {
   return ref.watch(clubRepositoryProvider).listMyClubs();
 });
+
+final publicClubsProvider = FutureProvider.autoDispose
+    .family<List<Club>, ({String? search, String sort})>(
+  (ref, params) => ref.read(clubRepositoryProvider).listPublicClubs(
+        search: params.search,
+        sort: params.sort,
+      ),
+);

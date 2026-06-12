@@ -6,6 +6,7 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import (
+    Boolean,
     CheckConstraint,
     DateTime,
     ForeignKey,
@@ -57,6 +58,7 @@ class ReadingClub(Base):
         default=lambda: secrets.token_urlsafe(8)[:8].upper(),
     )
     max_members: Mapped[int] = mapped_column(SmallInteger, nullable=False, default=10)
+    is_public: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="false")
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, default=lambda: datetime.now()
     )

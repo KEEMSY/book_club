@@ -79,6 +79,18 @@ class DiscoveryScreen extends ConsumerWidget {
               child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
             )
           else ...[
+            // ── 클럽 찾기 진입 배너 (M32) ─────────────────────────────────
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(
+                  spacing.lg,
+                  0,
+                  spacing.lg,
+                  spacing.md,
+                ),
+                child: _ClubDiscoveryBanner(),
+              ),
+            ),
             // ── 맞춤 추천 (personalized, shown only when available) ──────
             if (recs.isNotEmpty) ...[
               const SliverToBoxAdapter(
@@ -320,6 +332,67 @@ class _ReasonChip extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         textAlign: TextAlign.center,
+      ),
+    );
+  }
+}
+
+/// Banner card linking to the public club discovery screen (M32).
+class _ClubDiscoveryBanner extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final radii = theme.extension<AppRadius>()!;
+    final spacing = theme.extension<AppSpacing>()!;
+
+    return InkWell(
+      onTap: () => context.push(AppRoutes.publicClubs),
+      borderRadius: BorderRadius.circular(radii.md),
+      child: Ink(
+        decoration: BoxDecoration(
+          color: theme.colorScheme.secondaryContainer,
+          borderRadius: BorderRadius.circular(radii.md),
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: spacing.md,
+            vertical: spacing.sm,
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.group_rounded,
+                color: theme.colorScheme.onSecondaryContainer,
+              ),
+              SizedBox(width: spacing.sm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '클럽 찾기',
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        color: theme.colorScheme.onSecondaryContainer,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    Text(
+                      '공개 독서 클럽에 지금 참여해 보세요',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSecondaryContainer
+                            .withValues(alpha: 0.8),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: theme.colorScheme.onSecondaryContainer,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

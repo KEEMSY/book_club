@@ -10,6 +10,7 @@ class Club {
     required this.maxMembers,
     required this.memberCount,
     required this.createdAt,
+    this.isPublic = false,
   });
 
   final String id;
@@ -22,6 +23,7 @@ class Club {
   final int maxMembers;
   final int memberCount;
   final DateTime createdAt;
+  final bool isPublic;
 
   factory Club.fromJson(Map<String, dynamic> json) => Club(
         id: json['id'] as String,
@@ -34,6 +36,7 @@ class Club {
         maxMembers: json['max_members'] as int,
         memberCount: json['member_count'] as int,
         createdAt: DateTime.parse(json['created_at'] as String),
+        isPublic: json['is_public'] as bool? ?? false,
       );
 }
 

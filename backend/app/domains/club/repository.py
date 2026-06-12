@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import secrets
 from datetime import datetime
+from typing import Literal
 from uuid import UUID, uuid4
 
 from sqlalchemy import delete, func, select
@@ -33,6 +34,7 @@ class ClubRepository:
         description: str | None,
         book_id: UUID | None,
         max_members: int,
+        is_public: bool = False,
     ) -> ReadingClub:
         club = ReadingClub(
             id=uuid4(),
@@ -41,6 +43,7 @@ class ClubRepository:
             description=description,
             book_id=book_id,
             max_members=max_members,
+            is_public=is_public,
             invite_code=secrets.token_urlsafe(6).upper()[:8],
             created_at=datetime.now(),
         )
@@ -72,6 +75,52 @@ class ClubRepository:
             .where(ClubMember.user_id == user_id)
             .order_by(ReadingClub.created_at.desc())
         )
+        rows = await self._session.execute(stmt)
+        return list(rows.scalars().all())
+
+    async def list_public(
+        self,
+        *,
+        search: str | None,
+        sort: Literal["popular", "newest"],
+        cursor: datetime | None,
+        limit: int,
+    ) -> list[ReadingClub]:
+        """Return public clubs, newest or popular first, with optional name/book-title search."""
+        from app.domains.book.models import Book
+
+        member_count_subq = (
+            select(func.count())
+            .select_from(ClubMember)
+            .where(ClubMember.club_id == ReadingClub.id)
+            .correlate(ReadingClub)
+            .scalar_subquery()
+        )
+
+        stmt = (
+            select(ReadingClub)
+            .outerjoin(Book, Book.id == ReadingClub.book_id)
+            .where(ReadingClub.is_public.is_(True))
+        )
+
+        if search:
+            pattern = f"%{search}%"
+            stmt = stmt.where(
+                ReadingClub.name.ilike(pattern) | Book.title.ilike(pattern)
+            )
+
+        if sort == "popular":
+            # cursor is encoded as "<member_count>:<uuid>" for popular sort
+            if cursor is not None:
+                # cursor re-used as created_at for simplicity — popular uses created_at tiebreak
+                stmt = stmt.where(ReadingClub.created_at < cursor)
+            stmt = stmt.order_by(member_count_subq.desc(), ReadingClub.created_at.desc())
+        else:
+            if cursor is not None:
+                stmt = stmt.where(ReadingClub.created_at < cursor)
+            stmt = stmt.order_by(ReadingClub.created_at.desc())
+
+        stmt = stmt.limit(limit)
         rows = await self._session.execute(stmt)
         return list(rows.scalars().all())
 
