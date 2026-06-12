@@ -13,6 +13,18 @@
 
 ## Phase 전환 리뷰 기록
 
+### Phase 8 전환 리뷰 (2026-06-12)
+
+- 리뷰 문서: `docs/plans/2026-06-12-phase8.md`
+- **완료 (M31)**: (growth) 친구 초대 & 딥링크 — referral 코드, GET/POST /me/referral, ReferralScreen, /invite/:code 딥링크
+- **완료 (M32)**: (club) 공개 클럽 발견 — is_public 컬럼, GET /clubs/public, PublicClubsScreen, 클럽 생성 공개 토글
+- **완료 (M33)**: (notification) 개인화 리마인더 — reading_reminders 테이블, CRUD API, ReminderScreen, 스트릭 경고 푸시
+- **완료 (M34)**: (monetization) Pro 구독 인프라 — is_pro/pro_expires_at 컬럼, 구독 API stub, PaywallScreen, ProBadge
+- **완료 (M35)**: (polish) 앱 폴리시 — 온보딩 3단계 PageView, Firebase 방어 코드, 이미지 캐싱, 접근성 Semantics
+- **보류 (Phase 9)**: (discovery) 딥러닝 추천 — 활성 사용자 1만 이상 확보 후 검토
+- **보류 (Phase 9)**: (monetization) RevenueCat 실제 영수증 검증 연동 — M34 stub → 실 결제 검증
+- **보류 (Phase 9)**: (engagement) 쉴드 유료 추가 구매 — Pro 반응 데이터 확인 후 결정
+
 ### Phase 7 전환 리뷰 (2026-06-10)
 
 - 리뷰 문서: `docs/plans/2026-06-07-phase7.md`
