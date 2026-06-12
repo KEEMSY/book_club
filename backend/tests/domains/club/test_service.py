@@ -180,6 +180,13 @@ class FakeClubRepository:
     async def my_rsvp(self, event_id: UUID, user_id: UUID) -> str | None:
         return self._rsvps.get((event_id, user_id))
 
+    async def set_book(self, club_id: UUID, book_id: UUID | None) -> _FakeClub:
+        club = self._clubs.get(club_id)
+        if club is None:
+            raise NotFoundError("club not found", code="CLUB_NOT_FOUND")
+        club.book_id = book_id
+        return club
+
 
 def _svc() -> tuple[ClubService, FakeClubRepository]:
     repo = FakeClubRepository()
@@ -431,3 +438,50 @@ async def test_rsvp_member_succeeds() -> None:
 
     # Should not raise
     await svc.rsvp(user_id=owner, event_id=created.id, status="going")
+
+
+# ---------------------------------------------------------------------------
+# set_book
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_set_book_owner_can_set_book() -> None:
+    svc, _ = _svc()
+    owner = uuid4()
+    club = await svc.create_club(user_id=owner, req=_create_req())
+    assert club.book_id is None
+
+    book_id = uuid4()
+    updated = await svc.set_book(club_id=club.id, user_id=owner, book_id=book_id)
+    assert updated.book_id == book_id
+
+
+@pytest.mark.asyncio
+async def test_set_book_owner_can_clear_book() -> None:
+    svc, _ = _svc()
+    owner = uuid4()
+    club = await svc.create_club(user_id=owner, req=_create_req())
+
+    await svc.set_book(club_id=club.id, user_id=owner, book_id=uuid4())
+    cleared = await svc.set_book(club_id=club.id, user_id=owner, book_id=None)
+    assert cleared.book_id is None
+
+
+@pytest.mark.asyncio
+async def test_set_book_non_owner_raises_permission_denied() -> None:
+    svc, repo = _svc()
+    owner = uuid4()
+    club = await svc.create_club(user_id=owner, req=_create_req())
+    member = uuid4()
+    await repo.join(club.id, member)
+
+    with pytest.raises(PermissionDeniedError):
+        await svc.set_book(club_id=club.id, user_id=member, book_id=uuid4())
+
+
+@pytest.mark.asyncio
+async def test_set_book_nonexistent_club_raises_not_found() -> None:
+    svc, _ = _svc()
+    with pytest.raises(NotFoundError):
+        await svc.set_book(club_id=uuid4(), user_id=uuid4(), book_id=uuid4())

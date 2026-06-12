@@ -127,6 +127,13 @@ class FakeUserBookRepo:
             ub.status = status
         return ub
 
+    async def update_chapter(self, user_book_id: UUID, current_chapter: int) -> UserBook:
+        ub = self.by_id.get(user_book_id)
+        if ub is None:
+            raise NotFoundError("not found", code="USER_BOOK_NOT_FOUND")
+        ub.current_chapter = current_chapter
+        return ub
+
     async def delete(self, user_book_id: UUID) -> None:
         self.by_id.pop(user_book_id, None)
 
@@ -438,3 +445,61 @@ async def test_remove_from_library_deletes_and_rejects_non_owner() -> None:
     await service.remove_from_library(user_id=owner, user_book_id=ub.id)
     page = await service.list_library(user_id=owner, status=None, cursor=None, limit=10)
     assert len(page.items) == 0
+
+
+# ---------------------------------------------------------------------------
+# update_chapter
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_update_chapter_happy_path() -> None:
+    service, books, _, _ = _build_service()
+    seeded = await books.upsert_by_isbn(
+        isbn13="9788937460111",
+        title="t",
+        author="a",
+        publisher=None,
+        cover_url=None,
+        description=None,
+        source=BookSource.NAVER,
+    )
+    user_id = uuid4()
+    ub = await service.add_to_library(user_id=user_id, book_id=seeded.id)
+
+    updated = await service.update_chapter(
+        user_id=user_id, user_book_id=ub.id, current_chapter=5
+    )
+    assert updated.current_chapter == 5
+
+
+@pytest.mark.asyncio
+async def test_update_chapter_non_owner_returns_not_found() -> None:
+    service, books, _, _ = _build_service()
+    seeded = await books.upsert_by_isbn(
+        isbn13="9788937460222",
+        title="t",
+        author="a",
+        publisher=None,
+        cover_url=None,
+        description=None,
+        source=BookSource.NAVER,
+    )
+    owner = uuid4()
+    attacker = uuid4()
+    ub = await service.add_to_library(user_id=owner, book_id=seeded.id)
+
+    with pytest.raises(NotFoundError):
+        await service.update_chapter(
+            user_id=attacker, user_book_id=ub.id, current_chapter=3
+        )
+
+
+@pytest.mark.asyncio
+async def test_update_chapter_nonexistent_book_returns_not_found() -> None:
+    service, _, _, _ = _build_service()
+
+    with pytest.raises(NotFoundError):
+        await service.update_chapter(
+            user_id=uuid4(), user_book_id=uuid4(), current_chapter=1
+        )
