@@ -17,8 +17,9 @@ import enum
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, String, UniqueConstraint, func
+from sqlalchemy import Boolean, DateTime, ForeignKey, String, Text, UniqueConstraint, func
 from sqlalchemy import Enum as SAEnum
+from sqlalchemy.dialects.postgresql import TIMESTAMP as PGTIMESTAMP
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -64,6 +65,11 @@ class User(Base):
     profile_image_url: Mapped[str | None] = mapped_column(String(1024), nullable=True)
     bio: Mapped[str | None] = mapped_column(String(200), nullable=True)
     referral_code: Mapped[str | None] = mapped_column(String(8), unique=True, nullable=True)
+
+    # Pro subscription fields — populated via RevenueCat receipt verification.
+    is_pro: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="false")
+    pro_expires_at: Mapped[datetime | None] = mapped_column(PGTIMESTAMP(timezone=True), nullable=True)
+    pro_product_id: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()

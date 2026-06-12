@@ -33,8 +33,10 @@ from app.domains.reading.providers import get_event_bus
 from app.domains.reading.router import me_router as reading_me_router
 from app.domains.reading.router import router as reading_router
 from app.domains.referral.router import router as referral_router
+from app.domains.reminder.router import router as reminder_router
 from app.domains.social.events import FollowReceived
 from app.domains.social.router import router as social_router
+from app.domains.subscription.router import router as subscription_router
 
 
 @asynccontextmanager
@@ -113,6 +115,8 @@ def create_app() -> FastAPI:
     app.include_router(club_router)
     app.include_router(club_ws_router)
     app.include_router(referral_router)
+    app.include_router(reminder_router)
+    app.include_router(subscription_router)
 
     return app
 
