@@ -9,6 +9,8 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/grade_theme.dart';
 import '../../auth/application/auth_notifier.dart';
 import '../../feed/presentation/comments_sheet.dart';
+import '../../subscription/application/subscription_notifier.dart';
+import '../../subscription/presentation/pro_badge.dart';
 import '../../feed/presentation/widgets/post_card.dart';
 import '../../reading/presentation/widgets/grade_badge.dart';
 import '../../social/application/social_providers.dart';
@@ -221,10 +223,18 @@ class _ProfileHeader extends StatelessWidget {
           nickname: profile.nickname,
         ),
         SizedBox(height: spacing.md),
-        Text(
-          profile.nickname,
-          style: theme.textTheme.headlineMedium,
-          textAlign: TextAlign.center,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              profile.nickname,
+              style: theme.textTheme.headlineMedium,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(width: 6),
+            const ProBadge(),
+          ],
         ),
         if (profile.bio != null && profile.bio!.isNotEmpty) ...[
           SizedBox(height: spacing.sm),
@@ -661,6 +671,12 @@ class _ActionButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (profile.isMe) {
+      final subscriptionAsync = ref.watch(subscriptionNotifierProvider);
+      final isPro = subscriptionAsync.maybeWhen(
+        data: (s) => s.isPro,
+        orElse: () => false,
+      );
+
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -670,10 +686,27 @@ class _ActionButton extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           OutlinedButton.icon(
+            onPressed: () => context.push(AppRoutes.reminders),
+            icon: const Icon(Icons.alarm_outlined),
+            label: const Text('독서 리마인더'),
+          ),
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
             onPressed: () => context.push(AppRoutes.referral),
             icon: const Icon(Icons.people_alt_outlined),
             label: const Text('친구 초대'),
           ),
+          if (!isPro) ...[
+            const SizedBox(height: 8),
+            FilledButton.icon(
+              onPressed: () => context.push(AppRoutes.paywall),
+              icon: const Icon(Icons.workspace_premium_rounded),
+              label: const Text('Book Club Pro'),
+              style: FilledButton.styleFrom(
+                backgroundColor: const Color(0xFF6B21A8),
+              ),
+            ),
+          ],
         ],
       );
     }

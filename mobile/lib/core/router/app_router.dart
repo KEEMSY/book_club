@@ -29,6 +29,8 @@ import '../../features/notification/presentation/notification_screen.dart';
 import '../../features/notification/presentation/weekly_report_screen.dart';
 import '../../features/referral/application/referral_providers.dart';
 import '../../features/referral/presentation/referral_screen.dart';
+import '../../features/reminder/presentation/reminder_screen.dart';
+import '../../features/subscription/presentation/paywall_screen.dart';
 import '../../features/reading/application/recap_notifier.dart';
 import '../../features/reading/presentation/dashboard_screen.dart';
 import '../../features/reading/presentation/goal_screen.dart';
@@ -94,6 +96,9 @@ class AppRoutes {
   // M31 — friend referral / invite screen.
   static const referral = '/profile/referral';
 
+  // M33 — personalized reading reminders.
+  static const reminders = '/profile/reminders';
+
   // Deeplink handled by go_router — applying a friend's invite code.
   static String invite(String code) => '/invite/$code';
 
@@ -107,6 +112,9 @@ class AppRoutes {
 
   // M32 — public club discovery screen.
   static const publicClubs = '/discover/clubs';
+
+  // M34 — Pro subscription paywall.
+  static const paywall = '/paywall';
 }
 
 /// Adapter that bridges a Riverpod [ValueNotifier]-free state stream into a
@@ -322,6 +330,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.referral,
         parentNavigatorKey: _rootKey,
         builder: (context, state) => const ReferralScreen(),
+      ),
+      // M33 — personalized reading reminders, pushed above the shell.
+      GoRoute(
+        path: AppRoutes.reminders,
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) => const ReminderScreen(),
+      ),
+      // M34 — Pro subscription paywall, reachable from any tab.
+      GoRoute(
+        path: AppRoutes.paywall,
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) => const PaywallScreen(),
       ),
       // M31 — deeplink entry point: bookclub.app/invite/{code}
       // Applies the referral code and then redirects to home. The apply call
