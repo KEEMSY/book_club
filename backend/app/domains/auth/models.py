@@ -63,6 +63,7 @@ class User(Base):
     nickname: Mapped[str] = mapped_column(String(64), nullable=False)
     profile_image_url: Mapped[str | None] = mapped_column(String(1024), nullable=True)
     bio: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    referral_code: Mapped[str | None] = mapped_column(String(8), unique=True, nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()

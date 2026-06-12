@@ -52,6 +52,8 @@ from app.domains.reading.schemas import (
     StartSessionRequest,
 )
 from app.domains.reading.service import ReadingService
+from app.domains.referral.providers import get_referral_service
+from app.domains.referral.service import ReferralService
 
 logger = logging.getLogger(__name__)
 
@@ -96,12 +98,19 @@ async def end_session(
     body: EndSessionRequest,
     user_id: Annotated[str, Depends(get_current_user_id)],
     service: Annotated[ReadingService, Depends(get_reading_service)],
+    referral_service: Annotated[ReferralService, Depends(get_referral_service)],
 ) -> SessionCompletionResponse:
     completion = await service.end_session(
         user_id=UUID(user_id),
         session_id=session_id,
         ended_at=body.ended_at,
         paused_ms=body.paused_ms,
+    )
+    # Post-process: complete any pending referral when the session is long enough.
+    # Always a no-op if the user has no open referral row.
+    await referral_service.complete_referral_if_eligible(
+        user_id=UUID(user_id),
+        duration_sec=completion.session.duration_sec or 0,
     )
     return SessionCompletionResponse(
         session=ReadingSessionPublic.from_row(completion.session),

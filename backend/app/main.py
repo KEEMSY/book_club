@@ -32,6 +32,7 @@ from app.domains.reading.events import ReadingSessionCompleted, UserGradeRecompu
 from app.domains.reading.providers import get_event_bus
 from app.domains.reading.router import me_router as reading_me_router
 from app.domains.reading.router import router as reading_router
+from app.domains.referral.router import router as referral_router
 from app.domains.social.events import FollowReceived
 from app.domains.social.router import router as social_router
 
@@ -111,6 +112,7 @@ def create_app() -> FastAPI:
     app.include_router(admin_router)
     app.include_router(club_router)
     app.include_router(club_ws_router)
+    app.include_router(referral_router)
 
     return app
 

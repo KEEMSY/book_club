@@ -661,9 +661,20 @@ class _ActionButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (profile.isMe) {
-      return OutlinedButton(
-        onPressed: () => context.push(AppRoutes.profileEdit, extra: profile),
-        child: const Text('프로필 편집'),
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          OutlinedButton(
+            onPressed: () => context.push(AppRoutes.profileEdit, extra: profile),
+            child: const Text('프로필 편집'),
+          ),
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: () => context.push(AppRoutes.referral),
+            icon: const Icon(Icons.people_alt_outlined),
+            label: const Text('친구 초대'),
+          ),
+        ],
       );
     }
 

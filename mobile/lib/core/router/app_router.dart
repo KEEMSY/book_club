@@ -26,6 +26,8 @@ import '../../features/club/presentation/club_rooms_screen.dart';
 import '../../features/club/domain/club.dart';
 import '../../features/notification/presentation/notification_screen.dart';
 import '../../features/notification/presentation/weekly_report_screen.dart';
+import '../../features/referral/application/referral_providers.dart';
+import '../../features/referral/presentation/referral_screen.dart';
 import '../../features/reading/application/recap_notifier.dart';
 import '../../features/reading/presentation/dashboard_screen.dart';
 import '../../features/reading/presentation/goal_screen.dart';
@@ -87,6 +89,12 @@ class AppRoutes {
 
   // M28 — monthly recap card.
   static const monthlyRecap = '/reading/recap/monthly';
+
+  // M31 — friend referral / invite screen.
+  static const referral = '/profile/referral';
+
+  // Deeplink handled by go_router — applying a friend's invite code.
+  static String invite(String code) => '/invite/$code';
 
   // M30 — offline reading meetup events list.
   static String clubEvents(String clubId) => '/clubs/$clubId/events';
@@ -297,6 +305,40 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final UserProfile profile = state.extra! as UserProfile;
           return ProfileEditScreen(profile: profile);
+        },
+      ),
+      // M31 — friend invite / referral screen, pushed above the shell.
+      GoRoute(
+        path: AppRoutes.referral,
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) => const ReferralScreen(),
+      ),
+      // M31 — deeplink entry point: bookclub.app/invite/{code}
+      // Applies the referral code and then redirects to home. The apply call
+      // is fire-and-forget here; errors are silently swallowed so the UX stays
+      // frictionless (the user lands on home regardless).
+      GoRoute(
+        path: '/invite/:code',
+        parentNavigatorKey: _rootKey,
+        redirect: (context, state) {
+          final String code = state.pathParameters['code']!;
+          // Obtain the repository via ProviderScope without a ref by reading
+          // through the container exposed on the root element. We use a
+          // builder+redirect hybrid: the redirect triggers the side-effect and
+          // immediately sends the user to home.
+          final container = ProviderScope.containerOf(context, listen: false);
+          // ignore: unawaited_futures — intentional fire-and-forget
+          container
+              .read(
+                // Import deferred to avoid a direct reference that would
+                // couple the router to the referral feature's internals.
+                // We pass the provider by dynamic lookup so build_runner does
+                // not need to codegen this file.
+                referralRepositoryProvider,
+              )
+              .applyReferral(code)
+              .catchError((_) {});
+          return AppRoutes.home;
         },
       ),
       // User profile — pushed above the shell so the nav bar disappears and
