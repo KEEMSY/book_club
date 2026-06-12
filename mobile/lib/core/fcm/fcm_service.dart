@@ -1,5 +1,6 @@
 import 'dart:developer' as dev;
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 
@@ -11,10 +12,15 @@ import 'package:flutter/foundation.dart';
 /// the codebase compile and run in dev/CI environments where
 /// GoogleService-Info.plist / google-services.json are absent.
 ///
-/// TODO(setup): Call `Firebase.initializeApp()` in main.dart once the Firebase
-/// project has been created and the platform config files have been added:
-///   - iOS:     ios/Runner/GoogleService-Info.plist
-///   - Android: android/app/google-services.json
+/// SETUP: To enable Firebase push notifications:
+///   1. Create a Firebase project at https://console.firebase.google.com
+///   2. Add the iOS app (bundle ID from Xcode → Runner target) and download
+///      GoogleService-Info.plist → place at ios/Runner/GoogleService-Info.plist
+///   3. Add the Android app and download google-services.json
+///      → place at android/app/google-services.json
+///   4. In main.dart, call `await Firebase.initializeApp()` before runApp().
+///      Import: package:firebase_core/firebase_core.dart
+///   Once Firebase.apps is non-empty, all methods below activate automatically.
 class FcmService {
   FcmService._();
 
@@ -23,12 +29,19 @@ class FcmService {
   /// Returns the current FCM registration token, or `null` when Firebase is
   /// not initialised or the device cannot reach FCM servers.
   Future<String?> getToken() async {
+    if (Firebase.apps.isEmpty) {
+      dev.log(
+        'Firebase not initialised — skipping FCM token.',
+        name: 'FcmService',
+      );
+      return null;
+    }
     try {
       return await FirebaseMessaging.instance.getToken();
     } catch (e) {
       // Non-fatal: token registration is best-effort at login time.
       dev.log(
-        'FCM getToken failed — Firebase may not be initialised yet.',
+        'FCM getToken failed.',
         name: 'FcmService',
         error: e,
       );
@@ -44,7 +57,9 @@ class FcmService {
   /// [onTokenRefresh] receives the new token string and is responsible for
   /// sending it to the backend.
   Stream<String> get tokenRefreshStream =>
-      FirebaseMessaging.instance.onTokenRefresh;
+      Firebase.apps.isEmpty
+          ? const Stream<String>.empty()
+          : FirebaseMessaging.instance.onTokenRefresh;
 
   /// Requests push notification permission from the OS.
   ///
@@ -53,6 +68,13 @@ class FcmService {
   /// `Firebase.initializeApp()` — the call is silently skipped if Firebase
   /// is uninitialised.
   Future<void> requestPermission() async {
+    if (Firebase.apps.isEmpty) {
+      dev.log(
+        'Firebase not initialised — skipping permission request.',
+        name: 'FcmService',
+      );
+      return;
+    }
     try {
       final NotificationSettings settings =
           await FirebaseMessaging.instance.requestPermission(
@@ -68,7 +90,7 @@ class FcmService {
       }
     } catch (e) {
       dev.log(
-        'FCM requestPermission failed — Firebase may not be initialised yet.',
+        'FCM requestPermission failed.',
         name: 'FcmService',
         error: e,
       );

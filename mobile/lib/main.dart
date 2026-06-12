@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
 import 'app.dart';
+import 'features/onboarding/presentation/onboarding_screen.dart';
 
 /// Kakao native-app key. Supplied via `--dart-define=KAKAO_NATIVE_APP_KEY=...`
 /// in CI/release builds. Falls back to the registered key so `flutter run`
@@ -24,9 +25,15 @@ Future<void> main() async {
 
   KakaoSdk.init(nativeAppKey: _kakaoNativeAppKey);
 
+  // Pre-warm the onboarding-complete flag so the router redirect can read it
+  // synchronously on the first navigation tick (avoids a spurious /login flash).
+  final container = ProviderContainer();
+  await container.read(onboardingCompleteProvider.future);
+
   runApp(
-    const ProviderScope(
-      child: BookClubApp(),
+    UncontrolledProviderScope(
+      container: container,
+      child: const BookClubApp(),
     ),
   );
 }

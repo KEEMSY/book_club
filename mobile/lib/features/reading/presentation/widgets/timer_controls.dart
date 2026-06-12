@@ -33,41 +33,53 @@ class TimerControls extends StatelessWidget {
     final spacing = theme.extension<AppSpacing>()!;
 
     return switch (state) {
-      TimerIdle() || TimerFailure() || TimerCompleted() => SizedBox(
-          width: double.infinity,
-          child: FilledButton(
-            key: const ValueKey('timer-start'),
-            onPressed: onStart,
-            style: FilledButton.styleFrom(
-              backgroundColor: accent,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 18),
-              shape: const StadiumBorder(),
-              textStyle: theme.textTheme.labelLarge?.copyWith(fontSize: 17),
+      TimerIdle() || TimerFailure() || TimerCompleted() => Semantics(
+          label: '독서 타이머 시작',
+          button: true,
+          child: SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              key: const ValueKey('timer-start'),
+              onPressed: onStart,
+              style: FilledButton.styleFrom(
+                backgroundColor: accent,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 18),
+                shape: const StadiumBorder(),
+                textStyle: theme.textTheme.labelLarge?.copyWith(fontSize: 17),
+              ),
+              child: const Text('시작'),
             ),
-            child: const Text('시작'),
           ),
         ),
       TimerRunning() => Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            _CircularControl(
-              key: const ValueKey('timer-pause'),
-              icon: Icons.pause_rounded,
-              onPressed: onPause,
+            Semantics(
+              label: '독서 타이머 일시정지',
+              button: true,
+              child: _CircularControl(
+                key: const ValueKey('timer-pause'),
+                icon: Icons.pause_rounded,
+                onPressed: onPause,
+              ),
             ),
             SizedBox(width: spacing.md),
             Expanded(
-              child: FilledButton(
-                key: const ValueKey('timer-end'),
-                onPressed: onEnd,
-                style: FilledButton.styleFrom(
-                  backgroundColor: accent,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 18),
-                  shape: const StadiumBorder(),
+              child: Semantics(
+                label: '독서 타이머 정지',
+                button: true,
+                child: FilledButton(
+                  key: const ValueKey('timer-end'),
+                  onPressed: onEnd,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: accent,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    shape: const StadiumBorder(),
+                  ),
+                  child: const Text('종료'),
                 ),
-                child: const Text('종료'),
               ),
             ),
           ],
@@ -75,43 +87,55 @@ class TimerControls extends StatelessWidget {
       TimerPaused() => Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            _CircularControl(
-              key: const ValueKey('timer-resume'),
-              icon: Icons.play_arrow_rounded,
-              onPressed: onResume,
+            Semantics(
+              label: '독서 타이머 재개',
+              button: true,
+              child: _CircularControl(
+                key: const ValueKey('timer-resume'),
+                icon: Icons.play_arrow_rounded,
+                onPressed: onResume,
+              ),
             ),
             SizedBox(width: spacing.md),
             Expanded(
-              child: FilledButton(
-                key: const ValueKey('timer-end'),
-                onPressed: onEnd,
-                style: FilledButton.styleFrom(
-                  backgroundColor: accent,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 18),
-                  shape: const StadiumBorder(),
+              child: Semantics(
+                label: '독서 타이머 정지',
+                button: true,
+                child: FilledButton(
+                  key: const ValueKey('timer-end'),
+                  onPressed: onEnd,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: accent,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    shape: const StadiumBorder(),
+                  ),
+                  child: const Text('종료'),
                 ),
-                child: const Text('종료'),
               ),
             ),
           ],
         ),
-      TimerEnding() => SizedBox(
-          width: double.infinity,
-          child: FilledButton(
-            onPressed: null,
-            style: FilledButton.styleFrom(
-              backgroundColor: accent.withValues(alpha: 0.38),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 18),
-              shape: const StadiumBorder(),
-            ),
-            child: const SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+      TimerEnding() => Semantics(
+          label: '독서 타이머 기록 저장 중',
+          button: true,
+          child: SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              onPressed: null,
+              style: FilledButton.styleFrom(
+                backgroundColor: accent.withValues(alpha: 0.38),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 18),
+                shape: const StadiumBorder(),
+              ),
+              child: const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
               ),
             ),
           ),

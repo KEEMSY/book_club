@@ -30,6 +30,7 @@ import '../../features/notification/presentation/weekly_report_screen.dart';
 import '../../features/referral/application/referral_providers.dart';
 import '../../features/referral/presentation/referral_screen.dart';
 import '../../features/reminder/presentation/reminder_screen.dart';
+import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/subscription/presentation/paywall_screen.dart';
 import '../../features/reading/application/recap_notifier.dart';
 import '../../features/reading/presentation/dashboard_screen.dart';
@@ -115,6 +116,9 @@ class AppRoutes {
 
   // M34 — Pro subscription paywall.
   static const paywall = '/paywall';
+
+  // M35 — first-run onboarding flow.
+  static const onboarding = '/onboarding';
 }
 
 /// Adapter that bridges a Riverpod [ValueNotifier]-free state stream into a
@@ -158,16 +162,30 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
       final bool authenticated = auth is Authenticated;
       final bool onLogin = canonical == AppRoutes.login;
+      final bool onOnboarding = canonical == AppRoutes.onboarding;
 
-      if (!authenticated && !onLogin) {
-        return AppRoutes.login;
-      }
-      if (authenticated && onLogin) {
+      // Authenticated users never need the onboarding/login screens.
+      if (authenticated && (onLogin || onOnboarding)) {
         return AppRoutes.home;
       }
+
+      // Unauthenticated: decide between onboarding and login.
+      if (!authenticated && !onLogin && !onOnboarding) {
+        // Check the onboarding-complete flag synchronously from the cache.
+        // The provider is pre-warmed in main.dart so the value is available.
+        final bool onboardingDone =
+            ref.read(onboardingCompleteProvider).valueOrNull ?? false;
+        return onboardingDone ? AppRoutes.login : AppRoutes.onboarding;
+      }
+
       return canonical == target ? null : canonical;
     },
     routes: <RouteBase>[
+      // Onboarding — shown on first launch before login.
+      GoRoute(
+        path: AppRoutes.onboarding,
+        builder: (context, state) => const OnboardingScreen(),
+      ),
       // Login sits outside the shell — no bottom nav on the login screen.
       GoRoute(
         path: AppRoutes.login,

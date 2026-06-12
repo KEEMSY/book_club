@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -498,7 +499,7 @@ class _UserSearchTileState extends ConsumerState<_UserSearchTile> {
       leading: CircleAvatar(
         radius: 22,
         backgroundImage: widget.user.profileImageUrl != null
-            ? NetworkImage(widget.user.profileImageUrl!)
+            ? CachedNetworkImageProvider(widget.user.profileImageUrl!)
             : null,
         child: widget.user.profileImageUrl == null
             ? Text(
