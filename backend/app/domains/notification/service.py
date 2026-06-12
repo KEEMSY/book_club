@@ -323,6 +323,40 @@ class NotificationService:
                 {"week_start": str(week_start)},
             )
 
+    async def send_streak_warning_push(
+        self,
+        *,
+        user_id: UUID,
+        streak_days: int,
+        device_token: str,
+    ) -> None:
+        """Send a 'streak at risk' push directly to a single device token.
+
+        Called when the daily scheduler detects the user has not yet logged
+        a reading session and their streak would break at midnight. Sends to
+        the supplied token rather than a topic so only active devices receive
+        the nudge.
+        """
+        title = "스트릭이 끊길 위험이에요! 🔥"
+        body = f"{streak_days}일 연속 독서 중이에요. 오늘 독서를 기록해 보세요."
+        async with self.sessionmaker() as session:
+            await self._save_notification(
+                session,
+                user_id=user_id,
+                ntype=NotificationType.STREAK_WARNING,
+                title=title,
+                body=body,
+                data={"streak_days": str(streak_days)},
+            )
+            await session.commit()
+
+        await self.push.send_to_tokens(
+            [device_token],
+            title,
+            body,
+            {"streak_days": str(streak_days)},
+        )
+
     @staticmethod
     async def _save_notification(
         session: AsyncSession,

@@ -41,6 +41,7 @@ class NotificationType(enum.StrEnum):
     WEEKLY_REPORT = "weekly_report"
     FOLLOW_RECEIVED = "follow_received"
     BADGE_EARNED = "badge_earned"
+    STREAK_WARNING = "streak_warning"
 
 
 class Notification(Base):
