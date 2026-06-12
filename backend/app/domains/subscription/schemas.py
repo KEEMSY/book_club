@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel
 
@@ -31,3 +31,17 @@ class SubscriptionVerifyResponse(BaseModel):
     is_pro: bool
     expires_at: datetime | None
     message: str
+
+
+class RevenueCatWebhookBody(BaseModel):
+    """Minimal representation of a RevenueCat webhook payload.
+
+    RevenueCat wraps the actual event inside an ``event`` key.  Only the
+    fields the service layer acts on are declared; the rest are captured in
+    ``model_config`` with ``extra="ignore"`` so future RevenueCat additions
+    do not break parsing.
+    """
+
+    model_config = {"extra": "ignore"}
+
+    event: dict[str, Any]

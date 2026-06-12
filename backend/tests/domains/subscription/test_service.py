@@ -7,6 +7,7 @@ from datetime import UTC, datetime, timedelta
 from uuid import UUID, uuid4
 
 import pytest
+from app.domains.subscription.adapters.stub_verifier import StubPurchaseVerifier
 from app.domains.subscription.schemas import VerifyReceiptRequest
 from app.domains.subscription.service import SubscriptionService
 
@@ -45,7 +46,7 @@ class FakeSubscriptionRepository:
 
 def _svc() -> tuple[SubscriptionService, FakeSubscriptionRepository]:
     repo = FakeSubscriptionRepository()
-    return SubscriptionService(repo=repo), repo  # type: ignore[arg-type]
+    return SubscriptionService(repo=repo, verifier=StubPurchaseVerifier()), repo  # type: ignore[arg-type]
 
 
 def _verify_req(platform: str = "ios") -> VerifyReceiptRequest:
