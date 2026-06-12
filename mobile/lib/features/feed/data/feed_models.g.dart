@@ -37,6 +37,7 @@ _PostDto _$PostDtoFromJson(Map<String, dynamic> json) => _PostDto(
           .toList(),
       commentCount: (json['comment_count'] as num).toInt(),
       createdAt: DateTime.parse(json['created_at'] as String),
+      metadata: json['metadata'] as Map<String, dynamic>?,
     );
 
 Map<String, dynamic> _$PostDtoToJson(_PostDto instance) => <String, dynamic>{
@@ -52,6 +53,7 @@ Map<String, dynamic> _$PostDtoToJson(_PostDto instance) => <String, dynamic>{
       'my_reactions': instance.myReactions,
       'comment_count': instance.commentCount,
       'created_at': instance.createdAt.toIso8601String(),
+      'metadata': instance.metadata,
     };
 
 _PostPageDto _$PostPageDtoFromJson(Map<String, dynamic> json) => _PostPageDto(

@@ -11,4 +11,6 @@ from app.domains.club.service import ClubService
 
 
 def get_club_service(session: Annotated[AsyncSession, Depends(get_session)]) -> ClubService:
-    return ClubService(repo=ClubRepository(session))
+    from app.domains.feed.providers import get_feed_service
+
+    return ClubService(repo=ClubRepository(session), feed_service=get_feed_service(session))

@@ -53,6 +53,9 @@ abstract class PostDto with _$PostDto {
     required List<String> myReactions,
     required int commentCount,
     required DateTime createdAt,
+    // Structured payload for M37 activity-event cards. Absent for
+    // user-composed posts; the JSON key is `metadata`.
+    Map<String, dynamic>? metadata,
   }) = _PostDto;
 
   factory PostDto.fromJson(Map<String, dynamic> json) =>
@@ -78,6 +81,7 @@ abstract class PostDto with _$PostDto {
       myReactions: typedMine,
       commentCount: commentCount,
       createdAt: createdAt,
+      metadata: metadata,
     );
   }
 }

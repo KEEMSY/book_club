@@ -44,6 +44,15 @@ from app.shared.event_bus import (
 )
 
 
+# Import deferred to break the potential circular import:
+# reading.providers → feed.providers → reading.providers (get_event_bus).
+# The function-level import below avoids the module-level cycle.
+def _get_feed_service(session: AsyncSession) -> object:
+    from app.domains.feed.providers import get_feed_service
+
+    return get_feed_service(session)
+
+
 class BookQueryAdapter:
     """Implements ``ReadingBookQueryPort`` by reading the book domain's
     UserBook table directly.
@@ -180,4 +189,5 @@ def get_reading_service(
         stage_event=_stage,
         bookmark_repo=BookmarkRepository(session),
         stats_repo=ReadingStatsRepository(session),
+        feed_service=_get_feed_service(session),  # type: ignore[arg-type]
     )

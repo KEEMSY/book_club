@@ -20,6 +20,7 @@ from app.domains.book.adapters.kakao_book_adapter import KakaoBookAdapter
 from app.domains.book.adapters.naver_book_adapter import NaverBookAdapter
 from app.domains.book.repository import BookRepository, UserBookRepository
 from app.domains.book.service import BookService
+from app.domains.feed.providers import get_feed_service
 from app.domains.reading.providers import get_event_bus
 from app.shared.event_bus import commit_and_publish, stage_event
 
@@ -29,6 +30,9 @@ def get_book_service(
 ) -> BookService:
     """Construct a BookService wired with live repositories + the composite
     search adapter (Naver primary, Kakao fallback).
+
+    ``feed_service`` is injected to fire CHAPTER_MILESTONE and BOOK_COMPLETED
+    activity events when the user updates chapter progress or finishes a book.
     """
     bus = get_event_bus()
 
@@ -46,4 +50,5 @@ def get_book_service(
         user_books=UserBookRepository(session),
         search_provider=search,
         stage_event=_stage,
+        feed_service=get_feed_service(session),
     )

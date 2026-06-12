@@ -81,6 +81,27 @@ class PostCard extends StatelessWidget {
               bookTitle: post.bookTitle,
               bookCoverUrl: post.bookCoverUrl,
             )
+          else if (post.postType == PostType.chapterMilestone)
+            _ActivityBody.chapterMilestone(
+              nickname: post.user.nickname,
+              metadata: post.metadata,
+            )
+          else if (post.postType == PostType.streakMilestone)
+            _ActivityBody.streakMilestone(
+              nickname: post.user.nickname,
+              metadata: post.metadata,
+            )
+          else if (post.postType == PostType.bookCompleted)
+            _ActivityBody.bookCompleted(
+              nickname: post.user.nickname,
+              metadata: post.metadata,
+              content: post.content,
+            )
+          else if (post.postType == PostType.clubJoined)
+            _ActivityBody.clubJoined(
+              nickname: post.user.nickname,
+              metadata: post.metadata,
+            )
           else
             Text(
               post.content,
@@ -89,7 +110,7 @@ class PostCard extends StatelessWidget {
                 height: 1.5,
               ),
             ),
-          if (post.imageUrls.isNotEmpty) ...<Widget>[
+          if (post.imageUrls.isNotEmpty && !post.postType.isActivity) ...<Widget>[
             SizedBox(height: spacing.sm),
             ImageGrid(urls: post.imageUrls),
           ],
@@ -305,6 +326,128 @@ class _HighlightBody extends StatelessWidget {
                 color: theme.colorScheme.onSurface,
                 height: 1.6,
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Activity-event card body for M37 system-generated feed events.
+///
+/// Each named constructor corresponds to one [PostType] activity variant and
+/// formats the copy from [metadata] fields. Missing metadata keys are
+/// gracefully replaced with empty strings so the widget never throws at
+/// render time — a defensive measure against backend schema drift.
+class _ActivityBody extends StatelessWidget {
+  const _ActivityBody._({
+    required this.emoji,
+    required this.label,
+    required this.subLabel,
+  });
+
+  factory _ActivityBody.chapterMilestone({
+    required String nickname,
+    required Map<String, dynamic>? metadata,
+  }) {
+    final bookTitle = (metadata?['book_title'] as String?) ?? '';
+    final chapter = metadata?['chapter_number'];
+    final chapterStr = chapter != null ? '$chapter장' : '';
+    return _ActivityBody._(
+      emoji: '📖',
+      label: '$nickname이 $chapterStr 완료했어요!',
+      subLabel: bookTitle,
+    );
+  }
+
+  factory _ActivityBody.streakMilestone({
+    required String nickname,
+    required Map<String, dynamic>? metadata,
+  }) {
+    final days = metadata?['streak_days'];
+    final daysStr = days != null ? '$days일' : '';
+    return _ActivityBody._(
+      emoji: '🔥',
+      label: '$nickname이 $daysStr연속 독서 달성!',
+      subLabel: '',
+    );
+  }
+
+  factory _ActivityBody.bookCompleted({
+    required String nickname,
+    required Map<String, dynamic>? metadata,
+    required String content,
+  }) {
+    final bookTitle = (metadata?['book_title'] as String?) ?? '';
+    return _ActivityBody._(
+      emoji: '✅',
+      label: '$nickname이 완독했어요!',
+      // One-line review stored in post content; fall back to book title only.
+      subLabel: content.isNotEmpty ? '"$content"' : bookTitle,
+    );
+  }
+
+  factory _ActivityBody.clubJoined({
+    required String nickname,
+    required Map<String, dynamic>? metadata,
+  }) {
+    final clubName = (metadata?['club_name'] as String?) ?? '';
+    return _ActivityBody._(
+      emoji: '👋',
+      label: '$nickname이 클럽에 참여했어요!',
+      subLabel: clubName,
+    );
+  }
+
+  final String emoji;
+  final String label;
+  final String subLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final radii = theme.extension<AppRadius>()!;
+    final spacing = theme.extension<AppSpacing>()!;
+
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: spacing.md,
+        vertical: spacing.sm,
+      ),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.all(Radius.circular(radii.sm)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Text(emoji, style: const TextStyle(fontSize: 28)),
+          SizedBox(width: spacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  label,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    height: 1.4,
+                  ),
+                ),
+                if (subLabel.isNotEmpty) ...<Widget>[
+                  const SizedBox(height: 2),
+                  Text(
+                    subLabel,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                      height: 1.4,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ],
             ),
           ),
         ],

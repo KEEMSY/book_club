@@ -56,8 +56,9 @@ completed-book count, recomputes grade + streak, and emits a derived
 from __future__ import annotations
 
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, date, datetime, timedelta
+from typing import Protocol
 from uuid import UUID
 
 from app.core.exceptions import ConflictError, NotFoundError
@@ -95,6 +96,18 @@ from app.shared.event_bus import EventBus
 
 StageEventFn = Callable[[object], None]
 
+
+class FeedStreakPort(Protocol):
+    """Minimal cross-domain interface consumed by ReadingService.
+
+    Defined here (rather than importing FeedService) so the reading service
+    depends only on this narrow contract per CLAUDE.md §3.2.
+    """
+
+    async def record_streak_milestone(
+        self, *, user_id: UUID, streak_days: int
+    ) -> None: ...
+
 _MAX_HEATMAP_DAYS = 366
 
 
@@ -129,6 +142,9 @@ class ReadingService:
     stage_event: StageEventFn
     bookmark_repo: BookmarkRepository
     stats_repo: ReadingStatsRepository
+    # Optional — existing callers that do not wire the feed service continue to
+    # work; streak milestone events are silently skipped when absent.
+    feed_service: FeedStreakPort | None = field(default=None)
 
     async def start_session(
         self,
@@ -225,6 +241,11 @@ class ReadingService:
                     new_tier=grade_after.tier,
                     streak_days=grade_after.streak_days,
                 )
+            )
+
+        if self.feed_service is not None:
+            await self.feed_service.record_streak_milestone(
+                user_id=user_id, streak_days=grade_after.streak_days
             )
 
         return SessionCompletion(

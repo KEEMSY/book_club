@@ -32,6 +32,7 @@ import asyncio
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
+from typing import Protocol
 from uuid import UUID
 
 from app.core.exceptions import ConflictError, NotFoundError
@@ -47,6 +48,23 @@ from app.domains.book.ports import (
 _MAX_LIBRARY_PAGE = 50
 _MIN_LIBRARY_PAGE = 1
 _REVIEW_MAX_LENGTH = 200
+
+
+class FeedMilestonePort(Protocol):
+    """Minimal cross-domain interface consumed by BookService.
+
+    Defined here (rather than importing FeedService) so the book service
+    depends only on this narrow contract per CLAUDE.md §3.2.  The concrete
+    implementation is ``FeedService``; tests can inject a no-op fake.
+    """
+
+    async def record_chapter_milestone(
+        self, *, user_id: UUID, book_id: UUID, chapter: int
+    ) -> None: ...
+
+    async def record_book_completed(
+        self, *, user_id: UUID, book_id: UUID
+    ) -> None: ...
 
 
 @dataclass(frozen=True, slots=True)
@@ -85,6 +103,9 @@ class BookService:
     user_books: UserBookRepositoryPort
     search_provider: BookSearchPort
     stage_event: Callable[[object], None] | None = field(default=None)
+    # Optional — existing tests and callers that do not wire the feed service
+    # continue to work; milestone events are silently skipped when absent.
+    feed_service: FeedMilestonePort | None = field(default=None)
 
     async def search_books(self, query: str, *, page: int = 1, size: int = 20) -> SearchBooksResult:
         external = await self.search_provider.search(query, page=page, size=size)
@@ -162,14 +183,19 @@ class BookService:
         if ub is None or ub.user_id != user_id:
             raise NotFoundError("user_book not found", code="USER_BOOK_NOT_FOUND")
         updated = await self.user_books.update_status(user_book_id, status)
-        if status is UserBookStatus.COMPLETED and self.stage_event is not None:
-            self.stage_event(
-                UserBookCompleted(
-                    user_id=user_id,
-                    user_book_id=user_book_id,
-                    book_id=ub.book_id,
+        if status is UserBookStatus.COMPLETED:
+            if self.stage_event is not None:
+                self.stage_event(
+                    UserBookCompleted(
+                        user_id=user_id,
+                        user_book_id=user_book_id,
+                        book_id=ub.book_id,
+                    )
                 )
-            )
+            if self.feed_service is not None:
+                await self.feed_service.record_book_completed(
+                    user_id=user_id, book_id=ub.book_id
+                )
         return updated
 
     async def submit_review(
@@ -209,14 +235,19 @@ class BookService:
             finished_at=next_finished,
             status=next_status,
         )
-        if next_status is UserBookStatus.COMPLETED and self.stage_event is not None:
-            self.stage_event(
-                UserBookCompleted(
-                    user_id=user_id,
-                    user_book_id=user_book_id,
-                    book_id=ub.book_id,
+        if next_status is UserBookStatus.COMPLETED:
+            if self.stage_event is not None:
+                self.stage_event(
+                    UserBookCompleted(
+                        user_id=user_id,
+                        user_book_id=user_book_id,
+                        book_id=ub.book_id,
+                    )
                 )
-            )
+            if self.feed_service is not None:
+                await self.feed_service.record_book_completed(
+                    user_id=user_id, book_id=ub.book_id
+                )
         return result
 
     async def update_chapter(
@@ -230,7 +261,12 @@ class BookService:
         # Return 404 (not 403) on ownership failure — CLAUDE.md §9.
         if ub is None or ub.user_id != user_id:
             raise NotFoundError("user_book not found", code="USER_BOOK_NOT_FOUND")
-        return await self.user_books.update_chapter(user_book_id, current_chapter)
+        result = await self.user_books.update_chapter(user_book_id, current_chapter)
+        if self.feed_service is not None:
+            await self.feed_service.record_chapter_milestone(
+                user_id=user_id, book_id=ub.book_id, chapter=current_chapter
+            )
+        return result
 
     async def remove_from_library(
         self,

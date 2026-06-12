@@ -29,6 +29,10 @@ abstract class Post with _$Post {
     required Set<ReactionType> myReactions,
     required int commentCount,
     required DateTime createdAt,
+    // Activity-event metadata (M37). Present when [PostType.isActivity] is
+    // true; null for user-composed posts. Keys vary by event type — consumers
+    // must guard with null checks.
+    Map<String, dynamic>? metadata,
   }) = _Post;
 }
 

@@ -42,6 +42,7 @@ from app.domains.feed.models import Comment, Post, PostHighlight, PostType, Reac
 from app.domains.feed.ports import (
     CommentRepositoryPort,
     FeedBookQueryPort,
+    FeedEventRepositoryPort,
     HighlightRepositoryPort,
     ImageStoragePort,
     PostFeedItem,
@@ -110,6 +111,9 @@ class ReactionToggleResult:
     counts: dict[ReactionType, int]
 
 
+_STREAK_MILESTONES: frozenset[int] = frozenset({3, 7, 14, 30, 60, 100})
+
+
 @dataclass(slots=True)
 class FeedService:
     """Orchestrates feed posts, reactions, comments, image uploads, and highlights."""
@@ -124,6 +128,9 @@ class FeedService:
     # not wire an event bus (the notification domain depends on these events).
     bus: EventBus | None = field(default=None)
     stage_event: Callable[[object], None] | None = field(default=None)
+    # Optional — callers that do not need activity event recording (e.g. older
+    # tests) can omit this; milestone methods silently no-op when absent.
+    feed_events: FeedEventRepositoryPort | None = field(default=None)
 
     async def request_image_upload(
         self,
@@ -373,6 +380,82 @@ class FeedService:
             raise NotFoundError("highlight not found", code="HIGHLIGHT_NOT_FOUND")
         await self.highlights.delete(highlight_id)
 
+    async def record_chapter_milestone(
+        self,
+        *,
+        user_id: UUID,
+        book_id: UUID,
+        chapter: int,
+    ) -> None:
+        """Record a CHAPTER_MILESTONE event when ``chapter`` is a multiple of 5.
+
+        Chapters that are not multiples of 5 are silently skipped so callers
+        need not add the guard themselves.  No-ops when ``feed_events`` is not
+        wired (backward-compatible with tests that do not inject the repo).
+        """
+        if chapter % 5 != 0 or self.feed_events is None:
+            return
+        await self.feed_events.create_event(
+            user_id=user_id,
+            event_type="CHAPTER_MILESTONE",
+            metadata={"book_id": str(book_id), "chapter": chapter},
+        )
+
+    async def record_streak_milestone(
+        self,
+        *,
+        user_id: UUID,
+        streak_days: int,
+    ) -> None:
+        """Record a STREAK_MILESTONE event for notable streak thresholds.
+
+        Only the values in {3, 7, 14, 30, 60, 100} produce an event; other
+        counts are silently ignored.  No-ops when ``feed_events`` is not wired.
+        """
+        if streak_days not in _STREAK_MILESTONES or self.feed_events is None:
+            return
+        await self.feed_events.create_event(
+            user_id=user_id,
+            event_type="STREAK_MILESTONE",
+            metadata={"streak_days": streak_days},
+        )
+
+    async def record_book_completed(
+        self,
+        *,
+        user_id: UUID,
+        book_id: UUID,
+    ) -> None:
+        """Record a BOOK_COMPLETED event.
+
+        No-ops when ``feed_events`` is not wired.
+        """
+        if self.feed_events is None:
+            return
+        await self.feed_events.create_event(
+            user_id=user_id,
+            event_type="BOOK_COMPLETED",
+            metadata={"book_id": str(book_id)},
+        )
+
+    async def record_club_joined(
+        self,
+        *,
+        user_id: UUID,
+        club_id: UUID,
+    ) -> None:
+        """Record a CLUB_JOINED event when a user joins a public club.
+
+        No-ops when ``feed_events`` is not wired.
+        """
+        if self.feed_events is None:
+            return
+        await self.feed_events.create_event(
+            user_id=user_id,
+            event_type="CLUB_JOINED",
+            metadata={"club_id": str(club_id)},
+        )
+
     async def list_all_highlights(self, *, user_id: UUID) -> list[BookHighlightGroup]:
         """Return all user highlights grouped by user_book, enriched with book info.
 
@@ -418,6 +501,7 @@ def _parse_iso_cursor(cursor: str | None) -> datetime | None:
 
 
 __all__ = [
+    "_STREAK_MILESTONES",
     "BookHighlightGroup",
     "CommentAdded",
     "CommentPage",

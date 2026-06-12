@@ -21,6 +21,7 @@ from app.domains.feed.adapters.r2_image_storage_adapter import R2ImageStorageAda
 from app.domains.feed.ports import AuthorView, BookSnapshot
 from app.domains.feed.repository import (
     CommentRepository,
+    FeedEventRepository,
     HighlightRepository,
     PostRepository,
     ReactionRepository,
@@ -93,6 +94,7 @@ def get_feed_service(
         highlights=HighlightRepository(session),
         bus=bus,
         stage_event=_stage,
+        feed_events=FeedEventRepository(session),
     )
 
 

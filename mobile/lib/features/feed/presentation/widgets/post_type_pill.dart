@@ -28,6 +28,14 @@ class PostTypePill extends StatelessWidget {
         return Icons.help_outline_rounded;
       case PostType.discussion:
         return Icons.forum_outlined;
+      case PostType.chapterMilestone:
+        return Icons.menu_book_outlined;
+      case PostType.streakMilestone:
+        return Icons.local_fire_department_outlined;
+      case PostType.bookCompleted:
+        return Icons.check_circle_outline_rounded;
+      case PostType.clubJoined:
+        return Icons.group_add_outlined;
     }
   }
 
@@ -49,6 +57,26 @@ class PostTypePill extends StatelessWidget {
           foreground: theme.colorScheme.onSurface,
         );
       case PostType.discussion:
+        return (
+          background: theme.colorScheme.tertiary.withValues(alpha: 0.14),
+          foreground: theme.colorScheme.tertiary,
+        );
+      case PostType.chapterMilestone:
+        return (
+          background: theme.colorScheme.secondary.withValues(alpha: 0.14),
+          foreground: theme.colorScheme.secondary,
+        );
+      case PostType.streakMilestone:
+        return (
+          background: const Color(0xFFFF6B35).withValues(alpha: 0.12),
+          foreground: const Color(0xFFE84C00),
+        );
+      case PostType.bookCompleted:
+        return (
+          background: const Color(0xFF2E7D32).withValues(alpha: 0.12),
+          foreground: const Color(0xFF2E7D32),
+        );
+      case PostType.clubJoined:
         return (
           background: theme.colorScheme.tertiary.withValues(alpha: 0.14),
           foreground: theme.colorScheme.tertiary,

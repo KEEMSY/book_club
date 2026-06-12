@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Literal
+from typing import Literal, Protocol
 from uuid import UUID
 
 from app.core.exceptions import ConflictError, NotFoundError, PermissionDeniedError
@@ -24,9 +24,24 @@ from app.domains.club.schemas import (
 )
 
 
+class FeedClubPort(Protocol):
+    """Minimal cross-domain interface consumed by ClubService.
+
+    Defined here (rather than importing FeedService) so the club service
+    depends only on this narrow contract per CLAUDE.md §3.2.
+    """
+
+    async def record_club_joined(
+        self, *, user_id: UUID, club_id: UUID
+    ) -> None: ...
+
+
 @dataclass(slots=True)
 class ClubService:
     repo: ClubRepository
+    # Optional — existing callers that do not wire the feed service continue to
+    # work; CLUB_JOINED events are silently skipped when absent.
+    feed_service: FeedClubPort | None = field(default=None)
 
     async def create_club(self, *, user_id: UUID, req: CreateClubRequest) -> ReadingClub:
         return await self.repo.create(
@@ -84,6 +99,10 @@ class ClubService:
             raise ConflictError("club is full", code="CLUB_FULL")
         if not await self.repo.is_member(club_id, user_id):
             await self.repo.join(club_id, user_id)
+            if self.feed_service is not None:
+                await self.feed_service.record_club_joined(
+                    user_id=user_id, club_id=club_id
+                )
         return club
 
     async def leave_club(self, *, user_id: UUID, club_id: UUID) -> None:

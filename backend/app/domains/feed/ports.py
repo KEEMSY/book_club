@@ -210,6 +210,21 @@ class HighlightWithBookId:
     book_id: UUID
 
 
+class FeedEventRepositoryPort(Protocol):
+    """Append-only log of per-user activity events.
+
+    The service only writes; reading events is out of scope for M37.
+    """
+
+    async def create_event(
+        self,
+        *,
+        user_id: UUID,
+        event_type: str,
+        metadata: dict[str, object] | None,
+    ) -> object: ...
+
+
 class HighlightRepositoryPort(Protocol):
     async def create(
         self,

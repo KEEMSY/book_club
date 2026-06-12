@@ -25,7 +25,11 @@ mixin _$Post {
   Map<ReactionType, int> get reactions;
   Set<ReactionType> get myReactions;
   int get commentCount;
-  DateTime get createdAt;
+  DateTime
+      get createdAt; // Activity-event metadata (M37). Present when [PostType.isActivity] is
+// true; null for user-composed posts. Keys vary by event type — consumers
+// must guard with null checks.
+  Map<String, dynamic>? get metadata;
 
   /// Create a copy of Post
   /// with the given fields replaced by the non-null parameter values.
@@ -56,7 +60,8 @@ mixin _$Post {
             (identical(other.commentCount, commentCount) ||
                 other.commentCount == commentCount) &&
             (identical(other.createdAt, createdAt) ||
-                other.createdAt == createdAt));
+                other.createdAt == createdAt) &&
+            const DeepCollectionEquality().equals(other.metadata, metadata));
   }
 
   @override
@@ -73,11 +78,12 @@ mixin _$Post {
       const DeepCollectionEquality().hash(reactions),
       const DeepCollectionEquality().hash(myReactions),
       commentCount,
-      createdAt);
+      createdAt,
+      const DeepCollectionEquality().hash(metadata));
 
   @override
   String toString() {
-    return 'Post(id: $id, bookId: $bookId, bookTitle: $bookTitle, bookCoverUrl: $bookCoverUrl, user: $user, postType: $postType, content: $content, imageUrls: $imageUrls, reactions: $reactions, myReactions: $myReactions, commentCount: $commentCount, createdAt: $createdAt)';
+    return 'Post(id: $id, bookId: $bookId, bookTitle: $bookTitle, bookCoverUrl: $bookCoverUrl, user: $user, postType: $postType, content: $content, imageUrls: $imageUrls, reactions: $reactions, myReactions: $myReactions, commentCount: $commentCount, createdAt: $createdAt, metadata: $metadata)';
   }
 }
 
@@ -98,7 +104,8 @@ abstract mixin class $PostCopyWith<$Res> {
       Map<ReactionType, int> reactions,
       Set<ReactionType> myReactions,
       int commentCount,
-      DateTime createdAt});
+      DateTime createdAt,
+      Map<String, dynamic>? metadata});
 
   $PostAuthorCopyWith<$Res> get user;
 }
@@ -127,6 +134,7 @@ class _$PostCopyWithImpl<$Res> implements $PostCopyWith<$Res> {
     Object? myReactions = null,
     Object? commentCount = null,
     Object? createdAt = null,
+    Object? metadata = freezed,
   }) {
     return _then(_self.copyWith(
       id: null == id
@@ -177,6 +185,10 @@ class _$PostCopyWithImpl<$Res> implements $PostCopyWith<$Res> {
           ? _self.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      metadata: freezed == metadata
+          ? _self.metadata
+          : metadata // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
     ));
   }
 
@@ -296,7 +308,8 @@ extension PostPatterns on Post {
             Map<ReactionType, int> reactions,
             Set<ReactionType> myReactions,
             int commentCount,
-            DateTime createdAt)?
+            DateTime createdAt,
+            Map<String, dynamic>? metadata)?
         $default, {
     required TResult orElse(),
   }) {
@@ -315,7 +328,8 @@ extension PostPatterns on Post {
             _that.reactions,
             _that.myReactions,
             _that.commentCount,
-            _that.createdAt);
+            _that.createdAt,
+            _that.metadata);
       case _:
         return orElse();
     }
@@ -348,7 +362,8 @@ extension PostPatterns on Post {
             Map<ReactionType, int> reactions,
             Set<ReactionType> myReactions,
             int commentCount,
-            DateTime createdAt)
+            DateTime createdAt,
+            Map<String, dynamic>? metadata)
         $default,
   ) {
     final _that = this;
@@ -366,7 +381,8 @@ extension PostPatterns on Post {
             _that.reactions,
             _that.myReactions,
             _that.commentCount,
-            _that.createdAt);
+            _that.createdAt,
+            _that.metadata);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -398,7 +414,8 @@ extension PostPatterns on Post {
             Map<ReactionType, int> reactions,
             Set<ReactionType> myReactions,
             int commentCount,
-            DateTime createdAt)?
+            DateTime createdAt,
+            Map<String, dynamic>? metadata)?
         $default,
   ) {
     final _that = this;
@@ -416,7 +433,8 @@ extension PostPatterns on Post {
             _that.reactions,
             _that.myReactions,
             _that.commentCount,
-            _that.createdAt);
+            _that.createdAt,
+            _that.metadata);
       case _:
         return null;
     }
@@ -438,10 +456,12 @@ class _Post implements Post {
       required final Map<ReactionType, int> reactions,
       required final Set<ReactionType> myReactions,
       required this.commentCount,
-      required this.createdAt})
+      required this.createdAt,
+      final Map<String, dynamic>? metadata})
       : _imageUrls = imageUrls,
         _reactions = reactions,
-        _myReactions = myReactions;
+        _myReactions = myReactions,
+        _metadata = metadata;
 
   @override
   final String id;
@@ -485,6 +505,21 @@ class _Post implements Post {
   final int commentCount;
   @override
   final DateTime createdAt;
+// Activity-event metadata (M37). Present when [PostType.isActivity] is
+// true; null for user-composed posts. Keys vary by event type — consumers
+// must guard with null checks.
+  final Map<String, dynamic>? _metadata;
+// Activity-event metadata (M37). Present when [PostType.isActivity] is
+// true; null for user-composed posts. Keys vary by event type — consumers
+// must guard with null checks.
+  @override
+  Map<String, dynamic>? get metadata {
+    final value = _metadata;
+    if (value == null) return null;
+    if (_metadata is EqualUnmodifiableMapView) return _metadata;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
 
   /// Create a copy of Post
   /// with the given fields replaced by the non-null parameter values.
@@ -518,7 +553,8 @@ class _Post implements Post {
             (identical(other.commentCount, commentCount) ||
                 other.commentCount == commentCount) &&
             (identical(other.createdAt, createdAt) ||
-                other.createdAt == createdAt));
+                other.createdAt == createdAt) &&
+            const DeepCollectionEquality().equals(other._metadata, _metadata));
   }
 
   @override
@@ -535,11 +571,12 @@ class _Post implements Post {
       const DeepCollectionEquality().hash(_reactions),
       const DeepCollectionEquality().hash(_myReactions),
       commentCount,
-      createdAt);
+      createdAt,
+      const DeepCollectionEquality().hash(_metadata));
 
   @override
   String toString() {
-    return 'Post(id: $id, bookId: $bookId, bookTitle: $bookTitle, bookCoverUrl: $bookCoverUrl, user: $user, postType: $postType, content: $content, imageUrls: $imageUrls, reactions: $reactions, myReactions: $myReactions, commentCount: $commentCount, createdAt: $createdAt)';
+    return 'Post(id: $id, bookId: $bookId, bookTitle: $bookTitle, bookCoverUrl: $bookCoverUrl, user: $user, postType: $postType, content: $content, imageUrls: $imageUrls, reactions: $reactions, myReactions: $myReactions, commentCount: $commentCount, createdAt: $createdAt, metadata: $metadata)';
   }
 }
 
@@ -561,7 +598,8 @@ abstract mixin class _$PostCopyWith<$Res> implements $PostCopyWith<$Res> {
       Map<ReactionType, int> reactions,
       Set<ReactionType> myReactions,
       int commentCount,
-      DateTime createdAt});
+      DateTime createdAt,
+      Map<String, dynamic>? metadata});
 
   @override
   $PostAuthorCopyWith<$Res> get user;
@@ -591,6 +629,7 @@ class __$PostCopyWithImpl<$Res> implements _$PostCopyWith<$Res> {
     Object? myReactions = null,
     Object? commentCount = null,
     Object? createdAt = null,
+    Object? metadata = freezed,
   }) {
     return _then(_Post(
       id: null == id
@@ -641,6 +680,10 @@ class __$PostCopyWithImpl<$Res> implements _$PostCopyWith<$Res> {
           ? _self.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      metadata: freezed == metadata
+          ? _self._metadata
+          : metadata // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
     ));
   }
 

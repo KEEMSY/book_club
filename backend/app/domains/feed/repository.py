@@ -32,7 +32,7 @@ from sqlalchemy import and_, delete, func, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domains.feed.models import Comment, Post, PostHighlight, Reaction, ReactionType
+from app.domains.feed.models import Comment, FeedEvent, Post, PostHighlight, Reaction, ReactionType
 from app.domains.feed.ports import HighlightWithBookId
 
 
@@ -364,3 +364,28 @@ class HighlightRepository:
             HighlightWithBookId(highlight=row.PostHighlight, book_id=row.book_id)
             for row in result.all()
         ]
+
+
+class FeedEventRepository:
+    """Persistence adapter for :class:`FeedEvent`.
+
+    Append-only — rows are inserted but never updated or deleted through
+    normal product flows.  The table is pruned via cascade when the user
+    row is hard-deleted.
+    """
+
+    def __init__(self, session: AsyncSession) -> None:
+        self._session = session
+
+    async def create_event(
+        self,
+        *,
+        user_id: UUID,
+        event_type: str,
+        metadata: dict[str, object] | None = None,
+    ) -> FeedEvent:
+        row = FeedEvent(user_id=user_id, event_type=event_type, event_metadata=metadata)
+        self._session.add(row)
+        await self._session.flush()
+        await self._session.refresh(row)
+        return row

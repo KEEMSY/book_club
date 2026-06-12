@@ -32,12 +32,13 @@ from sqlalchemy import (
     ForeignKey,
     Index,
     Integer,
+    String,
     Text,
     UniqueConstraint,
     func,
 )
 from sqlalchemy import Enum as SAEnum
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -195,6 +196,46 @@ class Comment(Base):
         onupdate=func.now(),
     )
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class FeedEventType(enum.StrEnum):
+    """Activity event types recorded in the feed events log."""
+
+    CHAPTER_MILESTONE = "CHAPTER_MILESTONE"
+    STREAK_MILESTONE = "STREAK_MILESTONE"
+    BOOK_COMPLETED = "BOOK_COMPLETED"
+    CLUB_JOINED = "CLUB_JOINED"
+
+
+class FeedEvent(Base):
+    """Append-only activity event row for a single user.
+
+    Each event carries a JSONB ``metadata`` payload whose shape depends on
+    ``event_type`` (see service docstrings).  Rows are never mutated after
+    insert — they are an audit / activity stream only.
+    """
+
+    __tablename__ = "feed_events"
+    __table_args__ = (
+        Index("ix_feed_events_user_id_created_at", "user_id", "created_at"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    event_type: Mapped[str] = mapped_column(String(32), nullable=False)
+    event_metadata: Mapped[dict[str, object] | None] = mapped_column(
+        "metadata", JSONB, nullable=True
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
 
 
 class PostHighlight(Base):
