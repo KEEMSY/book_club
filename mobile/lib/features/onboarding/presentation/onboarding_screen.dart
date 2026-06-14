@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
@@ -163,9 +164,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         child: const Text('다음'),
                       ),
                     )
-                  : KakaoLoginButton(
-                      onPressed: _onKakaoLogin,
-                      label: '카카오로 시작하기',
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        KakaoLoginButton(
+                          onPressed: _onKakaoLogin,
+                          label: '카카오로 시작하기',
+                        ),
+                        const SizedBox(height: 12),
+                        _PrivacyPolicyLink(),
+                      ],
                     ),
             ),
           ],
@@ -233,6 +241,32 @@ class _OnboardingPage extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Tappable link that opens the Privacy Policy URL in the system browser.
+class _PrivacyPolicyLink extends StatelessWidget {
+  _PrivacyPolicyLink();
+
+  static const _privacyUrl = 'https://bookclub.app/privacy';
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return GestureDetector(
+      onTap: () => launchUrl(
+        Uri.parse(_privacyUrl),
+        mode: LaunchMode.externalApplication,
+      ),
+      child: Text(
+        '개인정보 처리방침',
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+          decoration: TextDecoration.underline,
+        ),
+        textAlign: TextAlign.center,
       ),
     );
   }

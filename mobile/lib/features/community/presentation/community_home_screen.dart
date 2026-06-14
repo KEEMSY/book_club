@@ -371,6 +371,9 @@ class _PostFeedList extends StatelessWidget {
   Widget build(BuildContext context) {
     final spacing = Theme.of(context).extension<AppSpacing>()!;
 
+    // Build item count including the optional loading sentinel at the end.
+    final itemCount = posts.length + (isLoading ? 1 : 0);
+
     return NotificationListener<ScrollNotification>(
       onNotification: (n) {
         if (n is ScrollEndNotification &&
@@ -381,34 +384,40 @@ class _PostFeedList extends StatelessWidget {
         }
         return false;
       },
-      child: ListView.separated(
-        padding: EdgeInsets.all(spacing.md),
-        itemCount: posts.length + (isLoading ? 1 : 0),
-        separatorBuilder: (_, __) => SizedBox(height: spacing.md),
-        itemBuilder: (context, index) {
-          if (index == posts.length) {
-            return const Center(
-              child: Padding(
-                padding: EdgeInsets.all(16),
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
-            );
-          }
-          final post = posts[index];
-          return PostCard(
-            bookId: post.bookId,
-            post: post,
-            onTapAuthor: (userId) =>
-                context.push(AppRoutes.userProfile(userId)),
-            onTapComments: () => CommentsSheet.show(
-              context,
-              bookId: post.bookId,
-              postId: post.id,
-              initialCommentCount: post.commentCount,
+      child: CustomScrollView(
+        slivers: [
+          SliverPadding(
+            padding: EdgeInsets.all(spacing.md),
+            sliver: SliverList.separated(
+              itemCount: itemCount,
+              separatorBuilder: (_, __) => SizedBox(height: spacing.md),
+              itemBuilder: (context, index) {
+                if (index == posts.length) {
+                  return const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  );
+                }
+                final post = posts[index];
+                return PostCard(
+                  bookId: post.bookId,
+                  post: post,
+                  onTapAuthor: (userId) =>
+                      context.push(AppRoutes.userProfile(userId)),
+                  onTapComments: () => CommentsSheet.show(
+                    context,
+                    bookId: post.bookId,
+                    postId: post.id,
+                    initialCommentCount: post.commentCount,
+                  ),
+                  onReactionApplied: onReactionApplied,
+                );
+              },
             ),
-            onReactionApplied: onReactionApplied,
-          );
-        },
+          ),
+        ],
       ),
     );
   }

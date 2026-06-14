@@ -111,31 +111,35 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(height: spacing.md),
-                  FilledButton(
-                    onPressed: _loading ? null : _onSubscribe,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFF6B21A8),
-                      padding: EdgeInsets.symmetric(vertical: spacing.md),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
+                  Semantics(
+                    button: true,
+                    label: 'Pro 구독 시작하기',
+                    child: FilledButton(
+                      onPressed: _loading ? null : _onSubscribe,
+                      style: FilledButton.styleFrom(
+                        backgroundColor: const Color(0xFF6B21A8),
+                        padding: EdgeInsets.symmetric(vertical: spacing.md),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
                       ),
+                      child: _loading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : Text(
+                              'Pro 시작하기',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                     ),
-                    child: _loading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : Text(
-                            'Pro 시작하기',
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
                   ),
                   SizedBox(height: spacing.sm),
                   Text(

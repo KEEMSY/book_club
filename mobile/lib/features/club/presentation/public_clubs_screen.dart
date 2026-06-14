@@ -145,10 +145,16 @@ class _PublicClubsScreenState extends ConsumerState<PublicClubsScreen>
               ),
             );
           }
-          return ListView.builder(
-            padding: EdgeInsets.all(spacing.md),
-            itemCount: clubs.length,
-            itemBuilder: (_, i) => _PublicClubCard(club: clubs[i]),
+          return CustomScrollView(
+            slivers: [
+              SliverPadding(
+                padding: EdgeInsets.all(spacing.md),
+                sliver: SliverList.builder(
+                  itemCount: clubs.length,
+                  itemBuilder: (_, i) => _PublicClubCard(club: clubs[i]),
+                ),
+              ),
+            ],
           );
         },
       ),
