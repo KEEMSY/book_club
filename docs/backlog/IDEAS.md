@@ -13,6 +13,17 @@
 
 ## Phase 전환 리뷰 기록
 
+### Phase 9 전환 리뷰 (2026-06-14)
+
+- 리뷰 문서: `docs/plans/2026-06-12-phase9.md`
+- **완료 (M36)**: (monetization) RevenueCat 실 결제 연동 — PurchaseVerifierPort·RevenueCatAdapter·StubVerifier, POST /webhooks/revenuecat (HMAC 검증, 이벤트 처리)
+- **완료 (M37)**: (feed) 독서 활동 피드 고도화 — feed_events 테이블, CHAPTER_MILESTONE·STREAK_MILESTONE·BOOK_COMPLETED·CLUB_JOINED 이벤트, 모바일 타입별 카드 UI
+- **완료 (M38)**: (search) 통합 검색 강화 — tsvector GIN 인덱스, GET /search?q=&type=all|book|user|club, UnifiedSearchScreen + 탭 UI
+- **완료 (M39)**: (admin) 관리자 대시보드 — MAU/DAU/신규가입/Pro 통계, 사용자 조회·패치, GET /admin/stats·users·users/{id}, PATCH /admin/users/{id}
+- **완료 (M40)**: (polish) 성능 최적화 & 앱스토어 제출 준비 — Sliver 전환, url_launcher 개인정보처리방침, 접근성 Semantics, App Store Connect 메타데이터, version 0.6.0+6
+- **보류 (Phase 10)**: (discovery) 딥러닝 추천 — 활성 사용자 1만 이상 확보 후 검토
+- **보류 (Phase 10)**: (engagement) 쉴드 유료 추가 구매 IAP — 수익화 전환 데이터 분석 후 결정
+
 ### Phase 8 전환 리뷰 (2026-06-12)
 
 - 리뷰 문서: `docs/plans/2026-06-12-phase8.md`
