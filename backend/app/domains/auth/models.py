@@ -66,6 +66,10 @@ class User(Base):
     bio: Mapped[str | None] = mapped_column(String(200), nullable=True)
     referral_code: Mapped[str | None] = mapped_column(String(8), unique=True, nullable=True)
 
+    # Account status flags.
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="true")
+    is_admin: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="false")
+
     # Pro subscription fields — populated via RevenueCat receipt verification.
     is_pro: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="false")
     pro_expires_at: Mapped[datetime | None] = mapped_column(PGTIMESTAMP(timezone=True), nullable=True)

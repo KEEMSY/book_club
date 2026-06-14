@@ -96,3 +96,28 @@ async def get_current_user(
     if user is None:
         raise AuthError("user no longer exists", code="USER_GONE")
     return user
+
+
+async def get_current_admin_id(
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    session: Annotated[AsyncSession, Depends(get_session)],
+) -> str:
+    """Require a valid access token **and** ``is_admin=True``; raise 403 otherwise.
+
+    Returns the raw UUID string (same shape as ``get_current_user_id``) so admin
+    routers can use it directly without an additional DB round-trip.
+    """
+    from fastapi import HTTPException
+
+    try:
+        parsed = UUID(user_id)
+    except ValueError as exc:
+        raise AuthError("token sub is not a uuid", code="TOKEN_INVALID") from exc
+
+    repo = UserRepository(session)
+    user = await repo.get_by_id(parsed)
+    if user is None:
+        raise AuthError("user no longer exists", code="USER_GONE")
+    if not user.is_admin:
+        raise HTTPException(status_code=403, detail="admin access required")
+    return user_id
