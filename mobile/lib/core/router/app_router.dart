@@ -31,6 +31,7 @@ import '../../features/referral/application/referral_providers.dart';
 import '../../features/referral/presentation/referral_screen.dart';
 import '../../features/reminder/presentation/reminder_screen.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
+import '../../features/search/presentation/unified_search_screen.dart';
 import '../../features/subscription/presentation/paywall_screen.dart';
 import '../../features/reading/application/recap_notifier.dart';
 import '../../features/reading/presentation/dashboard_screen.dart';
@@ -119,6 +120,9 @@ class AppRoutes {
 
   // M35 — first-run onboarding flow.
   static const onboarding = '/onboarding';
+
+  // M38 — unified search (books + users + clubs).
+  static const unifiedSearch = '/unified-search';
 }
 
 /// Adapter that bridges a Riverpod [ValueNotifier]-free state stream into a
@@ -360,6 +364,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.paywall,
         parentNavigatorKey: _rootKey,
         builder: (context, state) => const PaywallScreen(),
+      ),
+      // M38 — unified search (books + users + clubs), pushed above the shell.
+      GoRoute(
+        path: AppRoutes.unifiedSearch,
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) => const UnifiedSearchScreen(),
       ),
       // M31 — deeplink entry point: bookclub.app/invite/{code}
       // Applies the referral code and then redirects to home. The apply call

@@ -43,32 +43,46 @@ class DiscoveryScreen extends ConsumerWidget {
                 children: [
                   Text('탐색', style: theme.textTheme.displaySmall),
                   SizedBox(height: spacing.md),
-                  GestureDetector(
-                    onTap: () => context.push(AppRoutes.search),
-                    child: Container(
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(radii.md),
-                      ),
-                      child: Row(
-                        children: [
-                          SizedBox(width: spacing.md),
-                          Icon(
-                            Icons.search_rounded,
-                            color: theme.colorScheme.onSurfaceVariant,
-                            size: 20,
-                          ),
-                          SizedBox(width: spacing.sm),
-                          Text(
-                            '책 제목, 저자, ISBN 검색',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => context.push(AppRoutes.search),
+                          child: Container(
+                            height: 44,
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.surfaceContainerHighest,
+                              borderRadius: BorderRadius.circular(radii.md),
+                            ),
+                            child: Row(
+                              children: [
+                                SizedBox(width: spacing.md),
+                                Icon(
+                                  Icons.search_rounded,
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                  size: 20,
+                                ),
+                                SizedBox(width: spacing.sm),
+                                Text(
+                                  '책 제목, 저자, ISBN 검색',
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ],
+                        ),
                       ),
-                    ),
+                      SizedBox(width: spacing.sm),
+                      // M38 — unified search button (books + users + clubs).
+                      IconButton(
+                        icon: const Icon(Icons.manage_search_rounded),
+                        tooltip: '통합 검색',
+                        onPressed: () =>
+                            context.push(AppRoutes.unifiedSearch),
+                      ),
+                    ],
                   ),
                 ],
               ),
