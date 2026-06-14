@@ -2,6 +2,9 @@ import 'package:book_club/features/reading/data/reading_models.dart'
     show DailySessionsResponseDto;
 import 'package:book_club/features/reading/data/reading_repository.dart';
 import 'package:book_club/features/reading/domain/bookmark.dart';
+import 'package:book_club/features/reading/domain/monthly_recap.dart';
+import 'package:book_club/features/reading/domain/reading_recap.dart';
+import 'package:book_club/features/reading/domain/reading_stats.dart';
 import 'package:book_club/features/reading/domain/goal_period.dart';
 import 'package:book_club/features/reading/domain/grade_summary.dart';
 import 'package:book_club/features/reading/domain/heatmap_day.dart';
@@ -181,6 +184,25 @@ class FakeReadingRepository implements ReadingRepository {
       sessions: [],
     );
   }
+
+  @override
+  Future<ReadingRecap> getReadingRecap({
+    required int year,
+    required int half,
+  }) async =>
+      throw UnimplementedError('FakeReadingRepository.getReadingRecap');
+
+  @override
+  Future<ReadingStats> getReadingStats() async =>
+      throw UnimplementedError('FakeReadingRepository.getReadingStats');
+
+  @override
+  Future<MonthlyRecap> getMonthlyRecap({int? year, int? month}) async =>
+      throw UnimplementedError('FakeReadingRepository.getMonthlyRecap');
+
+  @override
+  Future<List<MilestoneItem>> getMilestones() async =>
+      throw UnimplementedError('FakeReadingRepository.getMilestones');
 
   ReadingYearStats? yearStatsResult;
   Object? yearStatsError;

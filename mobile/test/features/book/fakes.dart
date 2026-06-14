@@ -132,6 +132,21 @@ class FakeBookRepository implements BookRepository {
     return submitReviewResult!;
   }
 
+  UserBook? updateChapterResult;
+  Object? updateChapterError;
+  final List<({String userBookId, int chapter})> updateChapterCalls =
+      <({String userBookId, int chapter})>[];
+
+  @override
+  Future<UserBook> updateChapter({
+    required String userBookId,
+    required int chapter,
+  }) async {
+    updateChapterCalls.add((userBookId: userBookId, chapter: chapter));
+    if (updateChapterError != null) throw updateChapterError!;
+    return updateChapterResult!;
+  }
+
   final List<String> removeFromLibraryCalls = <String>[];
   Object? removeFromLibraryError;
 

@@ -260,8 +260,8 @@ async def room_chat_stream(
                 UserBook.book_id == club.book_id,
             )
             chapter_result = await session.execute(chapter_stmt)
-            raw: int | None = chapter_result.scalar_one_or_none()
-            caller_chapter = raw if raw is not None else 0
+            chapter_val: int | None = chapter_result.scalar_one_or_none()
+            caller_chapter = chapter_val if chapter_val is not None else 0
 
         if caller_chapter < room.progress_gate:
             await websocket.close(
