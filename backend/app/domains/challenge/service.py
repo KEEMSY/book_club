@@ -26,7 +26,7 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from app.core.exceptions import NotFoundError
+from app.core.exceptions import ConflictError, NotFoundError
 from app.domains.challenge.events import BadgeEarned
 from app.domains.challenge.models import ChallengeParticipant
 from app.domains.challenge.repository import ChallengeRepository
@@ -128,6 +128,8 @@ class ChallengeService:
                     my_progress=p.current_value if p else None,
                     achieved_at=p.achieved_at if p else None,
                     badge=None,  # badge detail omitted in list view for performance
+                    is_limited=ch.is_limited,
+                    ends_at_exclusive=ch.ends_at_exclusive,
                 )
             )
 
@@ -175,6 +177,8 @@ class ChallengeService:
             my_progress=participant.current_value if participant else None,
             achieved_at=participant.achieved_at if participant else None,
             badge=badge_view,
+            is_limited=ch.is_limited,
+            ends_at_exclusive=ch.ends_at_exclusive,
         )
 
     async def join(self, challenge_id: UUID, user_id: UUID) -> ChallengeParticipant:
@@ -311,11 +315,16 @@ class ChallengeService:
         congratulatory message after the transaction commits.
         Raises:
             NotFoundError: badge does not exist.
+            ConflictError: badge_id is the exclusive badge of a limited-edition
+                challenge whose deadline has passed.
         """
         badges = await self._get_repo().list_badges(None)
         badge = next((b for b in badges if b.id == badge_id), None)
         if badge is None:
             raise NotFoundError("badge not found", code="BADGE_NOT_FOUND")
+
+        # Prevent manual award of an exclusive badge after its deadline.
+        await self._guard_exclusive_badge_deadline(badge_id)
 
         if await self._get_repo().has_badge(user_id, badge_id):
             return
@@ -324,6 +333,27 @@ class ChallengeService:
 
         if self.stage_event is not None:
             self.stage_event(BadgeEarned(user_id=user_id, badge_id=badge_id, badge_name=badge.name))
+
+    async def _guard_exclusive_badge_deadline(self, badge_id: UUID) -> None:
+        """Raise ConflictError if badge_id is an expired limited-edition exclusive badge.
+
+        A badge is "locked" when it is referenced as badge_id_exclusive by a
+        limited-edition challenge whose ends_at_exclusive has already passed.
+        This prevents even admin manual awards once the deadline has closed.
+        """
+        challenge = await self._get_repo().get_limited_challenge_by_exclusive_badge(badge_id)
+        if challenge is None:
+            return
+        deadline = challenge.ends_at_exclusive
+        if deadline is None:
+            return
+        if deadline.tzinfo is None:
+            deadline = deadline.replace(tzinfo=UTC)
+        if datetime.now(tz=UTC) > deadline:
+            raise ConflictError(
+                "기간이 종료된 챌린지예요.",
+                code="CHALLENGE_EXPIRED",
+            )
 
     async def on_reading_session_completed(self, event: object) -> None:
         """Accumulate reading_time challenge progress when a timer session ends."""
@@ -425,8 +455,32 @@ class ChallengeService:
                 achieved_at = now
             await repo.update_progress(ch.id, user_id, new_value, achieved_at)
 
-            if achieved_at is not None and ch.badge_id is not None:
+            if achieved_at is None:
+                continue
+
+            # Standard badge award.
+            if ch.badge_id is not None:
                 badge = await repo.get_badge(ch.badge_id)
                 if badge is not None and not await repo.has_badge(user_id, ch.badge_id):
                     await repo.award_badge(user_id, ch.badge_id)
                     stage(BadgeEarned(user_id=user_id, badge_id=ch.badge_id, badge_name=badge.name))
+
+            # Exclusive badge award: only within the limited-edition deadline.
+            if ch.is_limited and ch.badge_id_exclusive is not None:
+                deadline = ch.ends_at_exclusive
+                if deadline is not None:
+                    if deadline.tzinfo is None:
+                        deadline = deadline.replace(tzinfo=UTC)
+                    if now <= deadline:
+                        excl_badge = await repo.get_badge(ch.badge_id_exclusive)
+                        if excl_badge is not None and not await repo.has_badge(
+                            user_id, ch.badge_id_exclusive
+                        ):
+                            await repo.award_badge(user_id, ch.badge_id_exclusive)
+                            stage(
+                                BadgeEarned(
+                                    user_id=user_id,
+                                    badge_id=ch.badge_id_exclusive,
+                                    badge_name=excl_badge.name,
+                                )
+                            )

@@ -95,6 +95,10 @@ class CreateChallengeRequest(BaseModel):
     starts_at: datetime
     ends_at: datetime
     badge_id: UUID | None = None
+    # Limited-edition fields (M41).
+    is_limited: bool = False
+    ends_at_exclusive: datetime | None = None
+    badge_id_exclusive: UUID | None = None
 
 
 class ChallengeCreatedResponse(BaseModel):
@@ -107,6 +111,9 @@ class ChallengeCreatedResponse(BaseModel):
     starts_at: datetime
     ends_at: datetime
     badge_id: UUID | None
+    is_limited: bool
+    ends_at_exclusive: datetime | None
+    badge_id_exclusive: UUID | None
     created_at: datetime
 
 
@@ -127,6 +134,9 @@ async def create_challenge(
         starts_at=body.starts_at,
         ends_at=body.ends_at,
         badge_id=body.badge_id,
+        is_limited=body.is_limited,
+        ends_at_exclusive=body.ends_at_exclusive,
+        badge_id_exclusive=body.badge_id_exclusive,
     )
     await session.commit()
     return ChallengeCreatedResponse(
@@ -139,5 +149,8 @@ async def create_challenge(
         starts_at=ch.starts_at,
         ends_at=ch.ends_at,
         badge_id=ch.badge_id,
+        is_limited=ch.is_limited,
+        ends_at_exclusive=ch.ends_at_exclusive,
+        badge_id_exclusive=ch.badge_id_exclusive,
         created_at=ch.created_at,
     )

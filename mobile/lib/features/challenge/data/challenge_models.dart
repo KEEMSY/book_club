@@ -56,6 +56,9 @@ class ChallengeDto {
     this.myProgress,
     this.achievedAt,
     this.badge,
+    this.isLimited = false,
+    this.limitedEndsAt,
+    this.daysRemaining,
   });
 
   final String id;
@@ -73,6 +76,15 @@ class ChallengeDto {
   final int? myProgress;
   final DateTime? achievedAt;
   final BadgeDto? badge;
+
+  /// True when the challenge is a time-limited, scarce event.
+  final bool isLimited;
+
+  /// Server-provided end timestamp for limited challenges.
+  final DateTime? limitedEndsAt;
+
+  /// Remaining days until a limited challenge ends (null when not limited).
+  final int? daysRemaining;
 
   factory ChallengeDto.fromJson(Map<String, dynamic> json) {
     final badgeJson = json['badge'] as Map<String, dynamic>?;
@@ -92,6 +104,11 @@ class ChallengeDto {
           ? DateTime.parse(json['achieved_at'] as String)
           : null,
       badge: badgeJson != null ? BadgeDto.fromJson(badgeJson) : null,
+      isLimited: (json['is_limited'] as bool?) ?? false,
+      limitedEndsAt: json['ends_at'] != null && ((json['is_limited'] as bool?) ?? false)
+          ? DateTime.tryParse(json['ends_at'] as String)
+          : null,
+      daysRemaining: json['days_remaining'] as int?,
     );
   }
 }
@@ -166,15 +183,29 @@ class MyChallengeDto {
 // ---------------------------------------------------------------------------
 
 class BadgeEarnedDto {
-  const BadgeEarnedDto({required this.badge, required this.earnedAt});
+  const BadgeEarnedDto({
+    required this.badge,
+    required this.earnedAt,
+    this.isExclusive = false,
+  });
 
   final BadgeDto badge;
   final DateTime earnedAt;
 
+  /// True when the badge was earned via a time-limited exclusive challenge.
+  /// Derived from badge_id prefix "badge_id_exclusive" in the API response.
+  final bool isExclusive;
+
   factory BadgeEarnedDto.fromJson(Map<String, dynamic> json) {
+    final badge = BadgeDto.fromJson(json['badge'] as Map<String, dynamic>);
+    // The API signals exclusivity when the badge id starts with "badge_id_exclusive"
+    // or when the response carries an explicit "is_exclusive" field.
+    final bool isExclusive =
+        (json['is_exclusive'] as bool?) ?? badge.id.startsWith('badge_id_exclusive');
     return BadgeEarnedDto(
-      badge: BadgeDto.fromJson(json['badge'] as Map<String, dynamic>),
+      badge: badge,
       earnedAt: DateTime.parse(json['earned_at'] as String),
+      isExclusive: isExclusive,
     );
   }
 }

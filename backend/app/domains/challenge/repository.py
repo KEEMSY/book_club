@@ -51,11 +51,16 @@ class ChallengeRepository:
         status: str | None,
         limit: int,
         cursor_at: datetime | None,
+        exclude_expired_limited: bool = True,
     ) -> list[Challenge]:
         """Return challenges filtered by status with cursor pagination.
 
         status values: "active" | "upcoming" | "ended" | None (all).
         Cursor is the ends_at of the last item in the previous page.
+
+        When ``exclude_expired_limited`` is True (default), limited-edition
+        challenges whose ends_at_exclusive is in the past are hidden from the
+        active listing so users see only joinable challenges.
         """
         now = func.now()
         conditions: list[ColumnElement[bool]] = []
@@ -63,6 +68,16 @@ class ChallengeRepository:
         if status == "active":
             conditions.append(Challenge.starts_at <= now)
             conditions.append(Challenge.ends_at >= now)
+            if exclude_expired_limited:
+                from sqlalchemy import or_
+
+                # Keep if not limited, OR if limited but deadline not yet passed.
+                conditions.append(
+                    or_(
+                        Challenge.is_limited.is_(False),
+                        Challenge.ends_at_exclusive >= now,
+                    )
+                )
         elif status == "upcoming":
             conditions.append(Challenge.starts_at > now)
         elif status == "ended":
@@ -224,6 +239,21 @@ class ChallengeRepository:
         result = await self._session.execute(stmt)
         return [(row.Challenge, row.ChallengeParticipant) for row in result]
 
+    async def get_limited_challenge_by_exclusive_badge(
+        self, badge_id: UUID
+    ) -> Challenge | None:
+        """Return the limited-edition challenge that owns badge_id as its exclusive badge.
+
+        Used by the service to check whether a badge is locked behind an expired
+        deadline before allowing a manual award.
+        """
+        stmt = select(Challenge).where(
+            Challenge.is_limited.is_(True),
+            Challenge.badge_id_exclusive == badge_id,
+        )
+        result = await self._session.execute(stmt)
+        return result.scalar_one_or_none()
+
     async def get_badge(self, badge_id: UUID) -> Badge | None:
         """Return a badge by id, or None."""
         stmt = select(Badge).where(Badge.id == badge_id)
@@ -364,6 +394,9 @@ class ChallengeRepository:
         starts_at: datetime,
         ends_at: datetime,
         badge_id: UUID | None,
+        is_limited: bool = False,
+        ends_at_exclusive: datetime | None = None,
+        badge_id_exclusive: UUID | None = None,
     ) -> Challenge:
         """Insert a new challenge and return it."""
         from app.domains.challenge.models import ChallengeType
@@ -377,6 +410,9 @@ class ChallengeRepository:
             starts_at=starts_at,
             ends_at=ends_at,
             badge_id=badge_id,
+            is_limited=is_limited,
+            ends_at_exclusive=ends_at_exclusive,
+            badge_id_exclusive=badge_id_exclusive,
         )
         self._session.add(row)
         await self._session.flush()

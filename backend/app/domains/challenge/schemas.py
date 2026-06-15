@@ -11,10 +11,10 @@ URL rather than the raw icon_key stored in the DB).
 from __future__ import annotations
 
 import enum
-from datetime import datetime
+from datetime import UTC, datetime
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 
 
 class ChallengeStatus(enum.StrEnum):
@@ -60,8 +60,24 @@ class ChallengePublic(BaseModel):
     my_progress: int | None
     achieved_at: datetime | None
     badge: BadgeView | None
+    # Limited-edition fields (M41).
+    is_limited: bool = False
+    ends_at_exclusive: datetime | None = None
+    days_remaining: int | None = None
 
     model_config = {"from_attributes": True}
+
+    @model_validator(mode="after")
+    def _compute_days_remaining(self) -> ChallengePublic:
+        """Derive days_remaining from ends_at_exclusive when present."""
+        if self.ends_at_exclusive is not None:
+            now = datetime.now(tz=UTC)
+            deadline = self.ends_at_exclusive
+            if deadline.tzinfo is None:
+                deadline = deadline.replace(tzinfo=UTC)
+            delta = (deadline - now).days
+            self.days_remaining = max(delta, 0)
+        return self
 
 
 # Detail view shares the same shape — aliased for router readability.
@@ -138,3 +154,20 @@ class BadgeReorderRequest(BaseModel):
     """
 
     badge_ids: list[UUID]
+
+
+class CreateChallengeRequest(BaseModel):
+    """Request body for admin challenge creation (M41: limited fields added)."""
+
+    title: str
+    description: str | None = None
+    challenge_type: str
+    target_value: int
+    genre_filter: str | None = None
+    starts_at: datetime
+    ends_at: datetime
+    badge_id: UUID | None = None
+    # Limited-edition fields (M41).
+    is_limited: bool = False
+    ends_at_exclusive: datetime | None = None
+    badge_id_exclusive: UUID | None = None

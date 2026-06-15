@@ -21,7 +21,17 @@ import enum
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, Index, Integer, String, Text, UniqueConstraint, func
+from sqlalchemy import (
+    Boolean,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+    func,
+)
 from sqlalchemy import Enum as SAEnum
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column
@@ -103,6 +113,22 @@ class Challenge(Base):
     starts_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     ends_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     badge_id: Mapped[uuid.UUID | None] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("badges.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    # Limited-edition challenge fields (M41 — badge scarcity).
+    # is_limited=True means the exclusive badge can only be awarded before
+    # ends_at_exclusive; after that deadline the badge is permanently locked.
+    is_limited: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="false"
+    )
+    # Deadline for exclusive-badge eligibility; None when is_limited=False.
+    ends_at_exclusive: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    # Badge awarded only to participants who complete before ends_at_exclusive.
+    badge_id_exclusive: Mapped[uuid.UUID | None] = mapped_column(
         PGUUID(as_uuid=True),
         ForeignKey("badges.id", ondelete="SET NULL"),
         nullable=True,

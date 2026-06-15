@@ -211,9 +211,15 @@ class _ChallengeCard extends ConsumerWidget {
     final bool achieved = challenge.achievedAt != null;
     final bool isJoined = challenge.isJoined;
 
+    final bool isLimited = challenge.isLimited;
+    final Color? limitedBorderColor = isLimited ? Colors.amber.shade600 : null;
+
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(radius.md),
+        side: isLimited
+            ? BorderSide(color: limitedBorderColor!, width: 1.5)
+            : BorderSide.none,
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(radius.md),
@@ -223,6 +229,12 @@ class _ChallengeCard extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
+              // Limited banner chip (shown only for limited challenges)
+              if (isLimited) ...<Widget>[
+                const _LimitedBannerChip(),
+                SizedBox(height: spacing.xs),
+              ],
+
               // Title row + status chip
               Row(
                 children: <Widget>[
@@ -279,6 +291,12 @@ class _ChallengeCard extends ConsumerWidget {
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
+              ],
+
+              // Remaining days label (limited challenges only)
+              if (isLimited && challenge.daysRemaining != null) ...<Widget>[
+                SizedBox(height: spacing.xs),
+                _RemainingDaysLabel(daysRemaining: challenge.daysRemaining!),
               ],
 
               SizedBox(height: spacing.sm),
@@ -424,6 +442,62 @@ class _StatusChip extends StatelessWidget {
           color: color,
         ),
       ),
+    );
+  }
+}
+
+/// Amber chip displayed at the top-left of a limited-edition challenge card.
+class _LimitedBannerChip extends StatelessWidget {
+  const _LimitedBannerChip();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: Colors.amber.shade600.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.amber.shade600, width: 1),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Text(
+            '✶ 기간 한정',
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              color: Colors.amber.shade800,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Shows "D-N 종료" or "오늘 종료" for limited challenges.
+class _RemainingDaysLabel extends StatelessWidget {
+  const _RemainingDaysLabel({required this.daysRemaining});
+
+  final int daysRemaining;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final label = daysRemaining == 0 ? '오늘 종료' : 'D-$daysRemaining 종료';
+    return Row(
+      children: <Widget>[
+        Icon(Icons.schedule, size: 13, color: Colors.amber.shade700),
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: Colors.amber.shade800,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
     );
   }
 }

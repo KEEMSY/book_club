@@ -161,6 +161,7 @@ class _BadgeBody extends ConsumerWidget {
                     badge: earned.badge,
                     earned: true,
                     earnedAt: earned.earnedAt,
+                    isExclusive: earned.isExclusive,
                   );
                 },
                 childCount: myBadges.length,
@@ -441,11 +442,15 @@ class _BadgeCard extends StatelessWidget {
     required this.badge,
     required this.earned,
     this.earnedAt,
+    this.isExclusive = false,
   });
 
   final BadgeDto badge;
   final bool earned;
   final DateTime? earnedAt;
+
+  /// Whether the badge was obtained through a time-limited exclusive challenge.
+  final bool isExclusive;
 
   @override
   Widget build(BuildContext context) {
@@ -506,6 +511,20 @@ class _BadgeCard extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
+          if (earned && isExclusive) ...<Widget>[
+            const SizedBox(height: 2),
+            Text(
+              '✦ 기간 한정 획득',
+              style: TextStyle(
+                fontSize: 9,
+                fontWeight: FontWeight.w700,
+                color: Colors.amber.shade700,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
         ],
       ),
     );
@@ -521,6 +540,7 @@ class _BadgeCard extends StatelessWidget {
         badge: badge,
         earned: earned,
         earnedAt: earnedAt,
+        isExclusive: isExclusive,
       ),
     );
   }
@@ -535,11 +555,15 @@ class _BadgeDetailSheet extends StatelessWidget {
     required this.badge,
     required this.earned,
     this.earnedAt,
+    this.isExclusive = false,
   });
 
   final BadgeDto badge;
   final bool earned;
   final DateTime? earnedAt;
+
+  /// Whether the badge was earned via an exclusive limited-time challenge.
+  final bool isExclusive;
 
   @override
   Widget build(BuildContext context) {
@@ -605,6 +629,27 @@ class _BadgeDetailSheet extends StatelessWidget {
                 '아직 획득하지 못한 배지예요.',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                ),
+              ),
+            ],
+
+            // Exclusive acquisition label
+            if (earned && isExclusive) ...<Widget>[
+              SizedBox(height: spacing.xs),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.amber.shade600.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.amber.shade600, width: 1),
+                ),
+                child: Text(
+                  '✦ 기간 한정 획득',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.amber.shade800,
+                  ),
                 ),
               ),
             ],
