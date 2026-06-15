@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../curation/application/curation_providers.dart';
+import '../../curation/domain/curation_card.dart';
 import '../../feed/presentation/widgets/add_highlight_sheet.dart';
 import '../application/grade_notifier.dart';
 import '../application/grade_state.dart';
@@ -52,9 +54,45 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(gradeNotifierProvider.notifier).load();
       if (widget.autoStart) {
-        ref.read(timerNotifierProvider.notifier).start(widget.userBookId);
+        _startWithCurationCard();
       }
     });
+  }
+
+  /// Checks for a curation card and shows the sheet before starting the timer.
+  /// When no card is available (or autoStart is false from a manual tap),
+  /// this is also called from [TimerControls]'s onStart via [_handleStartTap].
+  Future<void> _startWithCurationCard() async {
+    if (!mounted) return;
+    // Read the already-cached result from the provider (pre-fetched in build).
+    final AsyncValue<CurationCard?> cardValue = ref.read(
+      firstCurationCardProvider(bookId: widget.userBookId),
+    );
+    final CurationCard? card = cardValue.valueOrNull;
+    if (card != null && mounted) {
+      final container = ProviderScope.containerOf(context);
+      await showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        useSafeArea: true,
+        builder: (_) => UncontrolledProviderScope(
+          container: container,
+          child: _CurationCardSheet(
+            card: card,
+            onStart: () {
+              Navigator.of(context).pop();
+              ref
+                  .read(timerNotifierProvider.notifier)
+                  .start(widget.userBookId);
+            },
+          ),
+        ),
+      );
+      // If the sheet was dismissed without tapping "독서 시작하기" (e.g. drag
+      // down), do not auto-start — leave the timer in idle state.
+    } else {
+      ref.read(timerNotifierProvider.notifier).start(widget.userBookId);
+    }
   }
 
   @override
@@ -84,6 +122,12 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     final Bookmark? bookmark = widget.userBookId.isNotEmpty
         ? ref.watch(latestBookmarkProvider(widget.userBookId)).valueOrNull
         : null;
+
+    // Pre-fetch the curation card while the user is on the idle screen so it
+    // is already in the provider cache when they tap "시작".
+    if (widget.userBookId.isNotEmpty) {
+      ref.watch(firstCurationCardProvider(bookId: widget.userBookId));
+    }
 
     // Auto-end when the countdown hits zero.
     if (widget.targetSeconds != null) {
@@ -212,9 +256,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                 TimerControls(
                   state: state,
                   accent: accent,
-                  onStart: () => ref
-                      .read(timerNotifierProvider.notifier)
-                      .start(widget.userBookId),
+                  onStart: _startWithCurationCard,
                   onPause: () =>
                       ref.read(timerNotifierProvider.notifier).pause(),
                   onResume: () =>
@@ -675,5 +717,98 @@ class _BookmarkSaveModalState extends ConsumerState<_BookmarkSaveModal> {
     } finally {
       if (mounted) setState(() => _saving = false);
     }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Curation card sheet
+// ---------------------------------------------------------------------------
+
+/// Maps a [CurationCard.cardType] string to a human-readable label and icon.
+({IconData icon, String label}) _cardTypeMeta(String type) {
+  return switch (type) {
+    'intro' => (icon: Icons.person_rounded, label: '작가 소개'),
+    'guide' => (icon: Icons.map_rounded, label: '독서 가이드'),
+    'context' => (icon: Icons.history_edu_rounded, label: '배경 지식'),
+    'quote' => (icon: Icons.format_quote_rounded, label: '인상적인 구절'),
+    _ => (icon: Icons.auto_stories_rounded, label: '큐레이션'),
+  };
+}
+
+/// Bottom sheet shown on timer screen entry when a curation card exists.
+///
+/// Displays the card content and provides a "독서 시작하기" CTA that both
+/// closes the sheet and starts the reading timer.
+class _CurationCardSheet extends StatelessWidget {
+  const _CurationCardSheet({
+    required this.card,
+    required this.onStart,
+  });
+
+  final CurationCard card;
+
+  /// Called when the user taps "독서 시작하기". The caller is responsible for
+  /// closing the sheet (via [Navigator.pop]) before starting the timer.
+  final VoidCallback onStart;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+    final double bottom = MediaQuery.viewInsetsOf(context).bottom;
+    final meta = _cardTypeMeta(card.cardType);
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        spacing.lg,
+        spacing.lg,
+        spacing.lg,
+        spacing.xl + bottom,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          // Card type label row
+          Row(
+            children: <Widget>[
+              Icon(
+                meta.icon,
+                size: 16,
+                color: theme.colorScheme.primary,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                meta.label,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: spacing.md),
+          // Title
+          Text(card.title, style: theme.textTheme.titleLarge),
+          SizedBox(height: spacing.sm),
+          // Body
+          Text(
+            card.body,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.75),
+            ),
+          ),
+          SizedBox(height: spacing.lg),
+          // CTA
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              icon: const Icon(Icons.menu_book_rounded, size: 18),
+              label: const Text('독서 시작하기'),
+              onPressed: onStart,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
