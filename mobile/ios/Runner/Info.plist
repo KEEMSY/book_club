@@ -16,10 +16,14 @@
 		configured separately in Runner/Runner.entitlements.
 	-->
 	<!-- Privacy usage descriptions required for App Store review -->
+	<key>NSCameraUsageDescription</key>
+	<string>프로필 사진 촬영에 사용됩니다</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>포스트에 첨부할 사진을 선택하거나 프로필 사진을 변경하기 위해 사진 라이브러리에 접근합니다.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>공유된 사진을 사진 라이브러리에 저장하기 위해 접근합니다.</string>
+	<key>NSUserNotificationsUsageDescription</key>
+	<string>독서 리마인더 알림에 사용됩니다</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
