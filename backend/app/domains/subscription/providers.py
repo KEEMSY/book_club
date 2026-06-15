@@ -18,6 +18,8 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_session
+from app.domains.experiment.providers import get_experiment_service
+from app.domains.experiment.service import ExperimentService
 from app.domains.subscription.adapters.revenuecat_adapter import RevenueCatAdapter
 from app.domains.subscription.adapters.stub_verifier import StubPurchaseVerifier
 from app.domains.subscription.ports import PurchaseVerifierPort
@@ -35,9 +37,12 @@ def get_verifier() -> PurchaseVerifierPort:
 
 def get_subscription_service(
     session: Annotated[AsyncSession, Depends(get_session)],
+    experiment_svc: Annotated[ExperimentService, Depends(get_experiment_service)],
 ) -> SubscriptionService:
-    """Construct a SubscriptionService wired with a live repository and verifier."""
+    """Construct a SubscriptionService wired with a live repository, verifier, and
+    experiment service for Pro conversion tracking."""
     return SubscriptionService(
         repo=SubscriptionRepository(session),
         verifier=get_verifier(),
+        experiment_service=experiment_svc,
     )

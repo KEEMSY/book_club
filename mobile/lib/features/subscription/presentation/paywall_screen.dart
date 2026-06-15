@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../experiment/application/experiment_providers.dart';
+import '../../experiment/domain/user_experiments.dart';
 import '../application/subscription_notifier.dart';
 
 /// Full-screen Pro subscription paywall.
@@ -51,6 +53,17 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
+
+    // pricing_display_v1 A/B: yearly_69000 variant shows annual price with
+    // monthly breakdown; default (monthly_6900 or unassigned) shows monthly.
+    final experimentsAsync = ref.watch(userExperimentsProvider);
+    final pricingVariant = experimentsAsync.valueOrNull
+        ?.variantFor('pricing_display_v1');
+    final bool showYearly = pricingVariant == 'yearly_69000';
+    final String priceLabel =
+        showYearly ? '연 69,000원' : '월 6,900원';
+    final String? priceSubLabel =
+        showYearly ? '월 5,750원으로 환산' : null;
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -103,13 +116,23 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    '월 4,900원',
+                    priceLabel,
                     style: theme.textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: const Color(0xFF6B21A8),
                     ),
                     textAlign: TextAlign.center,
                   ),
+                  if (priceSubLabel != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      priceSubLabel,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: const Color(0xFF6B21A8).withValues(alpha: 0.75),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                   SizedBox(height: spacing.md),
                   Semantics(
                     button: true,

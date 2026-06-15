@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from uuid import UUID
 
@@ -15,6 +15,10 @@ from app.domains.subscription.schemas import (
     VerifyReceiptRequest,
 )
 
+# Imported lazily to avoid a circular dependency at module load time.
+# ``ExperimentService`` is optional — when absent, conversion tracking is skipped.
+_ExperimentServiceT = object  # placeholder for type annotations only
+
 
 @dataclass(slots=True)
 class SubscriptionService:
@@ -22,6 +26,10 @@ class SubscriptionService:
 
     repo: SubscriptionRepository
     verifier: PurchaseVerifierPort
+    # Optional: when provided, Pro activations are forwarded as experiment
+    # conversion events.  Use ``field(default=None)`` so callers that do not
+    # care about experiments can omit the argument.
+    experiment_service: _ExperimentServiceT | None = field(default=None)
 
     async def get_status(self, user_id: UUID) -> SubscriptionStatus:
         """Return the current subscription status, auto-expiring if needed."""
@@ -69,6 +77,17 @@ class SubscriptionService:
             expires_at=result.expires_at,
             product_id=result.product_id,
         )
+
+        # Forward conversion event to the experiment layer when wired in.
+        if self.experiment_service is not None:
+            from app.domains.experiment.service import ExperimentService
+
+            if isinstance(self.experiment_service, ExperimentService):
+                await self.experiment_service.record_conversion(
+                    user_id=user_id,
+                    experiment_key="paywall_entry_v1",
+                )
+
         return SubscriptionVerifyResponse(
             is_pro=True,
             expires_at=result.expires_at,

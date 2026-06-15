@@ -6,6 +6,9 @@ import 'package:go_router/go_router.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../auth/application/auth_notifier.dart';
+import '../../experiment/application/experiment_providers.dart';
+import '../../experiment/domain/user_experiments.dart';
+import '../../subscription/application/subscription_notifier.dart';
 import '../../book/presentation/widgets/book_cover.dart';
 import '../data/reading_models.dart'
     show DailySessionDto, DailySessionsResponseDto;
@@ -167,7 +170,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   ),
                   SizedBox(height: spacing.md),
                 ],
-                _YearStatsCard(accent: accent),
+                _YearStatsCard(
+                  accent: accent,
+                  onTap: () => _onStatsTap(context),
+                ),
                 SizedBox(height: spacing.md),
                 if (prefs.showGoal) ...<Widget>[
                   DashboardGoalCard(
@@ -201,6 +207,27 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         ],
       ),
     );
+  }
+
+  /// Navigates to the reading stats screen, gated by the paywall_entry_v1
+  /// A/B experiment when the user is not yet Pro.
+  ///
+  /// stats_tab variant: non-Pro users are redirected to the paywall on tap.
+  /// All other variants (or no assignment): stats screen opens directly.
+  void _onStatsTap(BuildContext context) {
+    final experimentsAsync = ref.read(userExperimentsProvider);
+    final variant =
+        experimentsAsync.valueOrNull?.variantFor('paywall_entry_v1');
+
+    if (variant == 'stats_tab') {
+      final subAsync = ref.read(subscriptionNotifierProvider);
+      final isPro = subAsync.valueOrNull?.isPro ?? false;
+      if (!isPro) {
+        GoRouter.of(context).push(AppRoutes.paywall);
+        return;
+      }
+    }
+    GoRouter.of(context).push(AppRoutes.readingStats);
   }
 
   Future<void> _startReading(BuildContext context) async {
@@ -835,9 +862,12 @@ class _TopActions extends StatelessWidget {
 // ---------------------------------------------------------------------------
 
 class _YearStatsCard extends ConsumerWidget {
-  const _YearStatsCard({required this.accent});
+  const _YearStatsCard({required this.accent, this.onTap});
 
   final Color accent;
+
+  /// Optional tap handler — used by paywall_entry_v1 A/B gate.
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -848,7 +878,9 @@ class _YearStatsCard extends ConsumerWidget {
     final AsyncValue<ReadingYearStats> async =
         ref.watch(yearStatsProvider(year));
 
-    return Container(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
       padding: EdgeInsets.all(spacing.lg),
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerLowest,
@@ -937,6 +969,7 @@ class _YearStatsCard extends ConsumerWidget {
           ),
         ],
       ),
+    ),
     );
   }
 

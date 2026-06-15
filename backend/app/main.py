@@ -39,6 +39,7 @@ from app.domains.search.router import router as search_router
 from app.domains.social.events import FollowReceived
 from app.domains.social.router import router as social_router
 from app.domains.curation.router import router as curation_router
+from app.domains.experiment.router import router as experiment_router
 from app.domains.subscription.router import router as subscription_router
 
 
@@ -123,6 +124,7 @@ def create_app() -> FastAPI:
     app.include_router(subscription_router)
     app.include_router(search_router)
     app.include_router(curation_router)
+    app.include_router(experiment_router)
 
     return app
 

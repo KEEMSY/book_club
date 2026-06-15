@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../experiment/application/experiment_providers.dart';
+import '../../experiment/domain/user_experiments.dart';
 import '../application/club_providers.dart';
 import '../domain/club.dart';
 import 'club_detail_screen.dart';
@@ -188,15 +192,31 @@ class _PublicClubCardState extends ConsumerState<_PublicClubCard> {
           builder: (_) => ClubDetailScreen(club: joined),
         ),
       );
-    } catch (_) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('클럽 가입에 실패했습니다.')),
-        );
+    } catch (e) {
+      if (!mounted) return;
+      // club_limit variant: when the server rejects with CLUB_LIMIT_EXCEEDED,
+      // redirect to the paywall instead of showing a generic error toast.
+      if (_isClubLimitError(e)) {
+        final experiments = ref.read(userExperimentsProvider).valueOrNull;
+        final variant = experiments?.variantFor('paywall_entry_v1');
+        if (variant == 'club_limit') {
+          GoRouter.of(context).push(AppRoutes.paywall);
+          return;
+        }
       }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('클럽 가입에 실패했습니다.')),
+      );
     } finally {
       if (mounted) setState(() => _joining = false);
     }
+  }
+
+  /// Returns `true` when the error response carries the CLUB_LIMIT_EXCEEDED
+  /// code from the backend (HTTP 403 with `error.code == "CLUB_LIMIT_EXCEEDED"`).
+  bool _isClubLimitError(Object error) {
+    final msg = error.toString();
+    return msg.contains('CLUB_LIMIT_EXCEEDED');
   }
 
   @override
