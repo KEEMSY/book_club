@@ -55,10 +55,12 @@ completed-book count, recomputes grade + streak, and emits a derived
 
 from __future__ import annotations
 
-from collections.abc import Callable
+import asyncio
+import logging
+from collections.abc import Callable, Coroutine
 from dataclasses import dataclass, field
 from datetime import UTC, date, datetime, timedelta
-from typing import Protocol
+from typing import Any, Protocol
 from uuid import UUID
 
 from app.core.exceptions import ConflictError, NotFoundError
@@ -94,7 +96,24 @@ from app.domains.reading.repository import BookmarkRepository, ReadingStatsRepos
 from app.domains.reading.streak_policy import update_streak
 from app.shared.event_bus import EventBus
 
+logger = logging.getLogger(__name__)
+
 StageEventFn = Callable[[object], None]
+
+# Module-level set keeps a strong reference to fire-and-forget tasks so the
+# event loop does not garbage-collect them before they complete (RUF006).
+_background_tasks: set[asyncio.Task[None]] = set()
+
+
+def _schedule_background_task(coro: Coroutine[Any, Any, None]) -> None:
+    """Schedule *coro* as a fire-and-forget asyncio Task.
+
+    The strong reference is stored in ``_background_tasks`` and removed when
+    the task finishes, preventing premature GC while honouring RUF006.
+    """
+    task: asyncio.Task[None] = asyncio.create_task(coro)
+    _background_tasks.add(task)
+    task.add_done_callback(_background_tasks.discard)
 
 
 class FeedStreakPort(Protocol):
@@ -107,6 +126,18 @@ class FeedStreakPort(Protocol):
     async def record_streak_milestone(
         self, *, user_id: UUID, streak_days: int
     ) -> None: ...
+
+
+class TasteProfileRecomputePort(Protocol):
+    """Minimal port for triggering taste-profile recomputation on book completion.
+
+    Defined here (rather than importing TasteProfileService) so the reading
+    service depends only on this narrow contract per CLAUDE.md §3.2.
+    The concrete implementation is ``TasteProfileService``; tests can inject
+    a no-op fake.
+    """
+
+    async def recompute(self, user_id: UUID) -> object: ...
 
 _MAX_HEATMAP_DAYS = 366
 
@@ -145,6 +176,9 @@ class ReadingService:
     # Optional — existing callers that do not wire the feed service continue to
     # work; streak milestone events are silently skipped when absent.
     feed_service: FeedStreakPort | None = field(default=None)
+    # Optional — existing callers that do not wire the taste profile service
+    # continue to work; recompute is fire-and-forget, errors are swallowed.
+    taste_profile_service: TasteProfileRecomputePort | None = field(default=None)
 
     async def start_session(
         self,
@@ -247,6 +281,12 @@ class ReadingService:
             await self.feed_service.record_streak_milestone(
                 user_id=user_id, streak_days=grade_after.streak_days
             )
+
+        # Fire-and-forget: update the taste profile so ML recommendations
+        # reflect the latest reading session. Errors are intentionally swallowed
+        # — a failed recompute must never roll back the reading session itself.
+        if self.taste_profile_service is not None:
+            _schedule_background_task(self._fire_taste_recompute(user_id))
 
         return SessionCompletion(
             session=updated,
@@ -567,6 +607,17 @@ class ReadingService:
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
+
+    async def _fire_taste_recompute(self, user_id: UUID) -> None:
+        """Best-effort taste profile recompute. Exceptions are swallowed."""
+        try:
+            if self.taste_profile_service is not None:
+                await self.taste_profile_service.recompute(user_id)
+        except Exception:
+            # A failed recompute is non-critical — log and continue.
+            logger.warning(
+                "taste_profile_recompute_failed user_id=%s", user_id, exc_info=True
+            )
 
     async def _apply_session_completion(
         self,

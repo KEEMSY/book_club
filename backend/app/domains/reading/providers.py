@@ -53,6 +53,14 @@ def _get_feed_service(session: AsyncSession) -> object:
     return get_feed_service(session)
 
 
+def _get_taste_profile_service(session: AsyncSession) -> object:
+    """Deferred import to avoid circular dependency with the discovery domain."""
+    from app.domains.book.taste_profile_repository import TasteProfileRepository
+    from app.domains.discovery.taste_profile_service import TasteProfileService
+
+    return TasteProfileService(taste_profiles=TasteProfileRepository(session))
+
+
 class BookQueryAdapter:
     """Implements ``ReadingBookQueryPort`` by reading the book domain's
     UserBook table directly.
@@ -190,4 +198,5 @@ def get_reading_service(
         bookmark_repo=BookmarkRepository(session),
         stats_repo=ReadingStatsRepository(session),
         feed_service=_get_feed_service(session),  # type: ignore[arg-type]
+        taste_profile_service=_get_taste_profile_service(session),  # type: ignore[arg-type]
     )

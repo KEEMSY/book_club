@@ -36,6 +36,7 @@ from sqlalchemy import (
     func,
 )
 from sqlalchemy import Enum as SAEnum
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -174,3 +175,60 @@ class UserBook(Base):
     # selectin: async sessions cannot lazy-load; always eager-load the book
     # so router serializers can access ub.book without a greenlet error.
     book: Mapped[Book] = relationship("Book", back_populates="user_books", lazy="selectin")
+
+
+class UserTasteProfile(Base):
+    """Per-user genre/author frequency vector derived from completed books.
+
+    Upserted lazily after each book completion (fire-and-forget from the
+    reading domain). Used by the taste_match and similar_readers ML
+    recommendation strategies (M44).
+    """
+
+    __tablename__ = "user_taste_profiles"
+
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    # {"소설": 5, "자기계발": 3, ...}
+    genre_vector: Mapped[dict[str, int]] = mapped_column(
+        JSONB, nullable=False, server_default="{}"
+    )
+    # {"한강": 2, ...}
+    author_vector: Mapped[dict[str, int]] = mapped_column(
+        JSONB, nullable=False, server_default="{}"
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+
+
+class UserOnboardingInterest(Base):
+    """Explicit genre/author/keyword preferences selected at onboarding.
+
+    Used as a cold-start signal when the user has fewer than 3 completed
+    books and therefore no meaningful taste profile yet.
+    ``category`` is one of ``genre``, ``author``, or ``keyword``.
+    """
+
+    __tablename__ = "user_onboarding_interests"
+    __table_args__ = (
+        UniqueConstraint(
+            "user_id", "category", "value", name="uq_onboarding_interests_user_cat_val"
+        ),
+        Index("idx_onboarding_interests_user", "user_id"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    # "genre" | "author" | "keyword"
+    category: Mapped[str] = mapped_column(String(32), nullable=False)
+    value: Mapped[str] = mapped_column(String(64), nullable=False)

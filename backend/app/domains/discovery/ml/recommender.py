@@ -26,8 +26,8 @@ from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
 import numpy as np
-from scipy.sparse import csr_matrix  # type: ignore[import-untyped]
-from sklearn.preprocessing import normalize  # type: ignore[import-untyped]
+from scipy.sparse import csr_matrix
+from sklearn.preprocessing import normalize
 
 from app.domains.book.models import UserBookStatus
 from app.domains.discovery.service import RecommendedBookItem
@@ -274,7 +274,8 @@ class CollaborativeFilteringRecommender:
                     title=meta["title"],
                     author=meta["author"],
                     cover_url=meta.get("cover_url"),
-                    reason="similar_readers",
+                    reason="비슷한 취향의 독자가 읽은 책",
+                    strategy="collaborative",
                 )
             )
 
