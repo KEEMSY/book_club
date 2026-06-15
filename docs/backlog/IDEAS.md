@@ -13,6 +13,18 @@
 
 ## Phase 전환 리뷰 기록
 
+### Phase 10 전환 리뷰 (2026-06-15)
+
+- 리뷰 문서: `docs/plans/2026-06-15-phase10.md`
+- **완료 (M41)**: (engagement) 챌린지 배지 희소성 강화 — is_limited/ends_at_exclusive/badge_id_exclusive, 기간 한정 배지 자동 부여·차단, "D-N 종료" UI
+- **완료 (M42)**: (discovery) 독서 큐레이션 카드 MVP — curation_cards 테이블, GET /books/{id}/curation-cards/first, 타이머 시작 전 BottomSheet
+- **완료 (M43)**: (monetization) Pro 수익화 A/B 실험 인프라 — experiments/user_experiments 테이블, 결정론적 SHA-256 배정, 페이월 진입 시점·가격 표시 실험 2종
+- **완료 (M44)**: (discovery) ML 추천 고도화 — user_taste_profiles/user_onboarding_interests, similar_readers·taste_match·cold_start 전략, AI 추천 섹션 + 추천 근거 표시
+- **완료 (M45)**: (polish) 앱스토어 제출 준비 — pubspec.yaml v1.0.0+1, PrivacyPolicyScreen, iOS Info.plist 권한 문구, 스토어 메타데이터 완성
+- **보류 (Phase 11)**: (engagement) 쉴드 유료 추가 구매 IAP — M43 A/B 전환 데이터 확인 후 결정
+- **보류 (Phase 11)**: (audio) 실 오디오 코칭 — M42 큐레이션 카드 MVP 반응 확인 후
+- **보류 (Phase 11)**: (discovery) 딥러닝 추천 (딥 협업 필터링 / 콘텐츠 임베딩) — 활성 사용자 1만 이상 확보 후
+
 ### Phase 9 전환 리뷰 (2026-06-14)
 
 - 리뷰 문서: `docs/plans/2026-06-12-phase9.md`
