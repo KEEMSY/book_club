@@ -50,6 +50,10 @@ class _FakeChallenge:
         default_factory=lambda: datetime.now(tz=UTC) + timedelta(days=30)
     )
     badge_id: UUID | None = None
+    # M41 limited-edition fields (defaults keep pre-M41 tests unchanged)
+    is_limited: bool = False
+    ends_at_exclusive: datetime | None = None
+    badge_id_exclusive: UUID | None = None
     created_at: datetime = field(default_factory=lambda: datetime.now(tz=UTC))
 
 
@@ -245,6 +249,25 @@ class FakeChallengeRepository:
                 continue
             results.append((ch, p))
         return results
+
+    # M41 — exclusive badge deadline guard
+
+    async def get_limited_challenge_by_exclusive_badge(
+        self, badge_id: UUID
+    ) -> Any | None:
+        """Return the limited challenge whose badge_id_exclusive matches badge_id."""
+        for ch in self._challenges.values():
+            if ch.is_limited and ch.badge_id_exclusive == badge_id:
+                return ch
+        return None
+
+    async def reorder_pinned_badges(
+        self,
+        user_id: UUID,
+        ordered_badge_ids: list[UUID],
+    ) -> None:
+        # Minimal stub — pin ordering not tested in pre-M41 scope.
+        pass
 
 
 # ---------------------------------------------------------------------------
