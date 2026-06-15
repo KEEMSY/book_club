@@ -10,26 +10,41 @@ import '../../book/presentation/widgets/book_cover.dart';
 import '../application/discovery_providers.dart';
 import '../domain/recommended_book.dart';
 
-class DiscoveryScreen extends ConsumerWidget {
+/// Two AI-recommendation strategy tabs shown in the "AI 추천" section.
+enum _AiStrategy {
+  similarReaders('similar_readers', '비슷한 독자'),
+  tasteMatch('taste_match', '취향 매칭');
+
+  const _AiStrategy(this.apiValue, this.label);
+
+  final String apiValue;
+  final String label;
+}
+
+class DiscoveryScreen extends ConsumerStatefulWidget {
   const DiscoveryScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DiscoveryScreen> createState() => _DiscoveryScreenState();
+}
+
+class _DiscoveryScreenState extends ConsumerState<DiscoveryScreen> {
+  _AiStrategy _selectedStrategy = _AiStrategy.similarReaders;
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
-    final radii = theme.extension<AppRadius>()!;
-    final recommendationsAsync = ref.watch(recommendationsProvider);
     final discoverAsync = ref.watch(discoverBooksProvider);
 
-    final List<RecommendedBook> recs = recommendationsAsync.valueOrNull ?? [];
     final List<DiscoverSectionDto> sections =
         discoverAsync.valueOrNull?.sections ?? [];
-    // Show spinner only when there is genuinely nothing to display yet.
-    final bool showSpinner = discoverAsync is AsyncLoading && recs.isEmpty;
+    final bool showSpinner = discoverAsync is AsyncLoading;
 
     return Scaffold(
       body: CustomScrollView(
         slivers: [
+          // ── 헤더 + 검색 바 ───────────────────────────────────────────────
           SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsets.fromLTRB(
@@ -51,22 +66,27 @@ class DiscoveryScreen extends ConsumerWidget {
                           child: Container(
                             height: 44,
                             decoration: BoxDecoration(
-                              color: theme.colorScheme.surfaceContainerHighest,
-                              borderRadius: BorderRadius.circular(radii.md),
+                              color:
+                                  theme.colorScheme.surfaceContainerHighest,
+                              borderRadius:
+                                  BorderRadius.circular(spacing.md),
                             ),
                             child: Row(
                               children: [
                                 SizedBox(width: spacing.md),
                                 Icon(
                                   Icons.search_rounded,
-                                  color: theme.colorScheme.onSurfaceVariant,
+                                  color:
+                                      theme.colorScheme.onSurfaceVariant,
                                   size: 20,
                                 ),
                                 SizedBox(width: spacing.sm),
                                 Text(
                                   '책 제목, 저자, ISBN 검색',
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: theme.colorScheme.onSurfaceVariant,
+                                  style:
+                                      theme.textTheme.bodyMedium?.copyWith(
+                                    color:
+                                        theme.colorScheme.onSurfaceVariant,
                                   ),
                                 ),
                               ],
@@ -90,10 +110,12 @@ class DiscoveryScreen extends ConsumerWidget {
           ),
           if (showSpinner)
             const SliverFillRemaining(
-              child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+              child: Center(
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
             )
           else ...[
-            // ── 클럽 찾기 진입 배너 (M32) ─────────────────────────────────
+            // ── 클럽 찾기 진입 배너 (M32) ──────────────────────────────────
             SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.fromLTRB(
@@ -105,33 +127,19 @@ class DiscoveryScreen extends ConsumerWidget {
                 child: _ClubDiscoveryBanner(),
               ),
             ),
-            // ── 맞춤 추천 (personalized, shown only when available) ──────
-            if (recs.isNotEmpty) ...[
-              const SliverToBoxAdapter(
-                child: _SectionHeader(
-                  title: '당신만을 위한 추천',
-                  subtitle: '읽기 기록을 바탕으로 골랐어요',
-                ),
+            // ── AI 추천 섹션 (M44) ─────────────────────────────────────────
+            SliverToBoxAdapter(
+              child: _AiRecommendationSection(
+                selectedStrategy: _selectedStrategy,
+                onStrategyChanged: (s) =>
+                    setState(() => _selectedStrategy = s),
               ),
-              SliverToBoxAdapter(
-                child: _BookRow(
-                  books: recs
-                      .map(
-                        (r) => _BookRowItem(
-                          id: r.id,
-                          title: r.title,
-                          author: r.author,
-                          coverUrl: r.coverUrl,
-                          reason: r.reason,
-                        ),
-                      )
-                      .toList(growable: false),
-                ),
-              ),
-            ],
-            // ── 인기차트 (popular/new sections, always the default) ───────
+            ),
+            // ── 인기차트 (popular/new sections, always the default) ─────────
             for (final section in sections) ...[
-              SliverToBoxAdapter(child: _SectionHeader(title: section.title)),
+              SliverToBoxAdapter(
+                child: _SectionHeader(title: section.title),
+              ),
               SliverToBoxAdapter(
                 child: _BookRow(
                   books: section.books
@@ -157,46 +165,200 @@ class DiscoveryScreen extends ConsumerWidget {
   }
 }
 
-/// Maps a raw reason string from the ML recommendation API to a short
-/// human-readable Korean label shown on the card chip.
-String? _reasonLabel(String? reason) {
-  switch (reason) {
-    case 'community_popular':
-      return '많이 읽힌 책';
-    case 'similar_readers':
-      return '비슷한 독자들이 읽은 책';
-    case 'recently_added':
-      return '최근 많이 읽힌 책';
-    default:
-      return null;
+/// AI 추천 섹션: 헤더 + 전략 탭 + 추천 책 목록.
+class _AiRecommendationSection extends ConsumerWidget {
+  const _AiRecommendationSection({
+    required this.selectedStrategy,
+    required this.onStrategyChanged,
+  });
+
+  final _AiStrategy selectedStrategy;
+  final ValueChanged<_AiStrategy> onStrategyChanged;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final recsAsync = ref.watch(
+      recommendationsProvider(strategy: selectedStrategy.apiValue),
+    );
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Header row.
+        Padding(
+          padding: EdgeInsets.fromLTRB(
+            spacing.lg,
+            spacing.lg,
+            spacing.lg,
+            spacing.sm,
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.auto_awesome_rounded,
+                size: 18,
+                color: theme.colorScheme.primary,
+              ),
+              SizedBox(width: spacing.xs),
+              Text(
+                'AI 추천',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ),
+        // Strategy tabs.
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: spacing.lg),
+          child: Row(
+            children: _AiStrategy.values.map((s) {
+              final bool active = s == selectedStrategy;
+              return Padding(
+                padding: EdgeInsets.only(right: spacing.sm),
+                child: FilterChip(
+                  selected: active,
+                  label: Text(s.label),
+                  onSelected: (_) => onStrategyChanged(s),
+                  showCheckmark: false,
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+        SizedBox(height: spacing.sm),
+        // Recommendation list.
+        recsAsync.when(
+          data: (recs) => recs.isEmpty
+              ? Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: spacing.lg,
+                    vertical: spacing.md,
+                  ),
+                  child: Text(
+                    '추천 데이터를 쌓는 중이에요. 더 읽으면 정확해져요!',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                )
+              : _AiBookList(recs: recs),
+          loading: () => const Padding(
+            padding: EdgeInsets.symmetric(vertical: 32),
+            child: Center(
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          ),
+          error: (_, __) => Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: spacing.lg,
+              vertical: spacing.md,
+            ),
+            child: Text(
+              '추천 데이터를 불러오지 못했어요.',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.error,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
 
-/// Normalised card data so both recommendation and discover books share the
-/// same row widget without coupling it to either domain type.
-class _BookRowItem {
-  const _BookRowItem({
-    required this.id,
-    required this.title,
-    required this.author,
-    this.coverUrl,
-    this.reason,
-  });
+/// Horizontal scrollable list of AI-recommended book cards with reason text.
+class _AiBookList extends StatelessWidget {
+  const _AiBookList({required this.recs});
 
-  final String id;
-  final String title;
-  final String author;
-  final String? coverUrl;
-  // reason is only set for ML-recommended items.
-  final String? reason;
+  final List<RecommendedBook> recs;
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = Theme.of(context).extension<AppSpacing>()!;
+    return SizedBox(
+      height: 240,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.symmetric(horizontal: spacing.lg),
+        itemCount: recs.length,
+        itemBuilder: (_, i) => _AiBookCard(rec: recs[i]),
+      ),
+    );
+  }
+}
+
+/// Single AI-recommended book card.
+///
+/// Renders the cover image, title, author, and [reason] text on one line below
+/// the author (bodySmall, onSurfaceVariant colour) as specified in M44.
+class _AiBookCard extends StatelessWidget {
+  const _AiBookCard({required this.rec});
+
+  final RecommendedBook rec;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+    final radii = theme.extension<AppRadius>()!;
+
+    return GestureDetector(
+      onTap: () => context.push('/books/${rec.id}'),
+      child: Container(
+        width: 110,
+        margin: EdgeInsets.only(right: spacing.sm),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            BookCover(
+              coverUrl: rec.coverUrl,
+              width: 110,
+              borderRadius: BorderRadius.circular(radii.md),
+            ),
+            SizedBox(height: spacing.xs),
+            Text(
+              rec.title,
+              style: theme.textTheme.labelMedium,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 2),
+            Text(
+              rec.author,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 2),
+            // reason line — M44 spec: bodySmall, grey
+            Text(
+              rec.reason,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant.withValues(
+                  alpha: 0.7,
+                ),
+                fontSize: 10,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.title, this.subtitle});
+  const _SectionHeader({required this.title});
 
   final String title;
-  // Optional supporting line shown below the main title.
-  final String? subtitle;
 
   @override
   Widget build(BuildContext context) {
@@ -209,24 +371,10 @@ class _SectionHeader extends StatelessWidget {
         spacing.lg,
         spacing.sm,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: theme.textTheme.titleMedium
-                ?.copyWith(fontWeight: FontWeight.w700),
-          ),
-          if (subtitle != null) ...[
-            const SizedBox(height: 2),
-            Text(
-              subtitle!,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ],
+      child: Text(
+        title,
+        style: theme.textTheme.titleMedium
+            ?.copyWith(fontWeight: FontWeight.w700),
       ),
     );
   }
@@ -252,6 +400,21 @@ class _BookRow extends StatelessWidget {
   }
 }
 
+/// Normalised card data so discover-section books share the same widget.
+class _BookRowItem {
+  const _BookRowItem({
+    required this.id,
+    required this.title,
+    required this.author,
+    this.coverUrl,
+  });
+
+  final String id;
+  final String title;
+  final String author;
+  final String? coverUrl;
+}
+
 class _BookCard extends StatelessWidget {
   const _BookCard({required this.item});
 
@@ -262,7 +425,6 @@ class _BookCard extends StatelessWidget {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
     final radii = theme.extension<AppRadius>()!;
-    final label = _reasonLabel(item.reason);
 
     return GestureDetector(
       onTap: () => context.push('/books/${item.id}'),
@@ -271,25 +433,11 @@ class _BookCard extends StatelessWidget {
         margin: EdgeInsets.only(right: spacing.sm),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Stack(
-              children: [
-                BookCover(
-                  coverUrl: item.coverUrl,
-                  width: 100,
-                  borderRadius: BorderRadius.circular(radii.md),
-                ),
-                if (label != null)
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    child: _ReasonChip(
-                      label: label,
-                      borderRadius: radii.md,
-                    ),
-                  ),
-              ],
+          children: [
+            BookCover(
+              coverUrl: item.coverUrl,
+              width: 100,
+              borderRadius: BorderRadius.circular(radii.md),
             ),
             SizedBox(height: spacing.xs),
             Text(
@@ -309,43 +457,6 @@ class _BookCard extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-/// Accent-coloured semi-transparent chip overlaid on the bottom of a book
-/// cover image to explain why this title was recommended.
-class _ReasonChip extends StatelessWidget {
-  const _ReasonChip({required this.label, required this.borderRadius});
-
-  final String label;
-  final double borderRadius;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final accent = theme.colorScheme.primary;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-      decoration: BoxDecoration(
-        color: accent.withValues(alpha: 0.82),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(borderRadius),
-          bottomRight: Radius.circular(borderRadius),
-        ),
-      ),
-      child: Text(
-        label,
-        style: theme.textTheme.labelSmall?.copyWith(
-          color: theme.colorScheme.onPrimary,
-          fontWeight: FontWeight.w600,
-          height: 1.2,
-        ),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        textAlign: TextAlign.center,
       ),
     );
   }
