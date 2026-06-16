@@ -273,6 +273,7 @@ class RecapBook(BaseModel):
     title: str
     cover_url: str | None
     author: str
+    read_seconds: int = 0
 
 
 class RecapCard(BaseModel):
@@ -283,7 +284,13 @@ class RecapCard(BaseModel):
 
 class ReadingRecapResponse(BaseModel):
     period: str
+    year: int = 0
+    half: int = 0
+    total_books: int = 0
+    total_seconds: int = 0
+    longest_streak_days: int = 0
     cards: list[RecapCard]
+    top_books: list[RecapBook] = []
 
 
 # ---- monthly recap ----

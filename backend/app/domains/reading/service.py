@@ -89,6 +89,7 @@ from app.domains.reading.ports import (
     ReadingSpeedStats,
     ReadingStats,
     RecapCardData,
+    RecapTopBook,
     SessionCompletion,
     UserGradeRepositoryPort,
 )
@@ -523,7 +524,7 @@ class ReadingService:
         user_id: UUID,
         period: str,
     ) -> ReadingRecap:
-        """Return up to four recap cards for the given half-year/year period.
+        """Return recap cards and aggregate stats for the given half-year/year period.
 
         ``period`` format: ``YYYY-H1`` (Jan-Jun), ``YYYY-H2`` (Jul-Dec),
         or ``YYYY`` (full year).  Each card is only included when data
@@ -568,7 +569,32 @@ class ReadingService:
                 )
             )
 
-        return ReadingRecap(period=period, cards=cards)
+        # Aggregate stats for the mobile summary view.
+        agg = await self.stats_repo.recap_aggregate_stats(user_id, from_date, to_date)
+        top_book_rows = await self.stats_repo.recap_top_books(user_id, from_date, to_date)
+        top_books = [
+            RecapTopBook(
+                title=r.title,
+                cover_url=r.cover_url,
+                author=r.author,
+                read_seconds=r.stat_int or 0,
+            )
+            for r in top_book_rows
+        ]
+
+        # Longest streak from the grade snapshot (all-time best; period-scoped
+        # streak reconstruction is a future backlog item).
+        grade = await self.user_grades.get_or_init(user_id)
+        longest_streak_days = grade.longest_streak
+
+        return ReadingRecap(
+            period=period,
+            cards=cards,
+            total_books=agg["total_books"],
+            total_seconds=agg["total_seconds"],
+            longest_streak_days=longest_streak_days,
+            top_books=top_books,
+        )
 
     async def get_monthly_recap(
         self,

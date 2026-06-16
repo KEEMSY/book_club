@@ -278,29 +278,30 @@ Map<String, dynamic> _$ReadingYearStatsDtoToJson(
 
 _RecapBookDto _$RecapBookDtoFromJson(Map<String, dynamic> json) =>
     _RecapBookDto(
-      bookId: json['book_id'] as String,
       title: json['title'] as String,
       author: json['author'] as String,
       coverUrl: json['cover_url'] as String?,
-      readSeconds: (json['read_seconds'] as num).toInt(),
+      readSeconds: (json['read_seconds'] as num?)?.toInt() ?? 0,
+      bookId: json['book_id'] as String? ?? '',
     );
 
 Map<String, dynamic> _$RecapBookDtoToJson(_RecapBookDto instance) =>
     <String, dynamic>{
-      'book_id': instance.bookId,
       'title': instance.title,
       'author': instance.author,
       'cover_url': instance.coverUrl,
       'read_seconds': instance.readSeconds,
+      'book_id': instance.bookId,
     };
 
 _ReadingRecapDto _$ReadingRecapDtoFromJson(Map<String, dynamic> json) =>
     _ReadingRecapDto(
-      year: (json['year'] as num).toInt(),
-      half: (json['half'] as num).toInt(),
-      totalBooks: (json['total_books'] as num).toInt(),
-      totalSeconds: (json['total_seconds'] as num).toInt(),
-      longestStreakDays: (json['longest_streak_days'] as num).toInt(),
+      period: json['period'] as String? ?? '',
+      year: (json['year'] as num?)?.toInt() ?? 0,
+      half: (json['half'] as num?)?.toInt() ?? 0,
+      totalBooks: (json['total_books'] as num?)?.toInt() ?? 0,
+      totalSeconds: (json['total_seconds'] as num?)?.toInt() ?? 0,
+      longestStreakDays: (json['longest_streak_days'] as num?)?.toInt() ?? 0,
       topBooks: (json['top_books'] as List<dynamic>?)
               ?.map((e) => RecapBookDto.fromJson(e as Map<String, dynamic>))
               .toList() ??
@@ -309,6 +310,7 @@ _ReadingRecapDto _$ReadingRecapDtoFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$ReadingRecapDtoToJson(_ReadingRecapDto instance) =>
     <String, dynamic>{
+      'period': instance.period,
       'year': instance.year,
       'half': instance.half,
       'total_books': instance.totalBooks,

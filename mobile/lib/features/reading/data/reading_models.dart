@@ -340,17 +340,21 @@ abstract class ReadingYearStatsDto with _$ReadingYearStatsDto {
   }
 }
 
-/// Mirror of a single book entry in `GET /reading/recap` response.
+/// Mirror of a single book entry in the `top_books` list of
+/// `GET /me/reading-recap` response.
+///
+/// [bookId] is not sent by the backend; it defaults to empty string so
+/// existing domain code that requires it still compiles.
 @freezed
 abstract class RecapBookDto with _$RecapBookDto {
   const RecapBookDto._();
 
   const factory RecapBookDto({
-    required String bookId,
     required String title,
     required String author,
     String? coverUrl,
-    required int readSeconds,
+    @Default(0) int readSeconds,
+    @Default('') String bookId,
   }) = _RecapBookDto;
 
   factory RecapBookDto.fromJson(Map<String, dynamic> json) =>
@@ -367,17 +371,23 @@ abstract class RecapBookDto with _$RecapBookDto {
   }
 }
 
-/// Mirror of `GET /reading/recap?year=&half=` response.
+/// Mirror of `GET /me/reading-recap` aggregate response.
+///
+/// The backend sends snake_case keys; `build.yaml` `field_rename: snake`
+/// maps them automatically (e.g. `total_books` → [totalBooks]).
+/// The `cards` array from the backend is intentionally ignored here — the
+/// mobile screen only uses the aggregate stats and [topBooks].
 @freezed
 abstract class ReadingRecapDto with _$ReadingRecapDto {
   const ReadingRecapDto._();
 
   const factory ReadingRecapDto({
-    required int year,
-    required int half,
-    required int totalBooks,
-    required int totalSeconds,
-    required int longestStreakDays,
+    @Default('') String period,
+    @Default(0) int year,
+    @Default(0) int half,
+    @Default(0) int totalBooks,
+    @Default(0) int totalSeconds,
+    @Default(0) int longestStreakDays,
     @Default(<RecapBookDto>[]) List<RecapBookDto> topBooks,
   }) = _ReadingRecapDto;
 

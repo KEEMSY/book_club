@@ -374,8 +374,18 @@ async def get_reading_recap(
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
+    # Derive year and half from the period string for the mobile header.
+    _parts = recap.period.split("-H")
+    _year = int(_parts[0]) if _parts[0].isdigit() else 0
+    _half = int(_parts[1]) if len(_parts) > 1 and _parts[1].isdigit() else 0
+
     response = ReadingRecapResponse(
         period=recap.period,
+        year=_year,
+        half=_half,
+        total_books=recap.total_books,
+        total_seconds=recap.total_seconds,
+        longest_streak_days=recap.longest_streak_days,
         cards=[
             RecapCard(
                 card_type=RecapCardType(c.card_type),
@@ -387,6 +397,15 @@ async def get_reading_recap(
                 stat_value=c.stat_value,
             )
             for c in recap.cards
+        ],
+        top_books=[
+            RecapBook(
+                title=b.title,
+                cover_url=b.cover_url,
+                author=b.author,
+                read_seconds=b.read_seconds,
+            )
+            for b in recap.top_books
         ],
     )
 

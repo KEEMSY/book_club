@@ -5913,11 +5913,11 @@ class __$ReadingYearStatsDtoCopyWithImpl<$Res>
 
 /// @nodoc
 mixin _$RecapBookDto {
-  String get bookId;
   String get title;
   String get author;
   String? get coverUrl;
   int get readSeconds;
+  String get bookId;
 
   /// Create a copy of RecapBookDto
   /// with the given fields replaced by the non-null parameter values.
@@ -5935,23 +5935,23 @@ mixin _$RecapBookDto {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is RecapBookDto &&
-            (identical(other.bookId, bookId) || other.bookId == bookId) &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.author, author) || other.author == author) &&
             (identical(other.coverUrl, coverUrl) ||
                 other.coverUrl == coverUrl) &&
             (identical(other.readSeconds, readSeconds) ||
-                other.readSeconds == readSeconds));
+                other.readSeconds == readSeconds) &&
+            (identical(other.bookId, bookId) || other.bookId == bookId));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, bookId, title, author, coverUrl, readSeconds);
+      Object.hash(runtimeType, title, author, coverUrl, readSeconds, bookId);
 
   @override
   String toString() {
-    return 'RecapBookDto(bookId: $bookId, title: $title, author: $author, coverUrl: $coverUrl, readSeconds: $readSeconds)';
+    return 'RecapBookDto(title: $title, author: $author, coverUrl: $coverUrl, readSeconds: $readSeconds, bookId: $bookId)';
   }
 }
 
@@ -5962,11 +5962,11 @@ abstract mixin class $RecapBookDtoCopyWith<$Res> {
       _$RecapBookDtoCopyWithImpl;
   @useResult
   $Res call(
-      {String bookId,
-      String title,
+      {String title,
       String author,
       String? coverUrl,
-      int readSeconds});
+      int readSeconds,
+      String bookId});
 }
 
 /// @nodoc
@@ -5981,17 +5981,13 @@ class _$RecapBookDtoCopyWithImpl<$Res> implements $RecapBookDtoCopyWith<$Res> {
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? bookId = null,
     Object? title = null,
     Object? author = null,
     Object? coverUrl = freezed,
     Object? readSeconds = null,
+    Object? bookId = null,
   }) {
     return _then(_self.copyWith(
-      bookId: null == bookId
-          ? _self.bookId
-          : bookId // ignore: cast_nullable_to_non_nullable
-              as String,
       title: null == title
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -6008,6 +6004,10 @@ class _$RecapBookDtoCopyWithImpl<$Res> implements $RecapBookDtoCopyWith<$Res> {
           ? _self.readSeconds
           : readSeconds // ignore: cast_nullable_to_non_nullable
               as int,
+      bookId: null == bookId
+          ? _self.bookId
+          : bookId // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
@@ -6105,16 +6105,16 @@ extension RecapBookDtoPatterns on RecapBookDto {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String bookId, String title, String author,
-            String? coverUrl, int readSeconds)?
+    TResult Function(String title, String author, String? coverUrl,
+            int readSeconds, String bookId)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _RecapBookDto() when $default != null:
-        return $default(_that.bookId, _that.title, _that.author, _that.coverUrl,
-            _that.readSeconds);
+        return $default(_that.title, _that.author, _that.coverUrl,
+            _that.readSeconds, _that.bookId);
       case _:
         return orElse();
     }
@@ -6135,15 +6135,15 @@ extension RecapBookDtoPatterns on RecapBookDto {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String bookId, String title, String author,
-            String? coverUrl, int readSeconds)
+    TResult Function(String title, String author, String? coverUrl,
+            int readSeconds, String bookId)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _RecapBookDto():
-        return $default(_that.bookId, _that.title, _that.author, _that.coverUrl,
-            _that.readSeconds);
+        return $default(_that.title, _that.author, _that.coverUrl,
+            _that.readSeconds, _that.bookId);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -6163,15 +6163,15 @@ extension RecapBookDtoPatterns on RecapBookDto {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String bookId, String title, String author,
-            String? coverUrl, int readSeconds)?
+    TResult? Function(String title, String author, String? coverUrl,
+            int readSeconds, String bookId)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _RecapBookDto() when $default != null:
-        return $default(_that.bookId, _that.title, _that.author, _that.coverUrl,
-            _that.readSeconds);
+        return $default(_that.title, _that.author, _that.coverUrl,
+            _that.readSeconds, _that.bookId);
       case _:
         return null;
     }
@@ -6182,17 +6182,15 @@ extension RecapBookDtoPatterns on RecapBookDto {
 @JsonSerializable()
 class _RecapBookDto extends RecapBookDto {
   const _RecapBookDto(
-      {required this.bookId,
-      required this.title,
+      {required this.title,
       required this.author,
       this.coverUrl,
-      required this.readSeconds})
+      this.readSeconds = 0,
+      this.bookId = ''})
       : super._();
   factory _RecapBookDto.fromJson(Map<String, dynamic> json) =>
       _$RecapBookDtoFromJson(json);
 
-  @override
-  final String bookId;
   @override
   final String title;
   @override
@@ -6200,7 +6198,11 @@ class _RecapBookDto extends RecapBookDto {
   @override
   final String? coverUrl;
   @override
+  @JsonKey()
   final int readSeconds;
+  @override
+  @JsonKey()
+  final String bookId;
 
   /// Create a copy of RecapBookDto
   /// with the given fields replaced by the non-null parameter values.
@@ -6222,23 +6224,23 @@ class _RecapBookDto extends RecapBookDto {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _RecapBookDto &&
-            (identical(other.bookId, bookId) || other.bookId == bookId) &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.author, author) || other.author == author) &&
             (identical(other.coverUrl, coverUrl) ||
                 other.coverUrl == coverUrl) &&
             (identical(other.readSeconds, readSeconds) ||
-                other.readSeconds == readSeconds));
+                other.readSeconds == readSeconds) &&
+            (identical(other.bookId, bookId) || other.bookId == bookId));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, bookId, title, author, coverUrl, readSeconds);
+      Object.hash(runtimeType, title, author, coverUrl, readSeconds, bookId);
 
   @override
   String toString() {
-    return 'RecapBookDto(bookId: $bookId, title: $title, author: $author, coverUrl: $coverUrl, readSeconds: $readSeconds)';
+    return 'RecapBookDto(title: $title, author: $author, coverUrl: $coverUrl, readSeconds: $readSeconds, bookId: $bookId)';
   }
 }
 
@@ -6251,11 +6253,11 @@ abstract mixin class _$RecapBookDtoCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String bookId,
-      String title,
+      {String title,
       String author,
       String? coverUrl,
-      int readSeconds});
+      int readSeconds,
+      String bookId});
 }
 
 /// @nodoc
@@ -6271,17 +6273,13 @@ class __$RecapBookDtoCopyWithImpl<$Res>
   @override
   @pragma('vm:prefer-inline')
   $Res call({
-    Object? bookId = null,
     Object? title = null,
     Object? author = null,
     Object? coverUrl = freezed,
     Object? readSeconds = null,
+    Object? bookId = null,
   }) {
     return _then(_RecapBookDto(
-      bookId: null == bookId
-          ? _self.bookId
-          : bookId // ignore: cast_nullable_to_non_nullable
-              as String,
       title: null == title
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -6298,12 +6296,17 @@ class __$RecapBookDtoCopyWithImpl<$Res>
           ? _self.readSeconds
           : readSeconds // ignore: cast_nullable_to_non_nullable
               as int,
+      bookId: null == bookId
+          ? _self.bookId
+          : bookId // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
 
 /// @nodoc
 mixin _$ReadingRecapDto {
+  String get period;
   int get year;
   int get half;
   int get totalBooks;
@@ -6327,6 +6330,7 @@ mixin _$ReadingRecapDto {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is ReadingRecapDto &&
+            (identical(other.period, period) || other.period == period) &&
             (identical(other.year, year) || other.year == year) &&
             (identical(other.half, half) || other.half == half) &&
             (identical(other.totalBooks, totalBooks) ||
@@ -6342,6 +6346,7 @@ mixin _$ReadingRecapDto {
   @override
   int get hashCode => Object.hash(
       runtimeType,
+      period,
       year,
       half,
       totalBooks,
@@ -6351,7 +6356,7 @@ mixin _$ReadingRecapDto {
 
   @override
   String toString() {
-    return 'ReadingRecapDto(year: $year, half: $half, totalBooks: $totalBooks, totalSeconds: $totalSeconds, longestStreakDays: $longestStreakDays, topBooks: $topBooks)';
+    return 'ReadingRecapDto(period: $period, year: $year, half: $half, totalBooks: $totalBooks, totalSeconds: $totalSeconds, longestStreakDays: $longestStreakDays, topBooks: $topBooks)';
   }
 }
 
@@ -6362,7 +6367,8 @@ abstract mixin class $ReadingRecapDtoCopyWith<$Res> {
       _$ReadingRecapDtoCopyWithImpl;
   @useResult
   $Res call(
-      {int year,
+      {String period,
+      int year,
       int half,
       int totalBooks,
       int totalSeconds,
@@ -6383,6 +6389,7 @@ class _$ReadingRecapDtoCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? period = null,
     Object? year = null,
     Object? half = null,
     Object? totalBooks = null,
@@ -6391,6 +6398,10 @@ class _$ReadingRecapDtoCopyWithImpl<$Res>
     Object? topBooks = null,
   }) {
     return _then(_self.copyWith(
+      period: null == period
+          ? _self.period
+          : period // ignore: cast_nullable_to_non_nullable
+              as String,
       year: null == year
           ? _self.year
           : year // ignore: cast_nullable_to_non_nullable
@@ -6512,15 +6523,21 @@ extension ReadingRecapDtoPatterns on ReadingRecapDto {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(int year, int half, int totalBooks, int totalSeconds,
-            int longestStreakDays, List<RecapBookDto> topBooks)?
+    TResult Function(
+            String period,
+            int year,
+            int half,
+            int totalBooks,
+            int totalSeconds,
+            int longestStreakDays,
+            List<RecapBookDto> topBooks)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _ReadingRecapDto() when $default != null:
-        return $default(_that.year, _that.half, _that.totalBooks,
+        return $default(_that.period, _that.year, _that.half, _that.totalBooks,
             _that.totalSeconds, _that.longestStreakDays, _that.topBooks);
       case _:
         return orElse();
@@ -6542,14 +6559,20 @@ extension ReadingRecapDtoPatterns on ReadingRecapDto {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(int year, int half, int totalBooks, int totalSeconds,
-            int longestStreakDays, List<RecapBookDto> topBooks)
+    TResult Function(
+            String period,
+            int year,
+            int half,
+            int totalBooks,
+            int totalSeconds,
+            int longestStreakDays,
+            List<RecapBookDto> topBooks)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _ReadingRecapDto():
-        return $default(_that.year, _that.half, _that.totalBooks,
+        return $default(_that.period, _that.year, _that.half, _that.totalBooks,
             _that.totalSeconds, _that.longestStreakDays, _that.topBooks);
       case _:
         throw StateError('Unexpected subclass');
@@ -6570,14 +6593,20 @@ extension ReadingRecapDtoPatterns on ReadingRecapDto {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(int year, int half, int totalBooks, int totalSeconds,
-            int longestStreakDays, List<RecapBookDto> topBooks)?
+    TResult? Function(
+            String period,
+            int year,
+            int half,
+            int totalBooks,
+            int totalSeconds,
+            int longestStreakDays,
+            List<RecapBookDto> topBooks)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _ReadingRecapDto() when $default != null:
-        return $default(_that.year, _that.half, _that.totalBooks,
+        return $default(_that.period, _that.year, _that.half, _that.totalBooks,
             _that.totalSeconds, _that.longestStreakDays, _that.topBooks);
       case _:
         return null;
@@ -6589,11 +6618,12 @@ extension ReadingRecapDtoPatterns on ReadingRecapDto {
 @JsonSerializable()
 class _ReadingRecapDto extends ReadingRecapDto {
   const _ReadingRecapDto(
-      {required this.year,
-      required this.half,
-      required this.totalBooks,
-      required this.totalSeconds,
-      required this.longestStreakDays,
+      {this.period = '',
+      this.year = 0,
+      this.half = 0,
+      this.totalBooks = 0,
+      this.totalSeconds = 0,
+      this.longestStreakDays = 0,
       final List<RecapBookDto> topBooks = const <RecapBookDto>[]})
       : _topBooks = topBooks,
         super._();
@@ -6601,14 +6631,22 @@ class _ReadingRecapDto extends ReadingRecapDto {
       _$ReadingRecapDtoFromJson(json);
 
   @override
+  @JsonKey()
+  final String period;
+  @override
+  @JsonKey()
   final int year;
   @override
+  @JsonKey()
   final int half;
   @override
+  @JsonKey()
   final int totalBooks;
   @override
+  @JsonKey()
   final int totalSeconds;
   @override
+  @JsonKey()
   final int longestStreakDays;
   final List<RecapBookDto> _topBooks;
   @override
@@ -6639,6 +6677,7 @@ class _ReadingRecapDto extends ReadingRecapDto {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _ReadingRecapDto &&
+            (identical(other.period, period) || other.period == period) &&
             (identical(other.year, year) || other.year == year) &&
             (identical(other.half, half) || other.half == half) &&
             (identical(other.totalBooks, totalBooks) ||
@@ -6654,6 +6693,7 @@ class _ReadingRecapDto extends ReadingRecapDto {
   @override
   int get hashCode => Object.hash(
       runtimeType,
+      period,
       year,
       half,
       totalBooks,
@@ -6663,7 +6703,7 @@ class _ReadingRecapDto extends ReadingRecapDto {
 
   @override
   String toString() {
-    return 'ReadingRecapDto(year: $year, half: $half, totalBooks: $totalBooks, totalSeconds: $totalSeconds, longestStreakDays: $longestStreakDays, topBooks: $topBooks)';
+    return 'ReadingRecapDto(period: $period, year: $year, half: $half, totalBooks: $totalBooks, totalSeconds: $totalSeconds, longestStreakDays: $longestStreakDays, topBooks: $topBooks)';
   }
 }
 
@@ -6676,7 +6716,8 @@ abstract mixin class _$ReadingRecapDtoCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int year,
+      {String period,
+      int year,
       int half,
       int totalBooks,
       int totalSeconds,
@@ -6697,6 +6738,7 @@ class __$ReadingRecapDtoCopyWithImpl<$Res>
   @override
   @pragma('vm:prefer-inline')
   $Res call({
+    Object? period = null,
     Object? year = null,
     Object? half = null,
     Object? totalBooks = null,
@@ -6705,6 +6747,10 @@ class __$ReadingRecapDtoCopyWithImpl<$Res>
     Object? topBooks = null,
   }) {
     return _then(_ReadingRecapDto(
+      period: null == period
+          ? _self.period
+          : period // ignore: cast_nullable_to_non_nullable
+              as String,
       year: null == year
           ? _self.year
           : year // ignore: cast_nullable_to_non_nullable

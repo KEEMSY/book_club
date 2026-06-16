@@ -675,6 +675,96 @@ class ReadingStatsRepository:
             stat_date=None,
         )
 
+    async def recap_aggregate_stats(
+        self, user_id: UUID, from_date: date, to_date: date
+    ) -> dict[str, int]:
+        """Period aggregate: total completed books and total timer seconds.
+
+        Counts completed user_books whose ``finished_at`` falls within the
+        period and sums timer session durations for sessions that ended within
+        the same window.
+        """
+        stmt = text(
+            """
+            SELECT
+                COUNT(DISTINCT ub.id) FILTER (
+                    WHERE ub.status = 'completed'
+                      AND ub.finished_at IS NOT NULL
+                      AND ub.finished_at::date >= :from_date
+                      AND ub.finished_at::date <= :to_date
+                ) AS total_books,
+                COALESCE(SUM(rs.duration_sec) FILTER (
+                    WHERE rs.ended_at IS NOT NULL
+                      AND rs.ended_at::date >= :from_date
+                      AND rs.ended_at::date <= :to_date
+                ), 0) AS total_seconds
+            FROM user_books ub
+            LEFT JOIN reading_sessions rs ON rs.user_book_id = ub.id
+            WHERE ub.user_id = :user_id
+            """
+        )
+        row = (
+            await self._session.execute(
+                stmt, {"user_id": user_id, "from_date": from_date, "to_date": to_date}
+            )
+        ).one()
+        return {
+            "total_books": int(row.total_books or 0),
+            "total_seconds": int(row.total_seconds or 0),
+        }
+
+    async def recap_top_books(
+        self, user_id: UUID, from_date: date, to_date: date, limit: int = 3
+    ) -> list[RecapBookRow]:
+        """Top *limit* books by total timer reading seconds in the period.
+
+        Only completed user_books whose ``finished_at`` falls within the
+        window are considered.  Books with no timer sessions are excluded.
+        """
+        stmt = text(
+            """
+            SELECT
+                b.title,
+                b.cover_url,
+                b.author,
+                SUM(rs.duration_sec) AS total_sec
+            FROM user_books ub
+            JOIN books b ON b.id = ub.book_id
+            JOIN reading_sessions rs ON rs.user_book_id = ub.id
+            WHERE ub.user_id = :user_id
+              AND ub.status = 'completed'
+              AND ub.finished_at IS NOT NULL
+              AND ub.finished_at::date >= :from_date
+              AND ub.finished_at::date <= :to_date
+              AND rs.ended_at IS NOT NULL
+              AND rs.source = 'timer'
+            GROUP BY b.title, b.cover_url, b.author
+            ORDER BY total_sec DESC
+            LIMIT :limit
+            """
+        )
+        rows = (
+            await self._session.execute(
+                stmt,
+                {
+                    "user_id": user_id,
+                    "from_date": from_date,
+                    "to_date": to_date,
+                    "limit": limit,
+                },
+            )
+        ).all()
+        return [
+            RecapBookRow(
+                title=str(r.title),
+                cover_url=str(r.cover_url) if r.cover_url else None,
+                author=str(r.author),
+                stat_int=int(r.total_sec),
+                stat_date=None,
+            )
+            for r in rows
+        ]
+
     async def recap_most_highlighted(
         self, user_id: UUID, from_date: date, to_date: date
     ) -> RecapBookRow | None:

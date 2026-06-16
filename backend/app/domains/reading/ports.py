@@ -19,7 +19,7 @@ free of pydantic, FastAPI, or any transport imports.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import Protocol
 from uuid import UUID
@@ -251,11 +251,25 @@ class RecapCardData:
 
 
 @dataclass(frozen=True, slots=True)
+class RecapTopBook:
+    """One book entry in the aggregate top-books list."""
+
+    title: str
+    cover_url: str | None
+    author: str
+    read_seconds: int
+
+
+@dataclass(frozen=True, slots=True)
 class ReadingRecap:
     """Service-shape result for the reading recap endpoint."""
 
     period: str
     cards: list[RecapCardData]
+    total_books: int = 0
+    total_seconds: int = 0
+    longest_streak_days: int = 0
+    top_books: list[RecapTopBook] = field(default_factory=list)
 
 
 @dataclass(frozen=True, slots=True)
