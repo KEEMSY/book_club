@@ -85,6 +85,10 @@ dependencies:
   # Privacy Policy / external links (M40 · store submission).
   url_launcher: ^6.3.1
 
+  # Error monitoring (M50). DSN injected via --dart-define=SENTRY_DSN at build
+  # time; omitting the define disables Sentry entirely so local dev stays clean.
+  sentry_flutter: ^8.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

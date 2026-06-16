@@ -21,6 +21,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, TypedDict
 from uuid import UUID
 
+from app.core.cache import cache_response
 from app.domains.discovery.repository import DiscoveryRepository
 from app.domains.discovery.strategies import RecommendationStrategy, cosine_similarity
 
@@ -76,6 +77,7 @@ class DiscoveryService:
                 ]
         return await self.get_recommendations(user_id)
 
+    @cache_response(key_pattern="recommendations:{user_id}", ttl=3600)
     async def get_recommendations(
         self,
         user_id: UUID,

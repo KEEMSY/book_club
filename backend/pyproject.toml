@@ -24,6 +24,8 @@ dependencies = [
     "redis[hiredis]>=5.0",
     "scipy>=1.13",
     "scikit-learn>=1.5",
+    "prometheus-fastapi-instrumentator>=6.0.0",
+    "sentry-sdk[fastapi]>=2.0.0",
 ]
 
 [dependency-groups]
@@ -96,6 +98,14 @@ ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
 module = ["apscheduler.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["prometheus_fastapi_instrumentator.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["sentry_sdk.*"]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]

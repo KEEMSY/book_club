@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'app.dart';
 import 'features/onboarding/presentation/onboarding_screen.dart';
@@ -16,6 +17,29 @@ const String _kakaoNativeAppKey = String.fromEnvironment(
 );
 
 Future<void> main() async {
+  const dsn = String.fromEnvironment('SENTRY_DSN', defaultValue: '');
+
+  // Skip Sentry entirely in local dev to keep cold-start overhead minimal.
+  if (dsn.isEmpty) {
+    await _runApp();
+    return;
+  }
+
+  await SentryFlutter.init(
+    (options) {
+      options.dsn = dsn;
+      // Sample 10 % of transactions to stay within the free quota.
+      options.tracesSampleRate = 0.1;
+      options.environment = const String.fromEnvironment(
+        'APP_ENV',
+        defaultValue: 'development',
+      );
+    },
+    appRunner: _runApp,
+  );
+}
+
+Future<void> _runApp() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Preload Playfair Display before the first frame so CanvasKit has the Latin

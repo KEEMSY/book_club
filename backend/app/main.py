@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
+import sentry_sdk
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from app import __version__
 from app.api import health
@@ -78,12 +81,24 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     scheduler.shutdown(wait=False)
 
 
+def _init_sentry() -> None:
+    """Initialise Sentry only when SENTRY_DSN is set in the environment.
+
+    Keeping initialisation conditional avoids noise in local / CI runs where
+    no DSN is configured while ensuring production errors are reported.
+    """
+    dsn = os.getenv("SENTRY_DSN")
+    if dsn:
+        sentry_sdk.init(dsn=dsn, traces_sample_rate=0.1)
+
+
 def create_app() -> FastAPI:
     """Build and configure the FastAPI application.
 
     Use a factory (instead of a module-level global) so tests and alternative
     entry points can assemble their own configured instances cleanly.
     """
+    _init_sentry()
     settings = get_settings()
 
     app = FastAPI(
@@ -131,6 +146,10 @@ def create_app() -> FastAPI:
     app.include_router(experiment_router)
     app.include_router(retention_router)
     app.include_router(shield_router)
+
+    # Expose /metrics for Prometheus scraping; instrument after all routers are
+    # registered so every route is covered from the start.
+    Instrumentator().instrument(app).expose(app)
 
     return app
 

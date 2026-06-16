@@ -127,10 +127,31 @@ services:
       "
     restart: "no"
 
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./infra/prometheus:/etc/prometheus
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./infra/grafana:/etc/grafana/provisioning
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
 volumes:
   postgres_data:
     name: bookclub_postgres_data
   minio_data:
     name: bookclub_minio_data
+  grafana_data:
+    name: bookclub_grafana_data
 
 # Default bridge network is created automatically as `bookclub_default`.
