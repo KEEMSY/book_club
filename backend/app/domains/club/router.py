@@ -37,6 +37,7 @@ router = APIRouter(prefix="/clubs", tags=["clubs"])
 
 async def _to_public(club: ReadingClub, repo: ClubRepository) -> ClubPublic:
     count = await repo.member_count(club.id)
+    tags = await repo.get_club_tags(club.id)
     return ClubPublic(
         id=club.id,
         name=club.name,
@@ -48,6 +49,8 @@ async def _to_public(club: ReadingClub, repo: ClubRepository) -> ClubPublic:
         max_members=club.max_members,
         member_count=count,
         is_public=club.is_public,
+        category=club.category,
+        tags=tags,
         created_at=club.created_at,
     )
 
@@ -94,18 +97,33 @@ async def list_public_clubs(
         Query(description="ISO-8601 created_at of the last item on the previous page"),
     ] = None,
     limit: Annotated[int, Query(ge=1, le=100)] = 20,
+    category: Annotated[str | None, Query(max_length=32)] = None,
+    tag: Annotated[str | None, Query(max_length=32)] = None,
 ) -> PublicClubListResponse:
     clubs = await service.list_public_clubs(
         search=search,
         sort=sort,
         cursor=cursor,
         limit=limit + 1,
+        category=category,
+        tag=tag,
     )
     has_more = len(clubs) > limit
     page = clubs[:limit]
     items = [await _to_public(c, service.repo) for c in page]
     next_cursor = page[-1].created_at.isoformat() if has_more else None
     return PublicClubListResponse(items=items, next_cursor=next_cursor)
+
+
+@router.get("/recommended", response_model=PublicClubListResponse)
+async def recommended_clubs(
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+    limit: Annotated[int, Query(ge=1, le=20)] = 6,
+) -> PublicClubListResponse:
+    clubs = await service.get_recommended_clubs(UUID(user_id), limit=limit)
+    items = [await _to_public(c, service.repo) for c in clubs]
+    return PublicClubListResponse(items=items, next_cursor=None)
 
 
 @router.post("/{club_id}/join-public", response_model=ClubPublic, status_code=status.HTTP_200_OK)

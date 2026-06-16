@@ -15,6 +15,7 @@ from app.domains.club.models import (
     ClubMessage,
     ClubRole,
     ClubRoom,
+    ClubTag,
     EventAttendee,
     MessageRead,
     ReadingClub,
@@ -35,6 +36,8 @@ class ClubRepository:
         book_id: UUID | None,
         max_members: int,
         is_public: bool = False,
+        category: str | None = None,
+        tags: list[str] | None = None,
     ) -> ReadingClub:
         club = ReadingClub(
             id=uuid4(),
@@ -44,6 +47,7 @@ class ClubRepository:
             book_id=book_id,
             max_members=max_members,
             is_public=is_public,
+            category=category,
             invite_code=secrets.token_urlsafe(6).upper()[:8],
             created_at=datetime.now(),
         )
@@ -57,6 +61,9 @@ class ClubRepository:
                 joined_at=datetime.now(),
             )
         )
+        if tags:
+            for tag in tags:
+                self._session.add(ClubTag(club_id=club.id, tag=tag))
         await self._session.flush()
         return club
 
@@ -121,6 +128,139 @@ class ClubRepository:
             stmt = stmt.order_by(ReadingClub.created_at.desc())
 
         stmt = stmt.limit(limit)
+        rows = await self._session.execute(stmt)
+        return list(rows.scalars().all())
+
+    async def list_public_clubs(
+        self,
+        *,
+        category: str | None = None,
+        tag: str | None = None,
+        sort: str = "popular",
+        limit: int = 20,
+        cursor: str | None = None,
+    ) -> list[ReadingClub]:
+        """Return public clubs filtered by category and/or tag.
+
+        Supports cursor-based pagination where cursor is an ISO-8601 created_at
+        string.  sort='popular' orders by member count descending; 'new'/'newest'
+        orders by created_at descending.
+        """
+        member_count_subq = (
+            select(func.count())
+            .select_from(ClubMember)
+            .where(ClubMember.club_id == ReadingClub.id)
+            .correlate(ReadingClub)
+            .scalar_subquery()
+        )
+
+        stmt = select(ReadingClub).where(ReadingClub.is_public.is_(True))
+
+        if category is not None:
+            stmt = stmt.where(ReadingClub.category == category)
+
+        if tag is not None:
+            tag_subq = (
+                select(ClubTag.club_id)
+                .where(ClubTag.tag == tag)
+                .scalar_subquery()
+            )
+            stmt = stmt.where(ReadingClub.id.in_(tag_subq))
+
+        cursor_dt: datetime | None = None
+        if cursor is not None:
+            try:
+                cursor_dt = datetime.fromisoformat(cursor)
+            except ValueError:
+                cursor_dt = None
+
+        if sort == "popular":
+            if cursor_dt is not None:
+                stmt = stmt.where(ReadingClub.created_at < cursor_dt)
+            stmt = stmt.order_by(member_count_subq.desc(), ReadingClub.created_at.desc())
+        else:
+            if cursor_dt is not None:
+                stmt = stmt.where(ReadingClub.created_at < cursor_dt)
+            stmt = stmt.order_by(ReadingClub.created_at.desc())
+
+        stmt = stmt.limit(limit)
+        rows = await self._session.execute(stmt)
+        return list(rows.scalars().all())
+
+    async def recommended_clubs(
+        self,
+        *,
+        user_id: UUID,
+        limit: int = 6,
+    ) -> list[ReadingClub]:
+        """Return public clubs matching the user's top genre preferences.
+
+        Reads the user's genre_vector from user_taste_profiles, picks the top-2
+        genres by count, then returns public clubs whose category matches any of
+        those genres, ordered by member count descending.  Falls back to popular
+        public clubs when no taste profile exists.
+        """
+        from app.domains.book.models import UserTasteProfile
+
+        profile = await self._session.get(UserTasteProfile, user_id)
+
+        member_count_subq = (
+            select(func.count())
+            .select_from(ClubMember)
+            .where(ClubMember.club_id == ReadingClub.id)
+            .correlate(ReadingClub)
+            .scalar_subquery()
+        )
+
+        base_stmt = (
+            select(ReadingClub)
+            .where(ReadingClub.is_public.is_(True))
+            .order_by(member_count_subq.desc(), ReadingClub.created_at.desc())
+            .limit(limit)
+        )
+
+        if profile is None or not profile.genre_vector:
+            rows = await self._session.execute(base_stmt)
+            return list(rows.scalars().all())
+
+        # Pick top-2 genres by weight.
+        top_genres = sorted(profile.genre_vector.items(), key=lambda kv: kv[1], reverse=True)
+        top_genre_names = [g for g, _ in top_genres[:2]]
+
+        stmt = base_stmt.where(ReadingClub.category.in_(top_genre_names))
+        rows = await self._session.execute(stmt)
+        clubs = list(rows.scalars().all())
+
+        # Pad with popular clubs when there are not enough category matches.
+        if len(clubs) < limit:
+            existing_ids = [c.id for c in clubs]
+            fill_stmt = select(ReadingClub).where(ReadingClub.is_public.is_(True))
+            if existing_ids:
+                fill_stmt = fill_stmt.where(ReadingClub.id.not_in(existing_ids))
+            fill_stmt = (
+                fill_stmt
+                .order_by(member_count_subq.desc(), ReadingClub.created_at.desc())
+                .limit(limit - len(clubs))
+            )
+            fill_rows = await self._session.execute(fill_stmt)
+            clubs += list(fill_rows.scalars().all())
+
+        return clubs[:limit]
+
+    # --- tag helpers ---
+
+    async def set_club_tags(self, club_id: UUID, tags: list[str]) -> None:
+        """Replace all tags for a club with the supplied list."""
+        await self._session.execute(
+            delete(ClubTag).where(ClubTag.club_id == club_id)
+        )
+        for tag in tags:
+            self._session.add(ClubTag(club_id=club_id, tag=tag))
+        await self._session.flush()
+
+    async def get_club_tags(self, club_id: UUID) -> list[str]:
+        """Return the list of tag strings for a club."""
+        stmt = select(ClubTag.tag).where(ClubTag.club_id == club_id)
         rows = await self._session.execute(stmt)
         return list(rows.scalars().all())
 

@@ -15,6 +15,7 @@ from sqlalchemy import (
     SmallInteger,
     String,
     Text,
+    UniqueConstraint,
 )
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -59,6 +60,8 @@ class ReadingClub(Base):
     )
     max_members: Mapped[int] = mapped_column(SmallInteger, nullable=False, default=10)
     is_public: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="false")
+    # Coarse genre category, e.g. '소설', '자기계발', '인문학', '과학', '기타'.
+    category: Mapped[str | None] = mapped_column(String(32), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, default=lambda: datetime.now()
     )
@@ -69,6 +72,32 @@ class ReadingClub(Base):
     events: Mapped[list[ClubEvent]] = relationship(
         "ClubEvent", back_populates="club", cascade="all, delete-orphan"
     )
+    tags: Mapped[list[ClubTag]] = relationship(
+        "ClubTag", back_populates="club", cascade="all, delete-orphan"
+    )
+
+
+class ClubTag(Base):
+    """Fine-grained label attached to a reading club."""
+
+    __tablename__ = "club_tags"
+    __table_args__ = (
+        UniqueConstraint("club_id", "tag", name="uq_club_tags_club_tag"),
+        Index("idx_club_tags_club", "club_id"),
+        Index("idx_club_tags_tag", "tag"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    club_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("reading_clubs.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    tag: Mapped[str] = mapped_column(String(32), nullable=False)
+
+    club: Mapped[ReadingClub] = relationship("ReadingClub", back_populates="tags")
 
 
 class ClubMember(Base):

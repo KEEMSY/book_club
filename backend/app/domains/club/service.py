@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+import json
+import logging
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Literal, Protocol
 from uuid import UUID
+
+import redis.asyncio as aioredis
 
 from app.core.exceptions import ConflictError, NotFoundError, PermissionDeniedError
 from app.core.ws_manager import ws_manager
@@ -22,6 +26,8 @@ from app.domains.club.schemas import (
     CreateClubRequest,
     MessageListResponse,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class FeedClubPort(Protocol):
@@ -42,6 +48,8 @@ class ClubService:
     # Optional — existing callers that do not wire the feed service continue to
     # work; CLUB_JOINED events are silently skipped when absent.
     feed_service: FeedClubPort | None = field(default=None)
+    # Optional Redis client for recommendation caching; skipped when absent.
+    redis: aioredis.Redis | None = field(default=None)
 
     async def create_club(self, *, user_id: UUID, req: CreateClubRequest) -> ReadingClub:
         return await self.repo.create(
@@ -51,6 +59,8 @@ class ClubService:
             book_id=req.book_id,
             max_members=req.max_members,
             is_public=req.is_public,
+            category=req.category,
+            tags=req.tags,
         )
 
     async def get_club(self, club_id: UUID) -> ReadingClub:
@@ -76,17 +86,67 @@ class ClubService:
     async def list_public_clubs(
         self,
         *,
-        search: str | None,
-        sort: Literal["popular", "newest"],
-        cursor: datetime | None,
-        limit: int,
+        search: str | None = None,
+        sort: Literal["popular", "newest"] = "newest",
+        cursor: datetime | None = None,
+        limit: int = 20,
+        category: str | None = None,
+        tag: str | None = None,
     ) -> list[ReadingClub]:
+        # When category/tag filters are present use the richer repository method.
+        if category is not None or tag is not None:
+            cursor_str = cursor.isoformat() if cursor is not None else None
+            return await self.repo.list_public_clubs(
+                category=category,
+                tag=tag,
+                sort=sort,
+                limit=limit,
+                cursor=cursor_str,
+            )
         return await self.repo.list_public(
             search=search,
             sort=sort,
             cursor=cursor,
             limit=limit,
         )
+
+    async def get_recommended_clubs(
+        self, user_id: UUID, limit: int = 6
+    ) -> list[ReadingClub]:
+        """Return clubs recommended for the user based on their taste profile.
+
+        Caches the resolved club-ID list in Redis under
+        'club_recommendations:{user_id}' for 1 hour, then re-fetches the
+        ReadingClub rows by ID on a cache hit.  Falls back to a fresh DB query
+        when Redis is unavailable or the key has expired.
+        """
+        cache_key = f"club_recommendations:{user_id}"
+
+        if self.redis is not None:
+            try:
+                cached = await self.redis.get(cache_key)
+                if cached:
+                    club_id_strs: list[str] = json.loads(cached)
+                    club_ids = [UUID(cid) for cid in club_id_strs]
+                    clubs: list[ReadingClub] = []
+                    for cid in club_ids:
+                        club = await self.repo.get_by_id(cid)
+                        if club is not None:
+                            clubs.append(club)
+                    return clubs
+            except Exception:
+                logger.warning("Redis get failed for %s", cache_key, exc_info=True)
+
+        clubs = await self.repo.recommended_clubs(user_id=user_id, limit=limit)
+
+        if self.redis is not None:
+            try:
+                payload = [str(c.id) for c in clubs]
+                await self.redis.set(cache_key, json.dumps(payload), ex=3600)
+            except Exception:
+                logger.warning("Redis set failed for %s", cache_key, exc_info=True)
+
+        return clubs
 
     async def join_public(self, *, club_id: UUID, user_id: UUID) -> ReadingClub:
         club = await self.repo.get_by_id(club_id)

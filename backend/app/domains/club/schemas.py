@@ -12,6 +12,8 @@ class CreateClubRequest(BaseModel):
     book_id: UUID | None = None
     max_members: int = Field(default=10, ge=2, le=50)
     is_public: bool = False
+    category: str | None = Field(default=None, max_length=32)
+    tags: list[str] = Field(default_factory=list)
 
 
 class ClubPublic(BaseModel):
@@ -25,6 +27,8 @@ class ClubPublic(BaseModel):
     max_members: int
     member_count: int
     is_public: bool
+    category: str | None = None
+    tags: list[str] = Field(default_factory=list)
     created_at: datetime
 
 
