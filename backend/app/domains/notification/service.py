@@ -323,6 +323,50 @@ class NotificationService:
                 {"week_start": str(week_start)},
             )
 
+    async def send_reengagement_push(
+        self,
+        *,
+        user_id: UUID,
+        push_type: str,
+    ) -> None:
+        """Send a re-engagement push to a user who has been inactive.
+
+        Retrieves the user's current device tokens and delivers the push.
+        The push_type discriminator ('day7_inactive') controls copy so
+        future campaign types can share this method.
+        """
+        copy: dict[str, tuple[str, str]] = {
+            "day7_inactive": (
+                "다시 독서를 시작해 볼까요? 📚",
+                "7일 동안 독서 기록이 없어요. 오늘 잠깐이라도 읽어 보세요!",
+            ),
+            "streak_recovery": (
+                "스트릭을 되찾아 보세요! 🔥",
+                "스트릭 복구권을 사용해 독서 연속 기록을 이어 가세요.",
+            ),
+        }
+        title, body = copy.get(push_type, ("Book Club", ""))
+
+        async with self.sessionmaker() as session:
+            await self._save_notification(
+                session,
+                user_id=user_id,
+                ntype=NotificationType.STREAK_WARNING,
+                title=title,
+                body=body,
+                data={"push_type": push_type},
+            )
+            tokens = await self.device_tokens.get_active_tokens(user_id)
+            await session.commit()
+
+        if tokens:
+            await self.push.send_to_tokens(
+                tokens,
+                title,
+                body,
+                {"push_type": push_type},
+            )
+
     async def send_streak_warning_push(
         self,
         *,

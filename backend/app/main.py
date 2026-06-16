@@ -13,6 +13,7 @@ from app.api import health
 from app.api.admin import router as admin_router
 from app.core.config import get_settings
 from app.core.exceptions import register_exception_handlers
+from app.core.middleware import LastActiveMiddleware
 from app.domains.admin.router import router as admin_dashboard_router
 from app.domains.auth.router import router as auth_router
 from app.domains.book.events import UserBookCompleted
@@ -23,8 +24,10 @@ from app.domains.challenge.router import router as challenge_router
 from app.domains.club.router import router as club_router
 from app.domains.club.ws_router import router as club_ws_router
 from app.domains.community.router import router as community_router
+from app.domains.curation.router import router as curation_router
 from app.domains.discovery.providers import run_cf_retrain
 from app.domains.discovery.router import router as discovery_router
+from app.domains.experiment.router import router as experiment_router
 from app.domains.feed.events import CommentAdded, ReactionAdded
 from app.domains.feed.router import router as feed_router
 from app.domains.notification.providers import create_scheduler, get_notification_service
@@ -35,11 +38,10 @@ from app.domains.reading.router import me_router as reading_me_router
 from app.domains.reading.router import router as reading_router
 from app.domains.referral.router import router as referral_router
 from app.domains.reminder.router import router as reminder_router
+from app.domains.retention.router import router as retention_router
 from app.domains.search.router import router as search_router
 from app.domains.social.events import FollowReceived
 from app.domains.social.router import router as social_router
-from app.domains.curation.router import router as curation_router
-from app.domains.experiment.router import router as experiment_router
 from app.domains.subscription.router import router as subscription_router
 
 
@@ -104,6 +106,7 @@ def create_app() -> FastAPI:
     )
 
     register_exception_handlers(app)
+    app.add_middleware(LastActiveMiddleware)
     app.include_router(health.router)
     app.include_router(auth_router)
     app.include_router(book_router)
@@ -125,6 +128,7 @@ def create_app() -> FastAPI:
     app.include_router(search_router)
     app.include_router(curation_router)
     app.include_router(experiment_router)
+    app.include_router(retention_router)
 
     return app
 
