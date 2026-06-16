@@ -352,19 +352,16 @@ class _ReadingApi implements ReadingApi {
   }
 
   @override
-  Future<ReadingRecapDto> getRecap({
-    required int year,
-    required int half,
-  }) async {
+  Future<ReadingRecapDto> getRecap({required String period}) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{r'year': year, r'half': half};
+    final queryParameters = <String, dynamic>{r'period': period};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<ReadingRecapDto>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/reading/recap',
+            '/me/reading-recap',
             queryParameters: queryParameters,
             data: _data,
           )

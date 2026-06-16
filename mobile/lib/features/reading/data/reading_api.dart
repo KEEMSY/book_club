@@ -77,10 +77,9 @@ abstract class ReadingApi {
     @Query('year') required int year,
   });
 
-  @GET('/reading/recap')
+  @GET('/me/reading-recap')
   Future<ReadingRecapDto> getRecap({
-    @Query('year') required int year,
-    @Query('half') required int half,
+    @Query('period') required String period,
   });
 
   /// `GET /me/reading-stats` — M21 full analytics summary.

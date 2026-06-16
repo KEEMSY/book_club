@@ -186,8 +186,9 @@ class ReadingRepository {
     required int year,
     required int half,
   }) async {
+    final String period = '$year-H$half';
     final ReadingRecapDto dto =
-        await _call(() => _api.getRecap(year: year, half: half));
+        await _call(() => _api.getRecap(period: period));
     return dto.toDomain();
   }
 
