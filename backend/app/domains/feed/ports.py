@@ -20,6 +20,9 @@ from uuid import UUID
 
 from app.domains.feed.models import (
     Comment,
+    FeedComment,
+    FeedEvent,
+    FeedEventReaction,
     Post,
     PostHighlight,
     PostType,
@@ -210,11 +213,17 @@ class HighlightWithBookId:
     book_id: UUID
 
 
-class FeedEventRepositoryPort(Protocol):
-    """Append-only log of per-user activity events.
+@dataclass(frozen=True, slots=True)
+class FeedEventWithReactionsItem:
+    """Service-layer composition of a FeedEvent with its reactions and comment count."""
 
-    The service only writes; reading events is out of scope for M37.
-    """
+    event: FeedEvent
+    reactions: list[FeedEventReaction]
+    comment_count: int
+
+
+class FeedEventRepositoryPort(Protocol):
+    """Append-only log of per-user activity events, with M47 read extensions."""
 
     async def create_event(
         self,
@@ -223,6 +232,57 @@ class FeedEventRepositoryPort(Protocol):
         event_type: str,
         metadata: dict[str, object] | None,
     ) -> object: ...
+
+    async def get_by_id(self, event_id: UUID) -> FeedEvent | None: ...
+
+    async def list_global(self, *, cursor: str | None, limit: int) -> list[FeedEvent]: ...
+
+    async def list_following(
+        self,
+        *,
+        user_id: UUID,
+        cursor: str | None,
+        limit: int,
+    ) -> list[FeedEvent]: ...
+
+    async def comment_counts_for_events(self, event_ids: list[UUID]) -> dict[UUID, int]: ...
+
+
+class FeedEventReactionRepositoryPort(Protocol):
+    """Reactions on feed_events (activity stream entries)."""
+
+    async def add(
+        self, *, event_id: UUID, user_id: UUID, emoji: str
+    ) -> FeedEventReaction: ...
+
+    async def remove(self, *, event_id: UUID, user_id: UUID, emoji: str) -> bool: ...
+
+    async def get_for_event(self, event_id: UUID) -> list[FeedEventReaction]: ...
+
+    async def get_for_events(
+        self, event_ids: list[UUID]
+    ) -> dict[UUID, list[FeedEventReaction]]: ...
+
+    async def has_reacted(self, *, event_id: UUID, user_id: UUID, emoji: str) -> bool: ...
+
+
+class FeedCommentRepositoryPort(Protocol):
+    """Comments on feed_events (activity stream entries)."""
+
+    async def create(
+        self,
+        *,
+        event_id: UUID,
+        user_id: UUID,
+        parent_id: UUID | None,
+        body: str,
+    ) -> FeedComment: ...
+
+    async def get_by_id(self, comment_id: UUID) -> FeedComment | None: ...
+
+    async def list_for_event(self, event_id: UUID) -> list[FeedComment]: ...
+
+    async def delete(self, *, comment_id: UUID, user_id: UUID) -> bool: ...
 
 
 class HighlightRepositoryPort(Protocol):

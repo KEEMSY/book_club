@@ -21,6 +21,8 @@ from app.domains.feed.adapters.r2_image_storage_adapter import R2ImageStorageAda
 from app.domains.feed.ports import AuthorView, BookSnapshot
 from app.domains.feed.repository import (
     CommentRepository,
+    FeedCommentRepository,
+    FeedEventReactionRepository,
     FeedEventRepository,
     HighlightRepository,
     PostRepository,
@@ -85,6 +87,7 @@ def get_feed_service(
     # One-shot after_commit hook ties event delivery to the request transaction.
     commit_and_publish(session, bus)
 
+    feed_event_repo = FeedEventRepository(session)
     return FeedService(
         posts=PostRepository(session),
         reactions=ReactionRepository(session),
@@ -94,7 +97,9 @@ def get_feed_service(
         highlights=HighlightRepository(session),
         bus=bus,
         stage_event=_stage,
-        feed_events=FeedEventRepository(session),
+        feed_events=feed_event_repo,
+        feed_event_reactions=FeedEventReactionRepository(session),
+        feed_comments_repo=FeedCommentRepository(session),
     )
 
 

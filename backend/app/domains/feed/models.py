@@ -238,6 +238,88 @@ class FeedEvent(Base):
     )
 
 
+class FeedEventReaction(Base):
+    """Emoji reaction by one user on a feed_event (activity stream entry).
+
+    UNIQUE on (feed_event_id, user_id, emoji) keeps toggle-on idempotent at
+    the DB level — a duplicate INSERT is handled by ON CONFLICT DO NOTHING in
+    the repository, mirroring the Reaction toggle pattern on posts.
+    """
+
+    __tablename__ = "feed_event_reactions"
+    __table_args__ = (
+        UniqueConstraint(
+            "feed_event_id", "user_id", "emoji", name="uq_feed_event_reactions_triple"
+        ),
+        Index("ix_feed_event_reactions_event_id", "feed_event_id"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    feed_event_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("feed_events.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    # One of: ❤️ 🔥 👏 📚 💪 — stored as the raw emoji string.
+    emoji: Mapped[str] = mapped_column(String(8), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+
+
+class FeedComment(Base):
+    """Comment on a feed_event. Supports 2-depth replies via parent_id.
+
+    Depth enforcement (parent must be a root comment) lives in the service
+    layer because the rule references parent state, not just this row.
+    The body CHECK (≤500 chars) is enforced at both the DB and Pydantic layers.
+    """
+
+    __tablename__ = "feed_comments"
+    __table_args__ = (
+        Index("ix_feed_comments_event_created", "feed_event_id", "created_at"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    feed_event_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("feed_events.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    parent_id: Mapped[uuid.UUID | None] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("feed_comments.id", ondelete="CASCADE"),
+        nullable=True,
+        index=True,
+    )
+    body: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
+
+
 class PostHighlight(Base):
     """A private quote saved by the user from a book they're reading.
 

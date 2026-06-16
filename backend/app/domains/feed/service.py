@@ -38,11 +38,23 @@ from uuid import UUID
 
 from app.core.exceptions import ConflictError, NotFoundError
 from app.domains.feed.events import CommentAdded, PostCreated, ReactionAdded
-from app.domains.feed.models import Comment, Post, PostHighlight, PostType, ReactionType
+from app.domains.feed.models import (
+    Comment,
+    FeedComment,
+    FeedEvent,
+    FeedEventReaction,
+    Post,
+    PostHighlight,
+    PostType,
+    ReactionType,
+)
 from app.domains.feed.ports import (
     CommentRepositoryPort,
     FeedBookQueryPort,
+    FeedCommentRepositoryPort,
+    FeedEventReactionRepositoryPort,
     FeedEventRepositoryPort,
+    FeedEventWithReactionsItem,
     HighlightRepositoryPort,
     ImageStoragePort,
     PostFeedItem,
@@ -113,6 +125,19 @@ class ReactionToggleResult:
 
 _STREAK_MILESTONES: frozenset[int] = frozenset({3, 7, 14, 30, 60, 100})
 
+_ALLOWED_FEED_EMOJIS: frozenset[str] = frozenset({"❤️", "🔥", "👏", "📚", "💪"})
+_FEED_COMMENT_MAX = 500
+_FEED_EVENT_PAGE_MAX = 50
+_FEED_EVENT_PAGE_MIN = 1
+
+
+@dataclass(frozen=True, slots=True)
+class FeedReactionToggleResult:
+    """Outcome of toggling a reaction on a feed_event."""
+
+    state: str  # "added" | "removed"
+    reactions: list[FeedEventReaction]
+
 
 @dataclass(slots=True)
 class FeedService:
@@ -131,6 +156,9 @@ class FeedService:
     # Optional — callers that do not need activity event recording (e.g. older
     # tests) can omit this; milestone methods silently no-op when absent.
     feed_events: FeedEventRepositoryPort | None = field(default=None)
+    # Optional — wired for M47 social feed; omit in older tests.
+    feed_event_reactions: FeedEventReactionRepositoryPort | None = field(default=None)
+    feed_comments_repo: FeedCommentRepositoryPort | None = field(default=None)
 
     async def request_image_upload(
         self,
@@ -487,6 +515,215 @@ class FeedService:
         return result
 
 
+    # ------------------------------------------------------------------
+    # M47 — Social feed: following feed, reactions & comments on events
+    # ------------------------------------------------------------------
+
+    async def get_global_feed(
+        self,
+        *,
+        cursor: str | None,
+        limit: int,
+    ) -> list[FeedEventWithReactionsItem]:
+        """All feed events, newest-first, enriched with reactions and comment counts."""
+        if self.feed_events is None:
+            return []
+        clamped = max(_FEED_EVENT_PAGE_MIN, min(limit, _FEED_EVENT_PAGE_MAX))
+        events = await self.feed_events.list_global(cursor=cursor, limit=clamped)
+        return await self._enrich_events(events)
+
+    async def get_following_feed(
+        self,
+        user_id: UUID,
+        *,
+        cursor: str | None,
+        limit: int,
+    ) -> list[FeedEventWithReactionsItem]:
+        """Feed events from users that ``user_id`` follows, enriched with reactions."""
+        if self.feed_events is None:
+            return []
+        clamped = max(_FEED_EVENT_PAGE_MIN, min(limit, _FEED_EVENT_PAGE_MAX))
+        events = await self.feed_events.list_following(
+            user_id=user_id, cursor=cursor, limit=clamped
+        )
+        return await self._enrich_events(events)
+
+    async def toggle_feed_reaction(
+        self,
+        *,
+        event_id: UUID,
+        user_id: UUID,
+        emoji: str,
+    ) -> FeedReactionToggleResult:
+        """Toggle a reaction emoji on a feed_event. Returns state + updated reactions."""
+        if emoji not in _ALLOWED_FEED_EMOJIS:
+            raise ConflictError("unsupported emoji", code="UNSUPPORTED_EMOJI")
+        if self.feed_events is None or self.feed_event_reactions is None:
+            raise NotFoundError("feed event not found", code="FEED_EVENT_NOT_FOUND")
+
+        event = await self.feed_events.get_by_id(event_id)
+        if event is None:
+            raise NotFoundError("feed event not found", code="FEED_EVENT_NOT_FOUND")
+
+        already = await self.feed_event_reactions.has_reacted(
+            event_id=event_id, user_id=user_id, emoji=emoji
+        )
+        if already:
+            await self.feed_event_reactions.remove(
+                event_id=event_id, user_id=user_id, emoji=emoji
+            )
+            state = "removed"
+        else:
+            await self.feed_event_reactions.add(
+                event_id=event_id, user_id=user_id, emoji=emoji
+            )
+            state = "added"
+            # Fire-and-forget push to event author (non-self only).
+            if user_id != event.user_id:
+                await self._push_feed_reaction(
+                    actor_id=user_id,
+                    target_user_id=event.user_id,
+                    event_id=event_id,
+                )
+
+        reactions = await self.feed_event_reactions.get_for_event(event_id)
+        return FeedReactionToggleResult(state=state, reactions=reactions)
+
+    async def add_feed_comment(
+        self,
+        *,
+        event_id: UUID,
+        user_id: UUID,
+        parent_id: UUID | None,
+        body: str,
+    ) -> FeedComment:
+        """Create a comment on a feed_event; enforce body length and depth ≤ 2."""
+        if not body:
+            raise ConflictError("body empty", code="BODY_EMPTY")
+        if len(body) > _FEED_COMMENT_MAX:
+            raise ConflictError("body too long", code="BODY_TOO_LONG")
+        if self.feed_events is None or self.feed_comments_repo is None:
+            raise NotFoundError("feed event not found", code="FEED_EVENT_NOT_FOUND")
+
+        event = await self.feed_events.get_by_id(event_id)
+        if event is None:
+            raise NotFoundError("feed event not found", code="FEED_EVENT_NOT_FOUND")
+
+        if parent_id is not None:
+            parent = await self.feed_comments_repo.get_by_id(parent_id)
+            if parent is None or parent.feed_event_id != event_id:
+                raise NotFoundError("parent comment not found", code="COMMENT_NOT_FOUND")
+            if parent.parent_id is not None:
+                raise ConflictError("comment depth exceeded", code="COMMENT_DEPTH_EXCEEDED")
+
+        comment = await self.feed_comments_repo.create(
+            event_id=event_id,
+            user_id=user_id,
+            parent_id=parent_id,
+            body=body,
+        )
+        # Fire-and-forget push to event author (non-self only).
+        if user_id != event.user_id:
+            await self._push_feed_comment(
+                actor_id=user_id,
+                target_user_id=event.user_id,
+                event_id=event_id,
+            )
+        return comment
+
+    async def get_feed_comments(self, event_id: UUID) -> list[FeedComment]:
+        """Return comments for a feed_event as a flat list ordered by created_at ASC."""
+        if self.feed_comments_repo is None:
+            return []
+        return await self.feed_comments_repo.list_for_event(event_id)
+
+    async def delete_feed_comment(self, *, comment_id: UUID, user_id: UUID) -> None:
+        """Delete a feed comment; raises NotFoundError if missing or not owned by user."""
+        if self.feed_comments_repo is None:
+            raise NotFoundError("comment not found", code="COMMENT_NOT_FOUND")
+        deleted = await self.feed_comments_repo.delete(comment_id=comment_id, user_id=user_id)
+        if not deleted:
+            raise NotFoundError("comment not found", code="COMMENT_NOT_FOUND")
+
+    # ------------------------------------------------------------------
+    # Private helpers
+    # ------------------------------------------------------------------
+
+    async def _enrich_events(
+        self, events: list[FeedEvent]
+    ) -> list[FeedEventWithReactionsItem]:
+        if not events or self.feed_events is None or self.feed_event_reactions is None:
+            return [
+                FeedEventWithReactionsItem(event=ev, reactions=[], comment_count=0)
+                for ev in events
+            ]
+        event_ids = [ev.id for ev in events]
+        reactions_map = await self.feed_event_reactions.get_for_events(event_ids)
+        comment_counts = await self.feed_events.comment_counts_for_events(event_ids)
+        return [
+            FeedEventWithReactionsItem(
+                event=ev,
+                reactions=reactions_map.get(ev.id, []),
+                comment_count=comment_counts.get(ev.id, 0),
+            )
+            for ev in events
+        ]
+
+    async def _push_feed_reaction(
+        self,
+        *,
+        actor_id: UUID,
+        target_user_id: UUID,
+        event_id: UUID,
+    ) -> None:
+        """Send push notification for a feed reaction — errors are silently swallowed."""
+        try:
+            from app.domains.notification.providers import get_notification_service
+
+            svc = get_notification_service()
+            async with svc.sessionmaker() as session:
+                from app.domains.auth.repository import UserRepository
+                user = await UserRepository(session).get_by_id(actor_id)
+                nickname = (user.nickname or "누군가") if user else "누군가"
+            tokens = await svc.device_tokens.get_active_tokens(target_user_id)
+            if tokens:
+                await svc.push.send_to_tokens(
+                    tokens=tokens,
+                    title="새 리액션",
+                    body=f"{nickname}님이 회원님의 활동에 반응했습니다.",
+                    data={"type": "feed_reaction", "event_id": str(event_id)},
+                )
+        except Exception:
+            pass  # fire-and-forget: push failure must not affect the main flow
+
+    async def _push_feed_comment(
+        self,
+        *,
+        actor_id: UUID,
+        target_user_id: UUID,
+        event_id: UUID,
+    ) -> None:
+        """Send push notification for a feed comment — errors are silently swallowed."""
+        try:
+            from app.domains.notification.providers import get_notification_service
+
+            svc = get_notification_service()
+            async with svc.sessionmaker() as session:
+                from app.domains.auth.repository import UserRepository
+                user = await UserRepository(session).get_by_id(actor_id)
+                nickname = (user.nickname or "누군가") if user else "누군가"
+            tokens = await svc.device_tokens.get_active_tokens(target_user_id)
+            if tokens:
+                await svc.push.send_to_tokens(
+                    tokens=tokens,
+                    title="새 댓글",
+                    body=f"{nickname}님이 회원님의 활동에 댓글을 남겼습니다.",
+                    data={"type": "feed_comment", "event_id": str(event_id)},
+                )
+        except Exception:
+            pass  # fire-and-forget: push failure must not affect the main flow
+
+
 def _parse_iso_cursor(cursor: str | None) -> datetime | None:
     if cursor is None or cursor == "":
         return None
@@ -505,6 +742,7 @@ __all__ = [
     "BookHighlightGroup",
     "CommentAdded",
     "CommentPage",
+    "FeedEventWithReactionsItem",
     "FeedPage",
     "FeedService",
     "HighlightPage",

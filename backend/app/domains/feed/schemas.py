@@ -171,15 +171,102 @@ class AllHighlightsResponse(BaseModel):
     groups: list[BookHighlightGroupPublic]
 
 
+_ALLOWED_EMOJIS: frozenset[str] = frozenset({"❤️", "🔥", "👏", "📚", "💪"})
+
+
+class FeedEventReactionPublic(BaseModel):
+    """Single emoji reaction on a feed_event."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    emoji: str
+    user_id: UUID
+    created_at: datetime
+
+
+class FeedCommentPublic(BaseModel):
+    """Comment (or reply) on a feed_event, with nested replies list."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    body: str
+    user_id: UUID
+    event_id: UUID = Field(alias="feed_event_id")
+    parent_id: UUID | None
+    created_at: datetime
+    replies: list[FeedCommentPublic] = Field(default_factory=list)
+
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+
+
+class FeedEventPublic(BaseModel):
+    """Serialised feed_event row for the activity timeline."""
+
+    id: UUID
+    user_id: UUID
+    event_type: str
+    event_metadata: dict[str, object] | None
+    created_at: datetime
+
+
+class FeedEventWithReactions(BaseModel):
+    """Feed event enriched with reactions and comment count for the timeline."""
+
+    id: UUID
+    user_id: UUID
+    event_type: str
+    event_metadata: dict[str, object] | None
+    created_at: datetime
+    reactions: list[FeedEventReactionPublic]
+    comment_count: int
+
+
+class FeedEventPage(BaseModel):
+    """Cursor-paged list of feed events with reactions."""
+
+    items: list[FeedEventWithReactions]
+    next_cursor: str | None
+
+
+class AddFeedEventReactionRequest(BaseModel):
+    emoji: str = Field(
+        description="One of ❤️ 🔥 👏 📚 💪",
+    )
+
+
+class ToggleFeedReactionResponse(BaseModel):
+    state: Literal["added", "removed"]
+    reactions: list[FeedEventReactionPublic]
+
+
+class CreateFeedCommentRequest(BaseModel):
+    body: str = Field(min_length=1, max_length=500)
+    parent_id: UUID | None = None
+
+
+class FeedCommentListResponse(BaseModel):
+    items: list[FeedCommentPublic]
+
+
 __all__ = [
+    "AddFeedEventReactionRequest",
     "AllHighlightsResponse",
     "AuthorPublic",
     "BookHighlightGroupPublic",
     "CommentPublic",
     "CommentResponse",
     "CreateCommentRequest",
+    "CreateFeedCommentRequest",
     "CreateHighlightRequest",
     "CreatePostRequest",
+    "FeedCommentListResponse",
+    "FeedCommentPublic",
+    "FeedEventPage",
+    "FeedEventPublic",
+    "FeedEventReactionPublic",
+    "FeedEventWithReactions",
     "FeedResponse",
     "HighlightPublic",
     "HighlightResponse",
@@ -187,6 +274,7 @@ __all__ = [
     "PresignedUploadResponse",
     "ReactionType",
     "RequestUploadRequest",
+    "ToggleFeedReactionResponse",
     "ToggleReactionRequest",
     "ToggleReactionResponse",
 ]

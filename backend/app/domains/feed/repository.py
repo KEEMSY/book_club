@@ -28,11 +28,20 @@ from collections import defaultdict
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import and_, delete, func, select
+from sqlalchemy import ColumnElement, and_, delete, func, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domains.feed.models import Comment, FeedEvent, Post, PostHighlight, Reaction, ReactionType
+from app.domains.feed.models import (
+    Comment,
+    FeedComment,
+    FeedEvent,
+    FeedEventReaction,
+    Post,
+    PostHighlight,
+    Reaction,
+    ReactionType,
+)
 from app.domains.feed.ports import HighlightWithBookId
 
 
@@ -389,3 +398,189 @@ class FeedEventRepository:
         await self._session.flush()
         await self._session.refresh(row)
         return row
+
+    async def get_by_id(self, event_id: UUID) -> FeedEvent | None:
+        return await self._session.get(FeedEvent, event_id)
+
+    async def list_global(self, *, cursor: str | None, limit: int) -> list[FeedEvent]:
+        """All events ordered newest-first, cursor-paged by created_at ISO string."""
+        cursor_dt: datetime | None = None
+        if cursor:
+            try:
+                cursor_dt = datetime.fromisoformat(cursor)
+            except ValueError:
+                cursor_dt = None
+        conditions: list[ColumnElement[bool]] = []
+        if cursor_dt is not None:
+            conditions.append(FeedEvent.created_at < cursor_dt)
+        stmt = select(FeedEvent).order_by(FeedEvent.created_at.desc(), FeedEvent.id.desc())
+        if conditions:
+            stmt = stmt.where(and_(*conditions))
+        stmt = stmt.limit(limit)
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def list_following(
+        self,
+        *,
+        user_id: UUID,
+        cursor: str | None,
+        limit: int,
+    ) -> list[FeedEvent]:
+        """Events from users that ``user_id`` follows, newest-first, cursor-paged."""
+        from app.domains.social.models import Follow
+
+        cursor_dt: datetime | None = None
+        if cursor:
+            try:
+                cursor_dt = datetime.fromisoformat(cursor)
+            except ValueError:
+                cursor_dt = None
+        followees_subq = (
+            select(Follow.followee_id).where(Follow.follower_id == user_id).scalar_subquery()
+        )
+        conditions: list[ColumnElement[bool]] = [FeedEvent.user_id.in_(followees_subq)]
+        if cursor_dt is not None:
+            conditions.append(FeedEvent.created_at < cursor_dt)
+        stmt = (
+            select(FeedEvent)
+            .where(and_(*conditions))
+            .order_by(FeedEvent.created_at.desc(), FeedEvent.id.desc())
+            .limit(limit)
+        )
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def comment_counts_for_events(self, event_ids: list[UUID]) -> dict[UUID, int]:
+        """Batch comment count per feed_event_id."""
+        if not event_ids:
+            return {}
+        stmt = (
+            select(FeedComment.feed_event_id, func.count(FeedComment.id))
+            .where(FeedComment.feed_event_id.in_(event_ids))
+            .group_by(FeedComment.feed_event_id)
+        )
+        result = await self._session.execute(stmt)
+        counts = {eid: cnt for eid, cnt in result.all()}
+        return {eid: counts.get(eid, 0) for eid in event_ids}
+
+
+class FeedEventReactionRepository:
+    """Persistence adapter for :class:`FeedEventReaction`."""
+
+    def __init__(self, session: AsyncSession) -> None:
+        self._session = session
+
+    async def add(self, *, event_id: UUID, user_id: UUID, emoji: str) -> FeedEventReaction:
+        """Insert reaction; return existing row if the triple already exists (idempotent)."""
+        stmt = (
+            pg_insert(FeedEventReaction)
+            .values(feed_event_id=event_id, user_id=user_id, emoji=emoji)
+            .on_conflict_do_nothing(constraint="uq_feed_event_reactions_triple")
+        )
+        await self._session.execute(stmt)
+        await self._session.flush()
+        select_stmt = select(FeedEventReaction).where(
+            FeedEventReaction.feed_event_id == event_id,
+            FeedEventReaction.user_id == user_id,
+            FeedEventReaction.emoji == emoji,
+        )
+        existing = (await self._session.execute(select_stmt)).scalar_one_or_none()
+        if existing is None:
+            raise RuntimeError("feed_event_reaction upsert vanished")
+        return existing
+
+    async def remove(self, *, event_id: UUID, user_id: UUID, emoji: str) -> bool:
+        """Delete a reaction triple; returns True if a row was deleted."""
+        existing_stmt = select(FeedEventReaction).where(
+            FeedEventReaction.feed_event_id == event_id,
+            FeedEventReaction.user_id == user_id,
+            FeedEventReaction.emoji == emoji,
+        )
+        existing = (await self._session.execute(existing_stmt)).scalar_one_or_none()
+        if existing is None:
+            return False
+        await self._session.execute(
+            delete(FeedEventReaction).where(FeedEventReaction.id == existing.id)
+        )
+        await self._session.flush()
+        return True
+
+    async def get_for_event(self, event_id: UUID) -> list[FeedEventReaction]:
+        stmt = select(FeedEventReaction).where(FeedEventReaction.feed_event_id == event_id)
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def get_for_events(
+        self, event_ids: list[UUID]
+    ) -> dict[UUID, list[FeedEventReaction]]:
+        """Batch-fetch reactions keyed by feed_event_id."""
+        if not event_ids:
+            return {}
+        stmt = select(FeedEventReaction).where(FeedEventReaction.feed_event_id.in_(event_ids))
+        result = await self._session.execute(stmt)
+        bucket: dict[UUID, list[FeedEventReaction]] = {eid: [] for eid in event_ids}
+        for row in result.scalars().all():
+            bucket[row.feed_event_id].append(row)
+        return bucket
+
+    async def has_reacted(self, *, event_id: UUID, user_id: UUID, emoji: str) -> bool:
+        stmt = select(FeedEventReaction.id).where(
+            FeedEventReaction.feed_event_id == event_id,
+            FeedEventReaction.user_id == user_id,
+            FeedEventReaction.emoji == emoji,
+        )
+        result = await self._session.execute(stmt)
+        return result.scalar_one_or_none() is not None
+
+
+class FeedCommentRepository:
+    """Persistence adapter for :class:`FeedComment`."""
+
+    def __init__(self, session: AsyncSession) -> None:
+        self._session = session
+
+    async def create(
+        self,
+        *,
+        event_id: UUID,
+        user_id: UUID,
+        parent_id: UUID | None,
+        body: str,
+    ) -> FeedComment:
+        row = FeedComment(
+            feed_event_id=event_id,
+            user_id=user_id,
+            parent_id=parent_id,
+            body=body,
+        )
+        self._session.add(row)
+        await self._session.flush()
+        await self._session.refresh(row)
+        return row
+
+    async def get_by_id(self, comment_id: UUID) -> FeedComment | None:
+        return await self._session.get(FeedComment, comment_id)
+
+    async def list_for_event(self, event_id: UUID) -> list[FeedComment]:
+        """All comments for an event ordered by (created_at ASC, id ASC).
+
+        Returns both root comments and replies in a flat list; the caller
+        assembles the tree. The service guarantees depth ≤ 2.
+        """
+        stmt = (
+            select(FeedComment)
+            .where(FeedComment.feed_event_id == event_id)
+            .order_by(FeedComment.created_at.asc(), FeedComment.id.asc())
+        )
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def delete(self, *, comment_id: UUID, user_id: UUID) -> bool:
+        """Hard-delete comment if owned by ``user_id``; returns True on success."""
+        row = await self._session.get(FeedComment, comment_id)
+        if row is None or row.user_id != user_id:
+            return False
+        await self._session.execute(delete(FeedComment).where(FeedComment.id == comment_id))
+        await self._session.flush()
+        return True
