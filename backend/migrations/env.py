@@ -39,6 +39,7 @@ from app.domains.book import models as _book_models  # noqa: E402, F401
 from app.domains.challenge import models as _challenge_models  # noqa: E402, F401
 from app.domains.feed import models as _feed_models  # noqa: E402, F401
 from app.domains.reading import models as _reading_models  # noqa: E402, F401
+from app.domains.shield import models as _shield_models  # noqa: E402, F401
 
 target_metadata = Base.metadata
 

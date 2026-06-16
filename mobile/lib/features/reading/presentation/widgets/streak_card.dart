@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../shield/presentation/shield_purchase_sheet.dart';
 
 /// "연속 N일 독서 중 🔥" card reused across the dashboard, grade screen,
 /// and timer screen. When [streak] is zero we fall back to the longest-
@@ -97,9 +98,15 @@ class StreakCard extends StatelessWidget {
                 ),
                 if (showRecover) ...<Widget>[
                   const SizedBox(height: 4),
-                  _RecoverButton(
-                    recoveriesRemaining: recoveriesRemaining,
-                    onRecover: onRecover,
+                  Row(
+                    children: <Widget>[
+                      _RecoverButton(
+                        recoveriesRemaining: recoveriesRemaining,
+                        onRecover: onRecover,
+                      ),
+                      const SizedBox(width: 8),
+                      _ShieldPurchaseButton(),
+                    ],
                   ),
                 ],
               ],
@@ -107,6 +114,27 @@ class StreakCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Compact text button that opens the shield purchase bottom sheet.
+class _ShieldPurchaseButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      onPressed: () => showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        builder: (_) => const ShieldPurchaseSheet(),
+      ),
+      style: TextButton.styleFrom(
+        padding: EdgeInsets.zero,
+        minimumSize: const Size(0, 0),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        visualDensity: VisualDensity.compact,
+      ),
+      child: const Text('쉴드 구매'),
     );
   }
 }

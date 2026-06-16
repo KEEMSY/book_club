@@ -42,6 +42,7 @@ from app.domains.retention.router import router as retention_router
 from app.domains.search.router import router as search_router
 from app.domains.social.events import FollowReceived
 from app.domains.social.router import router as social_router
+from app.domains.shield.router import router as shield_router
 from app.domains.subscription.router import router as subscription_router
 
 
@@ -129,6 +130,7 @@ def create_app() -> FastAPI:
     app.include_router(curation_router)
     app.include_router(experiment_router)
     app.include_router(retention_router)
+    app.include_router(shield_router)
 
     return app
 
