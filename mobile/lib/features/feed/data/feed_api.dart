@@ -5,14 +5,15 @@ import 'feed_models.dart';
 
 part 'feed_api.g.dart';
 
-/// Typed HTTP bindings for the M4 feed router.
+
+/// Typed HTTP bindings for the M4 feed router plus M47 global event feed.
 ///
 /// All paths sit outside `/auth/*`, so [AuthInterceptor] attaches the bearer
 /// automatically. Bodies stay as `Map<String, dynamic>` for the same
 /// freezed/retrofit_generator 9.7 introspection issue documented in
 /// `auth_api.dart`.
 ///
-/// Endpoints:
+/// Endpoints (M4):
 ///   * `POST /uploads/presign-image`
 ///   * `GET  /books/{book_id}/posts?cursor=&limit=`
 ///   * `POST /books/{book_id}/posts`
@@ -24,6 +25,14 @@ part 'feed_api.g.dart';
 ///   * `POST /me/library/{user_book_id}/highlights`
 ///   * `GET  /me/library/{user_book_id}/highlights?cursor=&limit=`
 ///   * `DELETE /me/library/{user_book_id}/highlights/{highlight_id}`
+///
+/// Endpoints (M47 — global event feed):
+///   * `GET    /feed`
+///   * `GET    /feed/following`
+///   * `POST   /feed/{event_id}/reactions`
+///   * `GET    /feed/{event_id}/comments`
+///   * `POST   /feed/{event_id}/comments`
+///   * `DELETE /feed/comments/{id}`
 @RestApi()
 abstract class FeedApi {
   factory FeedApi(Dio dio, {String baseUrl}) = _FeedApi;
@@ -99,4 +108,38 @@ abstract class FeedApi {
 
   @GET('/me/highlights')
   Future<AllHighlightsResponseDto> listAllHighlights();
+
+  // ── M47 global event feed ──────────────────────────────────────────────────
+
+  @GET('/feed')
+  Future<FeedEventPageDto> getGlobalFeed({
+    @Query('cursor') String? cursor,
+    @Query('limit') int limit = 20,
+  });
+
+  @GET('/feed/following')
+  Future<FeedEventPageDto> getFollowingEventFeed({
+    @Query('cursor') String? cursor,
+    @Query('limit') int limit = 20,
+  });
+
+  @POST('/feed/{event_id}/reactions')
+  Future<FeedReactionToggleDto> toggleFeedReaction(
+    @Path('event_id') String eventId,
+    @Body() Map<String, dynamic> body,
+  );
+
+  @GET('/feed/{event_id}/comments')
+  Future<FeedCommentListDto> getFeedComments(
+    @Path('event_id') String eventId,
+  );
+
+  @POST('/feed/{event_id}/comments')
+  Future<FeedCommentDto> createFeedComment(
+    @Path('event_id') String eventId,
+    @Body() Map<String, dynamic> body,
+  );
+
+  @DELETE('/feed/comments/{id}')
+  Future<void> deleteFeedComment(@Path('id') String commentId);
 }

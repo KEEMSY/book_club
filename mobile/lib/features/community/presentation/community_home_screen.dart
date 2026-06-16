@@ -6,10 +6,16 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../auth/application/auth_notifier.dart';
+import '../../auth/domain/auth_state.dart';
 import '../../club/presentation/clubs_tab.dart';
+import '../../feed/application/global_feed_notifier.dart';
+import '../../feed/domain/feed_event.dart';
 import '../../feed/domain/post.dart';
 import '../../feed/domain/reaction_type.dart';
 import '../../feed/presentation/comments_sheet.dart';
+import '../../feed/presentation/feed_comment_sheet.dart';
+import '../../feed/presentation/widgets/feed_event_card.dart';
 import '../../feed/presentation/widgets/post_card.dart';
 import '../../social/application/social_providers.dart';
 import '../../social/domain/user_summary.dart';
@@ -31,7 +37,7 @@ class _CommunityHomeScreenState extends ConsumerState<CommunityHomeScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
   }
 
   @override
@@ -66,7 +72,10 @@ class _CommunityHomeScreenState extends ConsumerState<CommunityHomeScreen>
         ],
         bottom: TabBar(
           controller: _tabController,
+          isScrollable: true,
+          tabAlignment: TabAlignment.start,
           tabs: const <Tab>[
+            Tab(text: '피드'),
             Tab(text: '팔로잉'),
             Tab(text: '탐색'),
             Tab(text: '인용'),
@@ -77,10 +86,267 @@ class _CommunityHomeScreenState extends ConsumerState<CommunityHomeScreen>
       body: TabBarView(
         controller: _tabController,
         children: <Widget>[
-          _FollowingFeedTab(onExploreTap: () => _tabController.animateTo(1)),
+          const _GlobalEventFeedSection(),
+          _FollowingFeedTab(onExploreTap: () => _tabController.animateTo(2)),
           const _ExploreTab(),
           const _HighlightFeedTab(),
           const ClubsTab(),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 피드 탭 — global activity event feed with 전체 / 팔로우 sub-tabs (M47)
+// ---------------------------------------------------------------------------
+
+class _GlobalEventFeedSection extends ConsumerStatefulWidget {
+  const _GlobalEventFeedSection();
+
+  @override
+  ConsumerState<_GlobalEventFeedSection> createState() =>
+      _GlobalEventFeedSectionState();
+}
+
+class _GlobalEventFeedSectionState
+    extends ConsumerState<_GlobalEventFeedSection>
+    with SingleTickerProviderStateMixin {
+  late final TabController _subTabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _subTabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _subTabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Column(
+      children: <Widget>[
+        TabBar(
+          controller: _subTabController,
+          tabs: const <Tab>[
+            Tab(text: '전체'),
+            Tab(text: '팔로우'),
+          ],
+          labelStyle: theme.textTheme.labelLarge
+              ?.copyWith(fontWeight: FontWeight.w600),
+        ),
+        Expanded(
+          child: TabBarView(
+            controller: _subTabController,
+            children: const <Widget>[
+              _GlobalEventFeedTab(tab: FeedTab.global),
+              _GlobalEventFeedTab(tab: FeedTab.following),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _GlobalEventFeedTab extends ConsumerWidget {
+  const _GlobalEventFeedTab({required this.tab});
+
+  final FeedTab tab;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+
+    // Watch the correct notifier based on the active tab.
+    final GlobalFeedState state = tab == FeedTab.global
+        ? ref.watch(globalFeedNotifierProvider)
+        : ref.watch(followingEventFeedNotifierProvider);
+
+    // Fetch-first is triggered by notifier build(); just handle UI states.
+    if (state.isLoading && state.items.isEmpty) {
+      return const Center(child: CircularProgressIndicator(strokeWidth: 2));
+    }
+
+    if (state.error != null && state.items.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Text('피드를 불러오지 못했어요', style: theme.textTheme.bodyMedium),
+            SizedBox(height: spacing.sm),
+            FilledButton(
+              onPressed: () => tab == FeedTab.global
+                  ? ref
+                      .read(globalFeedNotifierProvider.notifier)
+                      .fetchFirst()
+                  : ref
+                      .read(followingEventFeedNotifierProvider.notifier)
+                      .fetchFirst(),
+              child: const Text('다시 시도'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (state.items.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: EdgeInsets.all(spacing.lg),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Icon(
+                Icons.dynamic_feed_outlined,
+                size: 64,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+              ),
+              SizedBox(height: spacing.md),
+              Text(
+                tab == FeedTab.following
+                    ? '팔로우한 독자의 활동이 없어요'
+                    : '아직 활동 피드가 없어요',
+                style: theme.textTheme.titleMedium,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final auth = ref.watch(authNotifierProvider);
+    final String currentUserId =
+        auth is Authenticated ? auth.user.id : '';
+
+    return RefreshIndicator(
+      onRefresh: () => tab == FeedTab.global
+          ? ref.read(globalFeedNotifierProvider.notifier).fetchFirst()
+          : ref
+              .read(followingEventFeedNotifierProvider.notifier)
+              .fetchFirst(),
+      child: _EventFeedList(
+        items: state.items,
+        hasMore: state.hasMore,
+        isLoading: state.isLoading,
+        currentUserId: currentUserId,
+        onLoadMore: () => tab == FeedTab.global
+            ? ref.read(globalFeedNotifierProvider.notifier).fetchMore()
+            : ref
+                .read(followingEventFeedNotifierProvider.notifier)
+                .fetchMore(),
+        onReactionToggled: (eventId, emoji, added) {
+          if (tab == FeedTab.global) {
+            ref.read(globalFeedNotifierProvider.notifier).applyReactionToggle(
+                  eventId: eventId,
+                  emoji: emoji,
+                  added: added,
+                  currentUserId: currentUserId,
+                );
+          } else {
+            ref
+                .read(followingEventFeedNotifierProvider.notifier)
+                .applyReactionToggle(
+                  eventId: eventId,
+                  emoji: emoji,
+                  added: added,
+                  currentUserId: currentUserId,
+                );
+          }
+        },
+        onCommentCountChanged: (eventId, delta) {
+          if (tab == FeedTab.global) {
+            ref
+                .read(globalFeedNotifierProvider.notifier)
+                .incrementCommentCount(eventId, delta);
+          } else {
+            ref
+                .read(followingEventFeedNotifierProvider.notifier)
+                .incrementCommentCount(eventId, delta);
+          }
+        },
+      ),
+    );
+  }
+}
+
+class _EventFeedList extends StatelessWidget {
+  const _EventFeedList({
+    required this.items,
+    required this.hasMore,
+    required this.isLoading,
+    required this.currentUserId,
+    required this.onLoadMore,
+    required this.onReactionToggled,
+    required this.onCommentCountChanged,
+  });
+
+  final List<FeedEvent> items;
+  final bool hasMore;
+  final bool isLoading;
+  final String currentUserId;
+  final VoidCallback onLoadMore;
+  final void Function(String eventId, String emoji, bool added)
+      onReactionToggled;
+  final void Function(String eventId, int delta) onCommentCountChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = Theme.of(context).extension<AppSpacing>()!;
+    final int itemCount = items.length + (isLoading ? 1 : 0);
+
+    return NotificationListener<ScrollNotification>(
+      onNotification: (n) {
+        if (n is ScrollEndNotification &&
+            n.metrics.extentAfter < 200 &&
+            hasMore &&
+            !isLoading) {
+          onLoadMore();
+        }
+        return false;
+      },
+      child: CustomScrollView(
+        slivers: <Widget>[
+          SliverPadding(
+            padding: EdgeInsets.all(spacing.md),
+            sliver: SliverList.separated(
+              itemCount: itemCount,
+              separatorBuilder: (_, __) => SizedBox(height: spacing.md),
+              itemBuilder: (context, index) {
+                if (index == items.length) {
+                  return const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  );
+                }
+                final FeedEvent event = items[index];
+                return FeedEventCard(
+                  event: event,
+                  currentUserId: currentUserId,
+                  onTapComments: () => FeedCommentSheet.show(
+                    context,
+                    eventId: event.id,
+                    currentUserId: currentUserId,
+                    initialCommentCount: event.commentCount,
+                    onCommentCountChanged: (delta) =>
+                        onCommentCountChanged(event.id, delta),
+                  ),
+                  onReactionToggled: (emoji, added) =>
+                      onReactionToggled(event.id, emoji, added),
+                );
+              },
+            ),
+          ),
         ],
       ),
     );

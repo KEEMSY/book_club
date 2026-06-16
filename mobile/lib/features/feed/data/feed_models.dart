@@ -1,6 +1,9 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../domain/comment.dart';
+import '../domain/feed_comment.dart';
+import '../domain/feed_event.dart';
+import '../domain/feed_reaction.dart';
 import '../domain/highlight.dart';
 import '../domain/post.dart';
 import '../domain/post_author.dart';
@@ -313,4 +316,136 @@ abstract class AllHighlightsResponseDto with _$AllHighlightsResponseDto {
 
   factory AllHighlightsResponseDto.fromJson(Map<String, dynamic> json) =>
       _$AllHighlightsResponseDtoFromJson(json);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// M47 — Feed event DTOs
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Wire representation of a single emoji reaction on a feed event.
+///
+/// Field names are camelCase; build.yaml `field_rename: snake` maps them to
+/// the backend's snake_case JSON keys automatically (`userId` ↔ `user_id`).
+@freezed
+abstract class FeedReactionDto with _$FeedReactionDto {
+  const FeedReactionDto._();
+
+  const factory FeedReactionDto({
+    required String id,
+    required String emoji,
+    required String userId,
+    required DateTime createdAt,
+  }) = _FeedReactionDto;
+
+  factory FeedReactionDto.fromJson(Map<String, dynamic> json) =>
+      _$FeedReactionDtoFromJson(json);
+
+  FeedReaction toDomain() => FeedReaction(
+        id: id,
+        emoji: emoji,
+        userId: userId,
+        createdAt: createdAt,
+      );
+}
+
+/// Wire representation of `FeedEventWithReactions`.
+@freezed
+abstract class FeedEventDto with _$FeedEventDto {
+  const FeedEventDto._();
+
+  const factory FeedEventDto({
+    required String id,
+    required String userId,
+    required String eventType,
+    required Map<String, dynamic> eventMetadata,
+    required List<FeedReactionDto> reactions,
+    required int commentCount,
+    required DateTime createdAt,
+  }) = _FeedEventDto;
+
+  factory FeedEventDto.fromJson(Map<String, dynamic> json) =>
+      _$FeedEventDtoFromJson(json);
+
+  FeedEvent toDomain() => FeedEvent(
+        id: id,
+        userId: userId,
+        eventType: eventType,
+        eventMetadata: eventMetadata,
+        reactions: reactions.map((r) => r.toDomain()).toList(growable: false),
+        commentCount: commentCount,
+        createdAt: createdAt,
+      );
+}
+
+/// Paginated envelope for `GET /feed` and `GET /feed/following`.
+@freezed
+abstract class FeedEventPageDto with _$FeedEventPageDto {
+  const factory FeedEventPageDto({
+    required List<FeedEventDto> items,
+    String? cursor,
+  }) = _FeedEventPageDto;
+
+  factory FeedEventPageDto.fromJson(Map<String, dynamic> json) =>
+      _$FeedEventPageDtoFromJson(json);
+}
+
+/// Response of `POST /feed/{event_id}/reactions`.
+@freezed
+abstract class FeedReactionToggleDto with _$FeedReactionToggleDto {
+  const FeedReactionToggleDto._();
+
+  const factory FeedReactionToggleDto({
+    required bool added,
+    required String emoji,
+    required int reactionCount,
+  }) = _FeedReactionToggleDto;
+
+  factory FeedReactionToggleDto.fromJson(Map<String, dynamic> json) =>
+      _$FeedReactionToggleDtoFromJson(json);
+
+  FeedReactionToggleResult toDomain() => FeedReactionToggleResult(
+        added: added,
+        emoji: emoji,
+        reactionCount: reactionCount,
+      );
+}
+
+/// Wire representation of a `FeedCommentPublic` entry (including nested replies).
+@freezed
+abstract class FeedCommentDto with _$FeedCommentDto {
+  const FeedCommentDto._();
+
+  const factory FeedCommentDto({
+    required String id,
+    required String body,
+    required String userId,
+    required String eventId,
+    String? parentId,
+    required DateTime createdAt,
+    @Default(<FeedCommentDto>[]) List<FeedCommentDto> replies,
+  }) = _FeedCommentDto;
+
+  factory FeedCommentDto.fromJson(Map<String, dynamic> json) =>
+      _$FeedCommentDtoFromJson(json);
+
+  FeedComment toDomain() => FeedComment(
+        id: id,
+        body: body,
+        userId: userId,
+        eventId: eventId,
+        parentId: parentId,
+        createdAt: createdAt,
+        replies: replies.map((r) => r.toDomain()).toList(growable: false),
+      );
+}
+
+/// Envelope for `GET /feed/{event_id}/comments`.
+@freezed
+abstract class FeedCommentListDto with _$FeedCommentListDto {
+  const factory FeedCommentListDto({
+    required List<FeedCommentDto> comments,
+  }) = _FeedCommentListDto;
+
+  factory FeedCommentListDto.fromJson(Map<String, dynamic> json) =>
+      _$FeedCommentListDtoFromJson(json);
 }

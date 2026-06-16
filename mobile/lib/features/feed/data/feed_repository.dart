@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 
 import '../domain/book_highlight_group.dart';
 import '../domain/comment.dart';
+import '../domain/feed_comment.dart';
+import '../domain/feed_event.dart';
 import '../domain/highlight.dart';
 import '../domain/post.dart';
 import '../domain/post_type.dart';
@@ -214,6 +216,71 @@ class FeedRepository {
       throw _fromDio(e);
     }
   }
+
+  // ── M47 global event feed ──────────────────────────────────────────────────
+
+  Future<FeedEventPage> getGlobalFeed({String? cursor, int limit = 20}) async {
+    final FeedEventPageDto dto = await _call(
+      () => _api.getGlobalFeed(cursor: cursor, limit: limit),
+    );
+    return FeedEventPage(
+      items: dto.items.map((d) => d.toDomain()).toList(growable: false),
+      cursor: dto.cursor,
+    );
+  }
+
+  Future<FeedEventPage> getFollowingEventFeed({
+    String? cursor,
+    int limit = 20,
+  }) async {
+    final FeedEventPageDto dto = await _call(
+      () => _api.getFollowingEventFeed(cursor: cursor, limit: limit),
+    );
+    return FeedEventPage(
+      items: dto.items.map((d) => d.toDomain()).toList(growable: false),
+      cursor: dto.cursor,
+    );
+  }
+
+  Future<FeedReactionToggleResult> toggleFeedReaction({
+    required String eventId,
+    required String emoji,
+  }) async {
+    final FeedReactionToggleDto dto = await _call(
+      () => _api.toggleFeedReaction(eventId, {'emoji': emoji}),
+    );
+    return dto.toDomain();
+  }
+
+  Future<List<FeedComment>> getFeedComments(String eventId) async {
+    final FeedCommentListDto dto = await _call(
+      () => _api.getFeedComments(eventId),
+    );
+    return dto.comments.map((d) => d.toDomain()).toList(growable: false);
+  }
+
+  Future<FeedComment> createFeedComment({
+    required String eventId,
+    required String body,
+    String? parentId,
+  }) async {
+    final FeedCommentDto dto = await _call(
+      () => _api.createFeedComment(
+        eventId,
+        <String, dynamic>{
+          'body': body,
+          if (parentId != null) 'parent_id': parentId,
+        },
+      ),
+    );
+    return dto.toDomain();
+  }
+
+  Future<void> deleteFeedComment(String commentId) async {
+    await _call(() => _api.deleteFeedComment(commentId));
+  }
+
+  // ── Image upload ───────────────────────────────────────────────────────────
 
   /// Orchestrates presign → PUT → key. Surfaced through the repository so
   /// notifiers don't depend on [ImageUploader] directly.

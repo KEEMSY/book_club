@@ -268,3 +268,110 @@ Map<String, dynamic> _$AllHighlightsResponseDtoToJson(
     <String, dynamic>{
       'groups': instance.groups.map((e) => e.toJson()).toList(),
     };
+
+_FeedReactionDto _$FeedReactionDtoFromJson(Map<String, dynamic> json) =>
+    _FeedReactionDto(
+      id: json['id'] as String,
+      emoji: json['emoji'] as String,
+      userId: json['user_id'] as String,
+      createdAt: DateTime.parse(json['created_at'] as String),
+    );
+
+Map<String, dynamic> _$FeedReactionDtoToJson(_FeedReactionDto instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'emoji': instance.emoji,
+      'user_id': instance.userId,
+      'created_at': instance.createdAt.toIso8601String(),
+    };
+
+_FeedEventDto _$FeedEventDtoFromJson(Map<String, dynamic> json) =>
+    _FeedEventDto(
+      id: json['id'] as String,
+      userId: json['user_id'] as String,
+      eventType: json['event_type'] as String,
+      eventMetadata: json['event_metadata'] as Map<String, dynamic>,
+      reactions: (json['reactions'] as List<dynamic>)
+          .map((e) => FeedReactionDto.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      commentCount: (json['comment_count'] as num).toInt(),
+      createdAt: DateTime.parse(json['created_at'] as String),
+    );
+
+Map<String, dynamic> _$FeedEventDtoToJson(_FeedEventDto instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'user_id': instance.userId,
+      'event_type': instance.eventType,
+      'event_metadata': instance.eventMetadata,
+      'reactions': instance.reactions.map((e) => e.toJson()).toList(),
+      'comment_count': instance.commentCount,
+      'created_at': instance.createdAt.toIso8601String(),
+    };
+
+_FeedEventPageDto _$FeedEventPageDtoFromJson(Map<String, dynamic> json) =>
+    _FeedEventPageDto(
+      items: (json['items'] as List<dynamic>)
+          .map((e) => FeedEventDto.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      cursor: json['cursor'] as String?,
+    );
+
+Map<String, dynamic> _$FeedEventPageDtoToJson(_FeedEventPageDto instance) =>
+    <String, dynamic>{
+      'items': instance.items.map((e) => e.toJson()).toList(),
+      'cursor': instance.cursor,
+    };
+
+_FeedReactionToggleDto _$FeedReactionToggleDtoFromJson(
+        Map<String, dynamic> json) =>
+    _FeedReactionToggleDto(
+      added: json['added'] as bool,
+      emoji: json['emoji'] as String,
+      reactionCount: (json['reaction_count'] as num).toInt(),
+    );
+
+Map<String, dynamic> _$FeedReactionToggleDtoToJson(
+        _FeedReactionToggleDto instance) =>
+    <String, dynamic>{
+      'added': instance.added,
+      'emoji': instance.emoji,
+      'reaction_count': instance.reactionCount,
+    };
+
+_FeedCommentDto _$FeedCommentDtoFromJson(Map<String, dynamic> json) =>
+    _FeedCommentDto(
+      id: json['id'] as String,
+      body: json['body'] as String,
+      userId: json['user_id'] as String,
+      eventId: json['event_id'] as String,
+      parentId: json['parent_id'] as String?,
+      createdAt: DateTime.parse(json['created_at'] as String),
+      replies: (json['replies'] as List<dynamic>?)
+              ?.map((e) => FeedCommentDto.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const <FeedCommentDto>[],
+    );
+
+Map<String, dynamic> _$FeedCommentDtoToJson(_FeedCommentDto instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'body': instance.body,
+      'user_id': instance.userId,
+      'event_id': instance.eventId,
+      'parent_id': instance.parentId,
+      'created_at': instance.createdAt.toIso8601String(),
+      'replies': instance.replies.map((e) => e.toJson()).toList(),
+    };
+
+_FeedCommentListDto _$FeedCommentListDtoFromJson(Map<String, dynamic> json) =>
+    _FeedCommentListDto(
+      comments: (json['comments'] as List<dynamic>)
+          .map((e) => FeedCommentDto.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
+Map<String, dynamic> _$FeedCommentListDtoToJson(_FeedCommentListDto instance) =>
+    <String, dynamic>{
+      'comments': instance.comments.map((e) => e.toJson()).toList(),
+    };

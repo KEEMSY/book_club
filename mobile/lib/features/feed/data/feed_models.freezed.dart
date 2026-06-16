@@ -5910,4 +5910,2264 @@ class __$AllHighlightsResponseDtoCopyWithImpl<$Res>
   }
 }
 
+/// @nodoc
+mixin _$FeedReactionDto {
+  String get id;
+  String get emoji;
+  String get userId;
+  DateTime get createdAt;
+
+  /// Create a copy of FeedReactionDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $FeedReactionDtoCopyWith<FeedReactionDto> get copyWith =>
+      _$FeedReactionDtoCopyWithImpl<FeedReactionDto>(
+          this as FeedReactionDto, _$identity);
+
+  /// Serializes this FeedReactionDto to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is FeedReactionDto &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.emoji, emoji) || other.emoji == emoji) &&
+            (identical(other.userId, userId) || other.userId == userId) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, emoji, userId, createdAt);
+
+  @override
+  String toString() {
+    return 'FeedReactionDto(id: $id, emoji: $emoji, userId: $userId, createdAt: $createdAt)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $FeedReactionDtoCopyWith<$Res> {
+  factory $FeedReactionDtoCopyWith(
+          FeedReactionDto value, $Res Function(FeedReactionDto) _then) =
+      _$FeedReactionDtoCopyWithImpl;
+  @useResult
+  $Res call({String id, String emoji, String userId, DateTime createdAt});
+}
+
+/// @nodoc
+class _$FeedReactionDtoCopyWithImpl<$Res>
+    implements $FeedReactionDtoCopyWith<$Res> {
+  _$FeedReactionDtoCopyWithImpl(this._self, this._then);
+
+  final FeedReactionDto _self;
+  final $Res Function(FeedReactionDto) _then;
+
+  /// Create a copy of FeedReactionDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? emoji = null,
+    Object? userId = null,
+    Object? createdAt = null,
+  }) {
+    return _then(_self.copyWith(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      emoji: null == emoji
+          ? _self.emoji
+          : emoji // ignore: cast_nullable_to_non_nullable
+              as String,
+      userId: null == userId
+          ? _self.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as String,
+      createdAt: null == createdAt
+          ? _self.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [FeedReactionDto].
+extension FeedReactionDtoPatterns on FeedReactionDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_FeedReactionDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _FeedReactionDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_FeedReactionDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _FeedReactionDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_FeedReactionDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _FeedReactionDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String id, String emoji, String userId, DateTime createdAt)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _FeedReactionDto() when $default != null:
+        return $default(_that.id, _that.emoji, _that.userId, _that.createdAt);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String id, String emoji, String userId, DateTime createdAt)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _FeedReactionDto():
+        return $default(_that.id, _that.emoji, _that.userId, _that.createdAt);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String id, String emoji, String userId, DateTime createdAt)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _FeedReactionDto() when $default != null:
+        return $default(_that.id, _that.emoji, _that.userId, _that.createdAt);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _FeedReactionDto extends FeedReactionDto {
+  const _FeedReactionDto(
+      {required this.id,
+      required this.emoji,
+      required this.userId,
+      required this.createdAt})
+      : super._();
+  factory _FeedReactionDto.fromJson(Map<String, dynamic> json) =>
+      _$FeedReactionDtoFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final String emoji;
+  @override
+  final String userId;
+  @override
+  final DateTime createdAt;
+
+  /// Create a copy of FeedReactionDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$FeedReactionDtoCopyWith<_FeedReactionDto> get copyWith =>
+      __$FeedReactionDtoCopyWithImpl<_FeedReactionDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$FeedReactionDtoToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _FeedReactionDto &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.emoji, emoji) || other.emoji == emoji) &&
+            (identical(other.userId, userId) || other.userId == userId) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, emoji, userId, createdAt);
+
+  @override
+  String toString() {
+    return 'FeedReactionDto(id: $id, emoji: $emoji, userId: $userId, createdAt: $createdAt)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$FeedReactionDtoCopyWith<$Res>
+    implements $FeedReactionDtoCopyWith<$Res> {
+  factory _$FeedReactionDtoCopyWith(
+          _FeedReactionDto value, $Res Function(_FeedReactionDto) _then) =
+      __$FeedReactionDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call({String id, String emoji, String userId, DateTime createdAt});
+}
+
+/// @nodoc
+class __$FeedReactionDtoCopyWithImpl<$Res>
+    implements _$FeedReactionDtoCopyWith<$Res> {
+  __$FeedReactionDtoCopyWithImpl(this._self, this._then);
+
+  final _FeedReactionDto _self;
+  final $Res Function(_FeedReactionDto) _then;
+
+  /// Create a copy of FeedReactionDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? emoji = null,
+    Object? userId = null,
+    Object? createdAt = null,
+  }) {
+    return _then(_FeedReactionDto(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      emoji: null == emoji
+          ? _self.emoji
+          : emoji // ignore: cast_nullable_to_non_nullable
+              as String,
+      userId: null == userId
+          ? _self.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as String,
+      createdAt: null == createdAt
+          ? _self.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$FeedEventDto {
+  String get id;
+  String get userId;
+  String get eventType;
+  Map<String, dynamic> get eventMetadata;
+  List<FeedReactionDto> get reactions;
+  int get commentCount;
+  DateTime get createdAt;
+
+  /// Create a copy of FeedEventDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $FeedEventDtoCopyWith<FeedEventDto> get copyWith =>
+      _$FeedEventDtoCopyWithImpl<FeedEventDto>(
+          this as FeedEventDto, _$identity);
+
+  /// Serializes this FeedEventDto to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is FeedEventDto &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.userId, userId) || other.userId == userId) &&
+            (identical(other.eventType, eventType) ||
+                other.eventType == eventType) &&
+            const DeepCollectionEquality()
+                .equals(other.eventMetadata, eventMetadata) &&
+            const DeepCollectionEquality().equals(other.reactions, reactions) &&
+            (identical(other.commentCount, commentCount) ||
+                other.commentCount == commentCount) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      userId,
+      eventType,
+      const DeepCollectionEquality().hash(eventMetadata),
+      const DeepCollectionEquality().hash(reactions),
+      commentCount,
+      createdAt);
+
+  @override
+  String toString() {
+    return 'FeedEventDto(id: $id, userId: $userId, eventType: $eventType, eventMetadata: $eventMetadata, reactions: $reactions, commentCount: $commentCount, createdAt: $createdAt)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $FeedEventDtoCopyWith<$Res> {
+  factory $FeedEventDtoCopyWith(
+          FeedEventDto value, $Res Function(FeedEventDto) _then) =
+      _$FeedEventDtoCopyWithImpl;
+  @useResult
+  $Res call(
+      {String id,
+      String userId,
+      String eventType,
+      Map<String, dynamic> eventMetadata,
+      List<FeedReactionDto> reactions,
+      int commentCount,
+      DateTime createdAt});
+}
+
+/// @nodoc
+class _$FeedEventDtoCopyWithImpl<$Res> implements $FeedEventDtoCopyWith<$Res> {
+  _$FeedEventDtoCopyWithImpl(this._self, this._then);
+
+  final FeedEventDto _self;
+  final $Res Function(FeedEventDto) _then;
+
+  /// Create a copy of FeedEventDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? userId = null,
+    Object? eventType = null,
+    Object? eventMetadata = null,
+    Object? reactions = null,
+    Object? commentCount = null,
+    Object? createdAt = null,
+  }) {
+    return _then(_self.copyWith(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      userId: null == userId
+          ? _self.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as String,
+      eventType: null == eventType
+          ? _self.eventType
+          : eventType // ignore: cast_nullable_to_non_nullable
+              as String,
+      eventMetadata: null == eventMetadata
+          ? _self.eventMetadata
+          : eventMetadata // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>,
+      reactions: null == reactions
+          ? _self.reactions
+          : reactions // ignore: cast_nullable_to_non_nullable
+              as List<FeedReactionDto>,
+      commentCount: null == commentCount
+          ? _self.commentCount
+          : commentCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      createdAt: null == createdAt
+          ? _self.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [FeedEventDto].
+extension FeedEventDtoPatterns on FeedEventDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_FeedEventDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _FeedEventDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_FeedEventDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _FeedEventDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_FeedEventDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _FeedEventDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String userId,
+            String eventType,
+            Map<String, dynamic> eventMetadata,
+            List<FeedReactionDto> reactions,
+            int commentCount,
+            DateTime createdAt)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _FeedEventDto() when $default != null:
+        return $default(
+            _that.id,
+            _that.userId,
+            _that.eventType,
+            _that.eventMetadata,
+            _that.reactions,
+            _that.commentCount,
+            _that.createdAt);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String userId,
+            String eventType,
+            Map<String, dynamic> eventMetadata,
+            List<FeedReactionDto> reactions,
+            int commentCount,
+            DateTime createdAt)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _FeedEventDto():
+        return $default(
+            _that.id,
+            _that.userId,
+            _that.eventType,
+            _that.eventMetadata,
+            _that.reactions,
+            _that.commentCount,
+            _that.createdAt);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String id,
+            String userId,
+            String eventType,
+            Map<String, dynamic> eventMetadata,
+            List<FeedReactionDto> reactions,
+            int commentCount,
+            DateTime createdAt)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _FeedEventDto() when $default != null:
+        return $default(
+            _that.id,
+            _that.userId,
+            _that.eventType,
+            _that.eventMetadata,
+            _that.reactions,
+            _that.commentCount,
+            _that.createdAt);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _FeedEventDto extends FeedEventDto {
+  const _FeedEventDto(
+      {required this.id,
+      required this.userId,
+      required this.eventType,
+      required final Map<String, dynamic> eventMetadata,
+      required final List<FeedReactionDto> reactions,
+      required this.commentCount,
+      required this.createdAt})
+      : _eventMetadata = eventMetadata,
+        _reactions = reactions,
+        super._();
+  factory _FeedEventDto.fromJson(Map<String, dynamic> json) =>
+      _$FeedEventDtoFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final String userId;
+  @override
+  final String eventType;
+  final Map<String, dynamic> _eventMetadata;
+  @override
+  Map<String, dynamic> get eventMetadata {
+    if (_eventMetadata is EqualUnmodifiableMapView) return _eventMetadata;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_eventMetadata);
+  }
+
+  final List<FeedReactionDto> _reactions;
+  @override
+  List<FeedReactionDto> get reactions {
+    if (_reactions is EqualUnmodifiableListView) return _reactions;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_reactions);
+  }
+
+  @override
+  final int commentCount;
+  @override
+  final DateTime createdAt;
+
+  /// Create a copy of FeedEventDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$FeedEventDtoCopyWith<_FeedEventDto> get copyWith =>
+      __$FeedEventDtoCopyWithImpl<_FeedEventDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$FeedEventDtoToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _FeedEventDto &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.userId, userId) || other.userId == userId) &&
+            (identical(other.eventType, eventType) ||
+                other.eventType == eventType) &&
+            const DeepCollectionEquality()
+                .equals(other._eventMetadata, _eventMetadata) &&
+            const DeepCollectionEquality()
+                .equals(other._reactions, _reactions) &&
+            (identical(other.commentCount, commentCount) ||
+                other.commentCount == commentCount) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      userId,
+      eventType,
+      const DeepCollectionEquality().hash(_eventMetadata),
+      const DeepCollectionEquality().hash(_reactions),
+      commentCount,
+      createdAt);
+
+  @override
+  String toString() {
+    return 'FeedEventDto(id: $id, userId: $userId, eventType: $eventType, eventMetadata: $eventMetadata, reactions: $reactions, commentCount: $commentCount, createdAt: $createdAt)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$FeedEventDtoCopyWith<$Res>
+    implements $FeedEventDtoCopyWith<$Res> {
+  factory _$FeedEventDtoCopyWith(
+          _FeedEventDto value, $Res Function(_FeedEventDto) _then) =
+      __$FeedEventDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      String userId,
+      String eventType,
+      Map<String, dynamic> eventMetadata,
+      List<FeedReactionDto> reactions,
+      int commentCount,
+      DateTime createdAt});
+}
+
+/// @nodoc
+class __$FeedEventDtoCopyWithImpl<$Res>
+    implements _$FeedEventDtoCopyWith<$Res> {
+  __$FeedEventDtoCopyWithImpl(this._self, this._then);
+
+  final _FeedEventDto _self;
+  final $Res Function(_FeedEventDto) _then;
+
+  /// Create a copy of FeedEventDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? userId = null,
+    Object? eventType = null,
+    Object? eventMetadata = null,
+    Object? reactions = null,
+    Object? commentCount = null,
+    Object? createdAt = null,
+  }) {
+    return _then(_FeedEventDto(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      userId: null == userId
+          ? _self.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as String,
+      eventType: null == eventType
+          ? _self.eventType
+          : eventType // ignore: cast_nullable_to_non_nullable
+              as String,
+      eventMetadata: null == eventMetadata
+          ? _self._eventMetadata
+          : eventMetadata // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>,
+      reactions: null == reactions
+          ? _self._reactions
+          : reactions // ignore: cast_nullable_to_non_nullable
+              as List<FeedReactionDto>,
+      commentCount: null == commentCount
+          ? _self.commentCount
+          : commentCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      createdAt: null == createdAt
+          ? _self.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$FeedEventPageDto {
+  List<FeedEventDto> get items;
+  String? get cursor;
+
+  /// Create a copy of FeedEventPageDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $FeedEventPageDtoCopyWith<FeedEventPageDto> get copyWith =>
+      _$FeedEventPageDtoCopyWithImpl<FeedEventPageDto>(
+          this as FeedEventPageDto, _$identity);
+
+  /// Serializes this FeedEventPageDto to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is FeedEventPageDto &&
+            const DeepCollectionEquality().equals(other.items, items) &&
+            (identical(other.cursor, cursor) || other.cursor == cursor));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, const DeepCollectionEquality().hash(items), cursor);
+
+  @override
+  String toString() {
+    return 'FeedEventPageDto(items: $items, cursor: $cursor)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $FeedEventPageDtoCopyWith<$Res> {
+  factory $FeedEventPageDtoCopyWith(
+          FeedEventPageDto value, $Res Function(FeedEventPageDto) _then) =
+      _$FeedEventPageDtoCopyWithImpl;
+  @useResult
+  $Res call({List<FeedEventDto> items, String? cursor});
+}
+
+/// @nodoc
+class _$FeedEventPageDtoCopyWithImpl<$Res>
+    implements $FeedEventPageDtoCopyWith<$Res> {
+  _$FeedEventPageDtoCopyWithImpl(this._self, this._then);
+
+  final FeedEventPageDto _self;
+  final $Res Function(FeedEventPageDto) _then;
+
+  /// Create a copy of FeedEventPageDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? items = null,
+    Object? cursor = freezed,
+  }) {
+    return _then(_self.copyWith(
+      items: null == items
+          ? _self.items
+          : items // ignore: cast_nullable_to_non_nullable
+              as List<FeedEventDto>,
+      cursor: freezed == cursor
+          ? _self.cursor
+          : cursor // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [FeedEventPageDto].
+extension FeedEventPageDtoPatterns on FeedEventPageDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_FeedEventPageDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _FeedEventPageDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_FeedEventPageDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _FeedEventPageDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_FeedEventPageDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _FeedEventPageDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(List<FeedEventDto> items, String? cursor)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _FeedEventPageDto() when $default != null:
+        return $default(_that.items, _that.cursor);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(List<FeedEventDto> items, String? cursor) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _FeedEventPageDto():
+        return $default(_that.items, _that.cursor);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(List<FeedEventDto> items, String? cursor)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _FeedEventPageDto() when $default != null:
+        return $default(_that.items, _that.cursor);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _FeedEventPageDto implements FeedEventPageDto {
+  const _FeedEventPageDto(
+      {required final List<FeedEventDto> items, this.cursor})
+      : _items = items;
+  factory _FeedEventPageDto.fromJson(Map<String, dynamic> json) =>
+      _$FeedEventPageDtoFromJson(json);
+
+  final List<FeedEventDto> _items;
+  @override
+  List<FeedEventDto> get items {
+    if (_items is EqualUnmodifiableListView) return _items;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_items);
+  }
+
+  @override
+  final String? cursor;
+
+  /// Create a copy of FeedEventPageDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$FeedEventPageDtoCopyWith<_FeedEventPageDto> get copyWith =>
+      __$FeedEventPageDtoCopyWithImpl<_FeedEventPageDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$FeedEventPageDtoToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _FeedEventPageDto &&
+            const DeepCollectionEquality().equals(other._items, _items) &&
+            (identical(other.cursor, cursor) || other.cursor == cursor));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, const DeepCollectionEquality().hash(_items), cursor);
+
+  @override
+  String toString() {
+    return 'FeedEventPageDto(items: $items, cursor: $cursor)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$FeedEventPageDtoCopyWith<$Res>
+    implements $FeedEventPageDtoCopyWith<$Res> {
+  factory _$FeedEventPageDtoCopyWith(
+          _FeedEventPageDto value, $Res Function(_FeedEventPageDto) _then) =
+      __$FeedEventPageDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call({List<FeedEventDto> items, String? cursor});
+}
+
+/// @nodoc
+class __$FeedEventPageDtoCopyWithImpl<$Res>
+    implements _$FeedEventPageDtoCopyWith<$Res> {
+  __$FeedEventPageDtoCopyWithImpl(this._self, this._then);
+
+  final _FeedEventPageDto _self;
+  final $Res Function(_FeedEventPageDto) _then;
+
+  /// Create a copy of FeedEventPageDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? items = null,
+    Object? cursor = freezed,
+  }) {
+    return _then(_FeedEventPageDto(
+      items: null == items
+          ? _self._items
+          : items // ignore: cast_nullable_to_non_nullable
+              as List<FeedEventDto>,
+      cursor: freezed == cursor
+          ? _self.cursor
+          : cursor // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$FeedReactionToggleDto {
+  bool get added;
+  String get emoji;
+  int get reactionCount;
+
+  /// Create a copy of FeedReactionToggleDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $FeedReactionToggleDtoCopyWith<FeedReactionToggleDto> get copyWith =>
+      _$FeedReactionToggleDtoCopyWithImpl<FeedReactionToggleDto>(
+          this as FeedReactionToggleDto, _$identity);
+
+  /// Serializes this FeedReactionToggleDto to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is FeedReactionToggleDto &&
+            (identical(other.added, added) || other.added == added) &&
+            (identical(other.emoji, emoji) || other.emoji == emoji) &&
+            (identical(other.reactionCount, reactionCount) ||
+                other.reactionCount == reactionCount));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, added, emoji, reactionCount);
+
+  @override
+  String toString() {
+    return 'FeedReactionToggleDto(added: $added, emoji: $emoji, reactionCount: $reactionCount)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $FeedReactionToggleDtoCopyWith<$Res> {
+  factory $FeedReactionToggleDtoCopyWith(FeedReactionToggleDto value,
+          $Res Function(FeedReactionToggleDto) _then) =
+      _$FeedReactionToggleDtoCopyWithImpl;
+  @useResult
+  $Res call({bool added, String emoji, int reactionCount});
+}
+
+/// @nodoc
+class _$FeedReactionToggleDtoCopyWithImpl<$Res>
+    implements $FeedReactionToggleDtoCopyWith<$Res> {
+  _$FeedReactionToggleDtoCopyWithImpl(this._self, this._then);
+
+  final FeedReactionToggleDto _self;
+  final $Res Function(FeedReactionToggleDto) _then;
+
+  /// Create a copy of FeedReactionToggleDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? added = null,
+    Object? emoji = null,
+    Object? reactionCount = null,
+  }) {
+    return _then(_self.copyWith(
+      added: null == added
+          ? _self.added
+          : added // ignore: cast_nullable_to_non_nullable
+              as bool,
+      emoji: null == emoji
+          ? _self.emoji
+          : emoji // ignore: cast_nullable_to_non_nullable
+              as String,
+      reactionCount: null == reactionCount
+          ? _self.reactionCount
+          : reactionCount // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [FeedReactionToggleDto].
+extension FeedReactionToggleDtoPatterns on FeedReactionToggleDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_FeedReactionToggleDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _FeedReactionToggleDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_FeedReactionToggleDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _FeedReactionToggleDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_FeedReactionToggleDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _FeedReactionToggleDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(bool added, String emoji, int reactionCount)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _FeedReactionToggleDto() when $default != null:
+        return $default(_that.added, _that.emoji, _that.reactionCount);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(bool added, String emoji, int reactionCount) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _FeedReactionToggleDto():
+        return $default(_that.added, _that.emoji, _that.reactionCount);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(bool added, String emoji, int reactionCount)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _FeedReactionToggleDto() when $default != null:
+        return $default(_that.added, _that.emoji, _that.reactionCount);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _FeedReactionToggleDto extends FeedReactionToggleDto {
+  const _FeedReactionToggleDto(
+      {required this.added, required this.emoji, required this.reactionCount})
+      : super._();
+  factory _FeedReactionToggleDto.fromJson(Map<String, dynamic> json) =>
+      _$FeedReactionToggleDtoFromJson(json);
+
+  @override
+  final bool added;
+  @override
+  final String emoji;
+  @override
+  final int reactionCount;
+
+  /// Create a copy of FeedReactionToggleDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$FeedReactionToggleDtoCopyWith<_FeedReactionToggleDto> get copyWith =>
+      __$FeedReactionToggleDtoCopyWithImpl<_FeedReactionToggleDto>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$FeedReactionToggleDtoToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _FeedReactionToggleDto &&
+            (identical(other.added, added) || other.added == added) &&
+            (identical(other.emoji, emoji) || other.emoji == emoji) &&
+            (identical(other.reactionCount, reactionCount) ||
+                other.reactionCount == reactionCount));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, added, emoji, reactionCount);
+
+  @override
+  String toString() {
+    return 'FeedReactionToggleDto(added: $added, emoji: $emoji, reactionCount: $reactionCount)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$FeedReactionToggleDtoCopyWith<$Res>
+    implements $FeedReactionToggleDtoCopyWith<$Res> {
+  factory _$FeedReactionToggleDtoCopyWith(_FeedReactionToggleDto value,
+          $Res Function(_FeedReactionToggleDto) _then) =
+      __$FeedReactionToggleDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call({bool added, String emoji, int reactionCount});
+}
+
+/// @nodoc
+class __$FeedReactionToggleDtoCopyWithImpl<$Res>
+    implements _$FeedReactionToggleDtoCopyWith<$Res> {
+  __$FeedReactionToggleDtoCopyWithImpl(this._self, this._then);
+
+  final _FeedReactionToggleDto _self;
+  final $Res Function(_FeedReactionToggleDto) _then;
+
+  /// Create a copy of FeedReactionToggleDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? added = null,
+    Object? emoji = null,
+    Object? reactionCount = null,
+  }) {
+    return _then(_FeedReactionToggleDto(
+      added: null == added
+          ? _self.added
+          : added // ignore: cast_nullable_to_non_nullable
+              as bool,
+      emoji: null == emoji
+          ? _self.emoji
+          : emoji // ignore: cast_nullable_to_non_nullable
+              as String,
+      reactionCount: null == reactionCount
+          ? _self.reactionCount
+          : reactionCount // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$FeedCommentDto {
+  String get id;
+  String get body;
+  String get userId;
+  String get eventId;
+  String? get parentId;
+  DateTime get createdAt;
+  List<FeedCommentDto> get replies;
+
+  /// Create a copy of FeedCommentDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $FeedCommentDtoCopyWith<FeedCommentDto> get copyWith =>
+      _$FeedCommentDtoCopyWithImpl<FeedCommentDto>(
+          this as FeedCommentDto, _$identity);
+
+  /// Serializes this FeedCommentDto to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is FeedCommentDto &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.body, body) || other.body == body) &&
+            (identical(other.userId, userId) || other.userId == userId) &&
+            (identical(other.eventId, eventId) || other.eventId == eventId) &&
+            (identical(other.parentId, parentId) ||
+                other.parentId == parentId) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            const DeepCollectionEquality().equals(other.replies, replies));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, body, userId, eventId,
+      parentId, createdAt, const DeepCollectionEquality().hash(replies));
+
+  @override
+  String toString() {
+    return 'FeedCommentDto(id: $id, body: $body, userId: $userId, eventId: $eventId, parentId: $parentId, createdAt: $createdAt, replies: $replies)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $FeedCommentDtoCopyWith<$Res> {
+  factory $FeedCommentDtoCopyWith(
+          FeedCommentDto value, $Res Function(FeedCommentDto) _then) =
+      _$FeedCommentDtoCopyWithImpl;
+  @useResult
+  $Res call(
+      {String id,
+      String body,
+      String userId,
+      String eventId,
+      String? parentId,
+      DateTime createdAt,
+      List<FeedCommentDto> replies});
+}
+
+/// @nodoc
+class _$FeedCommentDtoCopyWithImpl<$Res>
+    implements $FeedCommentDtoCopyWith<$Res> {
+  _$FeedCommentDtoCopyWithImpl(this._self, this._then);
+
+  final FeedCommentDto _self;
+  final $Res Function(FeedCommentDto) _then;
+
+  /// Create a copy of FeedCommentDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? body = null,
+    Object? userId = null,
+    Object? eventId = null,
+    Object? parentId = freezed,
+    Object? createdAt = null,
+    Object? replies = null,
+  }) {
+    return _then(_self.copyWith(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      body: null == body
+          ? _self.body
+          : body // ignore: cast_nullable_to_non_nullable
+              as String,
+      userId: null == userId
+          ? _self.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as String,
+      eventId: null == eventId
+          ? _self.eventId
+          : eventId // ignore: cast_nullable_to_non_nullable
+              as String,
+      parentId: freezed == parentId
+          ? _self.parentId
+          : parentId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      createdAt: null == createdAt
+          ? _self.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      replies: null == replies
+          ? _self.replies
+          : replies // ignore: cast_nullable_to_non_nullable
+              as List<FeedCommentDto>,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [FeedCommentDto].
+extension FeedCommentDtoPatterns on FeedCommentDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_FeedCommentDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _FeedCommentDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_FeedCommentDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _FeedCommentDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_FeedCommentDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _FeedCommentDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String id, String body, String userId, String eventId,
+            String? parentId, DateTime createdAt, List<FeedCommentDto> replies)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _FeedCommentDto() when $default != null:
+        return $default(_that.id, _that.body, _that.userId, _that.eventId,
+            _that.parentId, _that.createdAt, _that.replies);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String id, String body, String userId, String eventId,
+            String? parentId, DateTime createdAt, List<FeedCommentDto> replies)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _FeedCommentDto():
+        return $default(_that.id, _that.body, _that.userId, _that.eventId,
+            _that.parentId, _that.createdAt, _that.replies);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String id, String body, String userId, String eventId,
+            String? parentId, DateTime createdAt, List<FeedCommentDto> replies)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _FeedCommentDto() when $default != null:
+        return $default(_that.id, _that.body, _that.userId, _that.eventId,
+            _that.parentId, _that.createdAt, _that.replies);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _FeedCommentDto extends FeedCommentDto {
+  const _FeedCommentDto(
+      {required this.id,
+      required this.body,
+      required this.userId,
+      required this.eventId,
+      this.parentId,
+      required this.createdAt,
+      final List<FeedCommentDto> replies = const <FeedCommentDto>[]})
+      : _replies = replies,
+        super._();
+  factory _FeedCommentDto.fromJson(Map<String, dynamic> json) =>
+      _$FeedCommentDtoFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final String body;
+  @override
+  final String userId;
+  @override
+  final String eventId;
+  @override
+  final String? parentId;
+  @override
+  final DateTime createdAt;
+  final List<FeedCommentDto> _replies;
+  @override
+  @JsonKey()
+  List<FeedCommentDto> get replies {
+    if (_replies is EqualUnmodifiableListView) return _replies;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_replies);
+  }
+
+  /// Create a copy of FeedCommentDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$FeedCommentDtoCopyWith<_FeedCommentDto> get copyWith =>
+      __$FeedCommentDtoCopyWithImpl<_FeedCommentDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$FeedCommentDtoToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _FeedCommentDto &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.body, body) || other.body == body) &&
+            (identical(other.userId, userId) || other.userId == userId) &&
+            (identical(other.eventId, eventId) || other.eventId == eventId) &&
+            (identical(other.parentId, parentId) ||
+                other.parentId == parentId) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            const DeepCollectionEquality().equals(other._replies, _replies));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, body, userId, eventId,
+      parentId, createdAt, const DeepCollectionEquality().hash(_replies));
+
+  @override
+  String toString() {
+    return 'FeedCommentDto(id: $id, body: $body, userId: $userId, eventId: $eventId, parentId: $parentId, createdAt: $createdAt, replies: $replies)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$FeedCommentDtoCopyWith<$Res>
+    implements $FeedCommentDtoCopyWith<$Res> {
+  factory _$FeedCommentDtoCopyWith(
+          _FeedCommentDto value, $Res Function(_FeedCommentDto) _then) =
+      __$FeedCommentDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      String body,
+      String userId,
+      String eventId,
+      String? parentId,
+      DateTime createdAt,
+      List<FeedCommentDto> replies});
+}
+
+/// @nodoc
+class __$FeedCommentDtoCopyWithImpl<$Res>
+    implements _$FeedCommentDtoCopyWith<$Res> {
+  __$FeedCommentDtoCopyWithImpl(this._self, this._then);
+
+  final _FeedCommentDto _self;
+  final $Res Function(_FeedCommentDto) _then;
+
+  /// Create a copy of FeedCommentDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? body = null,
+    Object? userId = null,
+    Object? eventId = null,
+    Object? parentId = freezed,
+    Object? createdAt = null,
+    Object? replies = null,
+  }) {
+    return _then(_FeedCommentDto(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      body: null == body
+          ? _self.body
+          : body // ignore: cast_nullable_to_non_nullable
+              as String,
+      userId: null == userId
+          ? _self.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as String,
+      eventId: null == eventId
+          ? _self.eventId
+          : eventId // ignore: cast_nullable_to_non_nullable
+              as String,
+      parentId: freezed == parentId
+          ? _self.parentId
+          : parentId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      createdAt: null == createdAt
+          ? _self.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      replies: null == replies
+          ? _self._replies
+          : replies // ignore: cast_nullable_to_non_nullable
+              as List<FeedCommentDto>,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$FeedCommentListDto {
+  List<FeedCommentDto> get comments;
+
+  /// Create a copy of FeedCommentListDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $FeedCommentListDtoCopyWith<FeedCommentListDto> get copyWith =>
+      _$FeedCommentListDtoCopyWithImpl<FeedCommentListDto>(
+          this as FeedCommentListDto, _$identity);
+
+  /// Serializes this FeedCommentListDto to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is FeedCommentListDto &&
+            const DeepCollectionEquality().equals(other.comments, comments));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(comments));
+
+  @override
+  String toString() {
+    return 'FeedCommentListDto(comments: $comments)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $FeedCommentListDtoCopyWith<$Res> {
+  factory $FeedCommentListDtoCopyWith(
+          FeedCommentListDto value, $Res Function(FeedCommentListDto) _then) =
+      _$FeedCommentListDtoCopyWithImpl;
+  @useResult
+  $Res call({List<FeedCommentDto> comments});
+}
+
+/// @nodoc
+class _$FeedCommentListDtoCopyWithImpl<$Res>
+    implements $FeedCommentListDtoCopyWith<$Res> {
+  _$FeedCommentListDtoCopyWithImpl(this._self, this._then);
+
+  final FeedCommentListDto _self;
+  final $Res Function(FeedCommentListDto) _then;
+
+  /// Create a copy of FeedCommentListDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? comments = null,
+  }) {
+    return _then(_self.copyWith(
+      comments: null == comments
+          ? _self.comments
+          : comments // ignore: cast_nullable_to_non_nullable
+              as List<FeedCommentDto>,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [FeedCommentListDto].
+extension FeedCommentListDtoPatterns on FeedCommentListDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_FeedCommentListDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _FeedCommentListDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_FeedCommentListDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _FeedCommentListDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_FeedCommentListDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _FeedCommentListDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(List<FeedCommentDto> comments)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _FeedCommentListDto() when $default != null:
+        return $default(_that.comments);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(List<FeedCommentDto> comments) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _FeedCommentListDto():
+        return $default(_that.comments);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(List<FeedCommentDto> comments)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _FeedCommentListDto() when $default != null:
+        return $default(_that.comments);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _FeedCommentListDto implements FeedCommentListDto {
+  const _FeedCommentListDto({required final List<FeedCommentDto> comments})
+      : _comments = comments;
+  factory _FeedCommentListDto.fromJson(Map<String, dynamic> json) =>
+      _$FeedCommentListDtoFromJson(json);
+
+  final List<FeedCommentDto> _comments;
+  @override
+  List<FeedCommentDto> get comments {
+    if (_comments is EqualUnmodifiableListView) return _comments;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_comments);
+  }
+
+  /// Create a copy of FeedCommentListDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$FeedCommentListDtoCopyWith<_FeedCommentListDto> get copyWith =>
+      __$FeedCommentListDtoCopyWithImpl<_FeedCommentListDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$FeedCommentListDtoToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _FeedCommentListDto &&
+            const DeepCollectionEquality().equals(other._comments, _comments));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(_comments));
+
+  @override
+  String toString() {
+    return 'FeedCommentListDto(comments: $comments)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$FeedCommentListDtoCopyWith<$Res>
+    implements $FeedCommentListDtoCopyWith<$Res> {
+  factory _$FeedCommentListDtoCopyWith(
+          _FeedCommentListDto value, $Res Function(_FeedCommentListDto) _then) =
+      __$FeedCommentListDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call({List<FeedCommentDto> comments});
+}
+
+/// @nodoc
+class __$FeedCommentListDtoCopyWithImpl<$Res>
+    implements _$FeedCommentListDtoCopyWith<$Res> {
+  __$FeedCommentListDtoCopyWithImpl(this._self, this._then);
+
+  final _FeedCommentListDto _self;
+  final $Res Function(_FeedCommentListDto) _then;
+
+  /// Create a copy of FeedCommentListDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? comments = null,
+  }) {
+    return _then(_FeedCommentListDto(
+      comments: null == comments
+          ? _self._comments
+          : comments // ignore: cast_nullable_to_non_nullable
+              as List<FeedCommentDto>,
+    ));
+  }
+}
+
 // dart format on
