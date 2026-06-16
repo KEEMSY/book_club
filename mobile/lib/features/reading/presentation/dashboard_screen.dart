@@ -37,6 +37,8 @@ import '../domain/grade_summary.dart';
 import '../domain/heatmap_day.dart';
 import '../domain/reading_goal.dart';
 import '../domain/reading_year_stats.dart';
+import '../../retention/application/retention_providers.dart';
+import '../../retention/data/retention_repository.dart';
 import 'dashboard_settings_sheet.dart';
 import 'widgets/daily_total_card.dart';
 import 'widgets/dashboard_goal_card.dart';
@@ -164,7 +166,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 ),
                 SizedBox(height: spacing.md),
                 if (prefs.showStreak) ...<Widget>[
-                  StreakCard(
+                  _StreakCardWithRecovery(
                     streak: _streak(gradeState),
                     longest: _longest(gradeState),
                   ),
@@ -820,6 +822,64 @@ class _SessionRow extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Wraps [StreakCard] with streak recovery awareness.
+///
+/// Watches [streakRecoveryStatusProvider] and, when [streak] is 0 and the
+/// user still has recovery tokens, exposes a "스트릭 복구하기" button. On
+/// confirmation it calls `POST /me/streak/recover` and invalidates the grade
+/// and recovery-status providers so the dashboard refreshes automatically.
+class _StreakCardWithRecovery extends ConsumerWidget {
+  const _StreakCardWithRecovery({
+    required this.streak,
+    required this.longest,
+  });
+
+  final int streak;
+  final int longest;
+
+  Future<void> _recover(BuildContext context, WidgetRef ref) async {
+    try {
+      await ref.read(retentionRepositoryProvider).recoverStreak();
+      // Refresh grade (streak count) and recovery status.
+      ref.invalidate(gradeNotifierProvider);
+      ref.invalidate(streakRecoveryStatusProvider);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('스트릭이 복구되었어요!')),
+        );
+      }
+    } on RetentionRepositoryException catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message)),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Only fetch recovery status when the streak is broken — avoids
+    // unnecessary network requests for users actively maintaining their streak.
+    bool canRecover = false;
+    int remaining = 0;
+
+    if (streak == 0) {
+      final recoveryAsync = ref.watch(streakRecoveryStatusProvider);
+      canRecover = recoveryAsync.valueOrNull?.canRecover ?? false;
+      remaining = recoveryAsync.valueOrNull?.recoveriesRemaining ?? 0;
+    }
+
+    return StreakCard(
+      streak: streak,
+      longest: longest,
+      canRecover: canRecover,
+      recoveriesRemaining: remaining,
+      onRecover: canRecover ? () => _recover(context, ref) : null,
     );
   }
 }
