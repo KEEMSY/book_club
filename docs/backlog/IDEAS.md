@@ -13,6 +13,16 @@
 
 ## Phase 전환 리뷰 기록
 
+### Phase 11 완료 리뷰 (2026-06-16)
+
+- **완료 (M46)**: (engagement) 리텐션 & 재참여 강화 — 7일 이탈 감지, 재참여 푸시, 스트릭 복구 메커니즘, LastActiveMiddleware
+- **완료 (M47)**: (social) 소셜 피드 강화 — feed_event_reactions/feed_comments 테이블, 이모지 5종 리액션, 댓글 2뎁스 BottomSheet
+- **완료 (M48)**: (discovery) 클럽 발견 강화 — club_tags/category, AI 코사인 유사도 추천 TOP5, Redis 1h 캐시, PublicClubsScreen 리뉴얼
+- **완료 (M49)**: (monetization) IAP 쉴드 구매 — shield_purchases 테이블, ShieldPurchaseService(구매·환불), ShieldPurchaseSheet UI
+- **완료 (M50)**: (infra) 성능 & 모니터링 — cache_response 데코레이터, Prometheus/Grafana APM, Sentry(백엔드+Flutter)
+- **보류 (Phase 12)**: (audio) 실 오디오 코칭, (discovery) 딥러닝 추천, (monetization) Pro 연간 할인 캠페인
+- Phase 11 종료 태그: v0.8.0 (2026-06-16)
+
 ### Phase 11 전환 리뷰 (2026-06-16)
 
 - 리뷰 문서: `docs/plans/2026-06-16-phase11.md`
