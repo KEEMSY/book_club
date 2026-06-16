@@ -13,6 +13,18 @@
 
 ## Phase 전환 리뷰 기록
 
+### Phase 11 전환 리뷰 (2026-06-16)
+
+- 리뷰 문서: `docs/plans/2026-06-16-phase11.md`
+- **편입 (M46)**: (engagement) 리텐션 & 재참여 강화 — 7일 이탈 감지, 재참여 푸시, 스트릭 복구 메커니즘
+- **편입 (M47)**: (social) 소셜 피드 강화 — 팔로우 기반 피드, 리액션 시스템(이모지 5종), 댓글 2뎁스
+- **편입 (M48)**: (discovery) 클럽 발견 강화 — 클럽 태그/카테고리, AI 기반 클럽 추천
+- **편입 (M49)**: (monetization) IAP 쉴드 추가 구매 — 1개 990원·3개 2,490원, RevenueCat 소비형 IAP 연동
+- **편입 (M50)**: (infra) 성능 & 모니터링 인프라 — Redis 응답 캐싱, Prometheus/Grafana APM, Sentry 에러 모니터링
+- **보류 (Phase 12)**: (audio) 실 오디오 코칭 — M42 큐레이션 카드 MVP 반응 데이터 확보 후
+- **보류 (Phase 12)**: (discovery) 딥러닝 추천 — 활성 사용자 1만 이상 확보 후
+- **보류 (Phase 12)**: (monetization) Pro 연간 구독 할인 캠페인 — M43 A/B 실험 결과 분석 후
+
 ### Phase 10 전환 리뷰 (2026-06-15)
 
 - 리뷰 문서: `docs/plans/2026-06-15-phase10.md`
