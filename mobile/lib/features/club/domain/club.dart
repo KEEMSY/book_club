@@ -11,6 +11,8 @@ class Club {
     required this.memberCount,
     required this.createdAt,
     this.isPublic = false,
+    this.category,
+    this.tags = const [],
   });
 
   final String id;
@@ -24,6 +26,9 @@ class Club {
   final int memberCount;
   final DateTime createdAt;
   final bool isPublic;
+  // M48: category and tags for club discovery
+  final String? category;
+  final List<String> tags;
 
   factory Club.fromJson(Map<String, dynamic> json) => Club(
         id: json['id'] as String,
@@ -37,6 +42,8 @@ class Club {
         memberCount: json['member_count'] as int,
         createdAt: DateTime.parse(json['created_at'] as String),
         isPublic: json['is_public'] as bool? ?? false,
+        category: json['category'] as String?,
+        tags: (json['tags'] as List?)?.cast<String>() ?? const [],
       );
 }
 

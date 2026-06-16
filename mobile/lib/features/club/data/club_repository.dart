@@ -22,6 +22,8 @@ class ClubRepository {
     String? bookId,
     int maxMembers = 10,
     bool isPublic = false,
+    String? category,
+    List<String> tags = const [],
   }) async {
     final data = await _api.createClub({
       'name': name,
@@ -29,6 +31,8 @@ class ClubRepository {
       if (bookId != null) 'book_id': bookId,
       'max_members': maxMembers,
       'is_public': isPublic,
+      if (category != null) 'category': category,
+      if (tags.isNotEmpty) 'tags': tags,
     });
     return Club.fromJson(data);
   }
@@ -199,14 +203,26 @@ class ClubRepository {
 
   Future<List<Club>> listPublicClubs({
     String? search,
+    String? category,
+    String? tag,
     String sort = 'newest',
     String? cursor,
   }) async {
     final data = await _api.listPublicClubs(
       search: search,
+      category: category,
+      tag: tag,
       sort: sort,
       cursor: cursor,
     );
+    final items = (data['items'] as List? ?? []);
+    return items
+        .map((e) => Club.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<List<Club>> getRecommendedClubs() async {
+    final data = await _api.getRecommendedClubs();
     final items = (data['items'] as List? ?? []);
     return items
         .map((e) => Club.fromJson(e as Map<String, dynamic>))

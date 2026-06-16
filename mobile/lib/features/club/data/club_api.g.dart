@@ -324,6 +324,8 @@ class _ClubApi implements ClubApi {
   @override
   Future<dynamic> listPublicClubs({
     String? search,
+    String? category,
+    String? tag,
     String sort = 'newest',
     String? cursor,
     int limit = 20,
@@ -331,6 +333,8 @@ class _ClubApi implements ClubApi {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
       r'search': search,
+      r'category': category,
+      r'tag': tag,
       r'sort': sort,
       r'cursor': cursor,
       r'limit': limit,
@@ -343,6 +347,27 @@ class _ClubApi implements ClubApi {
           .compose(
             _dio.options,
             '/clubs/public',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch(_options);
+    final _value = _result.data;
+    return _value;
+  }
+
+  @override
+  Future<dynamic> getRecommendedClubs() async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<dynamic>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/clubs/recommended',
             queryParameters: queryParameters,
             data: _data,
           )

@@ -30,3 +30,19 @@ final publicClubsProvider = FutureProvider.autoDispose
         sort: params.sort,
       ),
 );
+
+/// M48: filtered public clubs with category/tag/sort support.
+final filteredPublicClubsProvider = FutureProvider.autoDispose
+    .family<List<Club>, ({String? category, String? tag, String sort})>(
+  (ref, params) => ref.read(clubRepositoryProvider).listPublicClubs(
+        category: params.category,
+        tag: params.tag,
+        sort: params.sort,
+      ),
+);
+
+/// M48: AI-recommended clubs for the current user.
+final recommendedClubsProvider =
+    FutureProvider.autoDispose<List<Club>>((ref) {
+  return ref.read(clubRepositoryProvider).getRecommendedClubs();
+});
