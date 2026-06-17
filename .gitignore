@@ -66,3 +66,6 @@ logs/
 
 # ─────── Docker ───────
 .docker/
+
+# ─────── DB 백업 ───────
+backups/
