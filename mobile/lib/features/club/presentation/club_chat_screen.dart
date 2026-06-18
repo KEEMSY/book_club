@@ -31,6 +31,25 @@ class ClubChatScreen extends ConsumerStatefulWidget {
   ConsumerState<ClubChatScreen> createState() => _ClubChatScreenState();
 }
 
+/// Standalone, full-screen wrapper around [ClubChatScreen].
+///
+/// [ClubChatScreen] renders a bare [Column] sized to live inside the club
+/// detail tab bar, so deeplink/notification routes that open chat directly
+/// need this scaffold to supply the AppBar and back affordance.
+class ClubChatPage extends StatelessWidget {
+  const ClubChatPage({super.key, required this.club});
+
+  final Club club;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('${club.name} 채팅')),
+      body: ClubChatScreen(club: club),
+    );
+  }
+}
+
 class _ClubChatScreenState extends ConsumerState<ClubChatScreen> {
   final _controller = TextEditingController();
   final _scrollController = ScrollController();

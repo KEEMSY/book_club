@@ -19,8 +19,12 @@ import '../../features/community/presentation/leaderboard_screen.dart';
 import '../../features/community/presentation/profile_edit_screen.dart';
 import '../../features/community/presentation/user_profile_screen.dart';
 import '../../features/social/domain/user_summary.dart';
+import '../../features/feed/presentation/highlight_explore_screen.dart';
 import '../../features/feed/presentation/post_compose_screen.dart';
+import '../../features/club/presentation/club_chat_screen.dart';
+import '../../features/club/presentation/club_detail_screen.dart';
 import '../../features/club/presentation/club_events_screen.dart';
+import '../../features/club/presentation/club_loader.dart';
 import '../../features/club/presentation/club_room_chat_screen.dart';
 import '../../features/club/presentation/club_rooms_screen.dart';
 import '../../features/club/presentation/public_clubs_screen.dart';
@@ -30,14 +34,19 @@ import '../../features/notification/presentation/weekly_report_screen.dart';
 import '../../features/referral/application/referral_providers.dart';
 import '../../features/referral/presentation/referral_screen.dart';
 import '../../features/reminder/presentation/reminder_screen.dart';
+import '../../features/legal/presentation/legal_screen.dart';
+import '../../features/onboarding/application/onboarding_provider.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/onboarding/presentation/privacy_policy_screen.dart';
 import '../../features/search/presentation/unified_search_screen.dart';
 import '../../features/subscription/presentation/paywall_screen.dart';
 import '../../features/reading/application/recap_notifier.dart';
+import '../../features/reading/domain/reading_goal.dart';
 import '../../features/reading/presentation/dashboard_screen.dart';
 import '../../features/reading/presentation/goal_screen.dart';
 import '../../features/reading/presentation/grade_screen.dart';
+import '../../features/reading/presentation/session_summary_screen.dart';
+import '../../features/retention/presentation/streak_recovery_screen.dart';
 import '../../features/reading/presentation/monthly_recap_screen.dart';
 import '../../features/reading/presentation/reading_recap_screen.dart';
 import '../../features/reading/presentation/advanced_stats_screen.dart';
@@ -131,6 +140,25 @@ class AppRoutes {
 
   // M45 — privacy policy screen (opens external browser).
   static const privacyPolicy = '/privacy-policy';
+
+  // M57 — in-app legal documents (App Store submission requirement).
+  static const settingsPrivacy = '/settings/privacy';
+  static const settingsTerms = '/settings/terms';
+
+  // Highlight discovery — community-wide highlight explore feed.
+  static const highlightExplore = '/highlights/explore';
+
+  // Post-session celebration; requires a SessionCompletion passed via extra.
+  static const sessionSummary = '/reading/session-summary';
+
+  // Broken-streak recovery; longest-streak count passed via extra.
+  static const streakRecovery = '/streak-recovery';
+
+  // Club detail; full Club passed via extra when available, else loaded by id.
+  static String clubDetail(String clubId) => '/clubs/$clubId';
+
+  // Club-level chat (distinct from chapter-gated room chat).
+  static String clubChat(String clubId) => '/clubs/$clubId/chat';
 }
 
 /// Adapter that bridges a Riverpod [ValueNotifier]-free state stream into a
@@ -186,7 +214,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         // Check the onboarding-complete flag synchronously from the cache.
         // The provider is pre-warmed in main.dart so the value is available.
         final bool onboardingDone =
-            ref.read(onboardingCompleteProvider).valueOrNull ?? false;
+            ref.read(onboardingCompletedProvider).valueOrNull ?? false;
         return onboardingDone ? AppRoutes.login : AppRoutes.onboarding;
       }
 
@@ -284,6 +312,29 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootKey,
         builder: (context, state) => const AdvancedStatsScreen(),
       ),
+      // Community-wide highlight discovery feed.
+      GoRoute(
+        path: AppRoutes.highlightExplore,
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) => const HighlightExploreScreen(),
+      ),
+      // Post-session celebration. Requires a SessionCompletion via extra;
+      // without it there is nothing to summarise, so fall back to home.
+      GoRoute(
+        path: AppRoutes.sessionSummary,
+        parentNavigatorKey: _rootKey,
+        redirect: (context, state) =>
+            state.extra is SessionCompletion ? null : AppRoutes.home,
+        builder: (context, state) =>
+            SessionSummaryScreen(completion: state.extra! as SessionCompletion),
+      ),
+      // Broken-streak recovery. Longest-streak count passed via extra int.
+      GoRoute(
+        path: AppRoutes.streakRecovery,
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) =>
+            StreakRecoveryScreen(longest: state.extra as int? ?? 0),
+      ),
       // M28 — monthly recap card. Optional (year, month) passed as extra Map.
       GoRoute(
         path: AppRoutes.monthlyRecap,
@@ -334,6 +385,39 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             roomId: roomId,
             roomName: roomName,
           );
+        },
+      ),
+      // Club-level chat — opened directly from chat notifications/deeplinks.
+      // The full Club is loaded by id since notification payloads carry only
+      // the club id.
+      GoRoute(
+        path: '/clubs/:clubId/chat',
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) {
+          final String clubId = state.pathParameters['clubId']!;
+          final Club? club = state.extra as Club?;
+          return club != null
+              ? ClubChatPage(club: club)
+              : ClubLoader(
+                  clubId: clubId,
+                  builder: (loaded) => ClubChatPage(club: loaded),
+                );
+        },
+      ),
+      // Club detail — reachable from club lists (Club passed via extra) and from
+      // notifications (loaded by id).
+      GoRoute(
+        path: '/clubs/:clubId',
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) {
+          final String clubId = state.pathParameters['clubId']!;
+          final Club? club = state.extra as Club?;
+          return club != null
+              ? ClubDetailScreen(club: club)
+              : ClubLoader(
+                  clubId: clubId,
+                  builder: (loaded) => ClubDetailScreen(club: loaded),
+                );
         },
       ),
       GoRoute(
@@ -387,6 +471,23 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.privacyPolicy,
         parentNavigatorKey: _rootKey,
         builder: (context, state) => const PrivacyPolicyScreen(),
+      ),
+      // M57 — in-app legal documents rendered from bundled Markdown assets.
+      GoRoute(
+        path: AppRoutes.settingsPrivacy,
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) => const LegalScreen(
+          title: '개인정보처리방침',
+          assetPath: 'assets/legal/privacy_policy.md',
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.settingsTerms,
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) => const LegalScreen(
+          title: '이용약관',
+          assetPath: 'assets/legal/terms.md',
+        ),
       ),
       // M31 — deeplink entry point: bookclub.app/invite/{code}
       // Applies the referral code and then redirects to home. The apply call

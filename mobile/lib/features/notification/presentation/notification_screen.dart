@@ -96,14 +96,16 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
       case 'weekly_report':
         return () => context.push(AppRoutes.weeklyReport);
       case 'comment' || 'reaction':
-        final postId = dto.data['post_id'];
-        if (postId != null) {
-          return () => context.push('/feed/post/$postId');
-        }
+        // TODO(feed): no standalone post-detail route exists yet; the feed
+        // lives inside the community tab, so route there until a
+        // `/feed/post/:id` screen ships. (owner: feed team)
+        return () => context.go(AppRoutes.community);
       case 'club_chat' || 'chat_mention':
+        // Payload carries only the club id (no room id), so open the
+        // club-level chat, which loads the club by id.
         final clubId = dto.data['club_id'];
         if (clubId != null) {
-          return () => context.push('/clubs/$clubId/chat');
+          return () => context.push(AppRoutes.clubChat(clubId));
         }
       case 'challenge_started' ||
             'challenge_completed' ||
@@ -116,7 +118,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
       case 'club_joined' || 'club_invite':
         final clubId = dto.data['club_id'];
         if (clubId != null) {
-          return () => context.push('/clubs/$clubId');
+          return () => context.push(AppRoutes.clubDetail(clubId));
         }
     }
     return null;
