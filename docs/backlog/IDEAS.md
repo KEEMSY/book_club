@@ -13,6 +13,16 @@
 
 ## Phase 전환 리뷰 기록
 
+### Phase 12 전환 리뷰 (2026-06-17)
+
+- 리뷰 문서: `docs/plans/2026-06-17-phase12.md`
+- **편입 (M51)**: (social) 독서 노트 & 하이라이트 소셜 공유 — visibility 토글, 피드 HIGHLIGHT_SHARED 이벤트, 탐색 화면
+- **편입 (M52)**: (club) 클럽 AI 독서 코치 — 주간 계획 자동 생성, 진도 알림, Pro 게이트
+- **편입 (M53)**: (monetization) Pro 연간 플랜 + 고급 통계 — 연간 59,000원, 장르 파이차트, 연간 비교
+- **편입 (M54)**: (social) 책 리뷰 & 평점 — 완독 후 별점 1–5, 리뷰 피드 카드, 신고 자동 숨김
+- **편입 (M55)**: (infra) 안정화 & UX 스프린트 — Sentry 트리아지, P99 쿼리 최적화, 스켈레톤 UI
+- **보류 (Phase 13)**: (audio) 실 오디오 코칭, (discovery) 딥러닝 추천, (social) 영상 통화 통합
+
 ### Phase 11 완료 리뷰 (2026-06-16)
 
 - **완료 (M46)**: (engagement) 리텐션 & 재참여 강화 — 7일 이탈 감지, 재참여 푸시, 스트릭 복구 메커니즘, LastActiveMiddleware
