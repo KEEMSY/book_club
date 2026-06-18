@@ -23,6 +23,13 @@ final myClubsProvider = FutureProvider.autoDispose<List<Club>>((ref) {
   return ref.watch(clubRepositoryProvider).listMyClubs();
 });
 
+/// Resolves a single [Club] by id. Used by deeplink/notification routes that
+/// only carry a club id, not the full object the detail/chat screens require.
+final clubByIdProvider =
+    FutureProvider.autoDispose.family<Club, String>((ref, clubId) {
+  return ref.watch(clubRepositoryProvider).getClub(clubId);
+});
+
 final publicClubsProvider = FutureProvider.autoDispose
     .family<List<Club>, ({String? search, String sort})>(
   (ref, params) => ref.read(clubRepositoryProvider).listPublicClubs(
