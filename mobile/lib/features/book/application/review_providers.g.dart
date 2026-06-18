@@ -65,29 +65,25 @@ class _SystemHash {
 }
 
 /// Aggregate review summary for a book — average, distribution, and the latest
-/// page of reviews. Named distinctly from the legacy `bookReviews` provider to
-/// avoid a generated-symbol collision.
+/// page of reviews.
 ///
 /// Copied from [bookReviewSummary].
 @ProviderFor(bookReviewSummary)
 const bookReviewSummaryProvider = BookReviewSummaryFamily();
 
 /// Aggregate review summary for a book — average, distribution, and the latest
-/// page of reviews. Named distinctly from the legacy `bookReviews` provider to
-/// avoid a generated-symbol collision.
+/// page of reviews.
 ///
 /// Copied from [bookReviewSummary].
 class BookReviewSummaryFamily extends Family<AsyncValue<BookReviewSummaryDto>> {
   /// Aggregate review summary for a book — average, distribution, and the latest
-  /// page of reviews. Named distinctly from the legacy `bookReviews` provider to
-  /// avoid a generated-symbol collision.
+  /// page of reviews.
   ///
   /// Copied from [bookReviewSummary].
   const BookReviewSummaryFamily();
 
   /// Aggregate review summary for a book — average, distribution, and the latest
-  /// page of reviews. Named distinctly from the legacy `bookReviews` provider to
-  /// avoid a generated-symbol collision.
+  /// page of reviews.
   ///
   /// Copied from [bookReviewSummary].
   BookReviewSummaryProvider call(
@@ -123,15 +119,13 @@ class BookReviewSummaryFamily extends Family<AsyncValue<BookReviewSummaryDto>> {
 }
 
 /// Aggregate review summary for a book — average, distribution, and the latest
-/// page of reviews. Named distinctly from the legacy `bookReviews` provider to
-/// avoid a generated-symbol collision.
+/// page of reviews.
 ///
 /// Copied from [bookReviewSummary].
 class BookReviewSummaryProvider
     extends AutoDisposeFutureProvider<BookReviewSummaryDto> {
   /// Aggregate review summary for a book — average, distribution, and the latest
-  /// page of reviews. Named distinctly from the legacy `bookReviews` provider to
-  /// avoid a generated-symbol collision.
+  /// page of reviews.
   ///
   /// Copied from [bookReviewSummary].
   BookReviewSummaryProvider(

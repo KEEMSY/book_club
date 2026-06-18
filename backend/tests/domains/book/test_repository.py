@@ -6,7 +6,6 @@ Verifies:
   duplicate insert.
 - ``list_for_user`` honours the (started_at DESC, id DESC) cursor order.
 - ``update_status`` on an unknown id raises NotFoundError.
-- ``set_rating_review`` rejects out-of-range ratings via the CHECK constraint.
 """
 
 from __future__ import annotations
@@ -132,40 +131,6 @@ async def test_update_status_happy_and_not_found(session: AsyncSession) -> None:
 
     with pytest.raises(NotFoundError):
         await ub_repo.update_status(uuid4(), UserBookStatus.PAUSED)
-
-
-@pytest.mark.asyncio
-async def test_set_rating_review_happy_and_out_of_range(session: AsyncSession) -> None:
-    user_id = await _create_user(session, sub="u-rate")
-    book_repo = BookRepository(session)
-    book = await book_repo.upsert_by_isbn(
-        isbn13="9788937460444",
-        title="총균쇠",
-        author="재레드 다이아몬드",
-        publisher=None,
-        cover_url=None,
-        description=None,
-        source=BookSource.NAVER,
-    )
-    ub_repo = UserBookRepository(session)
-    ub = await ub_repo.create(user_id=user_id, book_id=book.id)
-    now = datetime.now(tz=UTC)
-
-    done = await ub_repo.set_rating_review(
-        ub.id,
-        rating=5,
-        one_line_review="인생책",
-        finished_at=now,
-        status=UserBookStatus.COMPLETED,
-    )
-    assert done.rating == 5
-    assert done.one_line_review == "인생책"
-    assert done.status is UserBookStatus.COMPLETED
-    assert done.finished_at is not None
-
-    with pytest.raises(ConflictError) as exc_info:
-        await ub_repo.set_rating_review(ub.id, rating=99, one_line_review=None)
-    assert exc_info.value.code == "RATING_OUT_OF_RANGE"
 
 
 @pytest.mark.asyncio

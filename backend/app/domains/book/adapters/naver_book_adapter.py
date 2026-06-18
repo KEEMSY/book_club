@@ -62,6 +62,26 @@ def _upgrade_to_https(url: str | None) -> str | None:
     return url
 
 
+def _parse_page_count(raw: dict[str, Any]) -> int | None:
+    """Best-effort page count from a provider item.
+
+    Naver's book search response does not document a page-count field, but
+    some items carry an ``itemPage`` (Aladin-style) value. Read it defensively
+    and return None for anything missing or non-positive so the catalog never
+    stores a bogus zero. Shared by the Kakao adapter, which is similarly
+    page-count-poor.
+    """
+    for key in ("itemPage", "page", "pages"):
+        value = raw.get(key)
+        if isinstance(value, int) and value > 0:
+            return value
+        if isinstance(value, str) and value.strip().isdigit():
+            parsed = int(value.strip())
+            if parsed > 0:
+                return parsed
+    return None
+
+
 class NaverBookAdapter:
     """Implements :class:`app.domains.book.ports.BookSearchPort` for Naver."""
 
@@ -137,6 +157,7 @@ class NaverBookAdapter:
                     publisher=publisher or None,
                     cover_url=cover_url,
                     description=description,
+                    page_count=_parse_page_count(raw),
                     source=BookSource.NAVER,
                 )
             )

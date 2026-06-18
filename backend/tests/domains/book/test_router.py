@@ -6,9 +6,8 @@ an in-memory FakeBookService. No DB, no HTTP to Naver/Kakao.
 Coverage:
 - 200 happy path for search / get_book / list_library
 - 201 for add_to_library; 409 BOOK_ALREADY_IN_LIBRARY on duplicate
-- 200 for update_status and submit_review; 404 on not-owned
+- 200 for update_status; 404 on not-owned
 - 401 for missing auth header
-- 422 for rating out of range
 - 404 for unknown book_id and unknown user_book_id
 """
 
@@ -52,6 +51,9 @@ def _user_book(user_id: UUID, book: Book) -> UserBook:
     ub.finished_at = None
     ub.rating = None
     ub.one_line_review = None
+    # server_default only applies after a DB round-trip; these in-memory rows
+    # never touch the DB, so set the non-nullable column explicitly.
+    ub.current_chapter = 0
     ub.book = book
     return ub
 
@@ -106,35 +108,6 @@ class FakeBookService:
         if self.user_book is None:
             self.user_book = _user_book(user_id, self.book)
         self.user_book.status = status
-        return self.user_book
-
-    async def submit_review(
-        self,
-        *,
-        user_id: UUID,
-        user_book_id: UUID,
-        rating: int,
-        one_line_review: str | None,
-    ) -> UserBook:
-        self.calls.append(
-            (
-                "submit_review",
-                {
-                    "user_id": user_id,
-                    "user_book_id": user_book_id,
-                    "rating": rating,
-                    "one_line_review": one_line_review,
-                },
-            )
-        )
-        if self.not_found_on_user_book:
-            raise NotFoundError("not found", code="USER_BOOK_NOT_FOUND")
-        if self.user_book is None:
-            self.user_book = _user_book(user_id, self.book)
-        self.user_book.status = UserBookStatus.COMPLETED
-        self.user_book.rating = rating
-        self.user_book.one_line_review = one_line_review
-        self.user_book.finished_at = datetime.now(tz=UTC)
         return self.user_book
 
     async def list_library(
@@ -290,48 +263,6 @@ async def test_update_status_rejects_invalid_enum(
         headers=_auth(user_id),
     )
     assert response.status_code == 422
-
-
-@pytest.mark.asyncio
-async def test_submit_review_happy_and_422_on_bad_rating(
-    client_and_fake: tuple[AsyncClient, FakeBookService, UUID],
-) -> None:
-    client, _, user_id = client_and_fake
-
-    response = await client.post(
-        f"/me/library/{uuid4()}/review",
-        json={"rating": 5, "one_line_review": "인생책"},
-        headers=_auth(user_id),
-    )
-    assert response.status_code == 200
-    body = response.json()
-    assert body["status"] == "completed"
-    assert body["rating"] == 5
-    assert body["one_line_review"] == "인생책"
-    assert body["finished_at"] is not None
-
-    # Out-of-range rating → 422 from pydantic.
-    response = await client.post(
-        f"/me/library/{uuid4()}/review",
-        json={"rating": 9, "one_line_review": None},
-        headers=_auth(user_id),
-    )
-    assert response.status_code == 422
-
-
-@pytest.mark.asyncio
-async def test_submit_review_404_when_not_owner(
-    client_and_fake: tuple[AsyncClient, FakeBookService, UUID],
-) -> None:
-    client, fake, user_id = client_and_fake
-    fake.not_found_on_user_book = True
-    response = await client.post(
-        f"/me/library/{uuid4()}/review",
-        json={"rating": 3, "one_line_review": None},
-        headers=_auth(user_id),
-    )
-    assert response.status_code == 404
-    assert response.json()["error"]["code"] == "USER_BOOK_NOT_FOUND"
 
 
 @pytest.mark.asyncio

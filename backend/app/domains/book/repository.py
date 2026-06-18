@@ -23,16 +23,14 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from uuid import UUID
 
-from sqlalchemy import and_, or_, select, update
+from sqlalchemy import and_, func, or_, select, update
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.core.exceptions import ConflictError, NotFoundError
-from app.domains.auth.models import User
 from app.domains.book.models import Book, BookSource, UserBook, UserBookStatus
-from app.domains.book.ports import ReviewRow
 
 
 class BookRepository:
@@ -51,36 +49,37 @@ class BookRepository:
         cover_url: str | None,
         description: str | None,
         source: BookSource,
+        page_count: int | None = None,
     ) -> Book:
         # INSERT ... ON CONFLICT (isbn13) DO UPDATE so concurrent search
         # requests for the same ISBN collapse to one row. We update the
         # mutable fields in case the external provider has refreshed
         # metadata (e.g. a new cover_url).
-        stmt = (
-            pg_insert(Book)
-            .values(
-                isbn13=isbn13,
-                title=title,
-                author=author,
-                publisher=publisher,
-                cover_url=cover_url,
-                description=description,
-                source=source.value,
-            )
-            .on_conflict_do_update(
-                index_elements=["isbn13"],
-                set_={
-                    "title": title,
-                    "author": author,
-                    "publisher": publisher,
-                    "cover_url": cover_url,
-                    "description": description,
-                    "source": source.value,
-                    "updated_at": datetime.now(tz=UTC),
-                },
-            )
-            .returning(Book)
+        insert_stmt = pg_insert(Book).values(
+            isbn13=isbn13,
+            title=title,
+            author=author,
+            publisher=publisher,
+            cover_url=cover_url,
+            description=description,
+            page_count=page_count,
+            source=source.value,
         )
+        stmt = insert_stmt.on_conflict_do_update(
+            index_elements=["isbn13"],
+            set_={
+                "title": title,
+                "author": author,
+                "publisher": publisher,
+                "cover_url": cover_url,
+                "description": description,
+                # Providers rarely report pages; keep a previously-known value
+                # rather than clobbering it with NULL on a later search.
+                "page_count": func.coalesce(insert_stmt.excluded.page_count, Book.page_count),
+                "source": source.value,
+                "updated_at": datetime.now(tz=UTC),
+            },
+        ).returning(Book)
         result = await self._session.execute(stmt)
         book_id = result.scalar_one().id
         await self._session.flush()
@@ -154,38 +153,6 @@ class UserBookRepository:
         await self._session.refresh(ub)
         return ub
 
-    async def set_rating_review(
-        self,
-        user_book_id: UUID,
-        *,
-        rating: int,
-        one_line_review: str | None,
-        finished_at: datetime | None = None,
-        status: UserBookStatus | None = None,
-    ) -> UserBook:
-        ub = await self._session.get(UserBook, user_book_id)
-        if ub is None:
-            raise NotFoundError("user_book not found", code="USER_BOOK_NOT_FOUND")
-        ub.rating = rating
-        ub.one_line_review = one_line_review
-        if finished_at is not None:
-            ub.finished_at = finished_at
-        if status is not None:
-            ub.status = status
-        try:
-            await self._session.flush()
-        except IntegrityError as exc:
-            await self._session.rollback()
-            # The DB-level CHECK enforces 1..5 even if a caller bypassed the
-            # service's 422 validation. Map the violation so the service can
-            # keep its transport-agnostic contract.
-            raise ConflictError(
-                "rating out of range",
-                code="RATING_OUT_OF_RANGE",
-            ) from exc
-        await self._session.refresh(ub)
-        return ub
-
     async def update_chapter(self, user_book_id: UUID, current_chapter: int) -> UserBook:
         stmt = (
             update(UserBook)
@@ -203,45 +170,6 @@ class UserBookRepository:
         if ub is None:
             raise NotFoundError("user_book not found", code="USER_BOOK_NOT_FOUND")
         await self._session.delete(ub)
-
-    async def list_reviews_for_book(
-        self,
-        book_id: UUID,
-        *,
-        exclude_user_id: UUID | None = None,
-        limit: int = 20,
-    ) -> list[ReviewRow]:
-        conditions = [
-            UserBook.book_id == book_id,
-            UserBook.rating.is_not(None),
-            User.deleted_at.is_(None),
-        ]
-        if exclude_user_id is not None:
-            conditions.append(UserBook.user_id != exclude_user_id)
-
-        stmt = (
-            select(UserBook, User)
-            .join(User, UserBook.user_id == User.id)
-            .where(and_(*conditions))
-            .order_by(UserBook.updated_at.desc())
-            .limit(limit)
-        )
-        result = await self._session.execute(stmt)
-        rows: list[ReviewRow] = []
-        for ub, user in result.all():
-            rows.append(
-                ReviewRow(
-                    user_book_id=ub.id,
-                    book_id=ub.book_id,
-                    rating=ub.rating,
-                    one_line_review=ub.one_line_review,
-                    author_user_id=user.id,
-                    author_nickname=user.nickname,
-                    author_profile_image_url=user.profile_image_url,
-                    reviewed_at=ub.updated_at,
-                )
-            )
-        return rows
 
     async def list_for_user(
         self,

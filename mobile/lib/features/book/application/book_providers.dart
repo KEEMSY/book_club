@@ -4,7 +4,6 @@ import '../../../core/network/dio_provider.dart';
 import '../data/book_api.dart';
 import '../data/book_models.dart' show DiscoverResponseDto;
 import '../data/book_repository.dart';
-import '../domain/book_review.dart';
 import '../domain/book_status.dart';
 
 part 'book_providers.g.dart';
@@ -37,9 +36,4 @@ class LibraryPendingTab extends _$LibraryPendingTab {
 Future<DiscoverResponseDto> discoverBooks(DiscoverBooksRef ref) {
   ref.keepAlive();
   return ref.read(bookRepositoryProvider).getDiscover();
-}
-
-@riverpod
-Future<List<BookReview>> bookReviews(BookReviewsRef ref, String bookId) {
-  return ref.read(bookRepositoryProvider).getBookReviews(bookId);
 }

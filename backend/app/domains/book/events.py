@@ -10,8 +10,7 @@ from uuid import UUID
 class UserBookCompleted:
     """Fired when a UserBook transitions to COMPLETED status.
 
-    Produced by both ``update_status(COMPLETED)`` and ``submit_review``
-    (which implicitly completes the book).  Challenge handlers subscribe to
+    Produced by ``update_status(COMPLETED)``. Challenge handlers subscribe to
     this event to update ``books_count``-type challenge progress.
     """
 

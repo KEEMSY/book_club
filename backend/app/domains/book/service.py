@@ -1,4 +1,4 @@
-"""Book domain service — search, library, status, review.
+"""Book domain service — search, library, status.
 
 Depends only on the Protocols in ``ports.py`` (CLAUDE.md §3.2). Concrete
 repositories and the composite search adapter are injected by
@@ -15,12 +15,6 @@ Business rules captured here (the spec the service is responsible for):
 - ``update_status`` gates ownership with ``user_id`` — if the caller does
   not own the ``user_book_id`` we raise ``NotFoundError``, not
   ``ForbiddenError``, so an attacker cannot enumerate live ids.
-- ``submit_review`` is only valid once the book is marked completed. If
-  the user_book is currently in another status, we transition to
-  ``completed`` atomically (along with stamping ``finished_at`` when
-  absent). Rating 1..5 is enforced at the router (422); we validate again
-  here defensively and re-raise ``ConflictError`` so a direct-service
-  caller can still be rejected.
 - ``list_library`` clamps ``limit`` to [1, 50] and decodes the cursor as
   ISO8601. Returns (items, next_cursor) where next_cursor is the last
   row's ``started_at`` ISO string or None if the page is short.
@@ -31,23 +25,21 @@ from __future__ import annotations
 import asyncio
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import Protocol
 from uuid import UUID
 
-from app.core.exceptions import ConflictError, NotFoundError
+from app.core.exceptions import NotFoundError
 from app.domains.book.events import UserBookCompleted
 from app.domains.book.models import Book, BookSource, UserBook, UserBookStatus
 from app.domains.book.ports import (
     BookRepositoryPort,
     BookSearchPort,
-    ReviewRow,
     UserBookRepositoryPort,
 )
 
 _MAX_LIBRARY_PAGE = 50
 _MIN_LIBRARY_PAGE = 1
-_REVIEW_MAX_LENGTH = 200
 
 
 class FeedMilestonePort(Protocol):
@@ -62,9 +54,7 @@ class FeedMilestonePort(Protocol):
         self, *, user_id: UUID, book_id: UUID, chapter: int
     ) -> None: ...
 
-    async def record_book_completed(
-        self, *, user_id: UUID, book_id: UUID
-    ) -> None: ...
+    async def record_book_completed(self, *, user_id: UUID, book_id: UUID) -> None: ...
 
 
 @dataclass(frozen=True, slots=True)
@@ -97,7 +87,7 @@ class DiscoverSection:
 
 @dataclass(slots=True)
 class BookService:
-    """Orchestrates book search, library membership, status, and reviews."""
+    """Orchestrates book search, library membership, and status."""
 
     books: BookRepositoryPort
     user_books: UserBookRepositoryPort
@@ -118,6 +108,7 @@ class BookService:
                 publisher=item.publisher,
                 cover_url=item.cover_url,
                 description=item.description,
+                page_count=item.page_count,
                 source=item.source,
             )
             persisted.append(book)
@@ -193,62 +184,8 @@ class BookService:
                     )
                 )
             if self.feed_service is not None:
-                await self.feed_service.record_book_completed(
-                    user_id=user_id, book_id=ub.book_id
-                )
+                await self.feed_service.record_book_completed(user_id=user_id, book_id=ub.book_id)
         return updated
-
-    async def submit_review(
-        self,
-        *,
-        user_id: UUID,
-        user_book_id: UUID,
-        rating: int,
-        one_line_review: str | None,
-    ) -> UserBook:
-        if not 1 <= rating <= 5:
-            raise ConflictError("rating out of range", code="RATING_OUT_OF_RANGE")
-        if one_line_review is not None and len(one_line_review) > _REVIEW_MAX_LENGTH:
-            raise ConflictError("review too long", code="REVIEW_TOO_LONG")
-
-        ub = await self.user_books.get_by_id(user_book_id)
-        if ub is None or ub.user_id != user_id:
-            raise NotFoundError("user_book not found", code="USER_BOOK_NOT_FOUND")
-
-        # Review submission implies completion. If the caller hasn't marked
-        # it completed yet, do so now and stamp finished_at. If it was
-        # already completed without a finished_at (edge case from earlier
-        # manual transitions), backfill the stamp.
-        now = datetime.now(tz=UTC)
-        next_status: UserBookStatus | None = None
-        next_finished: datetime | None = None
-        if ub.status is not UserBookStatus.COMPLETED:
-            next_status = UserBookStatus.COMPLETED
-            next_finished = now
-        elif ub.finished_at is None:
-            next_finished = now
-
-        result = await self.user_books.set_rating_review(
-            user_book_id,
-            rating=rating,
-            one_line_review=one_line_review,
-            finished_at=next_finished,
-            status=next_status,
-        )
-        if next_status is UserBookStatus.COMPLETED:
-            if self.stage_event is not None:
-                self.stage_event(
-                    UserBookCompleted(
-                        user_id=user_id,
-                        user_book_id=user_book_id,
-                        book_id=ub.book_id,
-                    )
-                )
-            if self.feed_service is not None:
-                await self.feed_service.record_book_completed(
-                    user_id=user_id, book_id=ub.book_id
-                )
-        return result
 
     async def update_chapter(
         self,
@@ -298,23 +235,6 @@ class BookService:
                 next_cursor = last.started_at.isoformat()
         return LibraryPage(items=rows, next_cursor=next_cursor)
 
-    async def list_book_reviews(
-        self,
-        *,
-        book_id: UUID,
-        exclude_user_id: UUID | None = None,
-        limit: int = 20,
-    ) -> list[ReviewRow]:
-        book = await self.books.get_by_id(book_id)
-        if book is None:
-            raise NotFoundError("book not found", code="BOOK_NOT_FOUND")
-        clamped = max(1, min(limit, 50))
-        return await self.user_books.list_reviews_for_book(
-            book_id,
-            exclude_user_id=exclude_user_id,
-            limit=clamped,
-        )
-
     async def get_discover_sections(self) -> list[DiscoverSection]:
         # Sections that drive the pre-search discovery screen.  Queries are
         # independent so we fire them in parallel; a failed section must not
@@ -344,6 +264,5 @@ __all__ = [
     "BookSource",
     "DiscoverSection",
     "LibraryPage",
-    "ReviewRow",
     "SearchBooksResult",
 ]

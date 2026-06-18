@@ -23,14 +23,11 @@ from app.domains.book.providers import get_book_service
 from app.domains.book.schemas import (
     AddToLibraryRequest,
     BookPublic,
-    BookReviewPublic,
-    BookReviewsResponse,
     DiscoverResponse,
     DiscoverSectionPublic,
     LibraryResponse,
     SearchBookItem,
     SearchBooksResponse,
-    SubmitReviewRequest,
     UpdateChapterRequest,
     UpdateStatusRequest,
     UserBookPublic,
@@ -132,33 +129,6 @@ async def discover_books(
     )
 
 
-@router.get("/books/{book_id}/reviews", response_model=BookReviewsResponse)
-async def list_book_reviews(
-    book_id: UUID,
-    user_id: Annotated[str, Depends(get_current_user_id)],
-    service: Annotated[BookService, Depends(get_book_service)],
-    limit: Annotated[int, Query(ge=1, le=50)] = 20,
-) -> BookReviewsResponse:
-    rows = await service.list_book_reviews(
-        book_id=book_id,
-        exclude_user_id=UUID(user_id),
-        limit=limit,
-    )
-    return BookReviewsResponse(
-        items=[
-            BookReviewPublic(
-                user_book_id=r.user_book_id,
-                rating=r.rating,
-                one_line_review=r.one_line_review,
-                author_nickname=r.author_nickname,
-                author_profile_image_url=r.author_profile_image_url,
-                reviewed_at=r.reviewed_at,
-            )
-            for r in rows
-        ]
-    )
-
-
 @router.get("/books/{book_id}", response_model=BookPublic)
 async def get_book(
     book_id: UUID,
@@ -198,22 +168,6 @@ async def update_library_status(
         user_id=UUID(user_id),
         user_book_id=user_book_id,
         status=UserBookStatus(body.status),
-    )
-    return UserBookPublic.from_user_book(ub)
-
-
-@router.post("/me/library/{user_book_id}/review", response_model=UserBookPublic)
-async def submit_review(
-    user_book_id: UUID,
-    body: SubmitReviewRequest,
-    user_id: Annotated[str, Depends(get_current_user_id)],
-    service: Annotated[BookService, Depends(get_book_service)],
-) -> UserBookPublic:
-    ub = await service.submit_review(
-        user_id=UUID(user_id),
-        user_book_id=user_book_id,
-        rating=body.rating,
-        one_line_review=body.one_line_review,
     )
     return UserBookPublic.from_user_book(ub)
 

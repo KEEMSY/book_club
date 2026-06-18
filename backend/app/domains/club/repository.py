@@ -605,7 +605,7 @@ class ClubRepository:
         book = await self._session.get(Book, book_id)
         if book is None:
             return None
-        return getattr(book, "page_count", None)
+        return book.page_count
 
     async def create_reading_plan(
         self,

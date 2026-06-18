@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'app.dart';
@@ -48,6 +49,14 @@ Future<void> _runApp() async {
   await GoogleFonts.pendingFonts([GoogleFonts.playfairDisplay()]);
 
   KakaoSdk.init(nativeAppKey: _kakaoNativeAppKey);
+
+  // RevenueCat init (M56). Skipped when the key is absent so local dev cold-
+  // starts stay clean; the paywall then falls back to the backend test-receipt
+  // path instead of touching the store SDK.
+  const rcKey = String.fromEnvironment('REVENUECAT_API_KEY', defaultValue: '');
+  if (rcKey.isNotEmpty) {
+    await Purchases.configure(PurchasesConfiguration(rcKey));
+  }
 
   // Pre-warm the onboarding-complete flag so the router redirect can read it
   // synchronously on the first navigation tick (avoids a spurious /login flash).

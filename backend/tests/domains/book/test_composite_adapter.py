@@ -49,6 +49,7 @@ def _sample_result(*, source: BookSource, isbn13: str) -> BookSearchResult:
                 publisher=None,
                 cover_url=None,
                 description=None,
+                page_count=None,
                 source=source,
             )
         ],

@@ -20,24 +20,6 @@ from app.domains.book.models import Book, BookSource, UserBook, UserBookStatus
 
 
 @dataclass(frozen=True, slots=True)
-class ReviewRow:
-    """Flattened shape for a single book review, including author info.
-
-    Returned by ``list_reviews_for_book`` so the service and router never
-    touch auth models directly.
-    """
-
-    user_book_id: UUID
-    book_id: UUID
-    rating: int
-    one_line_review: str | None
-    author_user_id: UUID
-    author_nickname: str
-    author_profile_image_url: str | None
-    reviewed_at: datetime
-
-
-@dataclass(frozen=True, slots=True)
 class ExternalBook:
     """Normalized shape returned by any external book search adapter.
 
@@ -52,6 +34,7 @@ class ExternalBook:
     publisher: str | None
     cover_url: str | None
     description: str | None
+    page_count: int | None
     source: BookSource
 
 
@@ -76,6 +59,7 @@ class BookRepositoryPort(Protocol):
         cover_url: str | None,
         description: str | None,
         source: BookSource,
+        page_count: int | None = None,
     ) -> Book: ...
 
     async def get_by_id(self, book_id: UUID) -> Book | None: ...
@@ -98,25 +82,7 @@ class UserBookRepositoryPort(Protocol):
 
     async def update_status(self, user_book_id: UUID, status: UserBookStatus) -> UserBook: ...
 
-    async def set_rating_review(
-        self,
-        user_book_id: UUID,
-        *,
-        rating: int,
-        one_line_review: str | None,
-        finished_at: datetime | None = None,
-        status: UserBookStatus | None = None,
-    ) -> UserBook: ...
-
     async def delete(self, user_book_id: UUID) -> None: ...
-
-    async def list_reviews_for_book(
-        self,
-        book_id: UUID,
-        *,
-        exclude_user_id: UUID | None = None,
-        limit: int = 20,
-    ) -> list[ReviewRow]: ...
 
     async def update_chapter(self, user_book_id: UUID, current_chapter: int) -> UserBook: ...
 

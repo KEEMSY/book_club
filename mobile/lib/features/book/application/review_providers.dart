@@ -21,8 +21,7 @@ ReviewRepository reviewRepository(ReviewRepositoryRef ref) {
 }
 
 /// Aggregate review summary for a book — average, distribution, and the latest
-/// page of reviews. Named distinctly from the legacy `bookReviews` provider to
-/// avoid a generated-symbol collision.
+/// page of reviews.
 @riverpod
 Future<BookReviewSummaryDto> bookReviewSummary(
   BookReviewSummaryRef ref,

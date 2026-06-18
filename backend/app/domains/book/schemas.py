@@ -70,11 +70,6 @@ class UpdateChapterRequest(BaseModel):
     current_chapter: int = Field(ge=0)
 
 
-class SubmitReviewRequest(BaseModel):
-    rating: int = Field(ge=1, le=5)
-    one_line_review: str | None = Field(default=None, max_length=200)
-
-
 class UserBookPublic(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -106,16 +101,3 @@ class UserBookPublic(BaseModel):
 class LibraryResponse(BaseModel):
     items: list[UserBookPublic]
     next_cursor: str | None
-
-
-class BookReviewPublic(BaseModel):
-    user_book_id: UUID
-    rating: int
-    one_line_review: str | None
-    author_nickname: str
-    author_profile_image_url: str | None
-    reviewed_at: datetime
-
-
-class BookReviewsResponse(BaseModel):
-    items: list[BookReviewPublic]

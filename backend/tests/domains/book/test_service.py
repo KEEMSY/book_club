@@ -7,8 +7,6 @@ the Port Protocol shape. Covers the business rules owned by the service:
   ConflictError(BOOK_ALREADY_IN_LIBRARY) on duplicates
 - update_status returns 404 on ownership failure (no ForbiddenError
   leak) and happy-paths any-to-any transitions
-- submit_review transitions to completed, stamps finished_at, and rejects
-  out-of-range rating + over-length review
 - list_library clamps limit and emits next_cursor only on full pages
 """
 
@@ -39,6 +37,7 @@ class FakeBookRepo:
         cover_url: str | None,
         description: str | None,
         source: BookSource,
+        page_count: int | None = None,
     ) -> Book:
         existing_id = self.by_isbn.get(isbn13)
         if existing_id is not None:
@@ -48,6 +47,7 @@ class FakeBookRepo:
             existing.publisher = publisher
             existing.cover_url = cover_url
             existing.description = description
+            existing.page_count = page_count or existing.page_count
             existing.source = source
             return existing
         book = Book(
@@ -57,6 +57,7 @@ class FakeBookRepo:
             publisher=publisher,
             cover_url=cover_url,
             description=description,
+            page_count=page_count,
             source=source,
         )
         book.id = uuid4()
@@ -105,26 +106,6 @@ class FakeUserBookRepo:
         if ub is None:
             raise NotFoundError("not found", code="USER_BOOK_NOT_FOUND")
         ub.status = status
-        return ub
-
-    async def set_rating_review(
-        self,
-        user_book_id: UUID,
-        *,
-        rating: int,
-        one_line_review: str | None,
-        finished_at: datetime | None = None,
-        status: UserBookStatus | None = None,
-    ) -> UserBook:
-        ub = self.by_id.get(user_book_id)
-        if ub is None:
-            raise NotFoundError("not found", code="USER_BOOK_NOT_FOUND")
-        ub.rating = rating
-        ub.one_line_review = one_line_review
-        if finished_at is not None:
-            ub.finished_at = finished_at
-        if status is not None:
-            ub.status = status
         return ub
 
     async def update_chapter(self, user_book_id: UUID, current_chapter: int) -> UserBook:
@@ -192,6 +173,7 @@ def _external(isbn13: str, title: str = "책") -> ExternalBook:
         publisher=None,
         cover_url=None,
         description=None,
+        page_count=None,
         source=BookSource.NAVER,
     )
 
@@ -301,91 +283,6 @@ async def test_update_status_returns_404_when_not_owner() -> None:
 
 
 @pytest.mark.asyncio
-async def test_submit_review_transitions_to_completed_and_stamps_finished_at() -> None:
-    service, books, _, _ = _build_service()
-    seeded = await books.upsert_by_isbn(
-        isbn13="9788937460777",
-        title="t",
-        author="a",
-        publisher=None,
-        cover_url=None,
-        description=None,
-        source=BookSource.NAVER,
-    )
-    user_id = uuid4()
-    ub = await service.add_to_library(user_id=user_id, book_id=seeded.id)
-    assert ub.status is UserBookStatus.READING
-    assert ub.finished_at is None
-
-    done = await service.submit_review(
-        user_id=user_id,
-        user_book_id=ub.id,
-        rating=5,
-        one_line_review="인생책",
-    )
-    assert done.status is UserBookStatus.COMPLETED
-    assert done.rating == 5
-    assert done.one_line_review == "인생책"
-    assert done.finished_at is not None
-
-
-@pytest.mark.asyncio
-async def test_submit_review_rejects_bad_rating_and_long_review() -> None:
-    service, books, _, _ = _build_service()
-    seeded = await books.upsert_by_isbn(
-        isbn13="9788937460777",
-        title="t",
-        author="a",
-        publisher=None,
-        cover_url=None,
-        description=None,
-        source=BookSource.NAVER,
-    )
-    user_id = uuid4()
-    ub = await service.add_to_library(user_id=user_id, book_id=seeded.id)
-
-    with pytest.raises(ConflictError) as exc_info:
-        await service.submit_review(
-            user_id=user_id, user_book_id=ub.id, rating=99, one_line_review=None
-        )
-    assert exc_info.value.code == "RATING_OUT_OF_RANGE"
-
-    with pytest.raises(ConflictError) as exc_info:
-        await service.submit_review(
-            user_id=user_id,
-            user_book_id=ub.id,
-            rating=4,
-            one_line_review="x" * 201,
-        )
-    assert exc_info.value.code == "REVIEW_TOO_LONG"
-
-
-@pytest.mark.asyncio
-async def test_submit_review_404_for_non_owner() -> None:
-    service, books, _, _ = _build_service()
-    seeded = await books.upsert_by_isbn(
-        isbn13="9788937460777",
-        title="t",
-        author="a",
-        publisher=None,
-        cover_url=None,
-        description=None,
-        source=BookSource.NAVER,
-    )
-    owner = uuid4()
-    attacker = uuid4()
-    ub = await service.add_to_library(user_id=owner, book_id=seeded.id)
-
-    with pytest.raises(NotFoundError):
-        await service.submit_review(
-            user_id=attacker,
-            user_book_id=ub.id,
-            rating=5,
-            one_line_review=None,
-        )
-
-
-@pytest.mark.asyncio
 async def test_list_library_clamps_limit_and_emits_next_cursor() -> None:
     service, books, _user_books, _ = _build_service()
     user_id = uuid4()
@@ -467,9 +364,7 @@ async def test_update_chapter_happy_path() -> None:
     user_id = uuid4()
     ub = await service.add_to_library(user_id=user_id, book_id=seeded.id)
 
-    updated = await service.update_chapter(
-        user_id=user_id, user_book_id=ub.id, current_chapter=5
-    )
+    updated = await service.update_chapter(user_id=user_id, user_book_id=ub.id, current_chapter=5)
     assert updated.current_chapter == 5
 
 
@@ -490,9 +385,7 @@ async def test_update_chapter_non_owner_returns_not_found() -> None:
     ub = await service.add_to_library(user_id=owner, book_id=seeded.id)
 
     with pytest.raises(NotFoundError):
-        await service.update_chapter(
-            user_id=attacker, user_book_id=ub.id, current_chapter=3
-        )
+        await service.update_chapter(user_id=attacker, user_book_id=ub.id, current_chapter=3)
 
 
 @pytest.mark.asyncio
@@ -500,6 +393,4 @@ async def test_update_chapter_nonexistent_book_returns_not_found() -> None:
     service, _, _, _ = _build_service()
 
     with pytest.raises(NotFoundError):
-        await service.update_chapter(
-            user_id=uuid4(), user_book_id=uuid4(), current_chapter=1
-        )
+        await service.update_chapter(user_id=uuid4(), user_book_id=uuid4(), current_chapter=1)

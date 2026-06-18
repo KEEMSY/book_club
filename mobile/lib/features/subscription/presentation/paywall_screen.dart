@@ -1,11 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../application/subscription_notifier.dart';
 
 const Color _kProPurple = Color(0xFF6B21A8);
+
+/// RevenueCat API key, injected via `--dart-define=REVENUECAT_API_KEY`. Empty
+/// in dev builds — when empty the paywall uses the backend test-receipt path
+/// instead of the store SDK (mirrors the skip in `main.dart`).
+const String _kRevenueCatApiKey =
+    String.fromEnvironment('REVENUECAT_API_KEY', defaultValue: '');
+
+/// RevenueCat entitlement identifier that unlocks Pro. Must match the
+/// entitlement configured in the RevenueCat dashboard.
+const String _kProEntitlement = 'pro';
+
+/// Result of a paywall purchase attempt — distinguishes a user cancel (no
+/// error toast) from an outright failure.
+enum _PurchaseOutcome { success, cancelled, failure }
 
 /// Selectable billing cadence on the paywall.
 ///
@@ -36,10 +52,10 @@ enum _PaywallPlan {
 
 /// Full-screen Pro subscription paywall.
 ///
-/// Shown to any user who taps "Book Club Pro" on their profile. In the current
-/// development build the purchase flow bypasses the real App Store: the
-/// notifier always sends `receipt_data: "test_receipt"` so the backend can
-/// activate Pro without a real receipt.
+/// Shown to any user who taps "Book Club Pro" on their profile. When a
+/// RevenueCat API key is configured the CTA runs the real store purchase via
+/// `Purchases.purchasePackage`; dev builds without a key fall back to the
+/// backend test-receipt path so Pro can be activated without a real receipt.
 ///
 /// Layout (top → bottom):
 ///   1. Hero gradient header — crown icon + "Book Club Pro" headline
@@ -60,23 +76,74 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
 
   Future<void> _onSubscribe() async {
     setState(() => _loading = true);
-    final success =
-        await ref.read(subscriptionNotifierProvider.notifier).verify(
-              platform: 'ios',
-              productId: _plan.productId,
-            );
+    final messenger = ScaffoldMessenger.of(context);
+    final router = GoRouter.of(context);
+
+    final _PurchaseOutcome outcome = await _purchase();
+
     if (!mounted) return;
     setState(() => _loading = false);
-    if (success) {
-      GoRouter.of(context).pop();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Pro 구독 활성화!')),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('구독 처리에 실패했습니다. 잠시 후 다시 시도해주세요.')),
-      );
+    switch (outcome) {
+      case _PurchaseOutcome.success:
+        router.pop();
+        messenger.showSnackBar(
+          const SnackBar(content: Text('Pro 구독 활성화!')),
+        );
+      case _PurchaseOutcome.cancelled:
+        break;
+      case _PurchaseOutcome.failure:
+        messenger.showSnackBar(
+          const SnackBar(content: Text('구독 처리에 실패했습니다. 잠시 후 다시 시도해주세요.')),
+        );
     }
+  }
+
+  /// Runs the purchase through RevenueCat when configured, otherwise the
+  /// backend test-receipt path used in dev builds.
+  Future<_PurchaseOutcome> _purchase() async {
+    if (_kRevenueCatApiKey.isEmpty) {
+      final ok = await ref.read(subscriptionNotifierProvider.notifier).verify(
+            platform: 'ios',
+            productId: _plan.productId,
+          );
+      return ok ? _PurchaseOutcome.success : _PurchaseOutcome.failure;
+    }
+
+    try {
+      final Offerings offerings = await Purchases.getOfferings();
+      final Package? package = _packageFor(offerings, _plan.productId);
+      if (package == null) return _PurchaseOutcome.failure;
+
+      final PurchaseResult result = await Purchases.purchasePackage(package);
+      final bool isPro =
+          result.customerInfo.entitlements.active.containsKey(_kProEntitlement);
+      if (!isPro) return _PurchaseOutcome.failure;
+
+      // RevenueCat webhooks tell the backend about the entitlement; refresh the
+      // app-wide status so every isPro watcher reflects the new state.
+      ref.invalidate(subscriptionNotifierProvider);
+      return _PurchaseOutcome.success;
+    } on PlatformException catch (e) {
+      final code = PurchasesErrorHelper.getErrorCode(e);
+      if (code == PurchasesErrorCode.purchaseCancelledError) {
+        return _PurchaseOutcome.cancelled;
+      }
+      return _PurchaseOutcome.failure;
+    }
+  }
+
+  /// Finds the store package whose product id matches [productId] across the
+  /// current and all configured offerings.
+  Package? _packageFor(Offerings offerings, String productId) {
+    for (final Offering offering in <Offering?>[
+      offerings.current,
+      ...offerings.all.values,
+    ].whereType<Offering>()) {
+      for (final Package package in offering.availablePackages) {
+        if (package.storeProduct.identifier == productId) return package;
+      }
+    }
+    return null;
   }
 
   @override

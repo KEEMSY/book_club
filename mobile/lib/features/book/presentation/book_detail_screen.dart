@@ -17,9 +17,7 @@ import '../application/library_state.dart';
 import '../domain/book.dart';
 import '../domain/book_status.dart';
 import '../domain/user_book.dart';
-import '../../reading/application/reading_providers.dart';
 import 'widgets/book_cover.dart';
-import 'widgets/review_modal.dart';
 import 'widgets/review_section.dart';
 
 /// Two-pane Airbnb-toned book detail:
@@ -657,9 +655,6 @@ class _ReviewsSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final spacing = theme.extension<AppSpacing>()!;
-
     // Prefer the live library cache so the section updates immediately after
     // a review is saved without requiring a full screen reload.
     UserBook? myUserBook = initialUserBook;
@@ -677,116 +672,10 @@ class _ReviewsSection extends ConsumerWidget {
       }
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        if (myUserBook != null) ...<Widget>[
-          _MyReviewCard(userBook: myUserBook),
-          SizedBox(height: spacing.xl),
-        ],
-        ReviewSection(
-          bookId: bookId,
-          bookTitle: myUserBook?.book.title,
-          canWrite: myUserBook?.status == BookStatus.completed,
-        ),
-      ],
-    );
-  }
-}
-
-class _MyReviewCard extends ConsumerWidget {
-  const _MyReviewCard({required this.userBook});
-
-  final UserBook userBook;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final spacing = theme.extension<AppSpacing>()!;
-    final radii = theme.extension<AppRadius>()!;
-
-    final bool hasReview = userBook.rating != null;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Row(
-          children: <Widget>[
-            Expanded(
-              child: Text('내 리뷰', style: theme.textTheme.titleMedium),
-            ),
-            TextButton(
-              onPressed: () => _openReviewModal(context, ref),
-              child: Text(hasReview ? '수정' : '작성'),
-            ),
-          ],
-        ),
-        SizedBox(height: spacing.xs),
-        if (!hasReview)
-          Text(
-            '아직 리뷰를 작성하지 않았어요.',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          )
-        else
-          Container(
-            padding: EdgeInsets.all(spacing.md),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceContainerLow,
-              borderRadius: BorderRadius.all(Radius.circular(radii.md)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                _ReadOnlyStars(
-                  rating: userBook.rating!,
-                  size: 20,
-                  color: ref.watch(gradePrimaryProvider),
-                ),
-                if (userBook.oneLineReview != null &&
-                    userBook.oneLineReview!.isNotEmpty) ...<Widget>[
-                  SizedBox(height: spacing.sm),
-                  Text(
-                    userBook.oneLineReview!,
-                    style: theme.textTheme.bodyMedium?.copyWith(height: 1.5),
-                  ),
-                ],
-              ],
-            ),
-          ),
-      ],
-    );
-  }
-
-  Future<void> _openReviewModal(BuildContext context, WidgetRef ref) async {
-    await ReviewModal.show(context, userBook: userBook);
-  }
-}
-
-class _ReadOnlyStars extends StatelessWidget {
-  const _ReadOnlyStars({required this.rating, this.size = 16, this.color});
-
-  final int rating;
-  final double size;
-  // When null, falls back to theme.colorScheme.primary (community reviews use
-  // the generic primary; _MyReviewCard passes the grade-specific accent).
-  final Color? color;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final filledColor = color ?? theme.colorScheme.primary;
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: List<Widget>.generate(
-        5,
-        (int i) => Icon(
-          i < rating ? Icons.star_rounded : Icons.star_outline_rounded,
-          size: size,
-          color: i < rating ? filledColor : theme.colorScheme.outline,
-        ),
-      ),
+    return ReviewSection(
+      bookId: bookId,
+      bookTitle: myUserBook?.book.title,
+      canWrite: myUserBook?.status == BookStatus.completed,
     );
   }
 }

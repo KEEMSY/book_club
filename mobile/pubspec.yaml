@@ -93,6 +93,12 @@ dependencies:
   # understand why content stops loading when the device drops its connection.
   connectivity_plus: ^6.1.0
 
+  # In-app purchases (M56). RevenueCat wraps StoreKit / Play Billing and
+  # validates receipts server-side; the API key is injected via
+  # --dart-define=REVENUECAT_API_KEY and omitted in dev (paywall falls back to
+  # the backend test-receipt path when unconfigured).
+  purchases_flutter: ^10.3.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

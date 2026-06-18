@@ -27,7 +27,7 @@ import '../domain/user_book.dart';
 import 'widgets/book_card.dart';
 import 'widgets/book_cover.dart';
 import 'widgets/empty_states.dart';
-import 'widgets/review_modal.dart';
+import 'widgets/write_review_sheet.dart';
 import 'widgets/status_segment.dart';
 
 /// "내 서재" — tab-based library with All / Reading / Completed / Wishlist /
@@ -638,14 +638,21 @@ class _LibraryActionsSheet extends ConsumerWidget {
                 await _showStatusSheet(context, ref, userBook);
               },
             ),
-            ListTile(
-              leading: const Icon(Icons.rate_review_outlined),
-              title: const Text('리뷰 작성'),
-              onTap: () async {
-                Navigator.of(context).pop();
-                await ReviewModal.show(context, userBook: userBook);
-              },
-            ),
+            // Reviews are gated on completion (M54): only completed books can
+            // be reviewed, so the entry point is hidden otherwise.
+            if (userBook.status == BookStatus.completed)
+              ListTile(
+                leading: const Icon(Icons.rate_review_outlined),
+                title: const Text('리뷰 작성'),
+                onTap: () async {
+                  Navigator.of(context).pop();
+                  await WriteReviewSheet.show(
+                    context,
+                    bookId: userBook.book.id,
+                    bookTitle: userBook.book.title,
+                  );
+                },
+              ),
             ListTile(
               leading: const Icon(Icons.format_quote_rounded),
               title: const Text('하이라이트 추가'),
@@ -820,10 +827,15 @@ class _StatusChangeSheetState extends ConsumerState<_StatusChangeSheet> {
       ref.read(libraryNotifierProvider.notifier).upsert(updated);
       if (!mounted) return;
       Navigator.of(context).pop();
+      // Prompt for a review the moment a book becomes completed (M54 gates
+      // reviews on completion, so this is the natural entry point).
       if (_selected == BookStatus.completed &&
-          widget.userBook.status != BookStatus.completed &&
-          updated.rating == null) {
-        await ReviewModal.show(context, userBook: updated);
+          widget.userBook.status != BookStatus.completed) {
+        await WriteReviewSheet.show(
+          context,
+          bookId: updated.book.id,
+          bookTitle: updated.book.title,
+        );
       }
     } catch (_) {
       if (mounted) setState(() => _saving = false);

@@ -164,37 +164,6 @@ class _BookApi implements BookApi {
   }
 
   @override
-  Future<UserBookDto> submitReview(
-    String userBookId,
-    Map<String, dynamic> body,
-  ) async {
-    final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
-    final _headers = <String, dynamic>{};
-    final _data = <String, dynamic>{};
-    _data.addAll(body);
-    final _options = _setStreamType<UserBookDto>(
-      Options(method: 'POST', headers: _headers, extra: _extra)
-          .compose(
-            _dio.options,
-            '/me/library/${userBookId}/review',
-            queryParameters: queryParameters,
-            data: _data,
-          )
-          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
-    );
-    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late UserBookDto _value;
-    try {
-      _value = UserBookDto.fromJson(_result.data!);
-    } on Object catch (e, s) {
-      errorLogger?.logError(e, s, _options);
-      rethrow;
-    }
-    return _value;
-  }
-
-  @override
   Future<void> removeFromLibrary(String userBookId) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -269,36 +238,6 @@ class _BookApi implements BookApi {
     late DiscoverResponseDto _value;
     try {
       _value = DiscoverResponseDto.fromJson(_result.data!);
-    } on Object catch (e, s) {
-      errorLogger?.logError(e, s, _options);
-      rethrow;
-    }
-    return _value;
-  }
-
-  @override
-  Future<BookReviewsResponseDto> getBookReviews(
-    String bookId, {
-    int limit = 20,
-  }) async {
-    final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{r'limit': limit};
-    final _headers = <String, dynamic>{};
-    const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<BookReviewsResponseDto>(
-      Options(method: 'GET', headers: _headers, extra: _extra)
-          .compose(
-            _dio.options,
-            '/books/${bookId}/reviews',
-            queryParameters: queryParameters,
-            data: _data,
-          )
-          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
-    );
-    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late BookReviewsResponseDto _value;
-    try {
-      _value = BookReviewsResponseDto.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;

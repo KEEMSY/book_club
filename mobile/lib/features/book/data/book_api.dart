@@ -11,7 +11,6 @@ part 'book_api.g.dart';
 ///   * `GET /books/search?q=...&page=...&size=...`
 ///   * `GET /books/{id}`
 ///   * `POST /me/library` · `PATCH /me/library/{user_book_id}`
-///   * `POST /me/library/{user_book_id}/review`
 ///   * `GET /me/library?status=...&cursor=...&limit=...`
 ///
 /// Bearer attachment is handled globally by [AuthInterceptor] — every path
@@ -51,12 +50,6 @@ abstract class BookApi {
     @Body() Map<String, dynamic> body,
   );
 
-  @POST('/me/library/{user_book_id}/review')
-  Future<UserBookDto> submitReview(
-    @Path('user_book_id') String userBookId,
-    @Body() Map<String, dynamic> body,
-  );
-
   @DELETE('/me/library/{user_book_id}')
   Future<void> removeFromLibrary(
     @Path('user_book_id') String userBookId,
@@ -73,10 +66,4 @@ abstract class BookApi {
 
   @GET('/books/discover')
   Future<DiscoverResponseDto> getDiscover();
-
-  @GET('/books/{book_id}/reviews')
-  Future<BookReviewsResponseDto> getBookReviews(
-    @Path('book_id') String bookId, {
-    @Query('limit') int limit = 20,
-  });
 }

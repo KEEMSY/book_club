@@ -19,7 +19,7 @@ from typing import Any
 from app.core.config import get_settings
 from app.core.exceptions import KakaoBookError
 from app.core.http.base_client import AsyncHttpClient
-from app.domains.book.adapters.naver_book_adapter import _extract_isbn13
+from app.domains.book.adapters.naver_book_adapter import _extract_isbn13, _parse_page_count
 from app.domains.book.models import BookSource
 from app.domains.book.ports import BookSearchResult, ExternalBook
 
@@ -109,6 +109,7 @@ class KakaoBookAdapter:
                     publisher=publisher,
                     cover_url=cover_url,
                     description=description,
+                    page_count=_parse_page_count(raw),
                     source=BookSource.KAKAO,
                 )
             )

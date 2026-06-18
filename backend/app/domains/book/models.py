@@ -76,6 +76,9 @@ class Book(Base):
     publisher: Mapped[str | None] = mapped_column(String(255), nullable=True)
     cover_url: Mapped[str | None] = mapped_column(String(1024), nullable=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # Total page count when an external provider reports it; NULL otherwise.
+    # Club reading plans use this to size weekly page targets (M52/M56).
+    page_count: Mapped[int | None] = mapped_column(nullable=True)
     source: Mapped[BookSource] = mapped_column(
         SAEnum(
             BookSource,
@@ -193,9 +196,7 @@ class UserTasteProfile(Base):
         primary_key=True,
     )
     # {"소설": 5, "자기계발": 3, ...}
-    genre_vector: Mapped[dict[str, int]] = mapped_column(
-        JSONB, nullable=False, server_default="{}"
-    )
+    genre_vector: Mapped[dict[str, int]] = mapped_column(JSONB, nullable=False, server_default="{}")
     # {"한강": 2, ...}
     author_vector: Mapped[dict[str, int]] = mapped_column(
         JSONB, nullable=False, server_default="{}"
