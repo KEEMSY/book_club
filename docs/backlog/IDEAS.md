@@ -181,3 +181,17 @@
 - [ ] (mobile) RevenueCat SDK(purchases_flutter) 추가 — 맥락: M53 PaywallScreen 연간 플랜에서 실제 purchasePackage 연동 필요 (2026-06-18)
 - [ ] (book) M2 한줄리뷰(/me/library/.../review)와 M54 book_reviews 통합 — 맥락: M54 BookDetailScreen에 두 리뷰 UI 공존 중, M2 폐기 여부 제품 결정 필요 (2026-06-18)
 - [ ] (book) BookApi.getBookReviews(M2) + BookReviewDto 등 데드 엔드포인트 정리 — 맥락: M54 GET /books/{id}/reviews로 대체 후 M2 잔재 미삭제 (2026-06-18)
+
+### Phase 12 완료 리뷰 (2026-06-18)
+
+**편입 (Phase 13)**:
+- (book) page_count 컬럼 추가 — M52 weekly_pages 계산 정확도
+- (mobile) RevenueCat SDK(purchases_flutter) 실 연동 — M53 연간 구독 완성
+- (book) M2 한줄리뷰 + M54 book_reviews 통합/폐기 결정
+
+**보류 (Phase 13 이후)**:
+- (audio) 실 오디오 코칭 — 반응 데이터 확보 후
+- (discovery) 딥러닝 추천 — 활성 사용자 1만 이상 확보 후
+- (social) 독서 모임 영상 통화 통합
+
+**Phase 12 완료 요약**: M51(하이라이트 소셜) + M52(클럽 AI 코치) + M53(Pro 연간 플랜) + M54(책 리뷰&평점) + M55(안정화) — 독서 경험 심화 & 수익화 확대 완료. 클럽 테스트 23 passed 복원, 오프라인 배너 및 스켈레톤 UI 전체 적용.
