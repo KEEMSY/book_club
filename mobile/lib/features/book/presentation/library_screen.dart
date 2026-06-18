@@ -1172,7 +1172,8 @@ class _HighlightCardState extends ConsumerState<_HighlightCard> {
           .updateVisibility(highlight.id, visibility);
       messenger.showSnackBar(
         SnackBar(
-            content: Text('공개 범위를 ${_visibilityLabel(visibility)}(으)로 바꿨어요')),
+          content: Text('공개 범위를 ${_visibilityLabel(visibility)}(으)로 바꿨어요'),
+        ),
       );
     } on Exception {
       if (!mounted) return;

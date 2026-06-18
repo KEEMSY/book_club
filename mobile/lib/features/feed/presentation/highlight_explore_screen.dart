@@ -60,7 +60,11 @@ class _HighlightExploreScreenState
                   },
                   child: ListView.separated(
                     padding: EdgeInsets.fromLTRB(
-                        spacing.md, 0, spacing.md, spacing.lg),
+                      spacing.md,
+                      0,
+                      spacing.md,
+                      spacing.lg,
+                    ),
                     itemCount: items.length,
                     separatorBuilder: (_, __) => SizedBox(height: spacing.sm),
                     itemBuilder: (_, int index) =>
