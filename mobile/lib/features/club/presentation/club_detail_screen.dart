@@ -13,6 +13,7 @@ import '../domain/club.dart';
 import 'club_chat_screen.dart';
 import 'club_rooms_screen.dart';
 import 'create_event_sheet.dart';
+import 'reading_plan_tab.dart';
 
 // Club events provider — keyed by club id (uses legacy ClubEvent from club.dart).
 final _clubEventsProvider =
@@ -36,7 +37,7 @@ class _ClubDetailScreenState extends ConsumerState<ClubDetailScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override
@@ -64,6 +65,7 @@ class _ClubDetailScreenState extends ConsumerState<ClubDetailScreen>
           controller: _tabController,
           tabs: const [
             Tab(text: '모임'),
+            Tab(text: '독서 계획'),
             Tab(text: '채팅'),
             Tab(text: '채팅방'),
           ],
@@ -73,6 +75,7 @@ class _ClubDetailScreenState extends ConsumerState<ClubDetailScreen>
         controller: _tabController,
         children: [
           _ClubEventsTab(club: widget.club),
+          ReadingPlanTab(club: widget.club),
           ClubChatScreen(club: widget.club),
           ClubRoomsBody(club: widget.club),
         ],
