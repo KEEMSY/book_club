@@ -7,7 +7,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Query, status
 
 from app.core.deps import get_current_user_id
-from app.domains.club.models import ReadingClub
+from app.domains.club.models import ClubReadingPlan, ReadingClub
 from app.domains.club.providers import get_club_service
 from app.domains.club.repository import ClubRepository
 from app.domains.club.schemas import (
@@ -18,17 +18,21 @@ from app.domains.club.schemas import (
     ClubEventUpdate,
     ClubListResponse,
     ClubMessagePublic,
+    ClubProgressResponse,
     ClubPublic,
     ClubRoomCreate,
     ClubRoomListResponse,
     ClubRoomPublic,
     CreateClubRequest,
+    CreateReadingPlanRequest,
     EditMessageRequest,
     MessageListResponse,
     PublicClubListResponse,
+    ReadingPlanResponse,
     RsvpRequest,
     SendMessageRequest,
     SetClubBookRequest,
+    UpdateProgressRequest,
 )
 from app.domains.club.service import ClubService
 
@@ -388,6 +392,75 @@ async def delete_room(
         room_id=room_id,
         user_id=UUID(user_id),
     )
+
+
+# --- reading plans (M52) ---
+
+
+def _to_plan_response(plan: ClubReadingPlan) -> ReadingPlanResponse:
+    return ReadingPlanResponse(
+        id=plan.id,
+        club_id=plan.club_id,
+        book_id=plan.book_id,
+        start_date=plan.start_date,
+        end_date=plan.end_date,
+        weekly_pages=plan.weekly_pages,
+        created_at=plan.created_at,
+    )
+
+
+@router.post(
+    "/{club_id}/reading-plan",
+    response_model=ReadingPlanResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_reading_plan(
+    club_id: UUID,
+    body: CreateReadingPlanRequest,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> ReadingPlanResponse:
+    plan = await service.create_reading_plan(
+        club_id=club_id,
+        created_by=UUID(user_id),
+        book_id=body.book_id,
+        start_date=body.start_date,
+        end_date=body.end_date,
+    )
+    return _to_plan_response(plan)
+
+
+@router.get("/{club_id}/reading-plan", response_model=ReadingPlanResponse | None)
+async def get_reading_plan(
+    club_id: UUID,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> ReadingPlanResponse | None:
+    plan = await service.repo.get_active_reading_plan(club_id)
+    return _to_plan_response(plan) if plan is not None else None
+
+
+@router.patch("/{club_id}/members/me/progress", status_code=status.HTTP_204_NO_CONTENT)
+async def update_my_progress(
+    club_id: UUID,
+    body: UpdateProgressRequest,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> None:
+    await service.update_member_progress(
+        club_id=club_id,
+        user_id=UUID(user_id),
+        current_page=body.current_page,
+    )
+
+
+@router.get("/{club_id}/progress", response_model=ClubProgressResponse)
+async def get_club_progress(
+    club_id: UUID,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> ClubProgressResponse:
+    return await service.get_club_progress(club_id=club_id, requester_id=UUID(user_id))
 
 
 @router.patch("/{club_id}/book", response_model=ClubPublic)

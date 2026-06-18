@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import secrets
-from datetime import datetime
+from datetime import date, datetime
 from typing import Literal
 from uuid import UUID, uuid4
 
@@ -13,6 +13,7 @@ from app.domains.club.models import (
     ClubEvent,
     ClubMember,
     ClubMessage,
+    ClubReadingPlan,
     ClubRole,
     ClubRoom,
     ClubTag,
@@ -112,9 +113,7 @@ class ClubRepository:
 
         if search:
             pattern = f"%{search}%"
-            stmt = stmt.where(
-                ReadingClub.name.ilike(pattern) | Book.title.ilike(pattern)
-            )
+            stmt = stmt.where(ReadingClub.name.ilike(pattern) | Book.title.ilike(pattern))
 
         if sort == "popular":
             # cursor is encoded as "<member_count>:<uuid>" for popular sort
@@ -160,11 +159,7 @@ class ClubRepository:
             stmt = stmt.where(ReadingClub.category == category)
 
         if tag is not None:
-            tag_subq = (
-                select(ClubTag.club_id)
-                .where(ClubTag.tag == tag)
-                .scalar_subquery()
-            )
+            tag_subq = select(ClubTag.club_id).where(ClubTag.tag == tag).scalar_subquery()
             stmt = stmt.where(ReadingClub.id.in_(tag_subq))
 
         cursor_dt: datetime | None = None
@@ -237,11 +232,9 @@ class ClubRepository:
             fill_stmt = select(ReadingClub).where(ReadingClub.is_public.is_(True))
             if existing_ids:
                 fill_stmt = fill_stmt.where(ReadingClub.id.not_in(existing_ids))
-            fill_stmt = (
-                fill_stmt
-                .order_by(member_count_subq.desc(), ReadingClub.created_at.desc())
-                .limit(limit - len(clubs))
-            )
+            fill_stmt = fill_stmt.order_by(
+                member_count_subq.desc(), ReadingClub.created_at.desc()
+            ).limit(limit - len(clubs))
             fill_rows = await self._session.execute(fill_stmt)
             clubs += list(fill_rows.scalars().all())
 
@@ -251,9 +244,7 @@ class ClubRepository:
 
     async def set_club_tags(self, club_id: UUID, tags: list[str]) -> None:
         """Replace all tags for a club with the supplied list."""
-        await self._session.execute(
-            delete(ClubTag).where(ClubTag.club_id == club_id)
-        )
+        await self._session.execute(delete(ClubTag).where(ClubTag.club_id == club_id))
         for tag in tags:
             self._session.add(ClubTag(club_id=club_id, tag=tag))
         await self._session.flush()
@@ -595,3 +586,85 @@ class ClubRepository:
         result = await self._session.execute(stmt)
         chapter: int | None = result.scalar_one_or_none()
         return chapter if chapter is not None else 0
+
+    # --- reading plans (M52) ---
+
+    async def get_user_is_pro(self, user_id: UUID) -> bool:
+        stmt = select(User.is_pro).where(User.id == user_id)
+        result = await self._session.execute(stmt)
+        return bool(result.scalar_one_or_none())
+
+    async def get_book_page_count(self, book_id: UUID) -> int | None:
+        """Return the book's page count, or None when unknown.
+
+        The catalog row may not carry a page count yet; callers default to a
+        fixed estimate so plan generation still succeeds.
+        """
+        from app.domains.book.models import Book
+
+        book = await self._session.get(Book, book_id)
+        if book is None:
+            return None
+        return getattr(book, "page_count", None)
+
+    async def create_reading_plan(
+        self,
+        *,
+        club_id: UUID,
+        book_id: UUID,
+        start_date: date,
+        end_date: date,
+        weekly_pages: int,
+        created_by: UUID,
+    ) -> ClubReadingPlan:
+        plan = ClubReadingPlan(
+            id=uuid4(),
+            club_id=club_id,
+            book_id=book_id,
+            start_date=start_date,
+            end_date=end_date,
+            weekly_pages=weekly_pages,
+            created_by=created_by,
+            created_at=datetime.now(),
+        )
+        self._session.add(plan)
+        await self._session.flush()
+        return plan
+
+    async def get_active_reading_plan(self, club_id: UUID) -> ClubReadingPlan | None:
+        """Return the most recently created reading plan for the club, if any."""
+        stmt = (
+            select(ClubReadingPlan)
+            .where(ClubReadingPlan.club_id == club_id)
+            .order_by(ClubReadingPlan.created_at.desc())
+            .limit(1)
+        )
+        row = await self._session.execute(stmt)
+        return row.scalar_one_or_none()
+
+    async def update_member_progress(
+        self, *, club_id: UUID, user_id: UUID, current_page: int
+    ) -> ClubMember | None:
+        member = await self._session.get(ClubMember, (club_id, user_id))
+        if member is None:
+            return None
+        member.current_page = current_page
+        member.last_page_updated_at = datetime.now()
+        await self._session.flush()
+        return member
+
+    async def get_members_with_progress(self, club_id: UUID) -> list[tuple[ClubMember, str]]:
+        """Return (member, nickname) pairs for every member of the club."""
+        stmt = (
+            select(ClubMember, User.nickname)
+            .join(User, User.id == ClubMember.user_id)
+            .where(ClubMember.club_id == club_id)
+            .order_by(ClubMember.joined_at.asc())
+        )
+        rows = await self._session.execute(stmt)
+        return [(row.ClubMember, row.nickname) for row in rows]
+
+    async def get_member_ids(self, club_id: UUID) -> list[UUID]:
+        stmt = select(ClubMember.user_id).where(ClubMember.club_id == club_id)
+        rows = await self._session.execute(stmt)
+        return list(rows.scalars().all())

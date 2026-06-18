@@ -3,14 +3,16 @@ from __future__ import annotations
 import enum
 import secrets
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 
 from sqlalchemy import (
     Boolean,
     CheckConstraint,
+    Date,
     DateTime,
     ForeignKey,
     Index,
+    Integer,
     PrimaryKeyConstraint,
     SmallInteger,
     String,
@@ -117,8 +119,45 @@ class ClubMember(Base):
     joined_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, default=lambda: datetime.now()
     )
+    # Self-reported page the member has read up to, against the active reading plan.
+    current_page: Mapped[int] = mapped_column(Integer, nullable=False, server_default="0")
+    last_page_updated_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
 
     club: Mapped[ReadingClub] = relationship("ReadingClub", back_populates="members")
+
+
+class ClubReadingPlan(Base):
+    """An AI-paced reading schedule a Pro club owner sets for the club's book.
+
+    ``weekly_pages`` is derived once at creation from the book's page count and
+    the plan span; member progress is compared against it to drive coaching.
+    """
+
+    __tablename__ = "club_reading_plans"
+    __table_args__ = (Index("idx_club_plans_club", "club_id"),)
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    club_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("reading_clubs.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    book_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("books.id"), nullable=False
+    )
+    start_date: Mapped[date] = mapped_column(Date, nullable=False)
+    end_date: Mapped[date] = mapped_column(Date, nullable=False)
+    weekly_pages: Mapped[int] = mapped_column(Integer, nullable=False)
+    created_by: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("users.id"), nullable=False
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, default=lambda: datetime.now()
+    )
 
 
 class ClubEvent(Base):
