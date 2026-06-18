@@ -3,9 +3,36 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
-import '../../experiment/application/experiment_providers.dart';
-import '../../experiment/domain/user_experiments.dart';
 import '../application/subscription_notifier.dart';
+
+const Color _kProPurple = Color(0xFF6B21A8);
+
+/// Selectable billing cadence on the paywall.
+///
+/// [productId] mirrors the RevenueCat / store SKU sent to the backend for
+/// receipt verification.
+enum _PaywallPlan {
+  monthly(
+    productId: 'monthly_pro_6900',
+    price: '월 6,900원',
+    subLabel: '매월 결제 · 언제든 해지',
+  ),
+  annual(
+    productId: 'annual_pro_59000',
+    price: '59,000원/년',
+    subLabel: '월 4,917원으로 환산 · 약 29% 절약',
+  );
+
+  const _PaywallPlan({
+    required this.productId,
+    required this.price,
+    required this.subLabel,
+  });
+
+  final String productId;
+  final String price;
+  final String subLabel;
+}
 
 /// Full-screen Pro subscription paywall.
 ///
@@ -17,7 +44,7 @@ import '../application/subscription_notifier.dart';
 /// Layout (top → bottom):
 ///   1. Hero gradient header — crown icon + "Book Club Pro" headline
 ///   2. Benefit list — four items with check icons
-///   3. Price label + CTA button
+///   3. Plan segmented control (월간 / 연간) + price label + CTA button
 ///   4. Legal caption
 class PaywallScreen extends ConsumerStatefulWidget {
   const PaywallScreen({super.key});
@@ -27,14 +54,17 @@ class PaywallScreen extends ConsumerStatefulWidget {
 }
 
 class _PaywallScreenState extends ConsumerState<PaywallScreen> {
+  // Annual is preselected — it carries the "가장 인기" badge and best value.
+  _PaywallPlan _plan = _PaywallPlan.annual;
   bool _loading = false;
 
   Future<void> _onSubscribe() async {
     setState(() => _loading = true);
-    final success = await ref.read(subscriptionNotifierProvider.notifier).verify(
-          platform: 'ios',
-          productId: 'bookclub_pro_monthly',
-        );
+    final success =
+        await ref.read(subscriptionNotifierProvider.notifier).verify(
+              platform: 'ios',
+              productId: _plan.productId,
+            );
     if (!mounted) return;
     setState(() => _loading = false);
     if (success) {
@@ -53,17 +83,6 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
-
-    // pricing_display_v1 A/B: yearly_69000 variant shows annual price with
-    // monthly breakdown; default (monthly_6900 or unassigned) shows monthly.
-    final experimentsAsync = ref.watch(userExperimentsProvider);
-    final pricingVariant = experimentsAsync.valueOrNull
-        ?.variantFor('pricing_display_v1');
-    final bool showYearly = pricingVariant == 'yearly_69000';
-    final String priceLabel =
-        showYearly ? '연 69,000원' : '월 6,900원';
-    final String? priceSubLabel =
-        showYearly ? '월 5,750원으로 환산' : null;
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -115,24 +134,28 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  _PlanSelector(
+                    plan: _plan,
+                    onChanged:
+                        _loading ? null : (p) => setState(() => _plan = p),
+                  ),
+                  SizedBox(height: spacing.md),
                   Text(
-                    priceLabel,
+                    _plan.price,
                     style: theme.textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFF6B21A8),
+                      color: _kProPurple,
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  if (priceSubLabel != null) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      priceSubLabel,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: const Color(0xFF6B21A8).withValues(alpha: 0.75),
-                      ),
-                      textAlign: TextAlign.center,
+                  const SizedBox(height: 2),
+                  Text(
+                    _plan.subLabel,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: _kProPurple.withValues(alpha: 0.75),
                     ),
-                  ],
+                    textAlign: TextAlign.center,
+                  ),
                   SizedBox(height: spacing.md),
                   Semantics(
                     button: true,
@@ -140,7 +163,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                     child: FilledButton(
                       onPressed: _loading ? null : _onSubscribe,
                       style: FilledButton.styleFrom(
-                        backgroundColor: const Color(0xFF6B21A8),
+                        backgroundColor: _kProPurple,
                         padding: EdgeInsets.symmetric(vertical: spacing.md),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
@@ -178,6 +201,68 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Plan selector — 월간 / 연간 segmented control with "가장 인기" badge
+// ---------------------------------------------------------------------------
+
+class _PlanSelector extends StatelessWidget {
+  const _PlanSelector({required this.plan, required this.onChanged});
+
+  final _PaywallPlan plan;
+  final ValueChanged<_PaywallPlan>? onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Stack(
+      clipBehavior: Clip.none,
+      children: <Widget>[
+        SegmentedButton<_PaywallPlan>(
+          segments: const <ButtonSegment<_PaywallPlan>>[
+            ButtonSegment<_PaywallPlan>(
+              value: _PaywallPlan.monthly,
+              label: Text('월간'),
+            ),
+            ButtonSegment<_PaywallPlan>(
+              value: _PaywallPlan.annual,
+              label: Text('연간'),
+            ),
+          ],
+          selected: <_PaywallPlan>{plan},
+          showSelectedIcon: false,
+          onSelectionChanged: onChanged == null
+              ? null
+              : (selection) => onChanged!(selection.first),
+          style: SegmentedButton.styleFrom(
+            selectedBackgroundColor: _kProPurple.withValues(alpha: 0.12),
+            selectedForegroundColor: _kProPurple,
+          ),
+        ),
+        // "가장 인기" badge pinned over the annual segment (right half).
+        Positioned(
+          top: -10,
+          right: 16,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFF385C), // Rausch — app brand accent
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              '가장 인기',
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 10,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -280,7 +365,7 @@ class _BenefitTile extends StatelessWidget {
         children: [
           const Icon(
             Icons.check_circle_rounded,
-            color: Color(0xFF6B21A8),
+            color: _kProPurple,
             size: 22,
           ),
           const SizedBox(width: 12),

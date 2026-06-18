@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../application/reading_providers.dart';
 import '../application/reading_stats_notifier.dart';
@@ -61,6 +63,8 @@ class _StatsBody extends StatelessWidget {
         spacing.xl,
       ),
       children: <Widget>[
+        const _AdvancedStatsCta(),
+        SizedBox(height: spacing.md),
         _SpeedCard(stats: stats, accent: accent),
         SizedBox(height: spacing.md),
         _FormatCard(stats: stats, accent: accent),
@@ -390,8 +394,7 @@ class _GenreList extends StatelessWidget {
     final AppShadows shadows = theme.extension<AppShadows>()!;
 
     final List<GenreCount> top5 = stats.genreBreakdown.take(5).toList();
-    final int totalGenreBooks =
-        top5.fold(0, (sum, g) => sum + g.count);
+    final int totalGenreBooks = top5.fold(0, (sum, g) => sum + g.count);
 
     return _SectionCard(
       shadows: shadows,
@@ -424,7 +427,9 @@ class _GenreList extends StatelessWidget {
                         child: Text(
                           '${i + 1}',
                           style: theme.textTheme.labelSmall?.copyWith(
-                            color: i == 0 ? accent : theme.colorScheme.onSurfaceVariant,
+                            color: i == 0
+                                ? accent
+                                : theme.colorScheme.onSurfaceVariant,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -580,6 +585,97 @@ class _FigureCell extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Upsell card linking to the Pro-only advanced analytics screen.
+///
+/// Always visible — the destination screen gates itself on Pro entitlement, so
+/// non-Pro users land on the paywall from here.
+class _AdvancedStatsCta extends StatelessWidget {
+  const _AdvancedStatsCta();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () => GoRouter.of(context).push(AppRoutes.advancedStats),
+        child: Ink(
+          padding: EdgeInsets.all(spacing.lg),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: <Color>[Color(0xFF6B21A8), Color(0xFF9333EA)],
+            ),
+          ),
+          child: Row(
+            children: <Widget>[
+              const Icon(
+                Icons.insights_rounded,
+                color: Colors.white,
+                size: 28,
+              ),
+              SizedBox(width: spacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Text(
+                          'Pro 전용 고급 통계 보기',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 1,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.22),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            'PRO',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '속도 트렌드 · 장르 분포 · 연간 비교',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: Colors.white.withValues(alpha: 0.85),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: Colors.white70,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

@@ -40,6 +40,7 @@ import '../../features/reading/presentation/goal_screen.dart';
 import '../../features/reading/presentation/grade_screen.dart';
 import '../../features/reading/presentation/monthly_recap_screen.dart';
 import '../../features/reading/presentation/reading_recap_screen.dart';
+import '../../features/reading/presentation/advanced_stats_screen.dart';
 import '../../features/reading/presentation/reading_stats_screen.dart';
 import '../../features/reading/presentation/timer_screen.dart';
 import 'app_shell.dart';
@@ -92,6 +93,9 @@ class AppRoutes {
 
   // M21 — full reading analytics screen.
   static const readingStats = '/reading/stats';
+
+  // M53 — Pro-only advanced analytics (speed trend, genre, yearly compare).
+  static const advancedStats = '/reading/stats/advanced';
 
   // M28 — monthly recap card.
   static const monthlyRecap = '/reading/recap/monthly';
@@ -275,13 +279,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootKey,
         builder: (context, state) => const ReadingStatsScreen(),
       ),
+      GoRoute(
+        path: AppRoutes.advancedStats,
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) => const AdvancedStatsScreen(),
+      ),
       // M28 — monthly recap card. Optional (year, month) passed as extra Map.
       GoRoute(
         path: AppRoutes.monthlyRecap,
         parentNavigatorKey: _rootKey,
         builder: (context, state) {
-          final Map<String, int>? extra =
-              state.extra as Map<String, int>?;
+          final Map<String, int>? extra = state.extra as Map<String, int>?;
           return MonthlyRecapScreen(
             year: extra?['year'],
             month: extra?['month'],
@@ -320,8 +328,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           final String clubId = state.pathParameters['clubId']!;
           final String roomId = state.pathParameters['roomId']!;
           // Room name is optionally passed as extra String for AppBar display.
-          final String roomName =
-              state.extra as String? ?? '채팅방';
+          final String roomName = state.extra as String? ?? '채팅방';
           return ClubRoomChatScreen(
             clubId: clubId,
             roomId: roomId,
