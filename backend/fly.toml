@@ -1,9 +1,9 @@
 # Fly.io app config — Book Club backend (FastAPI).
 #
-# This is a minimal stub for the M58 deploy pipeline. The production app
-# (regions, scaling, machine sizing, R2 / Sentry wiring) is finalised in M59.
-# Secrets are NEVER stored here — they live in Fly.io secrets (see
-# docs/ops/fly-secrets.md). Rename `app` to the real Fly app before first deploy.
+# Production config (M59). Regions, scaling, machine sizing, and health checks
+# are finalised here; R2 / Sentry / DB credentials are injected as Fly secrets
+# (see docs/ops/fly-secrets.md) and NEVER stored in this file. First-time deploy
+# steps live in docs/ops/deployment-runbook.md.
 
 app = "book-club-api"
 primary_region = "nrt"  # Tokyo — closest to the Korean user base.
@@ -23,6 +23,10 @@ primary_region = "nrt"  # Tokyo — closest to the Korean user base.
 
 [env]
   PORT = "8000"
+  # App is installed at /app and imported as the `app` package; make that
+  # explicit so a thin runtime image without an editable install still resolves.
+  PYTHONPATH = "/app"
+  LOG_LEVEL = "info"
 
 [http_service]
   internal_port = 8000
@@ -32,12 +36,16 @@ primary_region = "nrt"  # Tokyo — closest to the Korean user base.
   min_machines_running = 1
 
   [http_service.checks]
+    # Routing check uses the readiness probe so a machine only takes traffic once
+    # its DB connection is live. grace_period covers cold start + connection-pool
+    # warmup; the release_command runs migrations before machines boot, so the
+    # schema is already current by the time this first fires.
     [http_service.checks.health]
       method = "get"
-      path = "/health"
+      path = "/health/ready"
       interval = "15s"
       timeout = "5s"
-      grace_period = "10s"
+      grace_period = "30s"
 
 [[vm]]
   size = "shared-cpu-1x"

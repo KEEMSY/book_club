@@ -1,0 +1,99 @@
+# Book Club — production-shaped compose (REFERENCE / LOCAL SMOKE-TEST ONLY).
+#
+# ⚠️  Fly.io does NOT use this file. Production runs the backend as Fly machines
+#     defined in backend/fly.toml, with Postgres/Redis/R2 as managed services
+#     and secrets injected via `flyctl secrets`. See:
+#       • docs/ops/deployment-runbook.md  — how production is actually deployed
+#       • docs/ops/fly-secrets.md         — secret inventory
+#
+# What this file IS for:
+#   • Locally reproducing the *production* runtime image (Dockerfile target
+#     `production`, no bind-mounts, no live-reload) before pushing a release.
+#   • Sanity-checking that the prod image boots, runs migrations, and answers
+#     /health/ready against a real Postgres + Redis.
+#
+# Usage:
+#   cp .env.example .env.prod   # then set ENV=prod and fill real-ish values
+#                               # (.env.prod is git-ignored — NEVER commit)
+#   docker compose -f docker-compose.prod.yml --env-file .env.prod up --build
+#
+# Object storage is intentionally omitted: production uses Cloudflare R2 (see
+# docs/ops/r2-setup.md), which has no local container. Point S3_* at a real R2
+# bucket or a local MinIO from docker-compose.yml if you need to exercise uploads.
+
+name: bookclub-prod
+
+services:
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      # The lean, non-root runtime stage — same image Fly builds.
+      target: production
+    image: bookclub-api:prod
+    # All configuration comes from the environment, exactly as on Fly. No .env
+    # baked into the image, no source bind-mounts.
+    env_file:
+      - .env.prod
+    environment:
+      # Compose-scope host overrides so the prod image talks to the sibling
+      # containers rather than whatever hosts .env.prod was written against.
+      DATABASE_URL: postgresql+asyncpg://bookclub:bookclub@db:5432/bookclub
+      REDIS_URL: redis://redis:6379/0
+      ENV: prod
+      LOG_LEVEL: info
+    # Run migrations, then start the server — mirrors fly.toml's release_command
+    # + default CMD. Kept here so the local smoke test exercises the same path.
+    command: >
+      /bin/sh -c "alembic upgrade head &&
+                  uvicorn app.main:app --host 0.0.0.0 --port 8000
+                  --workers 2 --no-access-log"
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8000/health/ready || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: on-failure:5
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: bookclub
+      POSTGRES_PASSWORD: bookclub
+      POSTGRES_DB: bookclub
+    volumes:
+      - prod_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bookclub -d bookclub"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - prod_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  # Distinct names from docker-compose.yml so the prod smoke test never shares
+  # state with the dev stack on the same machine.
+  prod_postgres_data:
+    name: bookclub_prod_postgres_data
+  prod_redis_data:
+    name: bookclub_prod_redis_data
