@@ -13,6 +13,8 @@ import '../../auth/application/auth_notifier.dart';
 import '../../auth/domain/auth_state.dart';
 import '../../auth/domain/auth_user.dart';
 import '../../feed/application/feed_providers.dart';
+import '../../feed/application/highlight_providers.dart';
+import '../../feed/data/highlight_models.dart';
 import '../../feed/domain/book_highlight_group.dart';
 import '../../feed/domain/highlight.dart';
 import '../../feed/presentation/widgets/add_highlight_sheet.dart';
@@ -986,13 +988,26 @@ class _HighlightGroupState extends State<_HighlightGroup> {
   }
 }
 
-class _HighlightCard extends ConsumerWidget {
+class _HighlightCard extends ConsumerStatefulWidget {
   const _HighlightCard({required this.highlight});
 
   final Highlight highlight;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_HighlightCard> createState() => _HighlightCardState();
+}
+
+class _HighlightCardState extends ConsumerState<_HighlightCard> {
+  // The library list endpoint doesn't yet carry per-highlight visibility, so
+  // we track the user's last in-session choice optimistically and let the
+  // PATCH be the source of truth on the server.
+  HighlightVisibility _visibility = HighlightVisibility.private;
+  bool _sharing = false;
+
+  Highlight get highlight => widget.highlight;
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final radii = theme.extension<AppRadius>()!;
     final spacing = theme.extension<AppSpacing>()!;
@@ -1073,9 +1088,118 @@ class _HighlightCard extends ConsumerWidget {
               ),
             ),
           ],
+          SizedBox(height: spacing.xs),
+          _buildFooter(context, theme),
         ],
       ),
     );
+  }
+
+  Widget _buildFooter(BuildContext context, ThemeData theme) {
+    return Row(
+      children: <Widget>[
+        PopupMenuButton<HighlightVisibility>(
+          tooltip: '공개 범위',
+          initialValue: _visibility,
+          onSelected: _changeVisibility,
+          itemBuilder: (_) => <PopupMenuEntry<HighlightVisibility>>[
+            _visibilityItem(HighlightVisibility.private),
+            _visibilityItem(HighlightVisibility.followers),
+            _visibilityItem(HighlightVisibility.public),
+          ],
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Icon(
+                _visibilityIcon(_visibility),
+                size: 16,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                _visibilityLabel(_visibility),
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              Icon(
+                Icons.arrow_drop_down_rounded,
+                size: 18,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ],
+          ),
+        ),
+        const Spacer(),
+        TextButton.icon(
+          onPressed: _sharing ? null : _shareToFeed,
+          icon: _sharing
+              ? const SizedBox(
+                  width: 14,
+                  height: 14,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Icon(Icons.ios_share_rounded, size: 16),
+          label: const Text('피드에 공유'),
+        ),
+      ],
+    );
+  }
+
+  PopupMenuItem<HighlightVisibility> _visibilityItem(
+    HighlightVisibility visibility,
+  ) {
+    return PopupMenuItem<HighlightVisibility>(
+      value: visibility,
+      child: Row(
+        children: <Widget>[
+          Icon(_visibilityIcon(visibility), size: 18),
+          const SizedBox(width: 8),
+          Text(_visibilityLabel(visibility)),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _changeVisibility(HighlightVisibility visibility) async {
+    if (visibility == _visibility) return;
+    final messenger = ScaffoldMessenger.of(context);
+    final HighlightVisibility previous = _visibility;
+    setState(() => _visibility = visibility);
+    try {
+      await ref
+          .read(highlightRepositoryProvider)
+          .updateVisibility(highlight.id, visibility);
+      messenger.showSnackBar(
+        SnackBar(
+            content: Text('공개 범위를 ${_visibilityLabel(visibility)}(으)로 바꿨어요')),
+      );
+    } on Exception {
+      if (!mounted) return;
+      setState(() => _visibility = previous);
+      messenger.showSnackBar(
+        const SnackBar(content: Text('공개 범위를 바꾸지 못했어요. 다시 시도해주세요.')),
+      );
+    }
+  }
+
+  Future<void> _shareToFeed() async {
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => _sharing = true);
+    try {
+      await ref.read(highlightRepositoryProvider).shareToFeed(highlight.id);
+      if (!mounted) return;
+      setState(() => _sharing = false);
+      messenger.showSnackBar(
+        const SnackBar(content: Text('피드에 공유했어요')),
+      );
+    } on Exception {
+      if (!mounted) return;
+      setState(() => _sharing = false);
+      messenger.showSnackBar(
+        const SnackBar(content: Text('공유에 실패했어요. 다시 시도해주세요.')),
+      );
+    }
   }
 
   Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
@@ -1121,6 +1245,28 @@ class _HighlightCard extends ConsumerWidget {
         const SnackBar(content: Text('삭제에 실패했어요. 다시 시도해주세요.')),
       );
     }
+  }
+}
+
+IconData _visibilityIcon(HighlightVisibility visibility) {
+  switch (visibility) {
+    case HighlightVisibility.private:
+      return Icons.lock_outline_rounded;
+    case HighlightVisibility.followers:
+      return Icons.group_outlined;
+    case HighlightVisibility.public:
+      return Icons.public_rounded;
+  }
+}
+
+String _visibilityLabel(HighlightVisibility visibility) {
+  switch (visibility) {
+    case HighlightVisibility.private:
+      return '비공개';
+    case HighlightVisibility.followers:
+      return '팔로워';
+    case HighlightVisibility.public:
+      return '전체 공개';
   }
 }
 
@@ -1444,8 +1590,7 @@ class _LibraryCaptureSheetState extends State<_LibraryCaptureSheet> {
                       height: 18,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        valueColor:
-                            AlwaysStoppedAnimation<Color>(Colors.white),
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                       ),
                     )
                   : const Icon(Icons.share_rounded),
@@ -1550,9 +1695,8 @@ class _LibraryCaptureWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final double height = aspect == _CaptureAspect.portrait
-        ? _cardWidth * 16 / 9
-        : _cardWidth;
+    final double height =
+        aspect == _CaptureAspect.portrait ? _cardWidth * 16 / 9 : _cardWidth;
 
     return Container(
       width: _cardWidth,
@@ -1674,8 +1818,7 @@ class _CoverGrid extends StatelessWidget {
         if (book == null) {
           return Container(
             decoration: BoxDecoration(
-              color:
-                  theme.colorScheme.primary.withValues(alpha: 0.06),
+              color: theme.colorScheme.primary.withValues(alpha: 0.06),
               borderRadius: BorderRadius.all(Radius.circular(radii.sm)),
             ),
           );
@@ -1688,5 +1831,3 @@ class _CoverGrid extends StatelessWidget {
     );
   }
 }
-
-
