@@ -5,7 +5,7 @@ import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'app.dart';
-import 'features/onboarding/presentation/onboarding_screen.dart';
+import 'features/onboarding/application/onboarding_provider.dart';
 
 /// Kakao native-app key. Supplied via `--dart-define=KAKAO_NATIVE_APP_KEY=...`
 /// in CI/release builds. Falls back to the registered key so `flutter run`
@@ -52,7 +52,7 @@ Future<void> _runApp() async {
   // Pre-warm the onboarding-complete flag so the router redirect can read it
   // synchronously on the first navigation tick (avoids a spurious /login flash).
   final container = ProviderContainer();
-  await container.read(onboardingCompleteProvider.future);
+  await container.read(onboardingCompletedProvider.future);
 
   runApp(
     UncontrolledProviderScope(

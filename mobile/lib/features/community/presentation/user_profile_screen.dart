@@ -77,6 +77,14 @@ class _ProfileContent extends ConsumerWidget {
                 PopupMenuButton<_OwnProfileAction>(
                   icon: const Icon(Icons.more_vert_rounded),
                   onSelected: (action) async {
+                    if (action == _OwnProfileAction.privacy) {
+                      context.push(AppRoutes.settingsPrivacy);
+                      return;
+                    }
+                    if (action == _OwnProfileAction.terms) {
+                      context.push(AppRoutes.settingsTerms);
+                      return;
+                    }
                     if (action == _OwnProfileAction.logout) {
                       final bool? confirmed = await showDialog<bool>(
                         context: context,
@@ -108,6 +116,27 @@ class _ProfileContent extends ConsumerWidget {
                     }
                   },
                   itemBuilder: (_) => <PopupMenuEntry<_OwnProfileAction>>[
+                    const PopupMenuItem<_OwnProfileAction>(
+                      value: _OwnProfileAction.privacy,
+                      child: Row(
+                        children: <Widget>[
+                          Icon(Icons.privacy_tip_outlined),
+                          SizedBox(width: 12),
+                          Text('개인정보처리방침'),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuItem<_OwnProfileAction>(
+                      value: _OwnProfileAction.terms,
+                      child: Row(
+                        children: <Widget>[
+                          Icon(Icons.description_outlined),
+                          SizedBox(width: 12),
+                          Text('이용약관'),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuDivider(),
                     const PopupMenuItem<_OwnProfileAction>(
                       value: _OwnProfileAction.logout,
                       child: Row(
@@ -956,4 +985,4 @@ class _UserPostsSliverState extends ConsumerState<_UserPostsSliver> {
   }
 }
 
-enum _OwnProfileAction { logout }
+enum _OwnProfileAction { privacy, terms, logout }

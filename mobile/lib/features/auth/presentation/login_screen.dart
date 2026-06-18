@@ -195,12 +195,14 @@ class _BottomCtas extends StatelessWidget {
             DevLoginButton(onPressed: onDevLogin, isLoading: isBusy),
             SizedBox(height: spacing.xs),
             Text(
-              'Dev 환경 전용',
+              'Dev 환경 전용 · 심사용 테스트 계정\n'
+              'test@bookclub.app / 비밀번호 불필요 (소셜 로그인 대체)',
               textAlign: TextAlign.center,
               style: theme.textTheme.bodySmall?.copyWith(
                 color:
                     theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
                 fontSize: 11,
+                height: 1.4,
               ),
             ),
           ],

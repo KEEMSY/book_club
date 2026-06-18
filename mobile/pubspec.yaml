@@ -108,6 +108,14 @@ dev_dependencies:
   retrofit_generator: ^9.7.0
   riverpod_generator: ^2.6.3
 
+  # App store submission assets (M57). Generators only — not linked into the
+  # app binary. flutter_launcher_icons stamps the launcher/adaptive icons,
+  # flutter_native_splash writes the native splash resources. Run manually via
+  # `dart run flutter_launcher_icons` / `dart run flutter_native_splash:create`
+  # once the source PNGs land in assets/icon/ (see assets/icon/README.md).
+  flutter_launcher_icons: ^0.14.0
+  flutter_native_splash: ^2.4.0
+
   # Lint plugins (Riverpod-aware)
   # riverpod_lint 3.x requires riverpod_generator 4.x / flutter_riverpod 3.x —
   # upgrade together as a separate step after the Riverpod 2→3 migration.
@@ -134,3 +142,4 @@ flutter:
   assets:
     - assets/fonts/
     - assets/illustrations/
+    - assets/legal/

@@ -1,36 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../auth/application/auth_notifier.dart';
-import '../../auth/presentation/widgets/kakao_login_button.dart';
+import '../application/onboarding_provider.dart';
 
-/// SharedPreferences key that records whether the user has completed the
-/// first-run onboarding flow.
-const String kOnboardingCompleteKey = 'onboarding_complete';
-
-/// Provider that exposes the onboarding-complete flag.
+/// Three-slide introduction shown to first-time users before login.
 ///
-/// Reads [SharedPreferences] once at startup. The value is updated by
-/// [OnboardingScreen] when the user finishes (or skips) the flow.
-final onboardingCompleteProvider =
-    FutureProvider<bool>((ref) async {
-  final prefs = await SharedPreferences.getInstance();
-  return prefs.getBool(kOnboardingCompleteKey) ?? false;
-});
-
-/// Three-page introduction shown to first-time users.
+/// Slide 1: reading-timer value prop.
+/// Slide 2: heatmap / growth value prop.
+/// Slide 3: community value prop, with the "시작하기" CTA.
 ///
-/// Page 1: app value proposition — books / streaks / clubs.
-/// Page 2: reading habit tracking illustration.
-/// Page 3: call-to-action with Kakao login button.
-///
-/// Completing or skipping the flow writes [kOnboardingCompleteKey] = true and
-/// navigates to [AppRoutes.login] (auth redirect takes over from there).
+/// Completing ("시작하기") or skipping ("건너뛰기") marks onboarding done via
+/// [markOnboardingDone] and navigates to [AppRoutes.login]; the auth redirect
+/// takes over from there.
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -42,7 +26,23 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final PageController _controller = PageController();
   int _currentPage = 0;
 
-  static const int _pageCount = 3;
+  static const List<_OnboardingSlide> _slides = <_OnboardingSlide>[
+    _OnboardingSlide(
+      icon: Icons.timer_outlined,
+      title: '독서 시간을 기록하세요',
+      description: '타이머로 매일의 독서를 가볍게 기록하고\n쌓이는 시간을 확인해요.',
+    ),
+    _OnboardingSlide(
+      icon: Icons.grid_view_rounded,
+      title: '성장을 눈으로 확인하세요',
+      description: '독서 잔디와 통계로 나의 꾸준함을\n한눈에 돌아볼 수 있어요.',
+    ),
+    _OnboardingSlide(
+      icon: Icons.chat_bubble_outline_rounded,
+      title: '독서 친구와 대화하세요',
+      description: '클럽과 커뮤니티에서 같은 책을 읽는\n친구들과 이야기를 나눠요.',
+    ),
+  ];
 
   @override
   void dispose() {
@@ -50,15 +50,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     super.dispose();
   }
 
-  Future<void> _markComplete() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(kOnboardingCompleteKey, true);
-    // Invalidate provider so the router redirect re-evaluates.
-    ref.invalidate(onboardingCompleteProvider);
-  }
+  bool get _isLastPage => _currentPage == _slides.length - 1;
 
   void _next() {
-    if (_currentPage < _pageCount - 1) {
+    if (!_isLastPage) {
       _controller.nextPage(
         duration: const Duration(milliseconds: 350),
         curve: Curves.easeInOut,
@@ -66,23 +61,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     }
   }
 
-  Future<void> _skip() async {
-    await _markComplete();
+  Future<void> _finish() async {
+    await markOnboardingDone(ref);
     if (mounted) context.go(AppRoutes.login);
-  }
-
-  Future<void> _onKakaoLogin() async {
-    await _markComplete();
-    if (mounted) {
-      // Trigger Kakao login; if already on login screen the auth notifier
-      // handles the flow. Navigate to login first so the auth state watcher
-      // can redirect to home after success.
-      context.go(AppRoutes.login);
-      // Kick off Kakao flow immediately after navigation settles.
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref.read(authNotifierProvider.notifier).loginWithKakao();
-      });
-    }
   }
 
   @override
@@ -95,59 +76,41 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       body: SafeArea(
         child: Column(
           children: <Widget>[
-            // Skip button — hidden on the last page.
+            // Skip button — hidden on the last slide.
             Align(
               alignment: Alignment.centerRight,
               child: Padding(
                 padding: EdgeInsets.only(top: spacing.sm, right: spacing.md),
-                child: _currentPage < _pageCount - 1
-                    ? TextButton(
-                        onPressed: _skip,
+                child: _isLastPage
+                    ? const SizedBox(height: 40)
+                    : TextButton(
+                        onPressed: _finish,
                         child: Text(
                           '건너뛰기',
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
-                      )
-                    : const SizedBox(height: 40),
+                      ),
               ),
             ),
-            // Page content.
             Expanded(
-              child: PageView(
+              child: PageView.builder(
                 controller: _controller,
+                itemCount: _slides.length,
                 onPageChanged: (index) =>
                     setState(() => _currentPage = index),
-                children: const <Widget>[
-                  _OnboardingPage(
-                    icon: Icons.auto_stories_rounded,
-                    title: '함께 읽는 즐거움',
-                    description: '독서 기록, 스트릭, 클럽 — 모두 한 곳에',
-                  ),
-                  _OnboardingPage(
-                    icon: Icons.local_fire_department_rounded,
-                    title: '내 독서 습관 추적',
-                    description: '매일의 기록이 쌓여 멋진 통계가 돼요',
-                  ),
-                  _OnboardingPage(
-                    icon: Icons.group_rounded,
-                    title: '지금 시작하기',
-                    description: '카카오 계정으로 간편하게 시작해보세요',
-                    isLast: true,
-                  ),
-                ],
+                itemBuilder: (context, index) =>
+                    _OnboardingPage(slide: _slides[index]),
               ),
             ),
-            // Dot indicator.
             Padding(
               padding: EdgeInsets.symmetric(vertical: spacing.md),
               child: _PageIndicator(
-                count: _pageCount,
+                count: _slides.length,
                 current: _currentPage,
               ),
             ),
-            // Bottom CTA.
             Padding(
               padding: EdgeInsets.fromLTRB(
                 spacing.lg,
@@ -155,26 +118,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 spacing.lg,
                 spacing.xl,
               ),
-              child: _currentPage < _pageCount - 1
-                  ? SizedBox(
-                      width: double.infinity,
-                      height: 54,
-                      child: FilledButton(
-                        onPressed: _next,
-                        child: const Text('다음'),
-                      ),
-                    )
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        KakaoLoginButton(
-                          onPressed: _onKakaoLogin,
-                          label: '카카오로 시작하기',
-                        ),
-                        const SizedBox(height: 12),
-                        _PrivacyPolicyLink(),
-                      ],
-                    ),
+              child: SizedBox(
+                width: double.infinity,
+                height: 54,
+                child: FilledButton(
+                  onPressed: _isLastPage ? _finish : _next,
+                  child: Text(_isLastPage ? '시작하기' : '다음'),
+                ),
+              ),
             ),
           ],
         ),
@@ -183,22 +134,24 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 }
 
-/// A single onboarding page with a large icon, title, and description.
-class _OnboardingPage extends StatelessWidget {
-  const _OnboardingPage({
+/// Immutable content for a single onboarding slide.
+class _OnboardingSlide {
+  const _OnboardingSlide({
     required this.icon,
     required this.title,
     required this.description,
-    this.isLast = false,
   });
 
   final IconData icon;
   final String title;
   final String description;
+}
 
-  /// When true the icon renders slightly larger to give the final CTA page
-  /// a bit more visual weight.
-  final bool isLast;
+/// Renders one onboarding slide with a large circular icon, title, and copy.
+class _OnboardingPage extends StatelessWidget {
+  const _OnboardingPage({required this.slide});
+
+  final _OnboardingSlide slide;
 
   @override
   Widget build(BuildContext context) {
@@ -211,21 +164,21 @@ class _OnboardingPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Container(
-            width: isLast ? 120 : 100,
-            height: isLast ? 120 : 100,
+            width: 120,
+            height: 120,
             decoration: BoxDecoration(
               color: theme.colorScheme.primaryContainer,
               shape: BoxShape.circle,
             ),
             child: Icon(
-              icon,
-              size: isLast ? 56 : 48,
+              slide.icon,
+              size: 56,
               color: theme.colorScheme.onPrimaryContainer,
             ),
           ),
           SizedBox(height: spacing.xl),
           Text(
-            title,
+            slide.title,
             style: theme.textTheme.headlineMedium?.copyWith(
               fontWeight: FontWeight.w700,
             ),
@@ -233,7 +186,7 @@ class _OnboardingPage extends StatelessWidget {
           ),
           SizedBox(height: spacing.md),
           Text(
-            description,
+            slide.description,
             style: theme.textTheme.bodyLarge?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
               height: 1.5,
@@ -246,33 +199,7 @@ class _OnboardingPage extends StatelessWidget {
   }
 }
 
-/// Tappable link that opens the Privacy Policy URL in the system browser.
-class _PrivacyPolicyLink extends StatelessWidget {
-  _PrivacyPolicyLink();
-
-  static const _privacyUrl = 'https://bookclub.app/privacy';
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return GestureDetector(
-      onTap: () => launchUrl(
-        Uri.parse(_privacyUrl),
-        mode: LaunchMode.externalApplication,
-      ),
-      child: Text(
-        '개인정보 처리방침',
-        style: theme.textTheme.bodySmall?.copyWith(
-          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-          decoration: TextDecoration.underline,
-        ),
-        textAlign: TextAlign.center,
-      ),
-    );
-  }
-}
-
-/// Row of circular dot indicators showing page position.
+/// Row of animated dot indicators showing the current slide position.
 class _PageIndicator extends StatelessWidget {
   const _PageIndicator({required this.count, required this.current});
 
