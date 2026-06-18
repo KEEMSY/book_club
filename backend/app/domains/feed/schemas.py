@@ -7,6 +7,7 @@ boundary. The router never leaks SQLAlchemy models past this shell.
 from __future__ import annotations
 
 from datetime import datetime
+from enum import StrEnum
 from typing import Literal
 from uuid import UUID
 
@@ -159,6 +160,40 @@ class HighlightResponse(BaseModel):
     next_cursor: str | None
 
 
+class HighlightVisibility(StrEnum):
+    """Who may see a highlight (M51)."""
+
+    private = "private"
+    followers = "followers"
+    public = "public"
+
+
+class UpdateHighlightVisibilityRequest(BaseModel):
+    visibility: HighlightVisibility
+
+
+class HighlightVisibilityResponse(BaseModel):
+    id: UUID
+    visibility: HighlightVisibility
+    shared_at: datetime | None
+
+
+class HighlightExploreItem(BaseModel):
+    id: UUID
+    user_id: UUID
+    book_id: UUID
+    book_title: str | None = None
+    book_cover_url: str | None = None
+    quote_text: str
+    page: int | None = None
+    created_at: datetime
+    reaction_count: int
+
+
+class HighlightExploreResponse(BaseModel):
+    items: list[HighlightExploreItem]
+
+
 class BookHighlightGroupPublic(BaseModel):
     user_book_id: UUID
     book_id: UUID
@@ -268,8 +303,12 @@ __all__ = [
     "FeedEventReactionPublic",
     "FeedEventWithReactions",
     "FeedResponse",
+    "HighlightExploreItem",
+    "HighlightExploreResponse",
     "HighlightPublic",
     "HighlightResponse",
+    "HighlightVisibility",
+    "HighlightVisibilityResponse",
     "PostPublic",
     "PresignedUploadResponse",
     "ReactionType",
@@ -277,4 +316,5 @@ __all__ = [
     "ToggleFeedReactionResponse",
     "ToggleReactionRequest",
     "ToggleReactionResponse",
+    "UpdateHighlightVisibilityRequest",
 ]

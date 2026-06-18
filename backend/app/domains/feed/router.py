@@ -14,7 +14,7 @@ catches domain exceptions; the global handler translates them
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Annotated
+from typing import Annotated, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, Response, status
@@ -47,17 +47,23 @@ from app.domains.feed.schemas import (
     FeedCommentListResponse,
     FeedCommentPublic,
     FeedEventPage,
+    FeedEventPublic,
     FeedEventReactionPublic,
     FeedEventWithReactions,
     FeedResponse,
+    HighlightExploreItem,
+    HighlightExploreResponse,
     HighlightPublic,
     HighlightResponse,
+    HighlightVisibility,
+    HighlightVisibilityResponse,
     PostPublic,
     PresignedUploadResponse,
     RequestUploadRequest,
     ToggleFeedReactionResponse,
     ToggleReactionRequest,
     ToggleReactionResponse,
+    UpdateHighlightVisibilityRequest,
 )
 from app.domains.feed.service import FeedService
 
@@ -510,3 +516,74 @@ async def delete_highlight(
 ) -> Response:
     await service.delete_highlight(user_id=UUID(user_id), highlight_id=highlight_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.patch(
+    "/me/highlights/{highlight_id}/visibility",
+    response_model=HighlightVisibilityResponse,
+)
+async def update_highlight_visibility(
+    highlight_id: UUID,
+    body: UpdateHighlightVisibilityRequest,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[FeedService, Depends(get_feed_service)],
+) -> HighlightVisibilityResponse:
+    highlight = await service.update_highlight_visibility(
+        user_id=UUID(user_id),
+        highlight_id=highlight_id,
+        visibility=body.visibility.value,
+    )
+    return HighlightVisibilityResponse(
+        id=highlight.id,
+        visibility=HighlightVisibility(highlight.visibility),
+        shared_at=highlight.shared_at,
+    )
+
+
+@router.post(
+    "/me/highlights/{highlight_id}/share",
+    response_model=FeedEventPublic,
+    status_code=status.HTTP_201_CREATED,
+)
+async def share_highlight_to_feed(
+    highlight_id: UUID,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[FeedService, Depends(get_feed_service)],
+) -> FeedEventPublic:
+    event = await service.share_highlight_to_feed(
+        user_id=UUID(user_id),
+        highlight_id=highlight_id,
+    )
+    return FeedEventPublic(
+        id=event.id,
+        user_id=event.user_id,
+        event_type=event.event_type,
+        event_metadata=event.event_metadata,
+        created_at=event.created_at,
+    )
+
+
+@router.get("/highlights/explore", response_model=HighlightExploreResponse)
+async def explore_highlights(
+    _user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[FeedService, Depends(get_feed_service)],
+    sort: Annotated[Literal["recent", "popular"], Query()] = "recent",
+    limit: Annotated[int, Query(ge=1, le=50)] = 50,
+) -> HighlightExploreResponse:
+    items = await service.get_explore_highlights(limit=limit, sort=sort)
+    return HighlightExploreResponse(
+        items=[
+            HighlightExploreItem(
+                id=item.highlight.id,
+                user_id=item.highlight.user_id,
+                book_id=item.book_id,
+                book_title=item.book_title,
+                book_cover_url=item.book_cover_url,
+                quote_text=item.highlight.quote_text,
+                page=item.highlight.page_number,
+                created_at=item.highlight.created_at,
+                reaction_count=item.reaction_count,
+            )
+            for item in items
+        ]
+    )
