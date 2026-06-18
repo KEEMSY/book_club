@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import json
 import logging
+import math
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import date, datetime
 from typing import Literal, Protocol
 from uuid import UUID
 
@@ -11,7 +12,7 @@ import redis.asyncio as aioredis
 
 from app.core.exceptions import ConflictError, NotFoundError, PermissionDeniedError
 from app.core.ws_manager import ws_manager
-from app.domains.club.models import ClubRole, ReadingClub
+from app.domains.club.models import ClubMember, ClubReadingPlan, ClubRole, ReadingClub
 from app.domains.club.repository import ClubRepository
 from app.domains.club.schemas import (
     AttendeeCount,
@@ -20,12 +21,19 @@ from app.domains.club.schemas import (
     ClubEventPublic,
     ClubEventUpdate,
     ClubMessagePublic,
+    ClubProgressResponse,
     ClubRoomCreate,
     ClubRoomListResponse,
     ClubRoomPublic,
     CreateClubRequest,
+    MemberProgressItem,
     MessageListResponse,
+    ReadingPlanResponse,
 )
+
+# Fallback page count when the catalog row carries no page total — keeps plan
+# generation deterministic for books that predate page-count ingestion.
+_DEFAULT_PAGE_COUNT = 200
 
 logger = logging.getLogger(__name__)
 
@@ -37,9 +45,7 @@ class FeedClubPort(Protocol):
     depends only on this narrow contract per CLAUDE.md §3.2.
     """
 
-    async def record_club_joined(
-        self, *, user_id: UUID, club_id: UUID
-    ) -> None: ...
+    async def record_club_joined(self, *, user_id: UUID, club_id: UUID) -> None: ...
 
 
 @dataclass(slots=True)
@@ -110,9 +116,7 @@ class ClubService:
             limit=limit,
         )
 
-    async def get_recommended_clubs(
-        self, user_id: UUID, limit: int = 6
-    ) -> list[ReadingClub]:
+    async def get_recommended_clubs(self, user_id: UUID, limit: int = 6) -> list[ReadingClub]:
         """Return clubs recommended for the user based on their taste profile.
 
         Caches the resolved club-ID list in Redis under
@@ -160,9 +164,7 @@ class ClubService:
         if not await self.repo.is_member(club_id, user_id):
             await self.repo.join(club_id, user_id)
             if self.feed_service is not None:
-                await self.feed_service.record_club_joined(
-                    user_id=user_id, club_id=club_id
-                )
+                await self.feed_service.record_club_joined(user_id=user_id, club_id=club_id)
         return club
 
     async def leave_club(self, *, user_id: UUID, club_id: UUID) -> None:
@@ -536,3 +538,131 @@ class ClubService:
                 "only owner or manager can delete rooms", code="PERMISSION_DENIED"
             )
         await self.repo.delete_room(room_id)
+
+    # --- reading plans (M52) ---
+
+    async def create_reading_plan(
+        self,
+        *,
+        club_id: UUID,
+        created_by: UUID,
+        book_id: UUID,
+        start_date: date,
+        end_date: date,
+    ) -> ClubReadingPlan:
+        club = await self.repo.get_by_id(club_id)
+        if club is None:
+            raise NotFoundError("club not found", code="CLUB_NOT_FOUND")
+        if club.owner_id != created_by:
+            raise PermissionDeniedError(
+                "only the club owner can create a reading plan", code="PERMISSION_DENIED"
+            )
+        if not await self.repo.get_user_is_pro(created_by):
+            raise ConflictError("Pro subscription required", code="PRO_REQUIRED")
+
+        total_pages = await self.repo.get_book_page_count(book_id) or _DEFAULT_PAGE_COUNT
+        weeks = self._plan_weeks(start_date, end_date)
+        weekly_pages = math.ceil(total_pages / weeks)
+
+        plan = await self.repo.create_reading_plan(
+            club_id=club_id,
+            book_id=book_id,
+            start_date=start_date,
+            end_date=end_date,
+            weekly_pages=weekly_pages,
+            created_by=created_by,
+        )
+        await self._push_plan_created(club_id=club_id, exclude_user_id=created_by)
+        return plan
+
+    async def update_member_progress(
+        self, *, club_id: UUID, user_id: UUID, current_page: int
+    ) -> ClubMember:
+        member = await self.repo.update_member_progress(
+            club_id=club_id, user_id=user_id, current_page=current_page
+        )
+        if member is None:
+            raise PermissionDeniedError("not a member", code="NOT_MEMBER")
+        return member
+
+    async def get_club_progress(self, *, club_id: UUID, requester_id: UUID) -> ClubProgressResponse:
+        if not await self.repo.is_member(club_id, requester_id):
+            raise PermissionDeniedError("not a member", code="NOT_MEMBER")
+
+        plan = await self.repo.get_active_reading_plan(club_id)
+        members = await self.repo.get_members_with_progress(club_id)
+
+        elapsed_weeks = self._elapsed_weeks(plan) if plan is not None else 0
+        plan_resp = self._to_plan_response(plan) if plan is not None else None
+
+        items = [
+            MemberProgressItem(
+                user_id=member.user_id,
+                nickname=nickname,
+                current_page=member.current_page,
+                last_page_updated_at=member.last_page_updated_at,
+                progress_pct=(
+                    self._progress_pct(member.current_page, plan.weekly_pages, elapsed_weeks)
+                    if plan is not None
+                    else 0.0
+                ),
+            )
+            for member, nickname in members
+        ]
+        return ClubProgressResponse(plan=plan_resp, members=items)
+
+    @staticmethod
+    def _plan_weeks(start_date: date, end_date: date) -> int:
+        """Number of whole weeks the plan spans, at least one."""
+        days = (end_date - start_date).days
+        return max(1, math.ceil((days + 1) / 7))
+
+    @staticmethod
+    def _elapsed_weeks(plan: ClubReadingPlan) -> int:
+        """Weeks elapsed since the plan start, clamped to [1, plan span]."""
+        total_weeks = ClubService._plan_weeks(plan.start_date, plan.end_date)
+        elapsed_days = (date.today() - plan.start_date).days
+        elapsed = max(1, math.ceil((elapsed_days + 1) / 7))
+        return min(elapsed, total_weeks)
+
+    @staticmethod
+    def _progress_pct(current_page: int, weekly_pages: int, elapsed_weeks: int) -> float:
+        expected = weekly_pages * elapsed_weeks
+        if expected <= 0:
+            return 0.0
+        pct = current_page / expected * 100
+        return max(0.0, min(100.0, pct))
+
+    @staticmethod
+    def _to_plan_response(plan: ClubReadingPlan) -> ReadingPlanResponse:
+        return ReadingPlanResponse(
+            id=plan.id,
+            club_id=plan.club_id,
+            book_id=plan.book_id,
+            start_date=plan.start_date,
+            end_date=plan.end_date,
+            weekly_pages=plan.weekly_pages,
+            created_at=plan.created_at,
+        )
+
+    async def _push_plan_created(self, *, club_id: UUID, exclude_user_id: UUID) -> None:
+        """Notify members that a reading plan was created — failures are swallowed."""
+        try:
+            member_ids = await self.repo.get_member_ids(club_id)
+            targets = [uid for uid in member_ids if uid != exclude_user_id]
+            if not targets:
+                return
+            from app.domains.notification.providers import get_notification_service
+
+            svc = get_notification_service()
+            for uid in targets:
+                tokens = await svc.device_tokens.get_active_tokens(uid)
+                if tokens:
+                    await svc.push.send_to_tokens(
+                        tokens=tokens,
+                        title="독서 계획이 생성됐어요!",
+                        body="클럽의 새 독서 계획을 확인해보세요.",
+                        data={"type": "club_reading_plan", "club_id": str(club_id)},
+                    )
+        except Exception:
+            pass  # fire-and-forget: push failure must not affect the main flow

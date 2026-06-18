@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -161,3 +161,39 @@ class ClubRoomPublic(BaseModel):
 
 class ClubRoomListResponse(BaseModel):
     rooms: list[ClubRoomPublic]
+
+
+# --- reading plans (M52) ---
+
+
+class CreateReadingPlanRequest(BaseModel):
+    book_id: UUID
+    start_date: date
+    end_date: date
+
+
+class ReadingPlanResponse(BaseModel):
+    id: UUID
+    club_id: UUID
+    book_id: UUID
+    start_date: date
+    end_date: date
+    weekly_pages: int
+    created_at: datetime
+
+
+class UpdateProgressRequest(BaseModel):
+    current_page: int = Field(ge=0)
+
+
+class MemberProgressItem(BaseModel):
+    user_id: UUID
+    nickname: str
+    current_page: int
+    last_page_updated_at: datetime | None
+    progress_pct: float
+
+
+class ClubProgressResponse(BaseModel):
+    plan: ReadingPlanResponse | None
+    members: list[MemberProgressItem]
