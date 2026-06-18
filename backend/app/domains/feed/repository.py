@@ -28,7 +28,7 @@ from collections import defaultdict
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import ColumnElement, and_, delete, func, select
+from sqlalchemy import ColumnElement, String, and_, cast, delete, func, select, update
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -37,12 +37,13 @@ from app.domains.feed.models import (
     FeedComment,
     FeedEvent,
     FeedEventReaction,
+    FeedEventType,
     Post,
     PostHighlight,
     Reaction,
     ReactionType,
 )
-from app.domains.feed.ports import HighlightWithBookId
+from app.domains.feed.ports import ExploreHighlightItem, HighlightWithBookId
 
 
 class PostRepository:
@@ -374,6 +375,79 @@ class HighlightRepository:
             for row in result.all()
         ]
 
+    async def set_visibility(self, highlight_id: UUID, visibility: str) -> None:
+        await self._session.execute(
+            update(PostHighlight)
+            .where(PostHighlight.id == highlight_id)
+            .values(visibility=visibility)
+        )
+        await self._session.flush()
+
+    async def mark_shared(self, highlight_id: UUID, *, shared_at: datetime) -> None:
+        # Sharing always implies public visibility — set both atomically so the
+        # explore feed and the share state never disagree.
+        await self._session.execute(
+            update(PostHighlight)
+            .where(PostHighlight.id == highlight_id)
+            .values(shared_at=shared_at, visibility="public")
+        )
+        await self._session.flush()
+
+    async def list_public(self, *, limit: int, sort: str) -> list[ExploreHighlightItem]:
+        """Public, non-deleted highlights enriched with book info and a reaction count.
+
+        ``reaction_count`` is a correlated subquery over the highlight's
+        HIGHLIGHT_SHARED feed event (matched by ``metadata->>'highlight_id'``),
+        keeping the page free of per-row reaction queries. The ``books`` JOIN is
+        an intentional same-DB cross-domain read per CLAUDE.md §3.3.
+        """
+        from app.domains.book.models import Book, UserBook
+
+        reaction_count = (
+            select(func.count(FeedEventReaction.id))
+            .select_from(FeedEvent)
+            .join(FeedEventReaction, FeedEventReaction.feed_event_id == FeedEvent.id)
+            .where(
+                FeedEvent.event_type == FeedEventType.HIGHLIGHT_SHARED.value,
+                FeedEvent.event_metadata["highlight_id"].astext
+                == cast(PostHighlight.id, String),
+            )
+            .correlate(PostHighlight)
+            .scalar_subquery()
+        )
+        stmt = (
+            select(
+                PostHighlight,
+                UserBook.book_id.label("book_id"),
+                Book.title.label("book_title"),
+                Book.cover_url.label("book_cover_url"),
+                reaction_count.label("reaction_count"),
+            )
+            .join(UserBook, UserBook.id == PostHighlight.user_book_id)
+            .join(Book, Book.id == UserBook.book_id)
+            .where(
+                PostHighlight.visibility == "public",
+                PostHighlight.deleted_at.is_(None),
+            )
+        )
+        if sort == "popular":
+            stmt = stmt.order_by(reaction_count.desc(), PostHighlight.created_at.desc())
+        else:
+            stmt = stmt.order_by(PostHighlight.created_at.desc())
+        stmt = stmt.limit(limit)
+
+        result = await self._session.execute(stmt)
+        return [
+            ExploreHighlightItem(
+                highlight=row.PostHighlight,
+                book_id=row.book_id,
+                book_title=row.book_title,
+                book_cover_url=row.book_cover_url,
+                reaction_count=row.reaction_count or 0,
+            )
+            for row in result.all()
+        ]
+
 
 class FeedEventRepository:
     """Persistence adapter for :class:`FeedEvent`.
@@ -463,6 +537,25 @@ class FeedEventRepository:
         result = await self._session.execute(stmt)
         counts = {eid: cnt for eid, cnt in result.all()}
         return {eid: counts.get(eid, 0) for eid in event_ids}
+
+    async def find_highlight_share(self, highlight_id: UUID) -> FeedEvent | None:
+        """Return the HIGHLIGHT_SHARED event for a highlight, if one exists.
+
+        Used to make a re-share idempotent — the highlight's ``highlight_id`` is
+        stored in the event ``metadata``. Returns the earliest match so repeated
+        shares always resolve to the original event.
+        """
+        stmt = (
+            select(FeedEvent)
+            .where(
+                FeedEvent.event_type == FeedEventType.HIGHLIGHT_SHARED.value,
+                FeedEvent.event_metadata["highlight_id"].astext == str(highlight_id),
+            )
+            .order_by(FeedEvent.created_at.asc())
+            .limit(1)
+        )
+        result = await self._session.execute(stmt)
+        return result.scalar_one_or_none()
 
 
 class FeedEventReactionRepository:

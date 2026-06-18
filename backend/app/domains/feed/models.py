@@ -205,6 +205,7 @@ class FeedEventType(enum.StrEnum):
     STREAK_MILESTONE = "STREAK_MILESTONE"
     BOOK_COMPLETED = "BOOK_COMPLETED"
     CLUB_JOINED = "CLUB_JOINED"
+    HIGHLIGHT_SHARED = "highlight_shared"
 
 
 class FeedEvent(Base):
@@ -349,6 +350,20 @@ class PostHighlight(Base):
     quote_text: Mapped[str] = mapped_column(Text, nullable=False)
     page_number: Mapped[int | None] = mapped_column(Integer, nullable=True)
     note_text: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    # Who may see this highlight: 'private' (default), 'followers', or 'public'.
+    # Promoting to 'public' is what surfaces a highlight in the explore feed.
+    visibility: Mapped[str] = mapped_column(
+        String(16), nullable=False, default="private", server_default="private"
+    )
+    # Set the first time the highlight is pushed to the feed — a non-null value
+    # makes a re-share idempotent (the existing feed event is returned instead).
+    shared_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    deleted_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()

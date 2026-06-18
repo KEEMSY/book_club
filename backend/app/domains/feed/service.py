@@ -34,6 +34,7 @@ import uuid as uuid_lib
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
+from typing import cast
 from uuid import UUID
 
 from app.core.exceptions import ConflictError, NotFoundError
@@ -43,6 +44,7 @@ from app.domains.feed.models import (
     FeedComment,
     FeedEvent,
     FeedEventReaction,
+    FeedEventType,
     Post,
     PostHighlight,
     PostType,
@@ -50,6 +52,7 @@ from app.domains.feed.models import (
 )
 from app.domains.feed.ports import (
     CommentRepositoryPort,
+    ExploreHighlightItem,
     FeedBookQueryPort,
     FeedCommentRepositoryPort,
     FeedEventReactionRepositoryPort,
@@ -73,6 +76,9 @@ _COMMENTS_PAGE_MAX = 100
 _COMMENTS_PAGE_MIN = 1
 _QUOTE_MAX = 500
 _HIGHLIGHTS_PAGE_MAX = 50
+_EXPLORE_PAGE_MAX = 50
+_HIGHLIGHT_VISIBILITIES: frozenset[str] = frozenset({"private", "followers", "public"})
+_EXPLORE_SORTS: frozenset[str] = frozenset({"recent", "popular"})
 
 _ALLOWED_CONTENT_TYPES: dict[str, str] = {
     "image/jpeg": "jpg",
@@ -407,6 +413,62 @@ class FeedService:
         if row is None or row.user_id != user_id:
             raise NotFoundError("highlight not found", code="HIGHLIGHT_NOT_FOUND")
         await self.highlights.delete(highlight_id)
+
+    async def update_highlight_visibility(
+        self, user_id: UUID, highlight_id: UUID, visibility: str
+    ) -> PostHighlight:
+        """Change who may see a highlight. Owner-only; 404 hides others' ids."""
+        if visibility not in _HIGHLIGHT_VISIBILITIES:
+            raise ConflictError("unsupported visibility", code="UNSUPPORTED_VISIBILITY")
+        row = await self.highlights.get_by_id(highlight_id)
+        if row is None or row.user_id != user_id:
+            raise NotFoundError("highlight not found", code="HIGHLIGHT_NOT_FOUND")
+        await self.highlights.set_visibility(highlight_id, visibility)
+        row.visibility = visibility
+        return row
+
+    async def share_highlight_to_feed(
+        self, user_id: UUID, highlight_id: UUID
+    ) -> FeedEvent:
+        """Push a highlight to the activity feed, idempotently.
+
+        A highlight that was already shared (``shared_at`` set) returns its
+        existing HIGHLIGHT_SHARED event instead of creating a duplicate. The
+        first share flips visibility to ``public`` and stamps ``shared_at``.
+        """
+        if self.feed_events is None:
+            raise NotFoundError("feed event not found", code="FEED_EVENT_NOT_FOUND")
+        row = await self.highlights.get_by_id(highlight_id)
+        if row is None or row.user_id != user_id:
+            raise NotFoundError("highlight not found", code="HIGHLIGHT_NOT_FOUND")
+
+        if row.shared_at is not None:
+            existing = await self.feed_events.find_highlight_share(highlight_id)
+            if existing is not None:
+                return existing
+
+        now = datetime.now(tz=UTC)
+        await self.highlights.mark_shared(highlight_id, shared_at=now)
+        row.shared_at = now
+        row.visibility = "public"
+        event = await self.feed_events.create_event(
+            user_id=user_id,
+            event_type=FeedEventType.HIGHLIGHT_SHARED.value,
+            metadata={
+                "highlight_id": str(highlight_id),
+                "user_book_id": str(row.user_book_id),
+                "quote_text": row.quote_text,
+            },
+        )
+        return cast(FeedEvent, event)
+
+    async def get_explore_highlights(
+        self, limit: int = 50, sort: str = "recent"
+    ) -> list[ExploreHighlightItem]:
+        """Discovery feed of public highlights, newest-first or by reaction count."""
+        clamped = max(1, min(limit, _EXPLORE_PAGE_MAX))
+        normalized = sort if sort in _EXPLORE_SORTS else "recent"
+        return await self.highlights.list_public(limit=clamped, sort=normalized)
 
     async def record_chapter_milestone(
         self,

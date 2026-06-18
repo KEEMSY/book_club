@@ -222,6 +222,24 @@ class FeedEventWithReactionsItem:
     comment_count: int
 
 
+@dataclass(frozen=True, slots=True)
+class ExploreHighlightItem:
+    """A public highlight enriched for the discovery feed.
+
+    ``book_id`` / ``book_title`` / ``book_cover_url`` come from the
+    ``user_books`` → ``books`` JOIN (not stored on ``PostHighlight``).
+    ``reaction_count`` is the number of reactions on the highlight's
+    HIGHLIGHT_SHARED feed event, computed by a correlated subquery so the
+    explore page stays N+1 free.
+    """
+
+    highlight: PostHighlight
+    book_id: UUID
+    book_title: str | None
+    book_cover_url: str | None
+    reaction_count: int
+
+
 class FeedEventRepositoryPort(Protocol):
     """Append-only log of per-user activity events, with M47 read extensions."""
 
@@ -246,6 +264,8 @@ class FeedEventRepositoryPort(Protocol):
     ) -> list[FeedEvent]: ...
 
     async def comment_counts_for_events(self, event_ids: list[UUID]) -> dict[UUID, int]: ...
+
+    async def find_highlight_share(self, highlight_id: UUID) -> FeedEvent | None: ...
 
 
 class FeedEventReactionRepositoryPort(Protocol):
@@ -310,3 +330,11 @@ class HighlightRepositoryPort(Protocol):
     async def delete(self, highlight_id: UUID) -> None: ...
 
     async def list_all_for_user(self, user_id: UUID) -> list[HighlightWithBookId]: ...
+
+    async def set_visibility(self, highlight_id: UUID, visibility: str) -> None: ...
+
+    async def mark_shared(self, highlight_id: UUID, *, shared_at: datetime) -> None: ...
+
+    async def list_public(
+        self, *, limit: int, sort: str
+    ) -> list[ExploreHighlightItem]: ...
