@@ -179,3 +179,5 @@
 
 - [ ] (book) Book 모델에 page_count 컬럼 추가 — 맥락: M52 독서 계획 weekly_pages 계산에서 page_count 없어 200 고정값 폴백 사용 중 (2026-06-18)
 - [ ] (mobile) RevenueCat SDK(purchases_flutter) 추가 — 맥락: M53 PaywallScreen 연간 플랜에서 실제 purchasePackage 연동 필요 (2026-06-18)
+- [ ] (book) M2 한줄리뷰(/me/library/.../review)와 M54 book_reviews 통합 — 맥락: M54 BookDetailScreen에 두 리뷰 UI 공존 중, M2 폐기 여부 제품 결정 필요 (2026-06-18)
+- [ ] (book) BookApi.getBookReviews(M2) + BookReviewDto 등 데드 엔드포인트 정리 — 맥락: M54 GET /books/{id}/reviews로 대체 후 M2 잔재 미삭제 (2026-06-18)

@@ -59,6 +59,8 @@ class ReviewResponse(BaseModel):
     report_count: int
     created_at: datetime
     updated_at: datetime
+    author_nickname: str | None = None
+    author_profile_image_url: str | None = None
 
 
 class BookReviewSummary(BaseModel):

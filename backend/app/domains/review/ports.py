@@ -17,6 +17,15 @@ from app.domains.review.models import BookReview
 
 
 @dataclass
+class ReviewRow:
+    """Review plus author display info (populated by JOIN in the repository)."""
+
+    review: BookReview
+    author_nickname: str | None
+    author_profile_image_url: str | None
+
+
+@dataclass
 class ReviewAggregate:
     """Aggregate rating view for a single book."""
 
@@ -45,7 +54,7 @@ class ReviewRepositoryPort(Protocol):
 
     async def increment_report(self, review_id: UUID, *, hide_threshold: int) -> BookReview: ...
 
-    async def list_by_book(self, book_id: UUID, *, limit: int, offset: int) -> list[BookReview]: ...
+    async def list_by_book(self, book_id: UUID, *, limit: int, offset: int) -> list[ReviewRow]: ...
 
     async def get_book_summary(self, book_id: UUID) -> ReviewAggregate: ...
 
@@ -73,5 +82,6 @@ __all__ = [
     "ReviewAggregate",
     "ReviewFeedEventPort",
     "ReviewRepositoryPort",
+    "ReviewRow",
     "UserBookQueryPort",
 ]

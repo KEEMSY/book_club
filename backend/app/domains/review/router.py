@@ -17,6 +17,7 @@ from fastapi import APIRouter, Depends, Query, status
 
 from app.core.deps import get_current_user_id
 from app.domains.review.models import BookReview
+from app.domains.review.ports import ReviewRow
 from app.domains.review.providers import get_review_service
 from app.domains.review.schemas import (
     BookReviewSummary,
@@ -39,6 +40,22 @@ def _to_response(review: BookReview) -> ReviewResponse:
         report_count=review.report_count,
         created_at=review.created_at,
         updated_at=review.updated_at,
+    )
+
+
+def _row_to_response(row: ReviewRow) -> ReviewResponse:
+    r = row.review
+    return ReviewResponse(
+        id=r.id,
+        user_id=r.user_id,
+        book_id=r.book_id,
+        rating=float(r.rating),
+        body=r.body,
+        report_count=r.report_count,
+        created_at=r.created_at,
+        updated_at=r.updated_at,
+        author_nickname=row.author_nickname,
+        author_profile_image_url=row.author_profile_image_url,
     )
 
 
@@ -93,7 +110,7 @@ async def list_book_reviews(
         average_rating=summary.average_rating,
         rating_count=summary.rating_count,
         distribution=summary.distribution,
-        reviews=[_to_response(r) for r in reviews],
+        reviews=[_row_to_response(r) for r in reviews],
     )
 
 

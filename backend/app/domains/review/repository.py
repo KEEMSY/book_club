@@ -15,8 +15,9 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import ConflictError, NotFoundError
+from app.domains.auth.models import User
 from app.domains.review.models import BookReview
-from app.domains.review.ports import ReviewAggregate
+from app.domains.review.ports import ReviewAggregate, ReviewRow
 
 
 class BookReviewRepository:
@@ -81,16 +82,20 @@ class BookReviewRepository:
         await self._session.refresh(review)
         return review
 
-    async def list_by_book(self, book_id: UUID, *, limit: int, offset: int) -> list[BookReview]:
+    async def list_by_book(self, book_id: UUID, *, limit: int, offset: int) -> list[ReviewRow]:
         stmt = (
-            select(BookReview)
+            select(BookReview, User.nickname, User.profile_image_url)
+            .join(User, User.id == BookReview.user_id)
             .where(BookReview.book_id == book_id, BookReview.hidden_at.is_(None))
             .order_by(BookReview.created_at.desc())
             .limit(limit)
             .offset(offset)
         )
         result = await self._session.execute(stmt)
-        return list(result.scalars().all())
+        return [
+            ReviewRow(review=review, author_nickname=nickname, author_profile_image_url=image_url)
+            for review, nickname, image_url in result.all()
+        ]
 
     async def get_book_summary(self, book_id: UUID) -> ReviewAggregate:
         stmt = (

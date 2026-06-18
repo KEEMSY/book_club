@@ -17,6 +17,7 @@ from app.domains.review.ports import (
     ReviewAggregate,
     ReviewFeedEventPort,
     ReviewRepositoryPort,
+    ReviewRow,
     UserBookQueryPort,
 )
 
@@ -101,7 +102,7 @@ class ReviewService:
 
     async def list_book_reviews(
         self, *, book_id: UUID, limit: int = 20, offset: int = 0
-    ) -> tuple[ReviewAggregate, list[BookReview]]:
+    ) -> tuple[ReviewAggregate, list[ReviewRow]]:
         """Return the rating aggregate plus a page of visible reviews."""
         clamped = max(1, min(limit, _LIST_LIMIT_MAX))
         safe_offset = max(0, offset)
