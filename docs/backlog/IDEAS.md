@@ -176,3 +176,6 @@
 - [x] (reading) 독서 통계 탭 강화 — M21 `v0.1.2-m21` GET /me/reading-stats 5개 지표 구현 완료 (2026-06-04)
 - [x] (club) 그룹 채팅 / 실시간 메시지 — Phase 6 M23-M24 편입 (2026-06-04)
 - [ ] (discovery) 딥러닝 추천 (딥 협업 필터링 / 콘텐츠 기반 임베딩) — 활성 사용자 1만 이상 확보 후 Phase 7 검토 (2026-06-04)
+
+- [ ] (book) Book 모델에 page_count 컬럼 추가 — 맥락: M52 독서 계획 weekly_pages 계산에서 page_count 없어 200 고정값 폴백 사용 중 (2026-06-18)
+- [ ] (mobile) RevenueCat SDK(purchases_flutter) 추가 — 맥락: M53 PaywallScreen 연간 플랜에서 실제 purchasePackage 연동 필요 (2026-06-18)
