@@ -113,7 +113,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
             'challenge_reminder':
         final challengeId = dto.data['challenge_id'];
         if (challengeId != null) {
-          return () => context.push('/challenges/$challengeId');
+          return () => context.push(AppRoutes.challengeDetail(challengeId));
         }
       case 'club_joined' || 'club_invite':
         final clubId = dto.data['club_id'];
