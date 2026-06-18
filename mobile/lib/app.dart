@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'core/widgets/offline_banner.dart';
 
 class BookClubApp extends ConsumerWidget {
   const BookClubApp({super.key});
@@ -16,6 +17,8 @@ class BookClubApp extends ConsumerWidget {
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       routerConfig: router,
+      builder: (BuildContext context, Widget? child) =>
+          OfflineBanner(child: child ?? const SizedBox.shrink()),
     );
   }
 }

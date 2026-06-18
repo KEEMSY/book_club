@@ -220,7 +220,7 @@ class _BookReviewSummaryProviderElement
   String get bookId => (origin as BookReviewSummaryProvider).bookId;
 }
 
-String _$reviewNotifierHash() => r'6112999fdd4687df026c3a90c3ed39165d0145d5';
+String _$reviewNotifierHash() => r'a287f7e425c3e75471d4bc4a9ed9710c245b2495';
 
 /// Drives create / update / delete mutations and exposes their in-flight and
 /// error state. Each mutation invalidates [bookReviewSummaryProvider] for the

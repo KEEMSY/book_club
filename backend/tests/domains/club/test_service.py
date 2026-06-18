@@ -34,6 +34,8 @@ class _FakeClub:
     book_id: UUID | None = None
     invite_code: str = "ABCD1234"
     max_members: int = 10
+    is_public: bool = False
+    category: str | None = None
     created_at: datetime = field(default_factory=lambda: datetime.now(tz=UTC))
 
 
@@ -71,8 +73,17 @@ class FakeClubRepository:
         description: str | None,
         book_id: UUID | None,
         max_members: int,
+        is_public: bool = False,
+        category: str | None = None,
+        tags: list[str] | None = None,
     ) -> _FakeClub:
-        c = _FakeClub(owner_id=owner_id, name=name, max_members=max_members)
+        c = _FakeClub(
+            owner_id=owner_id,
+            name=name,
+            max_members=max_members,
+            is_public=is_public,
+            category=category,
+        )
         self._clubs[c.id] = c
         self._by_code[c.invite_code] = c
         self._members[c.id] = {owner_id: "owner"}
