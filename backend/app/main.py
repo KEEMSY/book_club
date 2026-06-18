@@ -42,6 +42,7 @@ from app.domains.reading.router import router as reading_router
 from app.domains.referral.router import router as referral_router
 from app.domains.reminder.router import router as reminder_router
 from app.domains.retention.router import router as retention_router
+from app.domains.review.router import router as review_router
 from app.domains.search.router import router as search_router
 from app.domains.social.events import FollowReceived
 from app.domains.social.router import router as social_router
@@ -146,6 +147,7 @@ def create_app() -> FastAPI:
     app.include_router(experiment_router)
     app.include_router(retention_router)
     app.include_router(shield_router)
+    app.include_router(review_router)
 
     # Expose /metrics for Prometheus scraping; instrument after all routers are
     # registered so every route is covered from the start.

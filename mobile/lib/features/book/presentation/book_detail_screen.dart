@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -16,12 +15,12 @@ import '../application/book_providers.dart';
 import '../application/library_notifier.dart';
 import '../application/library_state.dart';
 import '../domain/book.dart';
-import '../domain/book_review.dart';
 import '../domain/book_status.dart';
 import '../domain/user_book.dart';
 import '../../reading/application/reading_providers.dart';
 import 'widgets/book_cover.dart';
 import 'widgets/review_modal.dart';
+import 'widgets/review_section.dart';
 
 /// Two-pane Airbnb-toned book detail:
 ///   * Hero cover with a three-layer shadow (AppShadows.elevated).
@@ -292,7 +291,7 @@ class _ContentState extends ConsumerState<_Content> {
                   ref.read(libraryNotifierProvider.notifier).upsert(updated);
                 },
               );
-            }),
+            },),
             SizedBox(height: spacing.xl),
             const Divider(height: 1),
             SizedBox(height: spacing.lg),
@@ -685,9 +684,11 @@ class _ReviewsSection extends ConsumerWidget {
           _MyReviewCard(userBook: myUserBook),
           SizedBox(height: spacing.xl),
         ],
-        Text('커뮤니티 리뷰', style: theme.textTheme.titleMedium),
-        SizedBox(height: spacing.md),
-        _CommunityReviewsList(bookId: bookId),
+        ReviewSection(
+          bookId: bookId,
+          bookTitle: myUserBook?.book.title,
+          canWrite: myUserBook?.status == BookStatus.completed,
+        ),
       ],
     );
   }
@@ -760,136 +761,6 @@ class _MyReviewCard extends ConsumerWidget {
 
   Future<void> _openReviewModal(BuildContext context, WidgetRef ref) async {
     await ReviewModal.show(context, userBook: userBook);
-  }
-}
-
-class _CommunityReviewsList extends ConsumerWidget {
-  const _CommunityReviewsList({required this.bookId});
-
-  final String bookId;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final spacing = theme.extension<AppSpacing>()!;
-    final AsyncValue<List<BookReview>> asyncReviews =
-        ref.watch(bookReviewsProvider(bookId));
-
-    return asyncReviews.when(
-      loading: () => const Padding(
-        padding: EdgeInsets.symmetric(vertical: 24),
-        child: Center(child: CircularProgressIndicator()),
-      ),
-      error: (_, __) => Padding(
-        padding: EdgeInsets.symmetric(vertical: spacing.md),
-        child: Text(
-          '리뷰를 불러오지 못했어요.',
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-        ),
-      ),
-      data: (reviews) {
-        if (reviews.isEmpty) {
-          return Padding(
-            padding: EdgeInsets.symmetric(vertical: spacing.md),
-            child: Text(
-              '아직 다른 독자의 리뷰가 없어요.',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-          );
-        }
-        return Column(
-          children: reviews
-              .map((r) => _CommunityReviewCard(review: r))
-              .toList(growable: false),
-        );
-      },
-    );
-  }
-}
-
-class _CommunityReviewCard extends StatelessWidget {
-  const _CommunityReviewCard({required this.review});
-
-  final BookReview review;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final spacing = theme.extension<AppSpacing>()!;
-    final radii = theme.extension<AppRadius>()!;
-
-    return Container(
-      margin: EdgeInsets.only(bottom: spacing.sm),
-      padding: EdgeInsets.all(spacing.md),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.all(Radius.circular(radii.md)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              CircleAvatar(
-                radius: 16,
-                backgroundColor: theme.colorScheme.secondaryContainer,
-                backgroundImage: review.authorProfileImageUrl != null
-                    ? CachedNetworkImageProvider(review.authorProfileImageUrl!)
-                    : null,
-                child: review.authorProfileImageUrl == null
-                    ? Text(
-                        review.authorNickname.isNotEmpty
-                            ? review.authorNickname[0]
-                            : '?',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: theme.colorScheme.onSecondaryContainer,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      )
-                    : null,
-              ),
-              SizedBox(width: spacing.sm),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      review.authorNickname,
-                      style: theme.textTheme.labelMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    _ReadOnlyStars(rating: review.rating, size: 13),
-                  ],
-                ),
-              ),
-              Text(
-                _formatDate(review.reviewedAt),
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ),
-          if (review.oneLineReview != null &&
-              review.oneLineReview!.isNotEmpty) ...<Widget>[
-            SizedBox(height: spacing.sm),
-            Text(
-              review.oneLineReview!,
-              style: theme.textTheme.bodySmall?.copyWith(height: 1.5),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  String _formatDate(DateTime dt) {
-    return '${dt.year}.${dt.month.toString().padLeft(2, '0')}.${dt.day.toString().padLeft(2, '0')}';
   }
 }
 
