@@ -21,6 +21,7 @@ from app.core.deps import get_current_user_id
 from app.domains.reading.models import GoalPeriod
 from app.domains.reading.providers import get_reading_service
 from app.domains.reading.schemas import (
+    AdvancedStatsResponse,
     BookmarkPublic,
     CreateBookmarkRequest,
     CreateGoalRequest,
@@ -29,6 +30,7 @@ from app.domains.reading.schemas import (
     EndSessionRequest,
     FormatBreakdownPublic,
     GenreBreakdownPublic,
+    GenreDistributionItem,
     GoalProgressPublic,
     GoalPublic,
     GradeSummaryPublic,
@@ -49,6 +51,7 @@ from app.domains.reading.schemas import (
     RecapCard,
     RecapCardType,
     SessionCompletionResponse,
+    SpeedTrendItem,
     StartSessionRequest,
 )
 from app.domains.reading.service import ReadingService
@@ -446,6 +449,31 @@ async def get_monthly_recap(
         longest_streak=recap.longest_streak,
         top_genre=recap.top_genre,
         prev_month_hours=recap.prev_month_hours,
+    )
+
+
+@me_router.get("/me/stats/advanced", response_model=AdvancedStatsResponse)
+async def get_advanced_stats(
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ReadingService, Depends(get_reading_service)],
+) -> AdvancedStatsResponse:
+    """Pro-only advanced reading statistics.
+
+    The service raises ``PermissionDeniedError`` (``PRO_REQUIRED`` → HTTP 403)
+    for non-Pro callers; the global handler translates it to the wire shape.
+    """
+    stats = await service.get_advanced_stats(user_id=UUID(user_id))
+    return AdvancedStatsResponse(
+        speed_trend=[
+            SpeedTrendItem(week_start=p.week_start, minutes_per_page=p.minutes_per_page)
+            for p in stats.speed_trend
+        ],
+        genre_distribution=[
+            GenreDistributionItem(genre=g.genre, count=g.count, pct=g.pct)
+            for g in stats.genre_distribution
+        ],
+        yearly_comparison=stats.yearly_comparison,
+        longest_streak_days=stats.longest_streak_days,
     )
 
 

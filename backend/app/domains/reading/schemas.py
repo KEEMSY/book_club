@@ -259,6 +259,27 @@ class ReadingStatsResponse(BaseModel):
     avg_completion_days: float | None
 
 
+# ---- advanced (Pro-only) stats ----
+
+
+class SpeedTrendItem(BaseModel):
+    week_start: date
+    minutes_per_page: float
+
+
+class GenreDistributionItem(BaseModel):
+    genre: str
+    count: int
+    pct: float
+
+
+class AdvancedStatsResponse(BaseModel):
+    speed_trend: list[SpeedTrendItem]  # 최근 4주, 분/페이지
+    genre_distribution: list[GenreDistributionItem]  # 책 장르 분포
+    yearly_comparison: dict[str, int]  # {current_year: N, prev_year: M}
+    longest_streak_days: int  # 독서 연속 최장 기록
+
+
 # ---- reading recap card schemas ----
 
 

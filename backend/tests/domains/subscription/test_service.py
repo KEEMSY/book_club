@@ -49,6 +49,16 @@ def _svc() -> tuple[SubscriptionService, FakeSubscriptionRepository]:
     return SubscriptionService(repo=repo, verifier=StubPurchaseVerifier()), repo  # type: ignore[arg-type]
 
 
+@dataclass
+class FakeShieldGrant:
+    """Records welcome-shield grants instead of touching the reading domain."""
+
+    grants: list[tuple[UUID, int]] = field(default_factory=list)
+
+    async def grant_shields(self, *, user_id: UUID, count: int) -> None:
+        self.grants.append((user_id, count))
+
+
 def _verify_req(platform: str = "ios") -> VerifyReceiptRequest:
     return VerifyReceiptRequest(
         platform=platform,  # type: ignore[arg-type]
@@ -139,3 +149,70 @@ async def test_verify_and_activate_expires_roughly_one_year_from_now() -> None:
     expected_min = before + timedelta(days=364)
     expected_max = after + timedelta(days=366)
     assert expected_min <= result.expires_at <= expected_max
+
+
+# ---------------------------------------------------------------------------
+# apply_webhook_event — annual Pro welcome shields
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_annual_initial_purchase_grants_three_welcome_shields() -> None:
+    repo = FakeSubscriptionRepository()
+    shield_grant = FakeShieldGrant()
+    svc = SubscriptionService(
+        repo=repo,  # type: ignore[arg-type]
+        verifier=StubPurchaseVerifier(),
+        shield_grant=shield_grant,
+    )
+    user = uuid4()
+
+    await svc.apply_webhook_event(
+        event_type="INITIAL_PURCHASE",
+        user_id=user,
+        product_id="annual_pro_59000",
+        expires_at=datetime.now(tz=UTC) + timedelta(days=365),
+    )
+
+    assert repo._store[user]["is_pro"] is True
+    assert shield_grant.grants == [(user, 3)]
+
+
+@pytest.mark.asyncio
+async def test_annual_renewal_does_not_grant_welcome_shields() -> None:
+    repo = FakeSubscriptionRepository()
+    shield_grant = FakeShieldGrant()
+    svc = SubscriptionService(
+        repo=repo,  # type: ignore[arg-type]
+        verifier=StubPurchaseVerifier(),
+        shield_grant=shield_grant,
+    )
+
+    await svc.apply_webhook_event(
+        event_type="RENEWAL",
+        user_id=uuid4(),
+        product_id="annual_pro_59000",
+        expires_at=datetime.now(tz=UTC) + timedelta(days=365),
+    )
+
+    assert shield_grant.grants == []
+
+
+@pytest.mark.asyncio
+async def test_monthly_initial_purchase_grants_no_welcome_shields() -> None:
+    repo = FakeSubscriptionRepository()
+    shield_grant = FakeShieldGrant()
+    svc = SubscriptionService(
+        repo=repo,  # type: ignore[arg-type]
+        verifier=StubPurchaseVerifier(),
+        shield_grant=shield_grant,
+    )
+
+    await svc.apply_webhook_event(
+        event_type="INITIAL_PURCHASE",
+        user_id=uuid4(),
+        product_id="bookclub_pro_monthly",
+        expires_at=datetime.now(tz=UTC) + timedelta(days=30),
+    )
+
+    assert shield_grant.grants == []

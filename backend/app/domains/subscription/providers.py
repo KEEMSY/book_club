@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import os
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -20,11 +21,27 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.db import get_session
 from app.domains.experiment.providers import get_experiment_service
 from app.domains.experiment.service import ExperimentService
+from app.domains.reading.repository import UserGradeRepository
 from app.domains.subscription.adapters.revenuecat_adapter import RevenueCatAdapter
 from app.domains.subscription.adapters.stub_verifier import StubPurchaseVerifier
 from app.domains.subscription.ports import PurchaseVerifierPort
 from app.domains.subscription.repository import SubscriptionRepository
 from app.domains.subscription.service import SubscriptionService
+
+
+class GradeShieldGrantAdapter:
+    """Implements ``ShieldGrantPort`` by crediting ``UserGrade.streak_shields``.
+
+    Welcome shields stack on the existing balance (matching the IAP purchase
+    path); they are not capped here because the gift is a one-time event.
+    """
+
+    def __init__(self, session: AsyncSession) -> None:
+        self._repo = UserGradeRepository(session)
+
+    async def grant_shields(self, *, user_id: UUID, count: int) -> None:
+        grade = await self._repo.get_or_init(user_id)
+        await self._repo.update_streak_shields(user_id, shields=grade.streak_shields + count)
 
 
 def get_verifier() -> PurchaseVerifierPort:
@@ -45,4 +62,5 @@ def get_subscription_service(
         repo=SubscriptionRepository(session),
         verifier=get_verifier(),
         experiment_service=experiment_svc,
+        shield_grant=GradeShieldGrantAdapter(session),
     )

@@ -14,7 +14,7 @@ info dict (see ``app.shared.event_bus.stage_event``).
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import UTC, date, datetime
 from functools import lru_cache
 from typing import Annotated
 from uuid import UUID
@@ -155,6 +155,29 @@ class BookQueryAdapter:
         ]
 
 
+class SubscriptionQueryAdapter:
+    """Implements ``SubscriptionQueryPort`` by reading the user's Pro columns.
+
+    Wraps the subscription domain's repository (read-only) so the reading
+    service never imports it directly (CLAUDE.md §3.3). A stored Pro flag
+    whose period has lapsed is treated as non-Pro; the lazy write-back of the
+    expired state stays in the subscription service's own ``get_status``.
+    """
+
+    def __init__(self, session: AsyncSession) -> None:
+        from app.domains.subscription.repository import SubscriptionRepository
+
+        self._repo = SubscriptionRepository(session)
+
+    async def is_pro(self, user_id: UUID) -> bool:
+        row = await self._repo.get_subscription_status(user_id)
+        is_pro = bool(row["is_pro"])
+        expires_at = row["pro_expires_at"]
+        if is_pro and isinstance(expires_at, datetime) and expires_at < datetime.now(tz=UTC):
+            return False
+        return is_pro
+
+
 @lru_cache(maxsize=1)
 def get_event_bus() -> EventBus:
     """Process-wide singleton event bus.
@@ -199,4 +222,5 @@ def get_reading_service(
         stats_repo=ReadingStatsRepository(session),
         feed_service=_get_feed_service(session),  # type: ignore[arg-type]
         taste_profile_service=_get_taste_profile_service(session),  # type: ignore[arg-type]
+        subscription_query=SubscriptionQueryAdapter(session),
     )

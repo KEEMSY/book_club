@@ -23,7 +23,8 @@ from __future__ import annotations
 
 import calendar
 from dataclasses import dataclass
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
+from itertools import pairwise
 from uuid import UUID
 
 from sqlalchemy import and_, select, text
@@ -544,6 +545,134 @@ class ReadingStatsRepository:
         )
         result = (await self._session.execute(raw, {"user_id": user_id})).scalar_one()
         return float(result) if result is not None else None
+
+    async def get_speed_trend(
+        self,
+        user_id: UUID,
+        weeks: int = 4,
+    ) -> list[dict[str, object]]:
+        """Per-week average reading speed (minutes per page) for the last *weeks*.
+
+        Reuses the bookmark page-delta proxy from ``avg_speed`` but buckets
+        each qualifying timer session into its ISO week (Monday-anchored via
+        ``DATE_TRUNC('week', ...)``).  Weeks with no qualifying session are
+        omitted — the caller zero-fills if a dense series is needed.  Result
+        is ordered oldest-first.
+        """
+        stmt = text(
+            """
+            WITH session_pages AS (
+                SELECT
+                    DATE_TRUNC('week', rs.ended_at)::date AS week_start,
+                    rs.duration_sec,
+                    MAX(bm.page) - MIN(bm.page) AS page_delta
+                FROM reading_sessions rs
+                JOIN bookmarks bm
+                    ON bm.user_book_id = rs.user_book_id
+                    AND bm.user_id = rs.user_id
+                    AND bm.created_at BETWEEN rs.started_at AND rs.ended_at
+                WHERE rs.user_id = :user_id
+                  AND rs.ended_at IS NOT NULL
+                  AND rs.duration_sec > 0
+                  AND rs.source = 'timer'
+                  AND rs.ended_at >= DATE_TRUNC('week', NOW())
+                                     - INTERVAL '1 week' * (:weeks - 1)
+                GROUP BY rs.id, week_start, rs.duration_sec
+                HAVING MAX(bm.page) > MIN(bm.page)
+            )
+            SELECT
+                week_start,
+                AVG(duration_sec / 60.0 / NULLIF(page_delta, 0)) AS minutes_per_page
+            FROM session_pages
+            GROUP BY week_start
+            ORDER BY week_start ASC
+            """
+        )
+        rows = (await self._session.execute(stmt, {"user_id": user_id, "weeks": weeks})).all()
+        return [
+            {"week_start": row.week_start, "minutes_per_page": float(row.minutes_per_page)}
+            for row in rows
+        ]
+
+    async def get_genre_distribution(self, user_id: UUID) -> list[dict[str, object]]:
+        """Completed-book count per genre with each genre's percentage share.
+
+        ``books`` has no dedicated ``genre`` column yet, so we use the
+        publisher as a proxy (same approximation as ``genre_breakdown``).
+        ``pct`` is the count divided by the user's total completed books,
+        expressed 0-100.  Returns an empty list when no completed books exist.
+        """
+        stmt = text(
+            """
+            SELECT
+                COALESCE(b.publisher, '기타') AS genre,
+                COUNT(*) AS cnt
+            FROM user_books ub
+            JOIN books b ON b.id = ub.book_id
+            WHERE ub.user_id = :user_id
+              AND ub.status = 'completed'
+            GROUP BY genre
+            ORDER BY cnt DESC
+            """
+        )
+        rows = (await self._session.execute(stmt, {"user_id": user_id})).all()
+        total = sum(int(row.cnt) for row in rows)
+        if total == 0:
+            return []
+        return [
+            {
+                "genre": str(row.genre),
+                "count": int(row.cnt),
+                "pct": int(row.cnt) / total * 100.0,
+            }
+            for row in rows
+        ]
+
+    async def get_yearly_reading_count(self, user_id: UUID, year: int) -> int:
+        """Count books completed (status='completed') within the given year."""
+        stmt = text(
+            """
+            SELECT COUNT(*)
+            FROM user_books
+            WHERE user_id = :user_id
+              AND status = 'completed'
+              AND finished_at IS NOT NULL
+              AND EXTRACT(YEAR FROM finished_at) = :year
+            """
+        )
+        result = (
+            await self._session.execute(stmt, {"user_id": user_id, "year": year})
+        ).scalar_one()
+        return int(result or 0)
+
+    async def get_longest_streak(self, user_id: UUID) -> int:
+        """Longest run of consecutive calendar days with a completed session.
+
+        Computed in Python from the distinct set of ``ended_at`` dates — the
+        data volume per user is small and the day-gap logic is far clearer
+        than an equivalent window-function expression.
+        """
+        stmt = text(
+            """
+            SELECT DISTINCT ended_at::date AS d
+            FROM reading_sessions
+            WHERE user_id = :user_id
+              AND ended_at IS NOT NULL
+            ORDER BY d ASC
+            """
+        )
+        days = [row.d for row in (await self._session.execute(stmt, {"user_id": user_id})).all()]
+        if not days:
+            return 0
+        longest = 1
+        run = 1
+        for prev, cur in pairwise(days):
+            if cur == prev + timedelta(days=1):
+                run += 1
+                longest = max(longest, run)
+            else:
+                run = 1
+        return longest
 
     async def recap_most_time(
         self, user_id: UUID, from_date: date, to_date: date

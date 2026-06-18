@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
+from typing import Protocol
 from uuid import UUID
 
 from app.core.exceptions import ConflictError
@@ -19,6 +20,21 @@ from app.domains.subscription.schemas import (
 # ``ExperimentService`` is optional — when absent, conversion tracking is skipped.
 _ExperimentServiceT = object  # placeholder for type annotations only
 
+# Annual Pro plan: a first-time purchase ships with a welcome gift of shields.
+ANNUAL_PRO_PRODUCT_ID = "annual_pro_59000"
+ANNUAL_WELCOME_SHIELDS = 3
+
+
+class ShieldGrantPort(Protocol):
+    """Minimal cross-domain port for crediting welcome shields.
+
+    Defined here so the subscription service depends only on this narrow
+    contract (CLAUDE.md §3.2); the concrete adapter wraps the reading
+    domain's ``UserGradeRepository`` and is wired in ``providers.py``.
+    """
+
+    async def grant_shields(self, *, user_id: UUID, count: int) -> None: ...
+
 
 @dataclass(slots=True)
 class SubscriptionService:
@@ -30,6 +46,9 @@ class SubscriptionService:
     # conversion events.  Use ``field(default=None)`` so callers that do not
     # care about experiments can omit the argument.
     experiment_service: _ExperimentServiceT | None = field(default=None)
+    # Optional: credits welcome shields on the first annual-Pro purchase.
+    # When absent the gift is skipped (e.g. callers that don't wire reading).
+    shield_grant: ShieldGrantPort | None = field(default=None)
 
     async def get_status(self, user_id: UUID) -> SubscriptionStatus:
         """Return the current subscription status, auto-expiring if needed."""
@@ -115,6 +134,14 @@ class SubscriptionService:
                 expires_at=expires_at,
                 product_id=product_id,
             )
+            # Welcome gift: only on the FIRST purchase of the annual plan, so
+            # renewals don't repeatedly top up shields.
+            if (
+                event_type == "INITIAL_PURCHASE"
+                and product_id == ANNUAL_PRO_PRODUCT_ID
+                and self.shield_grant is not None
+            ):
+                await self.shield_grant.grant_shields(user_id=user_id, count=ANNUAL_WELCOME_SHIELDS)
         elif event_type in ("CANCELLATION", "EXPIRATION"):
             await self.repo.update_subscription(
                 user_id,

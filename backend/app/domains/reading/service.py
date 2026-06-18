@@ -63,7 +63,7 @@ from datetime import UTC, date, datetime, timedelta
 from typing import Any, Protocol
 from uuid import UUID
 
-from app.core.exceptions import ConflictError, NotFoundError
+from app.core.exceptions import ConflictError, NotFoundError, PermissionDeniedError
 from app.domains.reading.events import (
     ReadingSessionCompleted,
     UserGradeRecomputed,
@@ -71,10 +71,12 @@ from app.domains.reading.events import (
 from app.domains.reading.grade_policy import calculate_grade_tier, next_threshold
 from app.domains.reading.models import Bookmark, Goal, GoalPeriod, ReadingSession
 from app.domains.reading.ports import (
+    AdvancedStats,
     DailySessionInfo,
     DailyStatRepositoryPort,
     FormatBreakdown,
     GenreBreakdown,
+    GenreSlice,
     GoalProgress,
     GoalRepositoryPort,
     GradeSummary,
@@ -91,6 +93,7 @@ from app.domains.reading.ports import (
     RecapCardData,
     RecapTopBook,
     SessionCompletion,
+    SpeedTrendPoint,
     UserGradeRepositoryPort,
 )
 from app.domains.reading.repository import BookmarkRepository, ReadingStatsRepository, RecapBookRow
@@ -124,9 +127,19 @@ class FeedStreakPort(Protocol):
     depends only on this narrow contract per CLAUDE.md §3.2.
     """
 
-    async def record_streak_milestone(
-        self, *, user_id: UUID, streak_days: int
-    ) -> None: ...
+    async def record_streak_milestone(self, *, user_id: UUID, streak_days: int) -> None: ...
+
+
+class SubscriptionQueryPort(Protocol):
+    """Minimal cross-domain port for reading the caller's Pro status.
+
+    Defined here (rather than importing the subscription service) so the
+    reading service depends only on this narrow contract per CLAUDE.md §3.2.
+    The concrete implementation lives in ``providers.py``; tests inject a
+    fake that returns a fixed boolean.
+    """
+
+    async def is_pro(self, user_id: UUID) -> bool: ...
 
 
 class TasteProfileRecomputePort(Protocol):
@@ -139,6 +152,7 @@ class TasteProfileRecomputePort(Protocol):
     """
 
     async def recompute(self, user_id: UUID) -> object: ...
+
 
 _MAX_HEATMAP_DAYS = 366
 
@@ -180,6 +194,9 @@ class ReadingService:
     # Optional — existing callers that do not wire the taste profile service
     # continue to work; recompute is fire-and-forget, errors are swallowed.
     taste_profile_service: TasteProfileRecomputePort | None = field(default=None)
+    # Optional — gates Pro-only endpoints. When absent the caller is treated
+    # as non-Pro so the gate fails closed rather than leaking the feature.
+    subscription_query: SubscriptionQueryPort | None = field(default=None)
 
     async def start_session(
         self,
@@ -630,6 +647,55 @@ class ReadingService:
         """Return all achieved milestones derived from existing reading data."""
         return await self.stats_repo.get_achieved_milestones(user_id)
 
+    async def get_advanced_stats(self, *, user_id: UUID) -> AdvancedStats:
+        """Pro-only advanced statistics: speed trend, genre mix, year-over-year.
+
+        Raises ``PermissionDeniedError`` (``PRO_REQUIRED``) when the caller is
+        not a Pro subscriber.  Queries run sequentially on the shared
+        AsyncSession — concurrent gather on a single SQLAlchemy async session
+        drops the connection (same constraint as ``get_year_stats`` /
+        ``get_reading_stats``).
+        """
+        is_pro = (
+            await self.subscription_query.is_pro(user_id)
+            if self.subscription_query is not None
+            else False
+        )
+        if not is_pro:
+            raise PermissionDeniedError(
+                "Pro 구독이 필요한 기능이에요.",
+                code="PRO_REQUIRED",
+            )
+
+        current_year = datetime.now(tz=UTC).year
+        prev_year = current_year - 1
+
+        speed_rows = await self.stats_repo.get_speed_trend(user_id)
+        genre_rows = await self.stats_repo.get_genre_distribution(user_id)
+        current_count = await self.stats_repo.get_yearly_reading_count(user_id, current_year)
+        prev_count = await self.stats_repo.get_yearly_reading_count(user_id, prev_year)
+        longest_streak = await self.stats_repo.get_longest_streak(user_id)
+
+        return AdvancedStats(
+            speed_trend=[
+                SpeedTrendPoint(
+                    week_start=row["week_start"],  # type: ignore[arg-type]
+                    minutes_per_page=round(float(str(row["minutes_per_page"])), 2),
+                )
+                for row in speed_rows
+            ],
+            genre_distribution=[
+                GenreSlice(
+                    genre=str(row["genre"]),
+                    count=int(str(row["count"])),
+                    pct=round(float(str(row["pct"])), 2),
+                )
+                for row in genre_rows
+            ],
+            yearly_comparison={str(current_year): current_count, str(prev_year): prev_count},
+            longest_streak_days=longest_streak,
+        )
+
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
@@ -641,9 +707,7 @@ class ReadingService:
                 await self.taste_profile_service.recompute(user_id)
         except Exception:
             # A failed recompute is non-critical — log and continue.
-            logger.warning(
-                "taste_profile_recompute_failed user_id=%s", user_id, exc_info=True
-            )
+            logger.warning("taste_profile_recompute_failed user_id=%s", user_id, exc_info=True)
 
     async def _apply_session_completion(
         self,

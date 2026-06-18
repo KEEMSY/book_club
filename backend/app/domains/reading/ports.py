@@ -273,6 +273,35 @@ class ReadingRecap:
 
 
 @dataclass(frozen=True, slots=True)
+class SpeedTrendPoint:
+    """Average reading speed for a single ISO week (Monday-anchored)."""
+
+    week_start: date
+    minutes_per_page: float
+
+
+@dataclass(frozen=True, slots=True)
+class GenreSlice:
+    """One genre's share of a user's completed-book distribution."""
+
+    genre: str
+    count: int
+    pct: float
+
+
+@dataclass(frozen=True, slots=True)
+class AdvancedStats:
+    """Pro-only advanced statistics returned by ``get_advanced_stats``."""
+
+    speed_trend: list[SpeedTrendPoint]
+    genre_distribution: list[GenreSlice]
+    # Keyed by the four-digit year (str) so the JSON contract is stable
+    # regardless of which two years are being compared.
+    yearly_comparison: dict[str, int]
+    longest_streak_days: int
+
+
+@dataclass(frozen=True, slots=True)
 class MonthlyRecap:
     """Service-shape monthly recap returned by ``get_monthly_recap``."""
 
