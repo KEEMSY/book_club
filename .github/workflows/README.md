@@ -43,6 +43,14 @@ docker build --target production -t bookclub-api:ci .
 - `analyze-and-test` — `flutter pub get`, `dart format --set-exit-if-changed .`,
   `flutter analyze`, `flutter test`. Flutter is pinned to `3.41.5` on the
   stable channel with pub cache keyed on `mobile/pubspec.lock`.
+- `build-android` — `needs: analyze-and-test`. JDK 17 + `flutter build apk
+  --release` to verify the Android release toolchain compiles.
+- `build-ios` — `needs: analyze-and-test`, `macos-latest`. `flutter build ios
+  --no-codesign --release` to verify the iOS release build without
+  provisioning. Signing + TestFlight upload is a separate M60 release job.
+
+Generated sources (`*.g.dart`, `*.freezed.dart`) are committed, so build jobs
+do not run `build_runner`.
 
 **Reproduce locally** (from `mobile/`):
 
@@ -51,13 +59,31 @@ flutter pub get
 dart format --set-exit-if-changed .
 flutter analyze
 flutter test
+flutter build apk --release
+flutter build ios --no-codesign --release   # macOS only
 ```
+
+### `deploy.yml`
+
+**Triggers**
+- `push` on `main` when the diff touches `backend/**` or `.github/workflows/deploy.yml`.
+  PRs never deploy.
+
+**Jobs**
+- `deploy` — `flyctl deploy --remote-only` from `backend/` (picks up
+  `backend/fly.toml`, builds on Fly's remote builders). Alembic migrations run
+  via the `release_command` in `fly.toml`, not from this workflow.
+
+Concurrency group `deploy-production` with `cancel-in-progress: false` so an
+in-flight deploy finishes cleanly instead of being aborted mid-release.
 
 ## Secrets
 
-None required at M0. When we wire staging deploy, Fly/Neon/Upstash/R2
-credentials and FCM service account JSON will be added via GitHub repo
-secrets and referenced as `${{ secrets.* }}` — never inlined.
+- **`backend.yml` / `mobile.yml`** — none. CI uses a throwaway `JWT_SECRET`
+  and unsigned mobile builds.
+- **`deploy.yml`** — `FLY_API_TOKEN` (repo secret). All backend runtime
+  secrets live in Fly.io secrets, never in the workflow. See
+  [`docs/ops/fly-secrets.md`](../../docs/ops/fly-secrets.md).
 
 ## Adding a new workflow
 

@@ -1,0 +1,42 @@
+name: deploy
+
+# Production deploy to Fly.io. Runs only on push to main when the backend tree
+# changes; mobile-only or docs-only merges don't redeploy the API. Pull requests
+# never deploy — they just run the backend.yml checks.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy.yml'
+
+# Serialise deploys: never let two merges race a `fly deploy` against the same
+# app. cancel-in-progress is intentionally false — we want an in-flight deploy
+# to finish cleanly rather than be aborted mid-release.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: fly deploy
+    runs-on: ubuntu-latest
+    # The Fly app config lives in backend/, so flyctl picks up fly.toml and uses
+    # this directory as the Docker build context.
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      # --remote-only builds the image on Fly's builders (no Docker on the
+      # runner). Alembic `upgrade head` runs via the fly.toml release_command,
+      # so migrations are NOT invoked from this workflow.
+      - name: Deploy
+        run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
