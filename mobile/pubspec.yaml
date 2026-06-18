@@ -89,6 +89,10 @@ dependencies:
   # time; omitting the define disables Sentry entirely so local dev stays clean.
   sentry_flutter: ^8.0.0
 
+  # Connectivity monitoring (M55). Drives the global "오프라인" banner so users
+  # understand why content stops loading when the device drops its connection.
+  connectivity_plus: ^6.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

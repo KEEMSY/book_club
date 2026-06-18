@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/skeleton.dart';
 import '../../auth/application/auth_notifier.dart';
 import '../../auth/domain/auth_state.dart';
 import '../../club/presentation/clubs_tab.dart';
@@ -138,8 +139,8 @@ class _GlobalEventFeedSectionState
             Tab(text: '전체'),
             Tab(text: '팔로우'),
           ],
-          labelStyle: theme.textTheme.labelLarge
-              ?.copyWith(fontWeight: FontWeight.w600),
+          labelStyle:
+              theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
         ),
         Expanded(
           child: TabBarView(
@@ -172,7 +173,7 @@ class _GlobalEventFeedTab extends ConsumerWidget {
 
     // Fetch-first is triggered by notifier build(); just handle UI states.
     if (state.isLoading && state.items.isEmpty) {
-      return const Center(child: CircularProgressIndicator(strokeWidth: 2));
+      return const FeedSkeletonList();
     }
 
     if (state.error != null && state.items.isEmpty) {
@@ -184,9 +185,7 @@ class _GlobalEventFeedTab extends ConsumerWidget {
             SizedBox(height: spacing.sm),
             FilledButton(
               onPressed: () => tab == FeedTab.global
-                  ? ref
-                      .read(globalFeedNotifierProvider.notifier)
-                      .fetchFirst()
+                  ? ref.read(globalFeedNotifierProvider.notifier).fetchFirst()
                   : ref
                       .read(followingEventFeedNotifierProvider.notifier)
                       .fetchFirst(),
@@ -211,9 +210,7 @@ class _GlobalEventFeedTab extends ConsumerWidget {
               ),
               SizedBox(height: spacing.md),
               Text(
-                tab == FeedTab.following
-                    ? '팔로우한 독자의 활동이 없어요'
-                    : '아직 활동 피드가 없어요',
+                tab == FeedTab.following ? '팔로우한 독자의 활동이 없어요' : '아직 활동 피드가 없어요',
                 style: theme.textTheme.titleMedium,
                 textAlign: TextAlign.center,
               ),
@@ -224,15 +221,12 @@ class _GlobalEventFeedTab extends ConsumerWidget {
     }
 
     final auth = ref.watch(authNotifierProvider);
-    final String currentUserId =
-        auth is Authenticated ? auth.user.id : '';
+    final String currentUserId = auth is Authenticated ? auth.user.id : '';
 
     return RefreshIndicator(
       onRefresh: () => tab == FeedTab.global
           ? ref.read(globalFeedNotifierProvider.notifier).fetchFirst()
-          : ref
-              .read(followingEventFeedNotifierProvider.notifier)
-              .fetchFirst(),
+          : ref.read(followingEventFeedNotifierProvider.notifier).fetchFirst(),
       child: _EventFeedList(
         items: state.items,
         hasMore: state.hasMore,
@@ -240,9 +234,7 @@ class _GlobalEventFeedTab extends ConsumerWidget {
         currentUserId: currentUserId,
         onLoadMore: () => tab == FeedTab.global
             ? ref.read(globalFeedNotifierProvider.notifier).fetchMore()
-            : ref
-                .read(followingEventFeedNotifierProvider.notifier)
-                .fetchMore(),
+            : ref.read(followingEventFeedNotifierProvider.notifier).fetchMore(),
         onReactionToggled: (eventId, emoji, added) {
           if (tab == FeedTab.global) {
             ref.read(globalFeedNotifierProvider.notifier).applyReactionToggle(
@@ -900,6 +892,77 @@ class _HighlightFeedTab extends ConsumerWidget {
                   toggleState: toggleState,
                   counts: counts,
                 ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 로딩 스켈레톤 (M55)
+// ---------------------------------------------------------------------------
+
+/// Shimmer placeholder shown while the first feed page loads — mirrors the
+/// rough shape of a stack of [FeedEventCard]s so the layout doesn't jump when
+/// real content arrives.
+class FeedSkeletonList extends StatelessWidget {
+  const FeedSkeletonList({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = Theme.of(context).extension<AppSpacing>()!;
+    return Shimmer(
+      child: ListView.separated(
+        physics: const NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(spacing.md),
+        itemCount: 5,
+        separatorBuilder: (_, __) => SizedBox(height: spacing.md),
+        itemBuilder: (_, __) => const _FeedSkeletonCard(),
+      ),
+    );
+  }
+}
+
+class _FeedSkeletonCard extends StatelessWidget {
+  const _FeedSkeletonCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = Theme.of(context).extension<AppSpacing>()!;
+    final radii = Theme.of(context).extension<AppRadius>()!;
+    return Container(
+      padding: EdgeInsets.all(spacing.md),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.all(Radius.circular(radii.md)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              const SkeletonBox(
+                width: 40,
+                height: 40,
+                borderRadius: BorderRadius.all(Radius.circular(20)),
+              ),
+              SizedBox(width: spacing.sm),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  const SkeletonBox(width: 120, height: 12),
+                  SizedBox(height: spacing.xs),
+                  const SkeletonBox(width: 80, height: 10),
+                ],
+              ),
+            ],
+          ),
+          SizedBox(height: spacing.md),
+          const SkeletonBox(width: double.infinity, height: 12),
+          SizedBox(height: spacing.xs),
+          const SkeletonBox(width: double.infinity, height: 12),
+          SizedBox(height: spacing.xs),
+          const SkeletonBox(width: 180, height: 12),
+        ],
       ),
     );
   }

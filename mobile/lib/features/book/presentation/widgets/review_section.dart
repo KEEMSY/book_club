@@ -131,7 +131,11 @@ class _SummaryHeader extends ConsumerWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            DisplayStars(rating: summary.averageRating, size: 18, color: accent),
+            DisplayStars(
+              rating: summary.averageRating,
+              size: 18,
+              color: accent,
+            ),
             const SizedBox(height: 4),
             Text(
               '리뷰 ${summary.ratingCount}개',
@@ -275,10 +279,9 @@ class _ReviewCard extends ConsumerWidget {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
     final radii = theme.extension<AppRadius>()!;
-    final String nickname =
-        (review.authorNickname?.isNotEmpty ?? false)
-            ? review.authorNickname!
-            : '익명 독자';
+    final String nickname = (review.authorNickname?.isNotEmpty ?? false)
+        ? review.authorNickname!
+        : '익명 독자';
 
     return Container(
       margin: EdgeInsets.only(bottom: spacing.sm),
@@ -386,24 +389,29 @@ class DisplayStars extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final Color filled = color ?? theme.colorScheme.primary;
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: List<Widget>.generate(5, (int i) {
-        final int starValue = i + 1;
-        final IconData icon;
-        if (rating >= starValue) {
-          icon = Icons.star_rounded;
-        } else if (rating >= starValue - 0.5) {
-          icon = Icons.star_half_rounded;
-        } else {
-          icon = Icons.star_outline_rounded;
-        }
-        return Icon(
-          icon,
-          size: size,
-          color: rating >= starValue - 0.5 ? filled : theme.colorScheme.outline,
-        );
-      }),
+    return Semantics(
+      label: '5점 만점에 ${rating.toStringAsFixed(1)}점',
+      excludeSemantics: true,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: List<Widget>.generate(5, (int i) {
+          final int starValue = i + 1;
+          final IconData icon;
+          if (rating >= starValue) {
+            icon = Icons.star_rounded;
+          } else if (rating >= starValue - 0.5) {
+            icon = Icons.star_half_rounded;
+          } else {
+            icon = Icons.star_outline_rounded;
+          }
+          return Icon(
+            icon,
+            size: size,
+            color:
+                rating >= starValue - 0.5 ? filled : theme.colorScheme.outline,
+          );
+        }),
+      ),
     );
   }
 }

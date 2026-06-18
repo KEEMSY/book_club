@@ -9,6 +9,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/skeleton.dart';
 import '../../auth/application/auth_notifier.dart';
 import '../../auth/domain/auth_state.dart';
 import '../../auth/domain/auth_user.dart';
@@ -306,7 +307,7 @@ class _AllBooksTab extends StatelessWidget {
       final st = map[s];
       return st == null || st is LibraryListInitial || st is LibraryListLoading;
     });
-    if (allPending) return const Center(child: CircularProgressIndicator());
+    if (allPending) return const LibraryGridSkeleton();
 
     // Ordered merge: reading → completed → wishlist → paused → dropped.
     const List<BookStatus> order = <BookStatus>[
@@ -373,7 +374,7 @@ class _StatusTab extends StatelessWidget {
     return switch (state) {
       LibraryListInitial() ||
       LibraryListLoading() =>
-        const Center(child: CircularProgressIndicator()),
+        const LibraryGridSkeleton(),
       LibraryListError(:final String message) => _ErrorView(
           message: message,
           onRetry: onRefresh,
@@ -402,6 +403,50 @@ class _StatusTab extends StatelessWidget {
                 ),
               ),
     };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 로딩 스켈레톤 (M55)
+// ---------------------------------------------------------------------------
+
+/// Shimmer placeholder for the book grid tabs — a 2-column grid of cover-shaped
+/// blocks so the layout stays put when the real covers load in.
+class LibraryGridSkeleton extends StatelessWidget {
+  const LibraryGridSkeleton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = Theme.of(context).extension<AppSpacing>()!;
+    final radii = Theme.of(context).extension<AppRadius>()!;
+    return Shimmer(
+      child: GridView.builder(
+        physics: const NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.all(spacing.md),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: spacing.md,
+          crossAxisSpacing: spacing.md,
+          childAspectRatio: 2 / 4.3,
+        ),
+        itemCount: 6,
+        itemBuilder: (_, __) => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Expanded(
+              child: SkeletonBox(
+                width: double.infinity,
+                borderRadius: BorderRadius.all(Radius.circular(radii.md)),
+              ),
+            ),
+            SizedBox(height: spacing.sm),
+            const SkeletonBox(width: double.infinity, height: 12),
+            const SizedBox(height: 4),
+            const SkeletonBox(width: 80, height: 10),
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -1295,7 +1340,7 @@ class _CompletedTab extends StatelessWidget {
     return switch (state) {
       LibraryListInitial() ||
       LibraryListLoading() =>
-        const Center(child: CircularProgressIndicator()),
+        const LibraryGridSkeleton(),
       LibraryListError(:final String message) => _ErrorView(
           message: message,
           onRetry: onRefresh,

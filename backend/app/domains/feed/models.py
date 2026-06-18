@@ -220,6 +220,10 @@ class FeedEvent(Base):
     __tablename__ = "feed_events"
     __table_args__ = (
         Index("ix_feed_events_user_id_created_at", "user_id", "created_at"),
+        # Global timeline (list_global) orders by created_at DESC with no
+        # user_id filter, so the composite index above can't serve it — a
+        # standalone created_at index keeps every home-feed page off a full sort.
+        Index("ix_feed_events_created_at", "created_at"),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(

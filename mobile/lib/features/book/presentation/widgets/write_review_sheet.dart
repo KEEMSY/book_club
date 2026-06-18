@@ -90,7 +90,11 @@ class _WriteReviewSheetState extends ConsumerState<WriteReviewSheet> {
     final notifier = ref.read(reviewNotifierProvider.notifier);
 
     final bool ok = widget.isEdit
-        ? await notifier.updateReview(widget.bookId, rating: _rating, body: body)
+        ? await notifier.updateReview(
+            widget.bookId,
+            rating: _rating,
+            body: body,
+          )
         : await notifier.create(widget.bookId, _rating, body);
 
     if (!mounted) return;
@@ -158,7 +162,9 @@ class _WriteReviewSheetState extends ConsumerState<WriteReviewSheet> {
           SizedBox(height: spacing.xs),
           Center(
             child: Text(
-              _rating == 0 ? '별점을 선택해주세요' : '${_rating.toStringAsFixed(1)} / 5.0',
+              _rating == 0
+                  ? '별점을 선택해주세요'
+                  : '${_rating.toStringAsFixed(1)} / 5.0',
               style: theme.textTheme.labelMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -233,29 +239,42 @@ class _HalfStarPicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        for (int i = 0; i < 5; i++) ...<Widget>[
-          if (i > 0) const SizedBox(width: 6),
-          GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTapDown: (TapDownDetails details) {
-              final bool isLeft = details.localPosition.dx < size / 2;
-              onChanged(isLeft ? i + 0.5 : i + 1.0);
-            },
-            child: SizedBox(
-              width: size,
-              height: size,
-              child: Icon(
-                _iconFor(i + 1),
-                size: size,
-                color: value >= i + 0.5 ? color : theme.colorScheme.outline,
+    // Present the five tap targets as one slider so screen readers announce a
+    // single "별점" control with a value and ↑/↓ adjustment in 0.5 steps,
+    // rather than five unlabeled icons behind an opaque GestureDetector.
+    return Semantics(
+      slider: true,
+      label: '별점',
+      value: value == 0 ? '선택 안 함' : '${value.toStringAsFixed(1)} / 5.0',
+      onIncrease:
+          value < 5.0 ? () => onChanged((value + 0.5).clamp(0.5, 5.0)) : null,
+      onDecrease:
+          value > 0.5 ? () => onChanged((value - 0.5).clamp(0.5, 5.0)) : null,
+      excludeSemantics: true,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          for (int i = 0; i < 5; i++) ...<Widget>[
+            if (i > 0) const SizedBox(width: 6),
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTapDown: (TapDownDetails details) {
+                final bool isLeft = details.localPosition.dx < size / 2;
+                onChanged(isLeft ? i + 0.5 : i + 1.0);
+              },
+              child: SizedBox(
+                width: size,
+                height: size,
+                child: Icon(
+                  _iconFor(i + 1),
+                  size: size,
+                  color: value >= i + 0.5 ? color : theme.colorScheme.outline,
+                ),
               ),
             ),
-          ),
+          ],
         ],
-      ],
+      ),
     );
   }
 
