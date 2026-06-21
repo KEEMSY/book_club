@@ -31,6 +31,7 @@ from app.domains.community.router import router as community_router
 from app.domains.curation.router import router as curation_router
 from app.domains.discovery.providers import run_cf_retrain
 from app.domains.discovery.router import router as discovery_router
+from app.domains.event.router import router as event_router
 from app.domains.experiment.router import router as experiment_router
 from app.domains.feed.events import CommentAdded, ReactionAdded
 from app.domains.feed.router import router as feed_router
@@ -147,6 +148,7 @@ def create_app() -> FastAPI:
     app.include_router(search_router)
     app.include_router(curation_router)
     app.include_router(experiment_router)
+    app.include_router(event_router)
     app.include_router(retention_router)
     app.include_router(shield_router)
     app.include_router(review_router)
