@@ -78,6 +78,9 @@ dependencies:
   # cold restarts. Tiny footprint — no native channel beyond the plugin.
   shared_preferences: ^2.3.0
   share_plus: ^12.0.2
+  # Deep-link QR rendered on M62 SNS share cards. Encodes
+  # bookclub.app/join?ref=<code> so a shared card is a referral entry point.
+  qr_flutter: ^4.1.0
   flutter_svg: ^2.3.0
   web_socket_channel: ^3.0.3
   firebase_messaging: ^16.3.0
