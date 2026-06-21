@@ -214,3 +214,7 @@
 - (social) 독서 모임 영상 통화 통합
 
 **Phase 12 완료 요약**: M51(하이라이트 소셜) + M52(클럽 AI 코치) + M53(Pro 연간 플랜) + M54(책 리뷰&평점) + M55(안정화) — 독서 경험 심화 & 수익화 확대 완료. 클럽 테스트 23 passed 복원, 오프라인 배너 및 스켈레톤 UI 전체 적용.
+
+### 2026-06-21 (Phase 14 진행 중 발견)
+
+- [ ] (reading) `firstCurationCardProvider`가 `bookId` 파라미터에 `userBookId`(UserBook UUID)를 전달 — 큐레이션 카드 API가 catalog book_id 기준일 경우 404→null로 조용히 무시됨. AI prep card 배선 작업(M63) 중 발견. 실제 404가 나는지 확인 후 `bookId` 파라미터 타입·네이밍 정합성 수정 필요 — 맥락: M63 AI 어시스턴트 진입점 배선 (2026-06-21)
