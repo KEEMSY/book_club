@@ -18,8 +18,8 @@ mixin _$Event {
   String get title;
   String? get description;
   String? get address;
-  double get lat;
-  double get lng;
+  double? get lat;
+  double? get lng;
   DateTime get eventAt;
   int? get maxAttendees;
   bool get isPublic;
@@ -105,8 +105,8 @@ abstract mixin class $EventCopyWith<$Res> {
       String title,
       String? description,
       String? address,
-      double lat,
-      double lng,
+      double? lat,
+      double? lng,
       DateTime eventAt,
       int? maxAttendees,
       bool isPublic,
@@ -134,8 +134,8 @@ class _$EventCopyWithImpl<$Res> implements $EventCopyWith<$Res> {
     Object? title = null,
     Object? description = freezed,
     Object? address = freezed,
-    Object? lat = null,
-    Object? lng = null,
+    Object? lat = freezed,
+    Object? lng = freezed,
     Object? eventAt = null,
     Object? maxAttendees = freezed,
     Object? isPublic = null,
@@ -163,14 +163,14 @@ class _$EventCopyWithImpl<$Res> implements $EventCopyWith<$Res> {
           ? _self.address
           : address // ignore: cast_nullable_to_non_nullable
               as String?,
-      lat: null == lat
+      lat: freezed == lat
           ? _self.lat
           : lat // ignore: cast_nullable_to_non_nullable
-              as double,
-      lng: null == lng
+              as double?,
+      lng: freezed == lng
           ? _self.lng
           : lng // ignore: cast_nullable_to_non_nullable
-              as double,
+              as double?,
       eventAt: null == eventAt
           ? _self.eventAt
           : eventAt // ignore: cast_nullable_to_non_nullable
@@ -309,8 +309,8 @@ extension EventPatterns on Event {
             String title,
             String? description,
             String? address,
-            double lat,
-            double lng,
+            double? lat,
+            double? lng,
             DateTime eventAt,
             int? maxAttendees,
             bool isPublic,
@@ -367,8 +367,8 @@ extension EventPatterns on Event {
             String title,
             String? description,
             String? address,
-            double lat,
-            double lng,
+            double? lat,
+            double? lng,
             DateTime eventAt,
             int? maxAttendees,
             bool isPublic,
@@ -423,8 +423,8 @@ extension EventPatterns on Event {
             String title,
             String? description,
             String? address,
-            double lat,
-            double lng,
+            double? lat,
+            double? lng,
             DateTime eventAt,
             int? maxAttendees,
             bool isPublic,
@@ -469,8 +469,8 @@ class _Event implements Event {
       required this.title,
       this.description,
       this.address,
-      required this.lat,
-      required this.lng,
+      this.lat,
+      this.lng,
       required this.eventAt,
       this.maxAttendees,
       required this.isPublic,
@@ -491,9 +491,9 @@ class _Event implements Event {
   @override
   final String? address;
   @override
-  final double lat;
+  final double? lat;
   @override
-  final double lng;
+  final double? lng;
   @override
   final DateTime eventAt;
   @override
@@ -596,8 +596,8 @@ abstract mixin class _$EventCopyWith<$Res> implements $EventCopyWith<$Res> {
       String title,
       String? description,
       String? address,
-      double lat,
-      double lng,
+      double? lat,
+      double? lng,
       DateTime eventAt,
       int? maxAttendees,
       bool isPublic,
@@ -625,8 +625,8 @@ class __$EventCopyWithImpl<$Res> implements _$EventCopyWith<$Res> {
     Object? title = null,
     Object? description = freezed,
     Object? address = freezed,
-    Object? lat = null,
-    Object? lng = null,
+    Object? lat = freezed,
+    Object? lng = freezed,
     Object? eventAt = null,
     Object? maxAttendees = freezed,
     Object? isPublic = null,
@@ -654,14 +654,14 @@ class __$EventCopyWithImpl<$Res> implements _$EventCopyWith<$Res> {
           ? _self.address
           : address // ignore: cast_nullable_to_non_nullable
               as String?,
-      lat: null == lat
+      lat: freezed == lat
           ? _self.lat
           : lat // ignore: cast_nullable_to_non_nullable
-              as double,
-      lng: null == lng
+              as double?,
+      lng: freezed == lng
           ? _self.lng
           : lng // ignore: cast_nullable_to_non_nullable
-              as double,
+              as double?,
       eventAt: null == eventAt
           ? _self.eventAt
           : eventAt // ignore: cast_nullable_to_non_nullable
