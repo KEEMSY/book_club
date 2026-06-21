@@ -57,6 +57,11 @@ class Settings(BaseSettings):
     naver_book_api_url: str = Field(default="https://openapi.naver.com/v1/search/book.json")
     kakao_book_api_url: str = Field(default="https://dapi.kakao.com/v3/search/book")
 
+    # Anthropic Claude API key for the AI reading assistant (M63). Unset → the
+    # StubClaudeAdapter is selected so dev/test work without a real key.
+    anthropic_api_key: str = Field(default="")
+    anthropic_model: str = Field(default="claude-haiku-4-5-20251001")
+
     apple_client_id: str = Field(default="")
     apple_keys_url: str = Field(default="https://appleid.apple.com/auth/keys")
     apple_issuer: str = Field(default="https://appleid.apple.com")

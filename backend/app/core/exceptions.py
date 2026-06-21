@@ -64,6 +64,26 @@ class ExternalServiceError(DomainError):
     code = "EXTERNAL_SERVICE_ERROR"
 
 
+class RateLimitedError(DomainError):
+    """Caller exceeded a per-period quota (e.g. daily AI prep cards)."""
+
+    status_code = 429
+    code = "RATE_LIMITED"
+
+
+class NotConfiguredError(DomainError):
+    """A feature is disabled because a required secret/integration is unset.
+
+    Returns 503 (not 404) so the client can tell "this server can't do AI right
+    now" from "no such endpoint" and degrade gracefully instead of hiding the
+    feature entirely. Used when ``ANTHROPIC_API_KEY`` is absent in prod-like
+    envs and no stub fallback is wired.
+    """
+
+    status_code = 503
+    code = "NOT_CONFIGURED"
+
+
 class KakaoAuthError(AuthError):
     """Kakao OAuth exchange failed — bad code, revoked token, Kakao 4xx."""
 

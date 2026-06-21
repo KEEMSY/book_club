@@ -18,6 +18,7 @@ from app.core.config import get_settings
 from app.core.exceptions import register_exception_handlers
 from app.core.middleware import LastActiveMiddleware
 from app.domains.admin.router import router as admin_dashboard_router
+from app.domains.ai_assistant.router import router as ai_assistant_router
 from app.domains.auth.router import router as auth_router
 from app.domains.book.events import UserBookCompleted
 from app.domains.book.router import router as book_router
@@ -149,6 +150,7 @@ def create_app() -> FastAPI:
     app.include_router(retention_router)
     app.include_router(shield_router)
     app.include_router(review_router)
+    app.include_router(ai_assistant_router)
     app.include_router(share_router)
 
     # Expose /metrics for Prometheus scraping; instrument after all routers are
