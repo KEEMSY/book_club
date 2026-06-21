@@ -10,6 +10,7 @@ import '../domain/bookmark.dart';
 import '../domain/reading_year_stats.dart';
 import 'grade_notifier.dart';
 import 'grade_state.dart';
+import 'in_app_review_service.dart';
 import 'reading_journey_inputs.dart';
 
 /// retrofit client for `/reading/*` — built once per Dio instance.
@@ -58,6 +59,13 @@ final yearStatsProvider =
     FutureProvider.autoDispose.family<ReadingYearStats, int>(
   (ref, year) => ref.read(readingRepositoryProvider).getYearStats(year),
 );
+
+/// Gates the OS in-app review prompt fired after a reading session completes.
+/// Stateless beyond the [SharedPreferences] it is handed at call time, so a
+/// plain Provider suffices.
+final inAppReviewServiceProvider = Provider<InAppReviewService>((ref) {
+  return const InAppReviewService();
+});
 
 /// Single-source-of-truth for the grade accent color. TimerRing, GradeBadge,
 /// JanDeeGrid, and the dashboard's today CTA read this provider so the whole

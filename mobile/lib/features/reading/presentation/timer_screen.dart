@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
@@ -195,6 +196,10 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
           if (mounted) {
             router.go('/home');
           }
+          // Ask for an app-store review once the session is fully wrapped up
+          // (summary dismissed). Fire-and-forget: the service decides whether
+          // this session actually crosses the prompt threshold.
+          _maybeRequestReview();
         });
       } else if (next is TimerFailure) {
         _showFailure(next);
@@ -307,6 +312,15 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
         child: AddHighlightSheet(userBookId: widget.userBookId),
       ),
     );
+  }
+
+  /// Records the completed session with the review gate and lets it decide
+  /// whether to surface the OS review sheet. Captured before any await so a
+  /// disposed widget doesn't block the bookkeeping.
+  Future<void> _maybeRequestReview() async {
+    final service = ref.read(inAppReviewServiceProvider);
+    final prefs = await SharedPreferences.getInstance();
+    await service.onSessionCompleted(prefs);
   }
 
   void _showFailure(TimerFailure fail) {

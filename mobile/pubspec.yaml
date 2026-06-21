@@ -2,7 +2,7 @@ name: book_club
 description: "Book Club mobile app (Flutter)."
 publish_to: 'none'
 
-version: 0.1.0+1
+version: 0.1.1+2
 
 environment:
   sdk: '>=3.5.0 <4.0.0'
@@ -93,6 +93,13 @@ dependencies:
   # understand why content stops loading when the device drops its connection.
   connectivity_plus: ^6.1.0
 
+  # In-app review prompt (M61). Wraps StoreKit SKStoreReviewController on iOS
+  # and the Play In-App Review API on Android — both surface the native rating
+  # sheet without leaving the app. The OS rate-limits how often the sheet shows,
+  # so InAppReviewService gates requests on top (5-session trigger, daily cap,
+  # 3-requests-per-install ceiling) to avoid wasting the OS quota on bad moments.
+  in_app_review: ^2.0.9
+
   # In-app purchases (M56). RevenueCat wraps StoreKit / Play Billing and
   # validates receipts server-side; the API key is injected via
   # --dart-define=REVENUECAT_API_KEY and omitted in dev (paywall falls back to
@@ -106,6 +113,11 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^6.0.0
+
+  # Lets InAppReviewService tests swap the platform interface with a fake
+  # (InAppReview itself has a private constructor). Test-only — not linked into
+  # the app binary, which depends on in_app_review (the wrapper) directly.
+  in_app_review_platform_interface: ^2.0.5
 
   # Code generation
   build_runner: ^2.4.13
