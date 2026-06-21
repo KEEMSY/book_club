@@ -13,6 +13,25 @@
 
 ## Phase 전환 리뷰 기록
 
+### Phase 13 → Phase 14 전환 리뷰 (2026-06-21)
+
+- 리뷰 문서: `docs/plans/2026-06-21-phase14.md`
+- 시장 분석: `docs/2026-06-21-market-analysis-v2.md` (딥리서치 3차)
+
+**Phase 13 완료 확인**: M56(기술 부채 청산) + M57(앱스토어 메타데이터·온보딩) + M58(CI/CD) + M59(프로덕션 배포) + M60(소프트 런치) 전부 완료. 태그 `v0.1.0`.
+
+**Phase 13 보류 항목 처리**:
+- **보류 유지 (Phase 15)**: (audio) 실 오디오 코칭 — 반응 데이터 미확보
+- **보류 유지 (Phase 15)**: (discovery) 딥러닝 추천 — 활성 사용자 1만 조건 미충족 (소프트 런치 직후)
+- **보류 유지 (Phase 15)**: (social) 독서 모임 영상 통화 통합 — M64 오프라인 모임 안정화 후
+
+**신규 편입 (Phase 14) — 딥리서치 3차 기반**:
+- **편입 (M61)**: (growth) 앱스토어 공개 출시 & ASO — TestFlight·내부 테스트 → 공개 배포, 인앱 리뷰
+- **편입 (M62)**: (social) SNS 인증 카드 고도화 — 5종 템플릿, 비율 선택, 딥링크 QR, 공유 이벤트 추적
+- **편입 (M63)**: (ai) AI 독서 어시스턴트 (Claude API) — 독서 전 준비카드(무료), 완독 성찰 가이드(Pro), 클럽 토론 주제
+- **편입 (M64)**: (community) 위치 기반 오프라인 모임 강화 — 카카오맵 연동, 번개 모임, 대기 명단, 모임 후 리뷰
+- **편입 (M65)**: (monetization) 수익화 전환율 최적화 — A/B 실험 결과 적용, 얼리버드 연간 캠페인, Pro 7일 체험, MRR 추적
+
 ### Phase 12 전환 리뷰 (2026-06-17)
 
 - 리뷰 문서: `docs/plans/2026-06-17-phase12.md`
@@ -177,10 +196,10 @@
 - [x] (club) 그룹 채팅 / 실시간 메시지 — Phase 6 M23-M24 편입 (2026-06-04)
 - [ ] (discovery) 딥러닝 추천 (딥 협업 필터링 / 콘텐츠 기반 임베딩) — 활성 사용자 1만 이상 확보 후 Phase 7 검토 (2026-06-04)
 
-- [ ] (book) Book 모델에 page_count 컬럼 추가 — 맥락: M52 독서 계획 weekly_pages 계산에서 page_count 없어 200 고정값 폴백 사용 중 (2026-06-18)
-- [ ] (mobile) RevenueCat SDK(purchases_flutter) 추가 — 맥락: M53 PaywallScreen 연간 플랜에서 실제 purchasePackage 연동 필요 (2026-06-18)
-- [ ] (book) M2 한줄리뷰(/me/library/.../review)와 M54 book_reviews 통합 — 맥락: M54 BookDetailScreen에 두 리뷰 UI 공존 중, M2 폐기 여부 제품 결정 필요 (2026-06-18)
-- [ ] (book) BookApi.getBookReviews(M2) + BookReviewDto 등 데드 엔드포인트 정리 — 맥락: M54 GET /books/{id}/reviews로 대체 후 M2 잔재 미삭제 (2026-06-18)
+- [x] (book) Book 모델에 page_count 컬럼 추가 — M56 migration 0039 + 네이버/카카오 어댑터 파싱 완료 (feat(M56) 08c4941)
+- [x] (mobile) RevenueCat SDK(purchases_flutter) 추가 — M56 purchases_flutter ^10.3.0 + Purchases.configure() + purchasePackage() 완료 (feat(M56) 08c4941)
+- [x] (book) M2 한줄리뷰(/me/library/.../review)와 M54 book_reviews 통합 — M56에서 M2 엔드포인트 폐기, M54 WriteReviewSheet로 일원화 완료 (feat(M56) 08c4941)
+- [x] (book) BookApi.getBookReviews(M2) + BookReviewDto 등 데드 엔드포인트 정리 — M56 데드코드 전량 제거 완료 (feat(M56) 08c4941)
 
 ### Phase 12 완료 리뷰 (2026-06-18)
 
