@@ -274,22 +274,25 @@ class _ContentState extends ConsumerState<_Content> {
                   ? () => context.push(
                         '/reading/timer'
                         '?user_book_id=${widget.userBookId}'
+                        '&book_id=${widget.book.id}'
                         '&auto_start=true',
                       )
                   : null,
             ),
-            Builder(builder: (ctx) {
-              final ub = _resolveUserBook();
-              if (ub == null || ub.status != BookStatus.reading) {
-                return const SizedBox.shrink();
-              }
-              return _ChapterUpdateRow(
-                userBook: ub,
-                onUpdated: (updated) {
-                  ref.read(libraryNotifierProvider.notifier).upsert(updated);
-                },
-              );
-            },),
+            Builder(
+              builder: (ctx) {
+                final ub = _resolveUserBook();
+                if (ub == null || ub.status != BookStatus.reading) {
+                  return const SizedBox.shrink();
+                }
+                return _ChapterUpdateRow(
+                  userBook: ub,
+                  onUpdated: (updated) {
+                    ref.read(libraryNotifierProvider.notifier).upsert(updated);
+                  },
+                );
+              },
+            ),
             SizedBox(height: spacing.xl),
             const Divider(height: 1),
             SizedBox(height: spacing.lg),
@@ -662,8 +665,7 @@ class _ReviewsSection extends ConsumerWidget {
       final lib = ref.watch(libraryNotifierProvider);
       for (final listState in lib.values) {
         if (listState is LibraryListLoaded) {
-          final int idx =
-              listState.items.indexWhere((b) => b.id == userBookId);
+          final int idx = listState.items.indexWhere((b) => b.id == userBookId);
           if (idx != -1) {
             myUserBook = listState.items[idx];
             break;
@@ -740,7 +742,8 @@ class _HighlightSection extends ConsumerWidget {
           )
         else if (state is HighlightLoaded)
           ...state.items.map(
-            (Highlight h) => _HighlightCard(highlight: h, userBookId: userBookId),
+            (Highlight h) =>
+                _HighlightCard(highlight: h, userBookId: userBookId),
           ),
       ],
     );

@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../ai_assistant/presentation/ai_prep_card_sheet.dart';
 import '../../curation/application/curation_providers.dart';
 import '../../curation/domain/curation_card.dart';
 import '../../feed/presentation/widgets/add_highlight_sheet.dart';
@@ -30,11 +31,17 @@ class TimerScreen extends ConsumerStatefulWidget {
   const TimerScreen({
     super.key,
     required this.userBookId,
+    this.bookId = '',
     this.autoStart = false,
     this.targetSeconds,
   });
 
   final String userBookId;
+
+  /// Catalog book id (distinct from [userBookId]). Optional — when present the
+  /// "읽기 전 AI 준비" entry point is shown. Threaded via the `book_id` query
+  /// param so the AI prep card can call `/books/{bookId}/ai-prep-card`.
+  final String bookId;
   final bool autoStart;
 
   /// When set the ring counts down from this duration and auto-ends at zero.
@@ -82,9 +89,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
             card: card,
             onStart: () {
               Navigator.of(context).pop();
-              ref
-                  .read(timerNotifierProvider.notifier)
-                  .start(widget.userBookId);
+              ref.read(timerNotifierProvider.notifier).start(widget.userBookId);
             },
           ),
         ),
@@ -255,6 +260,20 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                     icon: const Icon(Icons.format_quote_rounded, size: 18),
                     label: const Text('하이라이트 추가'),
                     onPressed: () => _showHighlightSheet(context),
+                  ),
+                ],
+                if (widget.bookId.isNotEmpty &&
+                    state is! TimerRunning &&
+                    state is! TimerPaused &&
+                    state is! TimerEnding) ...<Widget>[
+                  SizedBox(height: spacing.sm),
+                  FilledButton.tonalIcon(
+                    icon: const Icon(Icons.auto_awesome, size: 18),
+                    label: const Text('읽기 전 AI 준비'),
+                    onPressed: () => AiPrepCardSheet.show(
+                      context,
+                      bookId: widget.bookId,
+                    ),
                   ),
                 ],
                 SizedBox(height: spacing.md),

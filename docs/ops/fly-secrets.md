@@ -68,6 +68,8 @@ flyctl tokens create deploy -a book-club-api
 | `NAVER_CLIENT_ID` | 네이버 책 API 클라이언트 ID | developers.naver.com |
 | `NAVER_CLIENT_SECRET` | 네이버 책 API 시크릿 | developers.naver.com |
 | `APPLE_CLIENT_ID` | Apple Sign In 번들/서비스 ID | Apple Developer |
+| `ANTHROPIC_API_KEY` | AI 독서 어시스턴트(M63) Claude API 키. **미설정 시 stub 어댑터로 동작** — 실제 AI 기능은 비활성 | console.anthropic.com |
+| `ANTHROPIC_MODEL` | (선택) 사용할 Claude 모델. 기본값 `claude-haiku-4-5-20251001` | — |
 
 ### 3.4 푸시 · 모니터링 · 운영
 
@@ -101,6 +103,7 @@ flyctl secrets set -a book-club-api \
   NAVER_CLIENT_ID='...' \
   NAVER_CLIENT_SECRET='...' \
   APPLE_CLIENT_ID='kr.mission-driven.bookclub' \
+  ANTHROPIC_API_KEY='sk-ant-...' \
   FIREBASE_PROJECT_ID='book-club-prod' \
   SENTRY_DSN='https://...@o0.ingest.sentry.io/0' \
   ADMIN_KEY="$(openssl rand -hex 16)"
@@ -148,3 +151,4 @@ DB 스키마 변경은 `backend/fly.toml` 의 `release_command = "alembic upgrad
 - [ ] `JWT_SECRET` 이 기본값이 아닌 강한 난수다.
 - [ ] `ENV=prod` 로 설정되어 있다.
 - [ ] R2 / FCM / Sentry 자격증명이 설정되어 있다(M59 범위).
+- [ ] AI 어시스턴트를 활성화하려면 `ANTHROPIC_API_KEY` 가 설정되어 있다(M63, 미설정 시 stub 동작).

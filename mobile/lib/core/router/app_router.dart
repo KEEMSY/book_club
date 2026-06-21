@@ -269,6 +269,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final String userBookId =
               state.uri.queryParameters['user_book_id'] ?? '';
+          final String bookId = state.uri.queryParameters['book_id'] ?? '';
           final bool autoStart =
               state.uri.queryParameters['auto_start'] == 'true';
           final int? targetSeconds = int.tryParse(
@@ -276,6 +277,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           );
           return TimerScreen(
             userBookId: userBookId,
+            bookId: bookId,
             autoStart: autoStart,
             targetSeconds: targetSeconds,
           );

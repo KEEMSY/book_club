@@ -4,10 +4,13 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../ai_assistant/application/ai_providers.dart';
+import '../../ai_assistant/data/ai_repository.dart';
 import '../../auth/application/auth_notifier.dart';
 import '../../auth/domain/auth_state.dart';
 import '../../book/application/book_providers.dart';
 import '../../book/domain/book.dart';
+import '../../subscription/application/subscription_notifier.dart';
 import '../application/club_providers.dart';
 import '../domain/club.dart';
 import 'club_chat_screen.dart';
@@ -116,10 +119,13 @@ class _ClubEventsTab extends ConsumerWidget {
                   ),
                 ),
                 SizedBox(height: spacing.md),
-                _ClubBookCard(club: club, onChanged: (updated) {
-                  // Refresh events tab to pick up updated club data.
-                  ref.invalidate(_clubEventsProvider(club.id));
-                }),
+                _ClubBookCard(
+                  club: club,
+                  onChanged: (updated) {
+                    // Refresh events tab to pick up updated club data.
+                    ref.invalidate(_clubEventsProvider(club.id));
+                  },
+                ),
                 SizedBox(height: spacing.lg),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -178,8 +184,8 @@ class _ClubEventsTab extends ConsumerWidget {
                     child: Text(
                       '아직 예정된 모임이 없어요',
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurface
-                            .withValues(alpha: 0.5),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.5),
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -404,9 +410,8 @@ class _ClubBookCardState extends ConsumerState<_ClubBookCard> {
 
   Future<void> _clearBook() async {
     try {
-      final updated = await ref
-          .read(clubRepositoryProvider)
-          .setClubBook(widget.club.id);
+      final updated =
+          await ref.read(clubRepositoryProvider).setClubBook(widget.club.id);
       widget.onChanged(updated);
     } catch (_) {
       if (!mounted) return;
@@ -422,6 +427,12 @@ class _ClubBookCardState extends ConsumerState<_ClubBookCard> {
     final spacing = theme.extension<AppSpacing>()!;
     final radii = theme.extension<AppRadius>()!;
     final hasBook = widget.club.bookId != null;
+    // AI discussion topics are a Pro-club-owner feature; only show the entry
+    // point when both hold (the backend re-checks both).
+    final bool isPro = ref.watch(subscriptionNotifierProvider).maybeWhen(
+          data: (s) => s.isPro,
+          orElse: () => false,
+        );
 
     return Container(
       padding: EdgeInsets.symmetric(
@@ -436,57 +447,129 @@ class _ClubBookCardState extends ConsumerState<_ClubBookCard> {
           width: 1,
         ),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Icon(
-            Icons.menu_book_rounded,
-            size: 20,
-            color: hasBook
-                ? theme.colorScheme.primary
-                : theme.colorScheme.onSurface.withValues(alpha: 0.4),
-          ),
-          SizedBox(width: spacing.sm),
-          Expanded(
-            child: Text(
-              hasBook ? '현재 책 설정됨' : '읽는 책 없음',
-              style: theme.textTheme.bodySmall?.copyWith(
+          Row(
+            children: [
+              Icon(
+                Icons.menu_book_rounded,
+                size: 20,
                 color: hasBook
-                    ? theme.colorScheme.onSurface
-                    : theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.4),
               ),
-            ),
-          ),
-          if (_isOwner) ...[
-            TextButton(
-              onPressed: _openPicker,
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.symmetric(
-                  horizontal: spacing.sm,
-                  vertical: 4,
-                ),
-                minimumSize: Size.zero,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-              child: Text(hasBook ? '변경' : '책 설정'),
-            ),
-            if (hasBook)
-              TextButton(
-                onPressed: _clearBook,
-                style: TextButton.styleFrom(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: spacing.sm,
-                    vertical: 4,
+              SizedBox(width: spacing.sm),
+              Expanded(
+                child: Text(
+                  hasBook ? '현재 책 설정됨' : '읽는 책 없음',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: hasBook
+                        ? theme.colorScheme.onSurface
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  foregroundColor: theme.colorScheme.error,
                 ),
-                child: const Text('해제'),
               ),
+              if (_isOwner) ...[
+                TextButton(
+                  onPressed: _openPicker,
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: spacing.sm,
+                      vertical: 4,
+                    ),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: Text(hasBook ? '변경' : '책 설정'),
+                ),
+                if (hasBook)
+                  TextButton(
+                    onPressed: _clearBook,
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: spacing.sm,
+                        vertical: 4,
+                      ),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      foregroundColor: theme.colorScheme.error,
+                    ),
+                    child: const Text('해제'),
+                  ),
+              ],
+            ],
+          ),
+          if (_isOwner && hasBook && isPro) ...[
+            SizedBox(height: spacing.sm),
+            OutlinedButton.icon(
+              onPressed: _generateAiTopics,
+              icon: const Icon(Icons.auto_awesome, size: 18),
+              label: const Text('AI 토론 주제 생성'),
+            ),
           ],
         ],
       ),
     );
+  }
+
+  /// Prompts for this week's page range, generates AI discussion topics via
+  /// `POST /clubs/{id}/ai-discussion-topics`, and shows the result. On success
+  /// the backend also pins the topics into the club chat.
+  Future<void> _generateAiTopics() async {
+    final range = await _PageRangeDialog.show(context);
+    if (range == null || !mounted) return;
+    final (int start, int end) = range;
+
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+    try {
+      final topics = await ref.read(aiRepositoryProvider).getClubTopics(
+            widget.club.id,
+            pageStart: start,
+            pageEnd: end,
+          );
+      if (!mounted) return;
+      Navigator.of(context).pop(); // dismiss loader
+      await showDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('이번 주 토론 주제'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (var i = 0; i < topics.length; i++)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Text('${i + 1}. ${topics[i]}'),
+                ),
+              const SizedBox(height: 4),
+              Text(
+                '채팅방에 고정 메시지로 게시했어요.',
+                style: Theme.of(ctx).textTheme.bodySmall,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('확인'),
+            ),
+          ],
+        ),
+      );
+    } on AiRepositoryException catch (e) {
+      if (!mounted) return;
+      Navigator.of(context).pop(); // dismiss loader
+      final String message =
+          e.isUnavailable ? 'AI 연결 안 됨 — 잠시 후 다시 시도해 주세요.' : e.message;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(message)));
+    }
   }
 }
 
@@ -497,8 +580,7 @@ class _ClubBookCardState extends ConsumerState<_ClubBookCard> {
 class _SetBookSheet extends ConsumerStatefulWidget {
   const _SetBookSheet();
 
-  static Future<Book?> show(BuildContext context) =>
-      showModalBottomSheet<Book>(
+  static Future<Book?> show(BuildContext context) => showModalBottomSheet<Book>(
         context: context,
         isScrollControlled: true,
         showDragHandle: true,
@@ -639,6 +721,90 @@ class _SetBookSheetState extends ConsumerState<_SetBookSheet> {
           ],
         ],
       ),
+    );
+  }
+}
+
+/// Small dialog collecting this week's reading page range for AI topic
+/// generation. Returns `(pageStart, pageEnd)` or null when cancelled.
+class _PageRangeDialog extends StatefulWidget {
+  const _PageRangeDialog();
+
+  static Future<(int, int)?> show(BuildContext context) {
+    return showDialog<(int, int)>(
+      context: context,
+      builder: (_) => const _PageRangeDialog(),
+    );
+  }
+
+  @override
+  State<_PageRangeDialog> createState() => _PageRangeDialogState();
+}
+
+class _PageRangeDialogState extends State<_PageRangeDialog> {
+  final _startController = TextEditingController();
+  final _endController = TextEditingController();
+  String? _error;
+
+  @override
+  void dispose() {
+    _startController.dispose();
+    _endController.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final start = int.tryParse(_startController.text.trim());
+    final end = int.tryParse(_endController.text.trim());
+    if (start == null || end == null || start < 0 || end < start) {
+      setState(() => _error = '올바른 페이지 범위를 입력해 주세요.');
+      return;
+    }
+    Navigator.of(context).pop((start, end));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('이번 주 읽기 범위'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _startController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(labelText: '시작 쪽'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: TextField(
+                  controller: _endController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(labelText: '끝 쪽'),
+                ),
+              ),
+            ],
+          ),
+          if (_error != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              _error!,
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
+          ],
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('취소'),
+        ),
+        FilledButton(onPressed: _submit, child: const Text('생성')),
+      ],
     );
   }
 }

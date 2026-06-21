@@ -550,7 +550,8 @@ class _LibraryCard extends ConsumerWidget {
         onPlayTap: () {
           final router = GoRouter.of(context);
           router.push(
-            '/reading/timer?user_book_id=${userBook.id}&auto_start=true',
+            '/reading/timer?user_book_id=${userBook.id}'
+            '&book_id=${userBook.book.id}&auto_start=true',
           );
         },
       ),
@@ -622,7 +623,8 @@ class _LibraryActionsSheet extends ConsumerWidget {
                   final router = GoRouter.of(context);
                   Navigator.of(context).pop();
                   router.push(
-                    '/reading/timer?user_book_id=${userBook.id}&auto_start=true',
+                    '/reading/timer?user_book_id=${userBook.id}'
+                    '&book_id=${userBook.book.id}&auto_start=true',
                   );
                 },
                 icon: const Icon(Icons.play_circle_outline_rounded),
