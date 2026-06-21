@@ -8,7 +8,7 @@ the domain boundary only through SQL queries — no service calls.
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import UTC, date, datetime, timedelta
 from functools import lru_cache
 from typing import Annotated
 from uuid import UUID
@@ -190,6 +190,23 @@ def get_notification_service() -> NotificationService:
                 value = result.scalar_one_or_none()
                 return int(value) if value is not None else 0
 
+    class _BatchTrialExpiryAdapter:
+        async def get_users_with_trial_ending_within(
+            self, hours: int
+        ) -> list[tuple[UUID, datetime]]:
+            async with sessionmaker() as s:
+                now = datetime.now(tz=UTC)
+                horizon = now + timedelta(hours=hours)
+                stmt = select(User.id, User.trial_ends_at).where(
+                    User.deleted_at.is_(None),
+                    User.is_pro.is_(False),
+                    User.trial_ends_at.isnot(None),
+                    User.trial_ends_at > now,
+                    User.trial_ends_at <= horizon,
+                )
+                result = await s.execute(stmt)
+                return [(row[0], row[1]) for row in result.all()]
+
     return NotificationService(
         sessionmaker=sessionmaker,
         push=get_push_port(),
@@ -197,6 +214,7 @@ def get_notification_service() -> NotificationService:
         daily_stats=_BatchDailyStatAdapter(),
         session_query=_BatchSessionAdapter(),
         active_users=_BatchActiveUserAdapter(),
+        trial_expiry=_BatchTrialExpiryAdapter(),
     )
 
 
@@ -230,5 +248,13 @@ def create_scheduler(notification_svc: NotificationService) -> AsyncIOScheduler:
         hour=21,
         minute=0,
         id="weekly_report",
+    )
+    # Daily 10:00 KST sweep for trials entering their final 24h (M65 D-1 push).
+    scheduler.add_job(
+        notification_svc.send_expiry_reminders,
+        "cron",
+        hour=10,
+        minute=0,
+        id="trial_expiry_reminders",
     )
     return scheduler

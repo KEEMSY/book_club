@@ -33,6 +33,18 @@ class SubscriptionVerifyResponse(BaseModel):
     message: str
 
 
+class PromoResponse(BaseModel):
+    """Currently active early-bird promo, as served to the paywall banner.
+
+    The endpoint returns ``null`` (not this model) when no promo is live, so
+    the client only renders the banner when there is something to show.
+    """
+
+    promo_code: str
+    discount_pct: int
+    valid_until: datetime
+
+
 class RevenueCatWebhookBody(BaseModel):
     """Minimal representation of a RevenueCat webhook payload.
 

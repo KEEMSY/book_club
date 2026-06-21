@@ -26,6 +26,7 @@ from app.domains.notification.ports import (
     DeviceTokenQueryPort,
     PushPort,
     SessionQueryPort,
+    TrialExpiryQueryPort,
 )
 from app.domains.notification.repository import NotificationRepository, WeeklyReportRepository
 from app.domains.reading.events import UserGradeRecomputed
@@ -60,6 +61,10 @@ class NotificationService:
     daily_stats: DailyStatQueryPort
     session_query: SessionQueryPort
     active_users: ActiveUserQueryPort
+    # Optional: queries trial-ending users for the expiry-reminder batch. When
+    # absent, ``send_expiry_reminders`` is a no-op (e.g. unit tests that don't
+    # exercise the reminder path).
+    trial_expiry: TrialExpiryQueryPort | None = None
 
     async def on_reaction_added(self, event: object) -> None:
         """Create an in-app notification and push when a reaction is added.
@@ -400,6 +405,63 @@ class NotificationService:
             body,
             {"streak_days": str(streak_days)},
         )
+
+    async def schedule_subscription_reminders(
+        self,
+        *,
+        user_id: UUID,
+        trial_ends_at: datetime,
+    ) -> None:
+        """Send the D-1 trial-expiry reminder push to a single user.
+
+        Persists an in-app notification and pushes to the user's active device
+        tokens. Named ``schedule_*`` because ``send_expiry_reminders`` calls it
+        once per user whose trial enters the final 24h window.
+        """
+        title = "내일 Pro 혜택이 종료돼요"
+        body = "지금 구독하면 30% 할인 — 체험 중 누린 Pro 기능을 계속 이어가세요."
+        async with self.sessionmaker() as session:
+            await self._save_notification(
+                session,
+                user_id=user_id,
+                ntype=NotificationType.SUBSCRIPTION_REMINDER,
+                title=title,
+                body=body,
+                data={"trial_ends_at": trial_ends_at.isoformat()},
+            )
+            tokens = await self.device_tokens.get_active_tokens(user_id)
+            await session.commit()
+
+        if tokens:
+            await self.push.send_to_tokens(
+                tokens,
+                title,
+                body,
+                {"trial_ends_at": trial_ends_at.isoformat()},
+            )
+
+    async def send_expiry_reminders(self) -> None:
+        """Push D-1 reminders to every user whose Pro trial ends within 24h.
+
+        Invoked daily by APScheduler. No-op when no trial-expiry query adapter
+        is wired (e.g. unit tests). Per-user failures are logged and skipped so
+        one bad token cannot abort the whole batch.
+        """
+        if self.trial_expiry is None:
+            return
+
+        users = await self.trial_expiry.get_users_with_trial_ending_within(24)
+        logger.info("trial_expiry_reminder_batch started users=%d", len(users))
+        for user_id, trial_ends_at in users:
+            try:
+                await self.schedule_subscription_reminders(
+                    user_id=user_id, trial_ends_at=trial_ends_at
+                )
+            except Exception:
+                logger.exception(
+                    "trial_expiry_reminder_failed user_id=%s", user_id
+                )
+        logger.info("trial_expiry_reminder_batch finished users=%d", len(users))
 
     @staticmethod
     async def _save_notification(

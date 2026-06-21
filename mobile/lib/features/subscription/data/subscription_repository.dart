@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 
+import '../domain/promo.dart';
 import '../domain/subscription_status.dart';
+import '../domain/trial_status.dart';
 import 'subscription_api.dart';
 
 /// Typed domain failure surfaced by [SubscriptionRepository].
@@ -64,6 +66,27 @@ class SubscriptionRepository {
             ? DateTime.tryParse(data['expires_at'] as String)
             : null,
       );
+    } on DioException catch (e) {
+      throw _fromDio(e);
+    }
+  }
+
+  /// Fetches the current user's Pro trial window state.
+  Future<TrialStatus> getTrialStatus() async {
+    try {
+      final dynamic raw = await _api.getTrialStatus();
+      return TrialStatus.fromJson(raw as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw _fromDio(e);
+    }
+  }
+
+  /// Fetches the active early-bird promo, or `null` when none is live.
+  Future<Promo?> getActivePromo() async {
+    try {
+      final dynamic raw = await _api.getActivePromo();
+      if (raw == null) return null;
+      return Promo.fromJson(raw as Map<String, dynamic>);
     } on DioException catch (e) {
       throw _fromDio(e);
     }

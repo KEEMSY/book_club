@@ -20,8 +20,9 @@ Business rules captured here:
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
 from app.core.exceptions import AuthError, NotFoundError
@@ -39,6 +40,19 @@ from app.domains.auth.ports import (
 )
 
 _APPLE_FALLBACK_NICKNAME = "애플회원"
+
+# New signups get a 7-day Pro trial (M65). The window is computed in the
+# service (domain policy) and persisted at user creation.
+_TRIAL_DAYS = 7
+
+
+@dataclass(frozen=True, slots=True)
+class TrialStatus:
+    """Service-layer view of a user's Pro trial window."""
+
+    is_in_trial: bool
+    trial_ends_at: datetime | None
+    days_remaining: int
 
 
 @dataclass(frozen=True, slots=True)
@@ -73,12 +87,15 @@ class AuthService:
         existing = await self.users.get_by_provider_sub(AuthProvider.KAKAO, profile.sub)
         is_new_user = existing is None
         if existing is None:
+            trial_start, trial_end = self._new_trial_window()
             user = await self.users.create(
                 provider=AuthProvider.KAKAO,
                 sub=profile.sub,
                 email=profile.email,
                 nickname=profile.nickname,
                 profile_image_url=profile.profile_image_url,
+                trial_started_at=trial_start,
+                trial_ends_at=trial_end,
             )
         else:
             user = existing
@@ -96,12 +113,15 @@ class AuthService:
         existing = await self.users.get_by_provider_sub(AuthProvider.KAKAO, sub)
         is_new_user = existing is None
         if existing is None:
+            trial_start, trial_end = self._new_trial_window()
             user = await self.users.create(
                 provider=AuthProvider.KAKAO,
                 sub=sub,
                 email=email,
                 nickname=nickname,
                 profile_image_url=None,
+                trial_started_at=trial_start,
+                trial_ends_at=trial_end,
             )
         else:
             user = existing
@@ -114,6 +134,7 @@ class AuthService:
         existing = await self.users.get_by_provider_sub(AuthProvider.APPLE, profile.sub)
         is_new_user = existing is None
         if existing is None:
+            trial_start, trial_end = self._new_trial_window()
             user = await self.users.create(
                 provider=AuthProvider.APPLE,
                 sub=profile.sub,
@@ -123,6 +144,8 @@ class AuthService:
                 # edit later.
                 nickname=_APPLE_FALLBACK_NICKNAME,
                 profile_image_url=None,
+                trial_started_at=trial_start,
+                trial_ends_at=trial_end,
             )
         else:
             user = existing
@@ -162,6 +185,35 @@ class AuthService:
         if user is None:
             raise NotFoundError("user not found", code="USER_NOT_FOUND")
         return user
+
+    async def get_trial_status(self, *, user_id: UUID) -> TrialStatus:
+        """Return the user's Pro trial window state.
+
+        A user is in trial while ``now < trial_ends_at``. ``days_remaining`` is
+        rounded up so a partial final day still reads as "1일 남음" rather than 0.
+        """
+        user = await self.users.get_by_id(user_id)
+        if user is None:
+            raise NotFoundError("user not found", code="USER_NOT_FOUND")
+
+        ends_at = user.trial_ends_at
+        now = datetime.now(tz=UTC)
+        is_in_trial = ends_at is not None and now < ends_at
+        if is_in_trial and ends_at is not None:
+            days_remaining = max(0, math.ceil((ends_at - now).total_seconds() / 86_400))
+        else:
+            days_remaining = 0
+        return TrialStatus(
+            is_in_trial=is_in_trial,
+            trial_ends_at=ends_at,
+            days_remaining=days_remaining,
+        )
+
+    @staticmethod
+    def _new_trial_window() -> tuple[datetime, datetime]:
+        """Compute the (start, end) of a new signup's Pro trial."""
+        now = datetime.now(tz=UTC)
+        return now, now + timedelta(days=_TRIAL_DAYS)
 
     async def update_profile(
         self,

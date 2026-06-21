@@ -13,7 +13,14 @@ from fastapi import APIRouter, Depends, Query
 
 from app.core.deps import get_current_admin_id
 from app.domains.admin.providers import get_admin_service
-from app.domains.admin.schemas import PatchUserRequest, StatsResponse, UserAdminItem, UserAdminPage
+from app.domains.admin.schemas import (
+    ConversionFunnelResponse,
+    PatchUserRequest,
+    RevenueMetricsResponse,
+    StatsResponse,
+    UserAdminItem,
+    UserAdminPage,
+)
 from app.domains.admin.service import AdminService
 
 router = APIRouter(prefix="/admin", tags=["admin-dashboard"])
@@ -26,6 +33,24 @@ async def get_stats(
 ) -> StatsResponse:
     """Return aggregate usage statistics (MAU, DAU, new users, Pro count)."""
     return await service.get_stats()
+
+
+@router.get("/conversion-funnel", response_model=ConversionFunnelResponse)
+async def get_conversion_funnel(
+    _: Annotated[str, Depends(get_current_admin_id)],
+    service: Annotated[AdminService, Depends(get_admin_service)],
+) -> ConversionFunnelResponse:
+    """Paywall conversion funnel: views → clicks → subscriptions."""
+    return await service.get_conversion_funnel()
+
+
+@router.get("/revenue-metrics", response_model=RevenueMetricsResponse)
+async def get_revenue_metrics(
+    _: Annotated[str, Depends(get_current_admin_id)],
+    service: Annotated[AdminService, Depends(get_admin_service)],
+) -> RevenueMetricsResponse:
+    """Recurring-revenue snapshot — MRR, ARR, active subscribers, 30-day churn."""
+    return await service.get_revenue_metrics()
 
 
 @router.get("/users", response_model=UserAdminPage)

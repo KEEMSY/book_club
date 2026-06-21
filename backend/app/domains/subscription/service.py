@@ -9,8 +9,9 @@ from uuid import UUID
 
 from app.core.exceptions import ConflictError
 from app.domains.subscription.ports import PurchaseVerifierPort
-from app.domains.subscription.repository import SubscriptionRepository
+from app.domains.subscription.repository import PromoRepository, SubscriptionRepository
 from app.domains.subscription.schemas import (
+    PromoResponse,
     SubscriptionStatus,
     SubscriptionVerifyResponse,
     VerifyReceiptRequest,
@@ -149,3 +150,21 @@ class SubscriptionService:
                 expires_at=None,
                 product_id=product_id,
             )
+
+
+@dataclass(slots=True)
+class PromoService:
+    """Serves the currently active promotional campaign to the paywall."""
+
+    repo: PromoRepository
+
+    async def get_active_promo(self) -> PromoResponse | None:
+        """Return the live promo as a DTO, or ``None`` when none is active."""
+        promo = await self.repo.get_active_promo()
+        if promo is None:
+            return None
+        return PromoResponse(
+            promo_code=promo.promo_code,
+            discount_pct=promo.discount_pct,
+            valid_until=promo.valid_until,
+        )

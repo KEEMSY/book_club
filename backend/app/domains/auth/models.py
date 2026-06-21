@@ -75,6 +75,15 @@ class User(Base):
     pro_expires_at: Mapped[datetime | None] = mapped_column(PGTIMESTAMP(timezone=True), nullable=True)
     pro_product_id: Mapped[str | None] = mapped_column(Text, nullable=True)
 
+    # New-signup Pro trial window (M65). Both NULL for accounts created before
+    # the trial launch; the service treats NULL trial_ends_at as "not in trial".
+    trial_started_at: Mapped[datetime | None] = mapped_column(
+        PGTIMESTAMP(timezone=True), nullable=True
+    )
+    trial_ends_at: Mapped[datetime | None] = mapped_column(
+        PGTIMESTAMP(timezone=True), nullable=True
+    )
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )

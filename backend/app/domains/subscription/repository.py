@@ -7,7 +7,7 @@ to avoid an extra join table for a simple 1:1 relationship.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from uuid import UUID
 
 from sqlalchemy import select, update
@@ -15,6 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import NotFoundError
 from app.domains.auth.models import User
+from app.domains.subscription.models import SubscriptionPromo
 
 
 @dataclass(slots=True)
@@ -62,3 +63,29 @@ class SubscriptionRepository:
             )
         )
         await self.session.flush()
+
+
+@dataclass(slots=True)
+class PromoRepository:
+    """Read access to time-boxed promotional campaigns."""
+
+    session: AsyncSession
+
+    async def get_active_promo(self) -> SubscriptionPromo | None:
+        """Return the live promo (active and within its validity window).
+
+        When several overlap, the one ending soonest wins so its countdown is
+        the most urgent — matching what the paywall banner should surface.
+        """
+        now = datetime.now(tz=UTC)
+        result = await self.session.execute(
+            select(SubscriptionPromo)
+            .where(
+                SubscriptionPromo.is_active.is_(True),
+                SubscriptionPromo.valid_from <= now,
+                SubscriptionPromo.valid_until > now,
+            )
+            .order_by(SubscriptionPromo.valid_until.asc())
+            .limit(1)
+        )
+        return result.scalar_one_or_none()

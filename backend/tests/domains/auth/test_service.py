@@ -41,6 +41,8 @@ class FakeUserRepo:
         email: str | None,
         nickname: str,
         profile_image_url: str | None,
+        trial_started_at: datetime | None = None,
+        trial_ends_at: datetime | None = None,
     ) -> User:
         user = User(
             provider=provider,
@@ -48,6 +50,8 @@ class FakeUserRepo:
             email=email,
             nickname=nickname,
             profile_image_url=profile_image_url,
+            trial_started_at=trial_started_at,
+            trial_ends_at=trial_ends_at,
         )
         user.id = uuid4()
         self.users[user.id] = user

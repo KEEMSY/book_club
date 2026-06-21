@@ -28,6 +28,30 @@ class StatsResponse(BaseModel):
     """Current count of users with ``is_pro=True``."""
 
 
+class ConversionFunnelResponse(BaseModel):
+    """Paywall conversion funnel: views → clicks → subscriptions (M65)."""
+
+    paywall_views: int
+    paywall_clicks: int
+    subscriptions: int
+    conversion_rate: float
+    """subscriptions / paywall_views, in [0, 1]; 0.0 when there are no views."""
+
+
+class RevenueMetricsResponse(BaseModel):
+    """Recurring-revenue snapshot derived from active subscribers (M65)."""
+
+    mrr: float
+    """Monthly recurring revenue (KRW), summed from active subscribers' plans."""
+
+    arr: float
+    """Annual recurring revenue — ``mrr * 12``."""
+
+    active_subscribers: int
+    churned_30d: int
+    """Churn events recorded in the last 30 days."""
+
+
 class UserAdminItem(BaseModel):
     """Flattened user record returned by admin user-management endpoints."""
 

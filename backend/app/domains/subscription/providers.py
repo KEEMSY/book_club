@@ -25,8 +25,8 @@ from app.domains.reading.repository import UserGradeRepository
 from app.domains.subscription.adapters.revenuecat_adapter import RevenueCatAdapter
 from app.domains.subscription.adapters.stub_verifier import StubPurchaseVerifier
 from app.domains.subscription.ports import PurchaseVerifierPort
-from app.domains.subscription.repository import SubscriptionRepository
-from app.domains.subscription.service import SubscriptionService
+from app.domains.subscription.repository import PromoRepository, SubscriptionRepository
+from app.domains.subscription.service import PromoService, SubscriptionService
 
 
 class GradeShieldGrantAdapter:
@@ -64,3 +64,10 @@ def get_subscription_service(
         experiment_service=experiment_svc,
         shield_grant=GradeShieldGrantAdapter(session),
     )
+
+
+def get_promo_service(
+    session: Annotated[AsyncSession, Depends(get_session)],
+) -> PromoService:
+    """Construct a ``PromoService`` wired with a live promo repository."""
+    return PromoService(repo=PromoRepository(session))

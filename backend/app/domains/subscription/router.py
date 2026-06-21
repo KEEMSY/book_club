@@ -21,14 +21,18 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
 
 from app.core.deps import get_current_user_id
-from app.domains.subscription.providers import get_subscription_service
+from app.domains.subscription.providers import (
+    get_promo_service,
+    get_subscription_service,
+)
 from app.domains.subscription.schemas import (
+    PromoResponse,
     RevenueCatWebhookBody,
     SubscriptionStatus,
     SubscriptionVerifyResponse,
     VerifyReceiptRequest,
 )
-from app.domains.subscription.service import SubscriptionService
+from app.domains.subscription.service import PromoService, SubscriptionService
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +46,18 @@ async def get_my_subscription(
 ) -> SubscriptionStatus:
     """Return the authenticated user's current Pro subscription status."""
     return await service.get_status(UUID(user_id))
+
+
+@router.get("/subscriptions/promo", response_model=PromoResponse | None)
+async def get_active_promo(
+    service: Annotated[PromoService, Depends(get_promo_service)],
+) -> PromoResponse | None:
+    """Return the currently active promo, or ``null`` when none is live.
+
+    Public (no auth): the early-bird banner is shown on the paywall before a
+    purchase decision, and the payload carries no user-specific data.
+    """
+    return await service.get_active_promo()
 
 
 @router.post("/me/subscription/verify", response_model=SubscriptionVerifyResponse)

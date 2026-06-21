@@ -42,6 +42,7 @@ class NotificationType(enum.StrEnum):
     FOLLOW_RECEIVED = "follow_received"
     BADGE_EARNED = "badge_earned"
     STREAK_WARNING = "streak_warning"
+    SUBSCRIPTION_REMINDER = "subscription_reminder"
 
 
 class Notification(Base):

@@ -102,3 +102,15 @@ class ActiveUserQueryPort(Protocol):
     async def get_all_active_user_ids(self) -> list[UUID]: ...
 
     # Excludes soft-deleted accounts.
+
+
+class TrialExpiryQueryPort(Protocol):
+    """Cross-domain query: users whose Pro trial ends within a horizon."""
+
+    async def get_users_with_trial_ending_within(
+        self, hours: int
+    ) -> list[tuple[UUID, datetime]]: ...
+
+    # Returns (user_id, trial_ends_at) for non-deleted, non-Pro users whose
+    # trial_ends_at falls between now and now + ``hours``. Excludes users who
+    # already converted to Pro.

@@ -14,6 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domains.auth.models import User
 from app.domains.reading.models import ReadingSession
+from app.domains.subscription.models import SubscriptionEvent
 
 
 class AdminRepository:
@@ -62,6 +63,42 @@ class AdminRepository:
         )
         result = await self._session.execute(stmt)
         return result.scalar_one() or 0
+
+    # ------------------------------------------------------------------
+    # Monetization metrics (M65)
+    # ------------------------------------------------------------------
+
+    async def count_subscription_events(self, *, event_type: str) -> int:
+        """Count subscription funnel events of the given type."""
+        stmt = select(func.count(SubscriptionEvent.id)).where(
+            SubscriptionEvent.event_type == event_type
+        )
+        result = await self._session.execute(stmt)
+        return result.scalar_one() or 0
+
+    async def count_churned_since(self, since: datetime) -> int:
+        """Count ``churn`` events recorded on/after ``since``."""
+        stmt = select(func.count(SubscriptionEvent.id)).where(
+            SubscriptionEvent.event_type == "churn",
+            SubscriptionEvent.created_at >= since,
+        )
+        result = await self._session.execute(stmt)
+        return result.scalar_one() or 0
+
+    async def count_active_subscribers_by_product(self) -> dict[str | None, int]:
+        """Active Pro subscriber counts grouped by ``pro_product_id``.
+
+        Drives MRR: each product's monthly-equivalent price is applied in the
+        service. NULL product ids (legacy/manual grants) are kept as a key so
+        the active-subscriber total stays accurate.
+        """
+        stmt = (
+            select(User.pro_product_id, func.count(User.id))
+            .where(User.is_pro.is_(True), User.deleted_at.is_(None))
+            .group_by(User.pro_product_id)
+        )
+        result = await self._session.execute(stmt)
+        return {row[0]: row[1] for row in result.all()}
 
     # ------------------------------------------------------------------
     # User management

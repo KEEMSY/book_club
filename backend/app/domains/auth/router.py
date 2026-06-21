@@ -24,6 +24,7 @@ from app.domains.auth.schemas import (
     LoginResponse,
     RefreshRequest,
     RefreshResponse,
+    TrialStatusResponse,
     UpdateProfileRequest,
     UserPublic,
 )
@@ -117,6 +118,20 @@ async def get_me(
 ) -> UserPublic:
     user = await service.get_me(user_id=UUID(user_id))
     return UserPublic.model_validate(user)
+
+
+@router.get("/me/trial-status", response_model=TrialStatusResponse)
+async def get_my_trial_status(
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[AuthService, Depends(get_auth_service)],
+) -> TrialStatusResponse:
+    """Return the authenticated user's Pro trial window state."""
+    status = await service.get_trial_status(user_id=UUID(user_id))
+    return TrialStatusResponse(
+        is_in_trial=status.is_in_trial,
+        trial_ends_at=status.trial_ends_at,
+        days_remaining=status.days_remaining,
+    )
 
 
 @router.patch("/me", response_model=UserPublic)

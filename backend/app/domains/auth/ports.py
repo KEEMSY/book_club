@@ -48,6 +48,8 @@ class UserRepositoryPort(Protocol):
         email: str | None,
         nickname: str,
         profile_image_url: str | None,
+        trial_started_at: datetime | None = None,
+        trial_ends_at: datetime | None = None,
     ) -> User: ...
 
     async def update_last_login(self, user_id: UUID, at: datetime) -> None: ...

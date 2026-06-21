@@ -69,6 +69,14 @@ class UserPublic(BaseModel):
         return cls.model_validate(user)
 
 
+class TrialStatusResponse(BaseModel):
+    """Pro trial window state for the authenticated user (M65)."""
+
+    is_in_trial: bool
+    trial_ends_at: datetime | None
+    days_remaining: int
+
+
 class UpdateProfileRequest(BaseModel):
     nickname: str | None = Field(default=None, min_length=1, max_length=64)
     # An explicit None clears the bio; omitting the field leaves it unchanged.

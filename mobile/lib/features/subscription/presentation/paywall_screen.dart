@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,7 +7,9 @@ import 'package:go_router/go_router.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../application/monetization_providers.dart';
 import '../application/subscription_notifier.dart';
+import '../domain/promo.dart';
 
 const Color _kProPurple = Color(0xFF6B21A8);
 
@@ -151,6 +155,12 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
 
+    // Early-bird promo (countdown banner) and trial state drive the optional
+    // header banner and the CTA label; both degrade silently on error/loading.
+    final Promo? promo = ref.watch(activePromoProvider).valueOrNull;
+    final bool isInTrial =
+        ref.watch(trialStatusProvider).valueOrNull?.isInTrial ?? false;
+
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       body: SafeArea(
@@ -173,6 +183,10 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    if (promo != null) ...[
+                      _EarlyBirdBanner(promo: promo),
+                      SizedBox(height: spacing.lg),
+                    ],
                     Text(
                       'Pro 혜택',
                       style: theme.textTheme.titleMedium?.copyWith(
@@ -246,7 +260,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                               ),
                             )
                           : Text(
-                              'Pro 시작하기',
+                              isInTrial ? '7일 무료 체험 시작' : 'Pro 시작하기',
                               style: theme.textTheme.titleMedium?.copyWith(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -440,6 +454,116 @@ class _BenefitTile extends StatelessWidget {
             child: Text(
               text,
               style: theme.textTheme.bodyLarge,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Early-bird promo banner with a live countdown to the promo's expiry
+// ---------------------------------------------------------------------------
+
+const Color _kEarlyBird = Color(0xFFFF385C); // Rausch — app brand accent
+
+class _EarlyBirdBanner extends StatefulWidget {
+  const _EarlyBirdBanner({required this.promo});
+
+  final Promo promo;
+
+  @override
+  State<_EarlyBirdBanner> createState() => _EarlyBirdBannerState();
+}
+
+class _EarlyBirdBannerState extends State<_EarlyBirdBanner> {
+  Timer? _ticker;
+  late Duration _remaining;
+
+  @override
+  void initState() {
+    super.initState();
+    _remaining = _timeLeft();
+    // One tick per second keeps the countdown live without a heavy rebuild.
+    _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
+      setState(() => _remaining = _timeLeft());
+    });
+  }
+
+  @override
+  void dispose() {
+    _ticker?.cancel();
+    super.dispose();
+  }
+
+  Duration _timeLeft() {
+    final left = widget.promo.validUntil.difference(DateTime.now());
+    return left.isNegative ? Duration.zero : left;
+  }
+
+  String _format(Duration d) {
+    final days = d.inDays;
+    final hh = (d.inHours % 24).toString().padLeft(2, '0');
+    final mm = (d.inMinutes % 60).toString().padLeft(2, '0');
+    final ss = (d.inSeconds % 60).toString().padLeft(2, '0');
+    return days > 0 ? '$days일 $hh:$mm:$ss' : '$hh:$mm:$ss';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            _kEarlyBird.withValues(alpha: 0.12),
+            _kProPurple.withValues(alpha: 0.12),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: _kEarlyBird.withValues(alpha: 0.4)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.local_fire_department_rounded, color: _kEarlyBird, size: 28),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      '얼리버드 혜택',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: _kEarlyBird,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${widget.promo.discountPct}% 할인',
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: _kProPurple,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  _remaining == Duration.zero
+                      ? '혜택이 종료되었어요'
+                      : '남은 시간 ${_format(_remaining)}',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
+                ),
+              ],
             ),
           ),
         ],
