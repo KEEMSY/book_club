@@ -23,6 +23,7 @@ from app.core.deps import get_current_user_id
 from app.domains.event.providers import get_event_service
 from app.domains.event.schemas import (
     EventCreateRequest,
+    EventDetailResponse,
     EventResponse,
     EventReviewRequest,
     EventReviewResponse,
@@ -55,6 +56,16 @@ async def get_nearby_events(
     )
 
 
+@router.get("/{event_id}", response_model=EventDetailResponse)
+async def get_event_detail(
+    event_id: UUID,
+    _: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[EventService, Depends(get_event_service)],
+) -> EventDetailResponse:
+    """Full event with join count and review summary for the detail screen."""
+    return await service.get_event_detail(event_id)
+
+
 @router.post("/", response_model=EventResponse)
 async def create_event(
     body: EventCreateRequest,
@@ -76,6 +87,17 @@ async def create_event(
         club_id=body.club_id,
         book_id=body.book_id,
     )
+
+
+@router.delete("/{event_id}", status_code=204)
+async def cancel_event(
+    event_id: UUID,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[EventService, Depends(get_event_service)],
+) -> Response:
+    """Cancel (soft-delete) an event; creator only."""
+    await service.cancel_event(user_id=UUID(user_id), event_id=event_id)
+    return Response(status_code=204)
 
 
 @router.post("/{event_id}/waitlist", response_model=WaitlistStatusResponse)

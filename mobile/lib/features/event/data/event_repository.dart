@@ -58,6 +58,31 @@ class EventRepository {
     }
   }
 
+  /// Fetches full detail (event + review summary) for [eventId].
+  Future<EventDetail> getEventDetail(String eventId) async {
+    try {
+      final dynamic raw = await _api.getEventDetail(eventId);
+      final Map<String, dynamic> data = raw as Map<String, dynamic>;
+      final Map<String, dynamic> reviews =
+          (data['reviews'] as Map<String, dynamic>?) ?? const {};
+      final List<dynamic> items =
+          (reviews['items'] as List<dynamic>?) ?? const [];
+      return EventDetail(
+        event: Event.fromJson(data['event'] as Map<String, dynamic>),
+        reviews: EventReviewsResult(
+          items: items
+              .map((dynamic e) =>
+                  EventReview.fromJson(e as Map<String, dynamic>),)
+              .toList(growable: false),
+          averageRating: (reviews['average_rating'] as num?)?.toDouble(),
+          count: (reviews['count'] as int?) ?? items.length,
+        ),
+      );
+    } on DioException catch (e) {
+      throw _fromDio(e);
+    }
+  }
+
   /// Creates a new meetup and returns the persisted [Event].
   Future<Event> createEvent(EventCreateInput input) async {
     try {
@@ -74,6 +99,15 @@ class EventRepository {
     try {
       final dynamic raw = await _api.joinWaitlist(eventId);
       return EventWaitlistStatus.fromJson(raw as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw _fromDio(e);
+    }
+  }
+
+  /// Cancels (soft-deletes) [eventId]; the backend enforces creator-only.
+  Future<void> cancelEvent(String eventId) async {
+    try {
+      await _api.cancelEvent(eventId);
     } on DioException catch (e) {
       throw _fromDio(e);
     }

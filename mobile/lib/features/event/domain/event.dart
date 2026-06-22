@@ -12,6 +12,7 @@ part 'event.g.dart';
 abstract class Event with _$Event {
   const factory Event({
     required String id,
+    String? creatorId,
     required String title,
     String? description,
     String? address,
@@ -73,6 +74,15 @@ class NearbyEventsResult {
   final List<Event> items;
   final int page;
   final bool hasMore;
+}
+
+/// Full event detail: the event plus its review summary, as returned by
+/// `GET /events/{id}`. Not JSON-serialized — the repository hydrates it.
+class EventDetail {
+  const EventDetail({required this.event, required this.reviews});
+
+  final Event event;
+  final EventReviewsResult reviews;
 }
 
 /// Plain wrapper for an event's review list and aggregate rating.

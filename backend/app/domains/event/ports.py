@@ -38,6 +38,8 @@ class EventRepositoryPort(Protocol):
 
     async def get_event(self, event_id: UUID) -> Event | None: ...
 
+    async def soft_delete_event(self, event_id: UUID) -> None: ...
+
     async def list_candidates_in_bbox(
         self,
         *,
