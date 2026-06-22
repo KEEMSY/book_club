@@ -9,6 +9,7 @@ import '../../auth/application/auth_notifier.dart';
 import '../../experiment/application/experiment_providers.dart';
 import '../../experiment/domain/user_experiments.dart';
 import '../../subscription/application/subscription_notifier.dart';
+import '../../subscription/presentation/widgets/trial_banner.dart';
 import '../../book/presentation/widgets/book_cover.dart';
 import '../data/reading_models.dart'
     show DailySessionDto, DailySessionsResponseDto;
@@ -155,6 +156,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   onManual: _onManualLog,
                 ),
                 SizedBox(height: spacing.lg),
+                // Pro free-trial nudge — renders nothing unless the user is
+                // mid-trial, so it sits silently above the sections otherwise.
+                const TrialBanner(),
                 // RecapBanner returns SizedBox.shrink outside June / December,
                 // so no extra spacing guard is needed.
                 const RecapBanner(),

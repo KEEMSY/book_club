@@ -10,8 +10,10 @@ const Color _kProPurple = Color(0xFF6B21A8);
 /// Compact banner shown while the user is inside their Pro free-trial window.
 ///
 /// Watches [trialStatusProvider]; renders nothing unless the user is currently
-/// in trial. Tapping "구독하기" routes to the paywall so the trial can convert
-/// before it lapses. Intended to sit at the top of the home screen.
+/// in trial with at least one day left. Tapping "구독하기" routes to the paywall
+/// so the trial can convert before it lapses. Designed to sit at the top of the
+/// dashboard list, so it relies on the parent's horizontal padding and only
+/// carries a bottom margin to separate itself from the sections below.
 class TrialBanner extends ConsumerWidget {
   const TrialBanner({super.key});
 
@@ -20,7 +22,9 @@ class TrialBanner extends ConsumerWidget {
     final trial = ref.watch(trialStatusProvider);
     return trial.maybeWhen(
       data: (status) {
-        if (!status.isInTrial) return const SizedBox.shrink();
+        if (!status.isInTrial || status.daysRemaining <= 0) {
+          return const SizedBox.shrink();
+        }
         return _Banner(daysRemaining: status.daysRemaining);
       },
       orElse: () => const SizedBox.shrink(),
@@ -37,7 +41,7 @@ class _Banner extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: _kProPurple.withValues(alpha: 0.08),

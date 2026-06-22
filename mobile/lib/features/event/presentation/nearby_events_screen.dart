@@ -167,16 +167,16 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     return switch (events) {
       AsyncLoading() => const Center(child: CircularProgressIndicator()),
-      AsyncError(:final Object error) => _MessageView(
+      AsyncError() => const _MessageView(
           icon: Icons.cloud_off_rounded,
           title: '모임을 불러오지 못했어요',
-          subtitle: '$error',
+          subtitle: '다시 시도해 주세요.',
         ),
       AsyncData(:final List<Event> value) when value.isEmpty =>
         const _MessageView(
           icon: Icons.location_off_rounded,
-          title: '근처에 모임이 없어요',
-          subtitle: '반경이나 필터를 바꾸거나 새 모임을 만들어보세요.',
+          title: '주변에 모임이 없어요',
+          subtitle: '첫 번째 모임을 만들어보세요!',
         ),
       AsyncData(:final List<Event> value) => ListView.separated(
           padding: EdgeInsets.symmetric(vertical: spacing.sm),

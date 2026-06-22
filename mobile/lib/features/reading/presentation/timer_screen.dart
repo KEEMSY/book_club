@@ -72,11 +72,13 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
   /// this is also called from [TimerControls]'s onStart via [_handleStartTap].
   Future<void> _startWithCurationCard() async {
     if (!mounted) return;
-    // Read the already-cached result from the provider (pre-fetched in build).
-    final AsyncValue<CurationCard?> cardValue = ref.read(
-      firstCurationCardProvider(bookId: widget.userBookId),
-    );
-    final CurationCard? card = cardValue.valueOrNull;
+    // The curation card API keys off the catalog book id, not the UserBook id.
+    // Without a catalog id there is nothing to pre-fetch, so fall through to a
+    // direct timer start instead of showing a card.
+    final CurationCard? card = widget.bookId.isEmpty
+        ? null
+        // Read the already-cached result (pre-fetched in build).
+        : ref.read(firstCurationCardProvider(bookId: widget.bookId)).valueOrNull;
     if (card != null && mounted) {
       final container = ProviderScope.containerOf(context);
       await showModalBottomSheet<void>(
@@ -130,9 +132,10 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
         : null;
 
     // Pre-fetch the curation card while the user is on the idle screen so it
-    // is already in the provider cache when they tap "시작".
-    if (widget.userBookId.isNotEmpty) {
-      ref.watch(firstCurationCardProvider(bookId: widget.userBookId));
+    // is already in the provider cache when they tap "시작". Keyed by the
+    // catalog book id (distinct from userBookId) — skip when it is absent.
+    if (widget.bookId.isNotEmpty) {
+      ref.watch(firstCurationCardProvider(bookId: widget.bookId));
     }
 
     // Auto-end when the countdown hits zero.

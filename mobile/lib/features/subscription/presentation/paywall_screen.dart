@@ -183,7 +183,10 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (promo != null) ...[
+                    // Hide the banner once the promo window has lapsed, even if
+                    // the cached promo object is still around.
+                    if (promo != null &&
+                        DateTime.now().isBefore(promo.validUntil)) ...[
                       _EarlyBirdBanner(promo: promo),
                       SizedBox(height: spacing.lg),
                     ],

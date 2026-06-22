@@ -562,13 +562,14 @@ class _ClubBookCardState extends ConsumerState<_ClubBookCard> {
           ],
         ),
       );
-    } on AiRepositoryException catch (e) {
+    } on AiRepositoryException {
       if (!mounted) return;
       Navigator.of(context).pop(); // dismiss loader
-      final String message =
-          e.isUnavailable ? 'AI 연결 안 됨 — 잠시 후 다시 시도해 주세요.' : e.message;
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(message)));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('AI 토론 주제 생성에 실패했어요. 잠시 후 다시 시도해 주세요.'),
+        ),
+      );
     }
   }
 }

@@ -109,6 +109,11 @@ dependencies:
   # the backend test-receipt path when unconfigured).
   purchases_flutter: ^10.3.0
 
+  # Device location for nearby-events discovery (M66). Centers the "근처 모임"
+  # search on the user's GPS position when permission is granted; falls back to
+  # Seoul City Hall when denied or when location services are off.
+  geolocator: ^13.0.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

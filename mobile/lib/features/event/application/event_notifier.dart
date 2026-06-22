@@ -56,13 +56,13 @@ class NearbyEventsState {
 
 /// Owns the nearby-events query origin, filters, and result list.
 ///
-/// The origin is a fixed default (see [NearbyEventsNotifier.originLat]) until
-/// GPS is wired up; distance is computed server-side and read off [Event].
+/// The origin is resolved once from the device location (with a Seoul City Hall
+/// fallback) via [LocationService] and then cached, so radius/filter changes do
+/// not re-prompt for permission; distance is computed server-side off [Event].
 class NearbyEventsNotifier extends AutoDisposeNotifier<NearbyEventsState> {
-  // TODO(M64): GPS 연동은 후속 (geolocator 의존성 추가는 §2 승인 필요).
-  // Default origin: Seoul City Hall.
-  static const double originLat = 37.5663;
-  static const double originLng = 126.9779;
+  // Resolved origin, cached after the first successful lookup.
+  double? _originLat;
+  double? _originLng;
 
   @override
   NearbyEventsState build() {
@@ -72,14 +72,23 @@ class NearbyEventsNotifier extends AutoDisposeNotifier<NearbyEventsState> {
   }
 
   /// Fetches the first page for the current radius and re-applies filters.
+  ///
+  /// Resolves the device origin on the first call (requesting location
+  /// permission if needed) and reuses it on subsequent loads.
   Future<void> load() async {
     state = state.copyWith(events: const AsyncValue<List<Event>>.loading());
+    if (_originLat == null || _originLng == null) {
+      final ({double lat, double lng}) origin =
+          await ref.read(locationServiceProvider).resolveOrigin();
+      _originLat = origin.lat;
+      _originLng = origin.lng;
+    }
     final AsyncValue<List<Event>> result =
         await AsyncValue.guard<List<Event>>(() async {
       final NearbyEventsResult page =
           await ref.read(eventRepositoryProvider).getNearbyEvents(
-                lat: originLat,
-                lng: originLng,
+                lat: _originLat!,
+                lng: _originLng!,
                 radiusKm: state.radiusKm,
               );
       return _applyFilters(page.items);
