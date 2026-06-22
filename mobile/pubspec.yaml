@@ -114,6 +114,10 @@ dependencies:
   # Seoul City Hall when denied or when location services are off.
   geolocator: ^13.0.2
 
+  # On-device text-to-speech for the AI audio reading coach (M67). Speaks the
+  # Claude-generated intro script in-app; no external TTS API is used.
+  flutter_tts: ^4.2.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

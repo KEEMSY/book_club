@@ -53,6 +53,29 @@ class AIReflectionGuide(Base):
     )
 
 
+class UserAiPreference(Base):
+    """One reader's AI prep-card persona style (M67).
+
+    One row per user, created on first style pick. ``card_style`` feeds both the
+    Claude prompt persona and the prep-card cache key. Default mirrors the
+    column server-default so a never-set reader is treated as ``motivational``.
+    """
+
+    __tablename__ = "user_ai_preferences"
+
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    card_style: Mapped[str] = mapped_column(
+        String(32), nullable=False, server_default="motivational"
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        PGTIMESTAMP(timezone=True), nullable=False, server_default=func.now()
+    )
+
+
 class AIUsageLog(Base):
     """One row per successful AI generation — the rate-limiting ledger."""
 

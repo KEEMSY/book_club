@@ -29,6 +29,7 @@ from tenacity import (
 
 from app.core.exceptions import ExternalServiceError
 from app.domains.ai_assistant.ports import (
+    AudioIntroContent,
     ClubTopicsContent,
     NextBookRecommendation,
     PrepCardContent,
@@ -53,6 +54,20 @@ _PREP_SYSTEM = (
     "기대감을 갖고 능동적으로 읽도록 돕습니다. 요약이 아니라 '준비'에 집중하세요. "
     "모든 답변은 한국어로 작성합니다."
 )
+
+# Per-style persona prepended to the prep-card system prompt (M67). The reader
+# picks one of these once; an unknown style falls back to the motivational tone.
+_PREP_PERSONAS: dict[str, str] = {
+    "motivational": (
+        "독자가 책을 펼치고 싶어지도록 동기를 부여하는 힘 있고 따뜻한 어조로 말하세요. "
+    ),
+    "analytical": (
+        "책의 구조와 핵심 논점을 또렷하게 짚어 주는 분석적이고 차분한 어조로 말하세요. "
+    ),
+    "reflective": (
+        "독자가 자신의 삶과 연결해 깊이 사색하도록 이끄는 잔잔하고 성찰적인 어조로 말하세요. "
+    ),
+}
 _REFLECTION_SYSTEM = (
     "당신은 따뜻하고 통찰력 있는 독서 코치입니다. 독자가 방금 완독한 책을 자신의 "
     "삶과 연결해 성찰하도록 돕습니다. 독자가 직접 밑줄 그은 문장에서 출발해 깊이 있는 "
@@ -61,6 +76,10 @@ _REFLECTION_SYSTEM = (
 _TOPICS_SYSTEM = (
     "당신은 독서 모임을 이끄는 진행자입니다. 이번 주 읽기 범위를 바탕으로 모임 구성원이 "
     "활발히 대화할 수 있는 토론 주제를 제안합니다. 모든 답변은 한국어로 작성합니다."
+)
+_AUDIO_INTRO_SYSTEM = (
+    "당신은 오디오 독서 코치입니다. 독자가 이어폰으로 들으며 책에 몰입할 수 있도록, "
+    "귀로 듣기 좋은 자연스러운 구어체로 책 소개를 들려줍니다. 모든 답변은 한국어로 작성합니다."
 )
 
 _PREP_SCHEMA: dict[str, Any] = {
@@ -128,6 +147,18 @@ _TOPICS_SCHEMA: dict[str, Any] = {
     "additionalProperties": False,
 }
 
+_AUDIO_INTRO_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "script": {
+            "type": "string",
+            "description": "귀로 듣기 좋은 구어체 책 소개 스크립트, 한국어로 약 200자",
+        },
+    },
+    "required": ["script"],
+    "additionalProperties": False,
+}
+
 
 class ClaudeAdapter:
     """Implements :class:`app.domains.ai_assistant.ports.AIAssistantPort`."""
@@ -177,14 +208,16 @@ class ClaudeAdapter:
         return data, tokens
 
     async def generate_prep_card(
-        self, *, book_title: str, author: str, description: str | None
+        self, *, book_title: str, author: str, description: str | None, style: str
     ) -> PrepCardContent:
         desc = description or "(설명 없음)"
+        persona = _PREP_PERSONAS.get(style, _PREP_PERSONAS["motivational"])
+        system = persona + _PREP_SYSTEM
         prompt = (
             f"책 제목: {book_title}\n저자: {author}\n책 소개: {desc}\n\n"
             "이 책을 읽기 전에 도움이 될 준비 카드를 만들어 주세요."
         )
-        data, tokens = await self._generate(system=_PREP_SYSTEM, prompt=prompt, schema=_PREP_SCHEMA)
+        data, tokens = await self._generate(system=system, prompt=prompt, schema=_PREP_SCHEMA)
         return PrepCardContent(
             author_intro=str(data["author_intro"]),
             theme_keywords=[str(k) for k in data["theme_keywords"]],
@@ -236,3 +269,17 @@ class ClaudeAdapter:
             topics=[str(t) for t in data["topics"]],
             tokens_used=tokens,
         )
+
+    async def generate_audio_intro(
+        self, *, book_title: str, author: str, description: str | None
+    ) -> AudioIntroContent:
+        desc = description or "(설명 없음)"
+        prompt = (
+            f"책 제목: {book_title}\n저자: {author}\n책 소개: {desc}\n\n"
+            "이 책을 읽기 전에 들려줄 약 200자 분량의 오디오 소개 스크립트를 만들어 주세요. "
+            "이어폰으로 듣기 좋은 자연스러운 구어체로 작성하세요."
+        )
+        data, tokens = await self._generate(
+            system=_AUDIO_INTRO_SYSTEM, prompt=prompt, schema=_AUDIO_INTRO_SCHEMA
+        )
+        return AudioIntroContent(script=str(data["script"]), tokens_used=tokens)

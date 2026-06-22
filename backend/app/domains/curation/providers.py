@@ -12,12 +12,18 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_session
-from app.domains.curation.repository import CurationRepository
+from app.domains.curation.repository import (
+    CurationFeedbackRepository,
+    CurationRepository,
+)
 from app.domains.curation.service import CurationService
 
 
 def get_curation_service(
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> CurationService:
-    """Construct a CurationService wired with a live repository."""
-    return CurationService(repo=CurationRepository(session))
+    """Construct a CurationService wired with live repositories."""
+    return CurationService(
+        repo=CurationRepository(session),
+        feedback_repo=CurationFeedbackRepository(session),
+    )

@@ -82,6 +82,35 @@ class AiRepository {
     }
   }
 
+  Future<AiPreferences> getPreferences() async {
+    try {
+      final dynamic raw = await _api.getPreferences();
+      return AiPreferences.fromJson(raw as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw _fromDio(e);
+    }
+  }
+
+  Future<AiPreferences> updatePreferences(String cardStyle) async {
+    try {
+      final dynamic raw = await _api.updatePreferences(
+        <String, dynamic>{'card_style': cardStyle},
+      );
+      return AiPreferences.fromJson(raw as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw _fromDio(e);
+    }
+  }
+
+  Future<AiAudioIntro> getAudioIntro(String bookId) async {
+    try {
+      final dynamic raw = await _api.createAudioIntro(bookId);
+      return AiAudioIntro.fromJson(raw as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw _fromDio(e);
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // Helpers
   // ---------------------------------------------------------------------------

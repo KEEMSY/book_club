@@ -1,10 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/widgets/skeleton.dart';
 import '../application/ai_providers.dart';
 import '../data/ai_repository.dart';
 import '../domain/ai_models.dart';
+
+/// SharedPreferences flag marking that the reader has picked a prep-card style
+/// at least once. The backend always returns a default style, so "never chosen"
+/// can't be inferred from the API alone — this local flag gates the one-time
+/// onboarding picker.
+const String _styleChosenKey = 'ai_card_style_chosen';
+
+/// The three prep-card personas the reader can pick from (M67).
+const List<({String value, String label, String description})> _cardStyles = [
+  (value: 'motivational', label: '동기부여형', description: '읽고 싶어지게 만드는 힘 있는 어조'),
+  (value: 'analytical', label: '분석형', description: '구조와 핵심 논점을 또렷하게'),
+  (value: 'reflective', label: '성찰형', description: '내 삶과 연결해 잔잔하게 사색'),
+];
 
 /// Bottom sheet shown before a reading session: an AI "prep card" with an
 /// author intro, three theme keywords, and two pre-reading questions.
@@ -17,12 +31,77 @@ class AiPrepCardSheet extends ConsumerWidget {
 
   final String bookId;
 
-  static Future<void> show(BuildContext context, {required String bookId}) {
+  /// Opens the prep-card sheet. On the reader's first ever use this first runs
+  /// a one-time style picker and persists the choice (PATCH /me/ai-preferences)
+  /// so the generated card matches their chosen persona.
+  static Future<void> show(
+    BuildContext context,
+    WidgetRef ref, {
+    required String bookId,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final bool chosen = prefs.getBool(_styleChosenKey) ?? false;
+    if (!chosen && context.mounted) {
+      final String? picked = await _showStylePicker(context);
+      if (picked != null) {
+        try {
+          await ref.read(aiRepositoryProvider).updatePreferences(picked);
+          ref.invalidate(userAiPreferencesProvider);
+          await prefs.setBool(_styleChosenKey, true);
+        } on AiRepositoryException {
+          // Non-fatal: fall through to the card with the server default style.
+        }
+      }
+    }
+    if (!context.mounted) return;
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
       builder: (_) => AiPrepCardSheet(bookId: bookId),
+    );
+  }
+
+  static Future<String?> _showStylePicker(BuildContext context) {
+    return showDialog<String>(
+      context: context,
+      builder: (ctx) {
+        final theme = Theme.of(ctx);
+        return AlertDialog(
+          title: const Text('AI 준비카드 스타일'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                '어떤 어조로 책을 소개해드릴까요?',
+                style: theme.textTheme.bodyMedium,
+              ),
+              const SizedBox(height: 12),
+              for (final style in _cardStyles)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.of(ctx).pop(style.value),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(style.label, style: theme.textTheme.titleSmall),
+                        const SizedBox(height: 2),
+                        Text(
+                          style.description,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 

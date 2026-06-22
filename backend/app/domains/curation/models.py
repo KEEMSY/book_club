@@ -12,7 +12,17 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Index, Integer, String, Text, func
+from sqlalchemy import (
+    CheckConstraint,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+    func,
+)
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -46,6 +56,43 @@ class CurationCard(Base):
     order_index: Mapped[int] = mapped_column(
         Integer, nullable=False, server_default="0"
     )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+
+
+class CurationCardFeedback(Base):
+    """One reader's reaction to one curation card (M67 feedback loop).
+
+    ``UNIQUE(user_id, card_id)`` makes the write an upsert: re-tapping flips the
+    stored ``action`` instead of stacking rows, so the per-type skip/dismiss
+    count that drives deprioritization stays one-vote-per-card.
+    """
+
+    __tablename__ = "curation_card_feedback"
+    __table_args__ = (
+        CheckConstraint(
+            "action IN ('helpful','skip','dismiss')",
+            name="ck_curation_card_feedback_action",
+        ),
+        UniqueConstraint("user_id", "card_id", name="uq_curation_feedback_user_card"),
+        Index("idx_curation_feedback_user", "user_id"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    card_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("curation_cards.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    action: Mapped[str] = mapped_column(String(16), nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )

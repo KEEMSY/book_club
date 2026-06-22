@@ -20,7 +20,6 @@ from typing import Any
 from uuid import UUID, uuid4
 
 import pytest
-
 from app.core.exceptions import ConflictError, NotFoundError
 from app.domains.curation.schemas import CreateCurationCardRequest
 from app.domains.curation.service import CurationService
@@ -85,6 +84,9 @@ class FakeCurationRepository:
         self._cards.append(card)
         return card
 
+    async def get_by_id(self, card_id: UUID) -> _FakeCard | None:
+        return next((c for c in self._cards if c.id == card_id), None)
+
     async def delete(self, card_id: UUID) -> bool:
         for i, c in enumerate(self._cards):
             if c.id == card_id:
@@ -105,8 +107,41 @@ class FakeCurationRepository:
 # ---------------------------------------------------------------------------
 
 
+class FakeFeedbackRepository:
+    """In-memory CurationFeedbackRepository for unit tests.
+
+    Mirrors the production semantics: ``upsert_feedback`` is one-vote-per-card,
+    and ``deprioritized_card_types`` counts skip/dismiss grouped by the card's
+    type (resolved against a shared card index seeded by the test).
+    """
+
+    def __init__(self, cards: dict[UUID, _FakeCard]) -> None:
+        self._cards = cards
+        self._feedback: dict[tuple[UUID, UUID], str] = {}
+
+    async def upsert_feedback(self, *, user_id: UUID, card_id: UUID, action: str) -> None:
+        self._feedback[(user_id, card_id)] = action
+
+    async def deprioritized_card_types(self, *, user_id: UUID, threshold: int) -> set[str]:
+        counts: dict[str, int] = {}
+        for (uid, card_id), action in self._feedback.items():
+            if uid != user_id or action not in ("skip", "dismiss"):
+                continue
+            card = self._cards.get(card_id)
+            if card is None:
+                continue
+            counts[card.card_type] = counts.get(card.card_type, 0) + 1
+        return {ctype for ctype, n in counts.items() if n >= threshold}
+
+
 def _svc(repo: FakeCurationRepository) -> CurationService:
     return CurationService(repo=repo)  # type: ignore[arg-type]
+
+
+def _svc_with_feedback(
+    repo: FakeCurationRepository, feedback: FakeFeedbackRepository
+) -> CurationService:
+    return CurationService(repo=repo, feedback_repo=feedback)  # type: ignore[arg-type]
 
 
 def _req(
@@ -288,3 +323,100 @@ async def test_list_cards_isolated_per_book() -> None:
     assert cards_a[0].title == "A 카드"
     assert len(cards_b) == 1
     assert cards_b[0].title == "B 카드"
+
+
+# ---------------------------------------------------------------------------
+# M67 — feedback loop & deprioritization
+# ---------------------------------------------------------------------------
+
+
+def _feedback_setup(
+    cards: list[_FakeCard],
+) -> tuple[FakeCurationRepository, FakeFeedbackRepository, CurationService]:
+    repo = FakeCurationRepository()
+    for c in cards:
+        repo.seed_card(c)
+    feedback = FakeFeedbackRepository({c.id: c for c in cards})
+    return repo, feedback, _svc_with_feedback(repo, feedback)
+
+
+@pytest.mark.asyncio
+async def test_record_feedback_persists_action() -> None:
+    """record_feedback upserts the reader's reaction for an existing card."""
+    book_id = uuid4()
+    card = _FakeCard(book_id=book_id, card_type="quote")
+    _, feedback, svc = _feedback_setup([card])
+    user_id = uuid4()
+
+    await svc.record_feedback(user_id=user_id, card_id=card.id, action="skip")
+
+    deprioritized = await feedback.deprioritized_card_types(user_id=user_id, threshold=1)
+    assert "quote" in deprioritized
+
+
+@pytest.mark.asyncio
+async def test_record_feedback_unknown_card_raises() -> None:
+    """Feedback on a non-existent card raises NotFoundError."""
+    _, _, svc = _feedback_setup([])
+    with pytest.raises(NotFoundError) as exc_info:
+        await svc.record_feedback(user_id=uuid4(), card_id=uuid4(), action="helpful")
+    assert exc_info.value.code == "CURATION_CARD_NOT_FOUND"
+
+
+@pytest.mark.asyncio
+async def test_get_first_card_deprioritizes_disliked_type() -> None:
+    """A type skipped >= threshold times sorts last, even with a lower order_index."""
+    book_id = uuid4()
+    # The quote card has the lowest order_index, so it wins by default order.
+    quote_card = _FakeCard(book_id=book_id, card_type="quote", order_index=0, title="인용")
+    intro_card = _FakeCard(book_id=book_id, card_type="intro", order_index=1, title="소개")
+    repo, feedback, svc = _feedback_setup([quote_card, intro_card])
+    user_id = uuid4()
+
+    # Skip three different quote cards to deprioritize the whole 'quote' type.
+    for _ in range(3):
+        other_quote = _FakeCard(book_id=book_id, card_type="quote")
+        repo.seed_card(other_quote)
+        feedback._cards[other_quote.id] = other_quote
+        await svc.record_feedback(user_id=user_id, card_id=other_quote.id, action="skip")
+
+    result = await svc.get_first_card(book_id, user_id=user_id)
+
+    assert result is not None
+    assert result.card_type == "intro"  # quote deprioritized despite lower order
+
+
+@pytest.mark.asyncio
+async def test_get_first_card_below_threshold_keeps_default_order() -> None:
+    """Fewer than threshold skips leave the default order_index ranking intact."""
+    book_id = uuid4()
+    quote_card = _FakeCard(book_id=book_id, card_type="quote", order_index=0, title="인용")
+    intro_card = _FakeCard(book_id=book_id, card_type="intro", order_index=1, title="소개")
+    repo, feedback, svc = _feedback_setup([quote_card, intro_card])
+    user_id = uuid4()
+
+    # Only two skips — under the threshold of 3.
+    for _ in range(2):
+        other_quote = _FakeCard(book_id=book_id, card_type="quote")
+        repo.seed_card(other_quote)
+        feedback._cards[other_quote.id] = other_quote
+        await svc.record_feedback(user_id=user_id, card_id=other_quote.id, action="skip")
+
+    result = await svc.get_first_card(book_id, user_id=user_id)
+
+    assert result is not None
+    assert result.card_type == "quote"  # default order preserved
+
+
+@pytest.mark.asyncio
+async def test_get_first_card_anonymous_uses_default_order() -> None:
+    """Without a user_id the service falls back to the single-query default."""
+    book_id = uuid4()
+    repo = FakeCurationRepository()
+    repo.seed_card(_FakeCard(book_id=book_id, card_type="quote", order_index=0, title="인용"))
+    svc = _svc(repo)
+
+    result = await svc.get_first_card(book_id)
+
+    assert result is not None
+    assert result.card_type == "quote"

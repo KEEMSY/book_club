@@ -26,6 +26,7 @@ from app.domains.ai_assistant.repository import (
     ClubCoachAdapter,
     LibraryQueryAdapter,
     RedisPrepCache,
+    UserAiPreferencesRepository,
     UserQueryAdapter,
 )
 from app.domains.ai_assistant.service import AIAssistantService
@@ -59,4 +60,5 @@ def get_ai_assistant_service(
             book_info=book_info,
             club_service=get_club_service(session),
         ),
+        preferences=UserAiPreferencesRepository(session),
     )

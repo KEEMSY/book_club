@@ -1400,4 +1400,641 @@ class __$AiUsageCopyWithImpl<$Res> implements _$AiUsageCopyWith<$Res> {
   }
 }
 
+/// @nodoc
+mixin _$AiPreferences {
+  String get cardStyle;
+
+  /// Create a copy of AiPreferences
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $AiPreferencesCopyWith<AiPreferences> get copyWith =>
+      _$AiPreferencesCopyWithImpl<AiPreferences>(
+          this as AiPreferences, _$identity);
+
+  /// Serializes this AiPreferences to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is AiPreferences &&
+            (identical(other.cardStyle, cardStyle) ||
+                other.cardStyle == cardStyle));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, cardStyle);
+
+  @override
+  String toString() {
+    return 'AiPreferences(cardStyle: $cardStyle)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $AiPreferencesCopyWith<$Res> {
+  factory $AiPreferencesCopyWith(
+          AiPreferences value, $Res Function(AiPreferences) _then) =
+      _$AiPreferencesCopyWithImpl;
+  @useResult
+  $Res call({String cardStyle});
+}
+
+/// @nodoc
+class _$AiPreferencesCopyWithImpl<$Res>
+    implements $AiPreferencesCopyWith<$Res> {
+  _$AiPreferencesCopyWithImpl(this._self, this._then);
+
+  final AiPreferences _self;
+  final $Res Function(AiPreferences) _then;
+
+  /// Create a copy of AiPreferences
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? cardStyle = null,
+  }) {
+    return _then(_self.copyWith(
+      cardStyle: null == cardStyle
+          ? _self.cardStyle
+          : cardStyle // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [AiPreferences].
+extension AiPreferencesPatterns on AiPreferences {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_AiPreferences value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _AiPreferences() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_AiPreferences value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _AiPreferences():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_AiPreferences value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _AiPreferences() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String cardStyle)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _AiPreferences() when $default != null:
+        return $default(_that.cardStyle);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String cardStyle) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _AiPreferences():
+        return $default(_that.cardStyle);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String cardStyle)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _AiPreferences() when $default != null:
+        return $default(_that.cardStyle);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _AiPreferences implements AiPreferences {
+  const _AiPreferences({required this.cardStyle});
+  factory _AiPreferences.fromJson(Map<String, dynamic> json) =>
+      _$AiPreferencesFromJson(json);
+
+  @override
+  final String cardStyle;
+
+  /// Create a copy of AiPreferences
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$AiPreferencesCopyWith<_AiPreferences> get copyWith =>
+      __$AiPreferencesCopyWithImpl<_AiPreferences>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$AiPreferencesToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _AiPreferences &&
+            (identical(other.cardStyle, cardStyle) ||
+                other.cardStyle == cardStyle));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, cardStyle);
+
+  @override
+  String toString() {
+    return 'AiPreferences(cardStyle: $cardStyle)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$AiPreferencesCopyWith<$Res>
+    implements $AiPreferencesCopyWith<$Res> {
+  factory _$AiPreferencesCopyWith(
+          _AiPreferences value, $Res Function(_AiPreferences) _then) =
+      __$AiPreferencesCopyWithImpl;
+  @override
+  @useResult
+  $Res call({String cardStyle});
+}
+
+/// @nodoc
+class __$AiPreferencesCopyWithImpl<$Res>
+    implements _$AiPreferencesCopyWith<$Res> {
+  __$AiPreferencesCopyWithImpl(this._self, this._then);
+
+  final _AiPreferences _self;
+  final $Res Function(_AiPreferences) _then;
+
+  /// Create a copy of AiPreferences
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? cardStyle = null,
+  }) {
+    return _then(_AiPreferences(
+      cardStyle: null == cardStyle
+          ? _self.cardStyle
+          : cardStyle // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$AiAudioIntro {
+  String get script;
+  String get bookId;
+  int get tokensUsed;
+
+  /// Create a copy of AiAudioIntro
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $AiAudioIntroCopyWith<AiAudioIntro> get copyWith =>
+      _$AiAudioIntroCopyWithImpl<AiAudioIntro>(
+          this as AiAudioIntro, _$identity);
+
+  /// Serializes this AiAudioIntro to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is AiAudioIntro &&
+            (identical(other.script, script) || other.script == script) &&
+            (identical(other.bookId, bookId) || other.bookId == bookId) &&
+            (identical(other.tokensUsed, tokensUsed) ||
+                other.tokensUsed == tokensUsed));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, script, bookId, tokensUsed);
+
+  @override
+  String toString() {
+    return 'AiAudioIntro(script: $script, bookId: $bookId, tokensUsed: $tokensUsed)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $AiAudioIntroCopyWith<$Res> {
+  factory $AiAudioIntroCopyWith(
+          AiAudioIntro value, $Res Function(AiAudioIntro) _then) =
+      _$AiAudioIntroCopyWithImpl;
+  @useResult
+  $Res call({String script, String bookId, int tokensUsed});
+}
+
+/// @nodoc
+class _$AiAudioIntroCopyWithImpl<$Res> implements $AiAudioIntroCopyWith<$Res> {
+  _$AiAudioIntroCopyWithImpl(this._self, this._then);
+
+  final AiAudioIntro _self;
+  final $Res Function(AiAudioIntro) _then;
+
+  /// Create a copy of AiAudioIntro
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? script = null,
+    Object? bookId = null,
+    Object? tokensUsed = null,
+  }) {
+    return _then(_self.copyWith(
+      script: null == script
+          ? _self.script
+          : script // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookId: null == bookId
+          ? _self.bookId
+          : bookId // ignore: cast_nullable_to_non_nullable
+              as String,
+      tokensUsed: null == tokensUsed
+          ? _self.tokensUsed
+          : tokensUsed // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [AiAudioIntro].
+extension AiAudioIntroPatterns on AiAudioIntro {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_AiAudioIntro value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _AiAudioIntro() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_AiAudioIntro value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _AiAudioIntro():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_AiAudioIntro value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _AiAudioIntro() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String script, String bookId, int tokensUsed)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _AiAudioIntro() when $default != null:
+        return $default(_that.script, _that.bookId, _that.tokensUsed);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String script, String bookId, int tokensUsed) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _AiAudioIntro():
+        return $default(_that.script, _that.bookId, _that.tokensUsed);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String script, String bookId, int tokensUsed)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _AiAudioIntro() when $default != null:
+        return $default(_that.script, _that.bookId, _that.tokensUsed);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _AiAudioIntro implements AiAudioIntro {
+  const _AiAudioIntro(
+      {required this.script, required this.bookId, this.tokensUsed = 0});
+  factory _AiAudioIntro.fromJson(Map<String, dynamic> json) =>
+      _$AiAudioIntroFromJson(json);
+
+  @override
+  final String script;
+  @override
+  final String bookId;
+  @override
+  @JsonKey()
+  final int tokensUsed;
+
+  /// Create a copy of AiAudioIntro
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$AiAudioIntroCopyWith<_AiAudioIntro> get copyWith =>
+      __$AiAudioIntroCopyWithImpl<_AiAudioIntro>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$AiAudioIntroToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _AiAudioIntro &&
+            (identical(other.script, script) || other.script == script) &&
+            (identical(other.bookId, bookId) || other.bookId == bookId) &&
+            (identical(other.tokensUsed, tokensUsed) ||
+                other.tokensUsed == tokensUsed));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, script, bookId, tokensUsed);
+
+  @override
+  String toString() {
+    return 'AiAudioIntro(script: $script, bookId: $bookId, tokensUsed: $tokensUsed)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$AiAudioIntroCopyWith<$Res>
+    implements $AiAudioIntroCopyWith<$Res> {
+  factory _$AiAudioIntroCopyWith(
+          _AiAudioIntro value, $Res Function(_AiAudioIntro) _then) =
+      __$AiAudioIntroCopyWithImpl;
+  @override
+  @useResult
+  $Res call({String script, String bookId, int tokensUsed});
+}
+
+/// @nodoc
+class __$AiAudioIntroCopyWithImpl<$Res>
+    implements _$AiAudioIntroCopyWith<$Res> {
+  __$AiAudioIntroCopyWithImpl(this._self, this._then);
+
+  final _AiAudioIntro _self;
+  final $Res Function(_AiAudioIntro) _then;
+
+  /// Create a copy of AiAudioIntro
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? script = null,
+    Object? bookId = null,
+    Object? tokensUsed = null,
+  }) {
+    return _then(_AiAudioIntro(
+      script: null == script
+          ? _self.script
+          : script // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookId: null == bookId
+          ? _self.bookId
+          : bookId // ignore: cast_nullable_to_non_nullable
+              as String,
+      tokensUsed: null == tokensUsed
+          ? _self.tokensUsed
+          : tokensUsed // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
 // dart format on
