@@ -21,6 +21,21 @@ enum _AiStrategy {
   final String label;
 }
 
+/// M69 curation channels rendered as horizontal sections, top to bottom.
+enum _CurationChannel {
+  tasteMatch('taste_match', '맞춤 추천'),
+  trending('trending', '인기 도서'),
+  clubPicks('club_picks', '클럽에서 읽는 책'),
+  aiPicks('ai_picks', 'AI 추천');
+
+  const _CurationChannel(this.apiValue, this.label);
+
+  final String apiValue;
+  final String label;
+}
+
+const List<_CurationChannel> _curationChannels = _CurationChannel.values;
+
 class DiscoveryScreen extends ConsumerStatefulWidget {
   const DiscoveryScreen({super.key});
 
@@ -155,6 +170,14 @@ class _DiscoveryScreenState extends ConsumerState<DiscoveryScreen> {
                 ),
               ),
             ],
+            // ── 맞춤 큐레이션 채널 (M69) ────────────────────────────────────
+            for (final channel in _curationChannels)
+              SliverToBoxAdapter(
+                child: _ChannelSection(
+                  channel: channel.apiValue,
+                  title: channel.label,
+                ),
+              ),
             SliverToBoxAdapter(
               child: SizedBox(height: spacing.xl * 2),
             ),
@@ -351,6 +374,46 @@ class _AiBookCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// A single M69 curation channel: header + horizontal book row.
+///
+/// The whole section hides itself while loading-empty or on error so the
+/// discovery feed never shows a dangling header with no books beneath it.
+class _ChannelSection extends ConsumerWidget {
+  const _ChannelSection({required this.channel, required this.title});
+
+  final String channel;
+  final String title;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final async = ref.watch(bookRecommendationsProvider(channel: channel));
+
+    return async.when(
+      data: (recs) {
+        if (recs.isEmpty) return const SizedBox.shrink();
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _SectionHeader(title: title),
+            _AiBookList(recs: recs),
+          ],
+        );
+      },
+      loading: () => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionHeader(title: title),
+          const SizedBox(
+            height: 240,
+            child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+          ),
+        ],
+      ),
+      error: (_, __) => const SizedBox.shrink(),
     );
   }
 }

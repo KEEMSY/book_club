@@ -31,3 +31,7 @@ class SearchResult(BaseModel):
     books: list[BookSearchItem]
     users: list[UserSearchItem]
     clubs: list[ClubSearchItem]
+
+
+class AutocompleteResult(BaseModel):
+    suggestions: list[str]

@@ -204,5 +204,168 @@ class _SearchResultsProviderElement
   @override
   String get query => (origin as SearchResultsProvider).query;
 }
+
+String _$autocompleteSuggestionsHash() =>
+    r'f841ea3872350a3499577903bb4f335b53aaa9f6';
+
+/// M69 — book title/author autocomplete suggestions for [query].
+///
+/// Returns an empty list for queries shorter than 2 characters so the UI can
+/// suppress the dropdown until the input is meaningful.
+///
+/// Copied from [autocompleteSuggestions].
+@ProviderFor(autocompleteSuggestions)
+const autocompleteSuggestionsProvider = AutocompleteSuggestionsFamily();
+
+/// M69 — book title/author autocomplete suggestions for [query].
+///
+/// Returns an empty list for queries shorter than 2 characters so the UI can
+/// suppress the dropdown until the input is meaningful.
+///
+/// Copied from [autocompleteSuggestions].
+class AutocompleteSuggestionsFamily extends Family<AsyncValue<List<String>>> {
+  /// M69 — book title/author autocomplete suggestions for [query].
+  ///
+  /// Returns an empty list for queries shorter than 2 characters so the UI can
+  /// suppress the dropdown until the input is meaningful.
+  ///
+  /// Copied from [autocompleteSuggestions].
+  const AutocompleteSuggestionsFamily();
+
+  /// M69 — book title/author autocomplete suggestions for [query].
+  ///
+  /// Returns an empty list for queries shorter than 2 characters so the UI can
+  /// suppress the dropdown until the input is meaningful.
+  ///
+  /// Copied from [autocompleteSuggestions].
+  AutocompleteSuggestionsProvider call({
+    required String query,
+  }) {
+    return AutocompleteSuggestionsProvider(
+      query: query,
+    );
+  }
+
+  @override
+  AutocompleteSuggestionsProvider getProviderOverride(
+    covariant AutocompleteSuggestionsProvider provider,
+  ) {
+    return call(
+      query: provider.query,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'autocompleteSuggestionsProvider';
+}
+
+/// M69 — book title/author autocomplete suggestions for [query].
+///
+/// Returns an empty list for queries shorter than 2 characters so the UI can
+/// suppress the dropdown until the input is meaningful.
+///
+/// Copied from [autocompleteSuggestions].
+class AutocompleteSuggestionsProvider
+    extends AutoDisposeFutureProvider<List<String>> {
+  /// M69 — book title/author autocomplete suggestions for [query].
+  ///
+  /// Returns an empty list for queries shorter than 2 characters so the UI can
+  /// suppress the dropdown until the input is meaningful.
+  ///
+  /// Copied from [autocompleteSuggestions].
+  AutocompleteSuggestionsProvider({
+    required String query,
+  }) : this._internal(
+          (ref) => autocompleteSuggestions(
+            ref as AutocompleteSuggestionsRef,
+            query: query,
+          ),
+          from: autocompleteSuggestionsProvider,
+          name: r'autocompleteSuggestionsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$autocompleteSuggestionsHash,
+          dependencies: AutocompleteSuggestionsFamily._dependencies,
+          allTransitiveDependencies:
+              AutocompleteSuggestionsFamily._allTransitiveDependencies,
+          query: query,
+        );
+
+  AutocompleteSuggestionsProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.query,
+  }) : super.internal();
+
+  final String query;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<String>> Function(AutocompleteSuggestionsRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: AutocompleteSuggestionsProvider._internal(
+        (ref) => create(ref as AutocompleteSuggestionsRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        query: query,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<String>> createElement() {
+    return _AutocompleteSuggestionsProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is AutocompleteSuggestionsProvider && other.query == query;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, query.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin AutocompleteSuggestionsRef on AutoDisposeFutureProviderRef<List<String>> {
+  /// The parameter `query` of this provider.
+  String get query;
+}
+
+class _AutocompleteSuggestionsProviderElement
+    extends AutoDisposeFutureProviderElement<List<String>>
+    with AutocompleteSuggestionsRef {
+  _AutocompleteSuggestionsProviderElement(super.provider);
+
+  @override
+  String get query => (origin as AutocompleteSuggestionsProvider).query;
+}
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

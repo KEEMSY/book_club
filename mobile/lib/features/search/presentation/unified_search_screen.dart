@@ -30,6 +30,9 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen>
   // Reflects the debounced query that is actually sent to the provider.
   String _debouncedQuery = '';
   Timer? _debounceTimer;
+  // Hidden once the user commits a query (taps a suggestion or submits) so the
+  // dropdown does not linger over the results.
+  bool _showSuggestions = false;
 
   @override
   void initState() {
@@ -47,11 +50,28 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen>
 
   void _onQueryChanged(String value) {
     _debounceTimer?.cancel();
+    setState(() => _showSuggestions = value.trim().isNotEmpty);
     _debounceTimer = Timer(const Duration(milliseconds: 300), () {
       if (mounted) {
         setState(() => _debouncedQuery = value);
       }
     });
+  }
+
+  void _onSubmitted(String _) {
+    setState(() => _showSuggestions = false);
+  }
+
+  void _onSuggestionSelected(String suggestion) {
+    _debounceTimer?.cancel();
+    _controller.text = suggestion;
+    _controller.selection =
+        TextSelection.collapsed(offset: suggestion.length);
+    setState(() {
+      _debouncedQuery = suggestion;
+      _showSuggestions = false;
+    });
+    FocusScope.of(context).unfocus();
   }
 
   @override
@@ -83,8 +103,14 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen>
             child: _SearchField(
               controller: _controller,
               onChanged: _onQueryChanged,
+              onSubmitted: _onSubmitted,
             ),
           ),
+          if (_showSuggestions && _debouncedQuery.trim().length >= 2)
+            _AutocompleteDropdown(
+              query: _debouncedQuery,
+              onSelected: _onSuggestionSelected,
+            ),
           Expanded(
             child: _ResultView(
               query: _debouncedQuery,
@@ -101,10 +127,12 @@ class _SearchField extends StatelessWidget {
   const _SearchField({
     required this.controller,
     required this.onChanged,
+    required this.onSubmitted,
   });
 
   final TextEditingController controller;
   final ValueChanged<String> onChanged;
+  final ValueChanged<String> onSubmitted;
 
   @override
   Widget build(BuildContext context) {
@@ -112,6 +140,7 @@ class _SearchField extends StatelessWidget {
     return TextField(
       controller: controller,
       onChanged: onChanged,
+      onSubmitted: onSubmitted,
       autofocus: true,
       textInputAction: TextInputAction.search,
       decoration: InputDecoration(
@@ -129,6 +158,54 @@ class _SearchField extends StatelessWidget {
               ),
         filled: true,
         fillColor: theme.colorScheme.surfaceContainerHigh,
+      ),
+    );
+  }
+}
+
+/// M69 — trigram autocomplete suggestions shown below the search field.
+///
+/// Renders up to 5 title/author suggestions. Stays silent (zero height) while
+/// loading, on error, or when there are no matches, so it never pushes the
+/// results down for an empty list.
+class _AutocompleteDropdown extends ConsumerWidget {
+  const _AutocompleteDropdown({
+    required this.query,
+    required this.onSelected,
+  });
+
+  final String query;
+  final ValueChanged<String> onSelected;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final async = ref.watch(autocompleteSuggestionsProvider(query: query));
+    final suggestions = async.valueOrNull ?? const <String>[];
+    if (suggestions.isEmpty) return const SizedBox.shrink();
+
+    return Material(
+      color: theme.colorScheme.surfaceContainerHigh,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (final suggestion in suggestions)
+            ListTile(
+              dense: true,
+              leading: Icon(
+                Icons.north_west_rounded,
+                size: 18,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              title: Text(
+                suggestion,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              onTap: () => onSelected(suggestion),
+            ),
+          const Divider(height: 0.5),
+        ],
       ),
     );
   }

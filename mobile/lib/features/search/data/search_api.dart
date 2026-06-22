@@ -17,4 +17,12 @@ abstract class SearchApi {
     @Query('type') String type = 'all',
     @Query('limit') int limit = 10,
   });
+
+  /// M69 — book title/author autocomplete suggestions (pg_trgm).
+  /// Returns a `{suggestions: [...]}` envelope parsed in the repository.
+  @GET('/search/autocomplete')
+  Future<dynamic> autocomplete(
+    @Query('q') String query, {
+    @Query('limit') int limit = 10,
+  });
 }

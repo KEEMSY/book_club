@@ -24,3 +24,17 @@ Future<SearchResult?> searchResults(
   if (query.trim().isEmpty) return null;
   return ref.watch(searchRepositoryProvider).search(query);
 }
+
+/// M69 — book title/author autocomplete suggestions for [query].
+///
+/// Returns an empty list for queries shorter than 2 characters so the UI can
+/// suppress the dropdown until the input is meaningful.
+@riverpod
+Future<List<String>> autocompleteSuggestions(
+  AutocompleteSuggestionsRef ref, {
+  required String query,
+}) async {
+  final trimmed = query.trim();
+  if (trimmed.length < 2) return const [];
+  return ref.watch(searchRepositoryProvider).autocomplete(trimmed, limit: 5);
+}

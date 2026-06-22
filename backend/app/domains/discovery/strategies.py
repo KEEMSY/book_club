@@ -13,10 +13,24 @@ import math
 class RecommendationStrategy(enum.StrEnum):
     """Supported recommendation strategies."""
 
-    COLLABORATIVE = "collaborative"       # item-based CF (existing M21 engine)
-    SIMILAR_READERS = "similar_readers"   # taste-vector cosine similarity
-    TASTE_MATCH = "taste_match"           # direct genre-vector matching
-    COLD_START = "cold_start"             # onboarding-interest based
+    COLLABORATIVE = "collaborative"  # item-based CF (existing M21 engine)
+    SIMILAR_READERS = "similar_readers"  # taste-vector cosine similarity
+    TASTE_MATCH = "taste_match"  # direct genre-vector matching
+    COLD_START = "cold_start"  # onboarding-interest based
+
+
+class RecommendationChannel(enum.StrEnum):
+    """Curation channels surfaced on the discovery screen (M69).
+
+    Each channel is a distinct angle on "books for you": the reader's taste
+    profile, what the community is reading right now, what their clubs are
+    reading, and an AI pick derived from their completed-book history.
+    """
+
+    TASTE_MATCH = "taste_match"  # genre-vector match against the catalog
+    TRENDING = "trending"  # most reading sessions started in last 7 days
+    CLUB_PICKS = "club_picks"  # books read by the user's clubs
+    AI_PICKS = "ai_picks"  # Claude-generated picks from reading history
 
 
 def cosine_similarity(a: dict[str, int], b: dict[str, int]) -> float:
