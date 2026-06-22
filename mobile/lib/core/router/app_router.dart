@@ -9,6 +9,8 @@ import '../../features/book/presentation/book_detail_screen.dart';
 import '../../features/book/presentation/library_screen.dart';
 import '../../features/book/presentation/search_screen.dart';
 import '../../features/discovery/presentation/discovery_screen.dart';
+import '../../features/event/presentation/event_detail_screen.dart';
+import '../../features/club/presentation/video_session_screen.dart';
 import '../../features/challenge/presentation/badge_collection_screen.dart';
 import '../../features/challenge/presentation/challenge_detail_screen.dart';
 import '../../features/challenge/presentation/challenge_list_screen.dart';
@@ -159,6 +161,12 @@ class AppRoutes {
 
   // Club-level chat (distinct from chapter-gated room chat).
   static String clubChat(String clubId) => '/clubs/$clubId/chat';
+
+  // M68 — location-based meetup detail.
+  static String eventDetail(String eventId) => '/events/$eventId';
+
+  // M68 — reading-club video call (Pro club owner).
+  static String clubVideo(String clubId) => '/clubs/$clubId/video';
 }
 
 /// Adapter that bridges a Riverpod [ValueNotifier]-free state stream into a
@@ -362,6 +370,24 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final String clubId = state.pathParameters['clubId']!;
           return ClubEventsScreen(clubId: clubId);
+        },
+      ),
+      // M68 — reading-club video call; Pro club owner only (backend re-checks).
+      GoRoute(
+        path: '/clubs/:clubId/video',
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) {
+          final String clubId = state.pathParameters['clubId']!;
+          return VideoSessionScreen(clubId: clubId);
+        },
+      ),
+      // M68 — location-based meetup detail screen.
+      GoRoute(
+        path: '/events/:eventId',
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) {
+          final String eventId = state.pathParameters['eventId']!;
+          return EventDetailScreen(eventId: eventId);
         },
       ),
       // M29 — chapter-gated room list; Club object passed via extra.

@@ -508,6 +508,16 @@ class _ClubBookCardState extends ConsumerState<_ClubBookCard> {
               label: const Text('AI 토론 주제 생성'),
             ),
           ],
+          // Video reading meetup — Pro club owner only (backend re-checks both).
+          if (_isOwner && isPro) ...[
+            SizedBox(height: spacing.sm),
+            OutlinedButton.icon(
+              onPressed: () =>
+                  context.push(AppRoutes.clubVideo(widget.club.id)),
+              icon: const Icon(Icons.videocam_rounded, size: 18),
+              label: const Text('화상 독서 모임 시작'),
+            ),
+          ],
         ],
       ),
     );

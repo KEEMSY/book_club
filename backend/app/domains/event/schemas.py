@@ -36,6 +36,7 @@ class EventResponse(BaseModel):
     """
 
     id: UUID
+    creator_id: UUID
     title: str
     description: str | None
     address: str | None
@@ -95,3 +96,10 @@ class EventReviewsResponse(BaseModel):
     items: list[EventReviewResponse]
     average_rating: float | None
     count: int
+
+
+class EventDetailResponse(BaseModel):
+    """Full event with its join count and review summary (M68 detail screen)."""
+
+    event: EventResponse
+    reviews: EventReviewsResponse

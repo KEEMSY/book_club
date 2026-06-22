@@ -1,18 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../application/event_notifier.dart';
 import '../domain/event.dart';
 import 'event_create_sheet.dart';
 
-/// Location-based meetup discovery (M64). A plain list — no map — driven by a
-/// fixed origin (Seoul City Hall) until GPS is approved (CLAUDE.md §2).
-class NearbyEventsScreen extends ConsumerWidget {
+/// Location-based meetup discovery (M64). Defaults to a list driven by a
+/// device-resolved origin (Seoul City Hall fallback); M68 adds a map-view
+/// toggle (placeholder until the Kakao Map SDK lands — CLAUDE.md §2).
+class NearbyEventsScreen extends ConsumerStatefulWidget {
   const NearbyEventsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<NearbyEventsScreen> createState() => _NearbyEventsScreenState();
+}
+
+class _NearbyEventsScreenState extends ConsumerState<NearbyEventsScreen> {
+  bool _mapView = false;
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
     final NearbyEventsState state = ref.watch(nearbyEventsProvider);
@@ -22,6 +32,13 @@ class NearbyEventsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('근처 모임', style: theme.textTheme.titleLarge),
+        actions: <Widget>[
+          IconButton(
+            tooltip: _mapView ? '목록 보기' : '지도 보기',
+            icon: Icon(_mapView ? Icons.view_list_rounded : Icons.map_rounded),
+            onPressed: () => setState(() => _mapView = !_mapView),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => EventCreateSheet.show(context),
@@ -40,9 +57,47 @@ class NearbyEventsScreen extends ConsumerWidget {
           ),
           const Divider(height: 0.5),
           Expanded(
-            child: RefreshIndicator(
-              onRefresh: notifier.load,
-              child: _Body(events: state.events, spacing: spacing),
+            child: _mapView
+                ? _MapPlaceholder(spacing: spacing)
+                : RefreshIndicator(
+                    onRefresh: notifier.load,
+                    child: _Body(events: state.events, spacing: spacing),
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Stand-in for the map view until the Kakao Map Flutter SDK is approved and
+/// wired (no new map package added — CLAUDE.md §2 / team decision).
+class _MapPlaceholder extends StatelessWidget {
+  const _MapPlaceholder({required this.spacing});
+
+  final AppSpacing spacing;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      color: theme.colorScheme.surfaceContainerHighest,
+      alignment: Alignment.center,
+      padding: EdgeInsets.all(spacing.xl),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Icon(
+            Icons.map_outlined,
+            size: 48,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+          SizedBox(height: spacing.md),
+          Text(
+            '지도 뷰 (카카오맵 SDK 연동 예정)',
+            textAlign: TextAlign.center,
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
         ],
@@ -199,48 +254,51 @@ class _EventRow extends StatelessWidget {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
 
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: spacing.md,
-        vertical: spacing.sm,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Expanded(
-                child: Text(
-                  event.title,
-                  style: theme.textTheme.titleMedium,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+    return InkWell(
+      onTap: () => context.push(AppRoutes.eventDetail(event.id)),
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: spacing.md,
+          vertical: spacing.sm,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    event.title,
+                    style: theme.textTheme.titleMedium,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-              ),
-              SizedBox(width: spacing.sm),
-              Text(
-                '${event.distanceKm.toStringAsFixed(1)}km',
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: theme.colorScheme.primary,
+                SizedBox(width: spacing.sm),
+                Text(
+                  '${event.distanceKm.toStringAsFixed(1)}km',
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    color: theme.colorScheme.primary,
+                  ),
                 ),
-              ),
-            ],
-          ),
-          SizedBox(height: spacing.xs),
-          if (event.address != null && event.address!.isNotEmpty)
-            _IconLine(icon: Icons.place_outlined, text: event.address!),
-          _IconLine(
-            icon: Icons.schedule_rounded,
-            text: _formatDateTime(event.eventAt),
-          ),
-          _IconLine(
-            icon: Icons.group_outlined,
-            text: event.maxAttendees == null
-                ? '${event.joinedCount}명 참여'
-                : '${event.joinedCount}/${event.maxAttendees}명',
-          ),
-        ],
+              ],
+            ),
+            SizedBox(height: spacing.xs),
+            if (event.address != null && event.address!.isNotEmpty)
+              _IconLine(icon: Icons.place_outlined, text: event.address!),
+            _IconLine(
+              icon: Icons.schedule_rounded,
+              text: _formatDateTime(event.eventAt),
+            ),
+            _IconLine(
+              icon: Icons.group_outlined,
+              text: event.maxAttendees == null
+                  ? '${event.joinedCount}명 참여'
+                  : '${event.joinedCount}/${event.maxAttendees}명',
+            ),
+          ],
+        ),
       ),
     );
   }

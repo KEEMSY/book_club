@@ -13,7 +13,7 @@ from decimal import Decimal
 from uuid import UUID, uuid4
 
 import pytest
-from app.core.exceptions import ConflictError, NotFoundError
+from app.core.exceptions import ConflictError, NotFoundError, PermissionDeniedError
 from app.domains.event.repository import EventWithCount
 from app.domains.event.service import EventService, haversine_km
 
@@ -31,6 +31,7 @@ class _FakeEvent:
     id: UUID
     title: str
     event_at: datetime
+    creator_id: UUID = field(default_factory=uuid4)
     lat: float | None = None
     lng: float | None = None
     description: str | None = None
@@ -85,6 +86,11 @@ class FakeEventRepository:
     async def get_event(self, event_id: UUID) -> _FakeEvent | None:
         ev = self.events.get(event_id)
         return ev if ev is not None and ev.deleted_at is None else None
+
+    async def soft_delete_event(self, event_id: UUID) -> None:
+        ev = self.events.get(event_id)
+        if ev is not None and ev.deleted_at is None:
+            ev.deleted_at = datetime.now(tz=UTC)
 
     async def list_candidates_in_bbox(
         self,
@@ -455,3 +461,70 @@ async def test_get_reviews_empty_has_no_average() -> None:
     res = await svc.get_reviews(ev.id)
     assert res.count == 0
     assert res.average_rating is None
+
+
+# ---------------------------------------------------------------------------
+# get_event_detail (M68)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_get_event_detail_bundles_count_and_reviews() -> None:
+    svc, repo = _svc()
+    ev = _FakeEvent(id=uuid4(), title="상세", event_at=_past(), max_attendees=10)
+    repo.add(ev)
+    await svc.join_waitlist(user_id=uuid4(), event_id=ev.id)
+    await svc.join_waitlist(user_id=uuid4(), event_id=ev.id)
+    await svc.create_review(reviewer_id=uuid4(), event_id=ev.id, rating=5.0, body=None)
+    await svc.create_review(reviewer_id=uuid4(), event_id=ev.id, rating=4.0, body=None)
+
+    detail = await svc.get_event_detail(ev.id)
+
+    assert detail.event.id == ev.id
+    assert detail.event.joined_count == 2
+    assert detail.event.distance_km is None
+    assert detail.reviews.count == 2
+    assert detail.reviews.average_rating == 4.5
+
+
+@pytest.mark.asyncio
+async def test_get_event_detail_unknown_event_raises_not_found() -> None:
+    svc, _ = _svc()
+    with pytest.raises(NotFoundError) as exc:
+        await svc.get_event_detail(uuid4())
+    assert exc.value.code == "EVENT_NOT_FOUND"
+
+
+# ---------------------------------------------------------------------------
+# cancel_event (M68)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_cancel_event_by_creator_soft_deletes() -> None:
+    svc, repo = _svc()
+    creator = uuid4()
+    ev = _FakeEvent(id=uuid4(), title="취소될 모임", event_at=_future(), creator_id=creator)
+    repo.add(ev)
+
+    await svc.cancel_event(user_id=creator, event_id=ev.id)
+
+    assert await repo.get_event(ev.id) is None
+
+
+@pytest.mark.asyncio
+async def test_cancel_event_by_non_creator_denied() -> None:
+    svc, repo = _svc()
+    ev = _FakeEvent(id=uuid4(), title="남의 모임", event_at=_future(), creator_id=uuid4())
+    repo.add(ev)
+    with pytest.raises(PermissionDeniedError) as exc:
+        await svc.cancel_event(user_id=uuid4(), event_id=ev.id)
+    assert exc.value.code == "PERMISSION_DENIED"
+
+
+@pytest.mark.asyncio
+async def test_cancel_event_unknown_raises_not_found() -> None:
+    svc, _ = _svc()
+    with pytest.raises(NotFoundError) as exc:
+        await svc.cancel_event(user_id=uuid4(), event_id=uuid4())
+    assert exc.value.code == "EVENT_NOT_FOUND"

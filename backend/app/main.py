@@ -46,11 +46,12 @@ from app.domains.reminder.router import router as reminder_router
 from app.domains.retention.router import router as retention_router
 from app.domains.review.router import router as review_router
 from app.domains.search.router import router as search_router
-from app.domains.social.events import FollowReceived
-from app.domains.social.router import router as social_router
 from app.domains.share.router import router as share_router
 from app.domains.shield.router import router as shield_router
+from app.domains.social.events import FollowReceived
+from app.domains.social.router import router as social_router
 from app.domains.subscription.router import router as subscription_router
+from app.domains.video.router import router as video_router
 
 
 @asynccontextmanager
@@ -154,6 +155,7 @@ def create_app() -> FastAPI:
     app.include_router(review_router)
     app.include_router(ai_assistant_router)
     app.include_router(share_router)
+    app.include_router(video_router)
 
     # Expose /metrics for Prometheus scraping; instrument after all routers are
     # registered so every route is covered from the start.

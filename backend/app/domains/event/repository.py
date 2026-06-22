@@ -9,7 +9,7 @@ reaches into the club/community domains' tables.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from decimal import Decimal
 from uuid import UUID
 
@@ -74,6 +74,13 @@ class EventRepository:
             select(Event).where(Event.id == event_id, Event.deleted_at.is_(None))
         )
         return result.scalar_one_or_none()
+
+    async def soft_delete_event(self, event_id: UUID) -> None:
+        """Mark an event deleted; ``get_event`` then filters it out."""
+        event = await self.session.get(Event, event_id)
+        if event is not None and event.deleted_at is None:
+            event.deleted_at = datetime.now(tz=UTC)
+            await self.session.flush()
 
     async def list_candidates_in_bbox(
         self,

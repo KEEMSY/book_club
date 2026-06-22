@@ -15,6 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Event {
   String get id;
+  String? get creatorId;
   String get title;
   String? get description;
   String? get address;
@@ -46,6 +47,8 @@ mixin _$Event {
         (other.runtimeType == runtimeType &&
             other is Event &&
             (identical(other.id, id) || other.id == id) &&
+            (identical(other.creatorId, creatorId) ||
+                other.creatorId == creatorId) &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.description, description) ||
                 other.description == description) &&
@@ -74,6 +77,7 @@ mixin _$Event {
   int get hashCode => Object.hash(
       runtimeType,
       id,
+      creatorId,
       title,
       description,
       address,
@@ -91,7 +95,7 @@ mixin _$Event {
 
   @override
   String toString() {
-    return 'Event(id: $id, title: $title, description: $description, address: $address, lat: $lat, lng: $lng, eventAt: $eventAt, maxAttendees: $maxAttendees, isPublic: $isPublic, clubId: $clubId, bookId: $bookId, category: $category, joinedCount: $joinedCount, distanceKm: $distanceKm, createdAt: $createdAt)';
+    return 'Event(id: $id, creatorId: $creatorId, title: $title, description: $description, address: $address, lat: $lat, lng: $lng, eventAt: $eventAt, maxAttendees: $maxAttendees, isPublic: $isPublic, clubId: $clubId, bookId: $bookId, category: $category, joinedCount: $joinedCount, distanceKm: $distanceKm, createdAt: $createdAt)';
   }
 }
 
@@ -102,6 +106,7 @@ abstract mixin class $EventCopyWith<$Res> {
   @useResult
   $Res call(
       {String id,
+      String? creatorId,
       String title,
       String? description,
       String? address,
@@ -131,6 +136,7 @@ class _$EventCopyWithImpl<$Res> implements $EventCopyWith<$Res> {
   @override
   $Res call({
     Object? id = null,
+    Object? creatorId = freezed,
     Object? title = null,
     Object? description = freezed,
     Object? address = freezed,
@@ -151,6 +157,10 @@ class _$EventCopyWithImpl<$Res> implements $EventCopyWith<$Res> {
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
+      creatorId: freezed == creatorId
+          ? _self.creatorId
+          : creatorId // ignore: cast_nullable_to_non_nullable
+              as String?,
       title: null == title
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -306,6 +316,7 @@ extension EventPatterns on Event {
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
             String id,
+            String? creatorId,
             String title,
             String? description,
             String? address,
@@ -328,6 +339,7 @@ extension EventPatterns on Event {
       case _Event() when $default != null:
         return $default(
             _that.id,
+            _that.creatorId,
             _that.title,
             _that.description,
             _that.address,
@@ -364,6 +376,7 @@ extension EventPatterns on Event {
   TResult when<TResult extends Object?>(
     TResult Function(
             String id,
+            String? creatorId,
             String title,
             String? description,
             String? address,
@@ -385,6 +398,7 @@ extension EventPatterns on Event {
       case _Event():
         return $default(
             _that.id,
+            _that.creatorId,
             _that.title,
             _that.description,
             _that.address,
@@ -420,6 +434,7 @@ extension EventPatterns on Event {
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
             String id,
+            String? creatorId,
             String title,
             String? description,
             String? address,
@@ -441,6 +456,7 @@ extension EventPatterns on Event {
       case _Event() when $default != null:
         return $default(
             _that.id,
+            _that.creatorId,
             _that.title,
             _that.description,
             _that.address,
@@ -466,6 +482,7 @@ extension EventPatterns on Event {
 class _Event implements Event {
   const _Event(
       {required this.id,
+      this.creatorId,
       required this.title,
       this.description,
       this.address,
@@ -484,6 +501,8 @@ class _Event implements Event {
 
   @override
   final String id;
+  @override
+  final String? creatorId;
   @override
   final String title;
   @override
@@ -536,6 +555,8 @@ class _Event implements Event {
         (other.runtimeType == runtimeType &&
             other is _Event &&
             (identical(other.id, id) || other.id == id) &&
+            (identical(other.creatorId, creatorId) ||
+                other.creatorId == creatorId) &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.description, description) ||
                 other.description == description) &&
@@ -564,6 +585,7 @@ class _Event implements Event {
   int get hashCode => Object.hash(
       runtimeType,
       id,
+      creatorId,
       title,
       description,
       address,
@@ -581,7 +603,7 @@ class _Event implements Event {
 
   @override
   String toString() {
-    return 'Event(id: $id, title: $title, description: $description, address: $address, lat: $lat, lng: $lng, eventAt: $eventAt, maxAttendees: $maxAttendees, isPublic: $isPublic, clubId: $clubId, bookId: $bookId, category: $category, joinedCount: $joinedCount, distanceKm: $distanceKm, createdAt: $createdAt)';
+    return 'Event(id: $id, creatorId: $creatorId, title: $title, description: $description, address: $address, lat: $lat, lng: $lng, eventAt: $eventAt, maxAttendees: $maxAttendees, isPublic: $isPublic, clubId: $clubId, bookId: $bookId, category: $category, joinedCount: $joinedCount, distanceKm: $distanceKm, createdAt: $createdAt)';
   }
 }
 
@@ -593,6 +615,7 @@ abstract mixin class _$EventCopyWith<$Res> implements $EventCopyWith<$Res> {
   @useResult
   $Res call(
       {String id,
+      String? creatorId,
       String title,
       String? description,
       String? address,
@@ -622,6 +645,7 @@ class __$EventCopyWithImpl<$Res> implements _$EventCopyWith<$Res> {
   @pragma('vm:prefer-inline')
   $Res call({
     Object? id = null,
+    Object? creatorId = freezed,
     Object? title = null,
     Object? description = freezed,
     Object? address = freezed,
@@ -642,6 +666,10 @@ class __$EventCopyWithImpl<$Res> implements _$EventCopyWith<$Res> {
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
+      creatorId: freezed == creatorId
+          ? _self.creatorId
+          : creatorId // ignore: cast_nullable_to_non_nullable
+              as String?,
       title: null == title
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable

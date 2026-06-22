@@ -21,10 +21,11 @@ from decimal import Decimal
 from math import asin, cos, radians, sin, sqrt
 from uuid import UUID
 
-from app.core.exceptions import ConflictError, NotFoundError
+from app.core.exceptions import ConflictError, NotFoundError, PermissionDeniedError
 from app.domains.event.models import Event, EventReview
 from app.domains.event.ports import EventRepositoryPort
 from app.domains.event.schemas import (
+    EventDetailResponse,
     EventResponse,
     EventReviewResponse,
     EventReviewsResponse,
@@ -139,6 +140,15 @@ class EventService:
         )
         return _to_response(event, joined_count=0, distance_km=None)
 
+    async def cancel_event(self, *, user_id: UUID, event_id: UUID) -> None:
+        """Soft-delete an event. Only its creator may cancel it."""
+        event = await self._require_event(event_id)
+        if event.creator_id != user_id:
+            raise PermissionDeniedError(
+                "only the creator can cancel this event", code="PERMISSION_DENIED"
+            )
+        await self.repo.soft_delete_event(event_id)
+
     async def join_waitlist(self, *, user_id: UUID, event_id: UUID) -> WaitlistStatusResponse:
         """Join an event; confirmed if within capacity, else queued."""
         event = await self._require_event(event_id)
@@ -183,6 +193,19 @@ class EventService:
     async def get_reviews(self, event_id: UUID) -> EventReviewsResponse:
         """All reviews for an event plus the average rating."""
         await self._require_event(event_id)
+        return await self._reviews_summary(event_id)
+
+    async def get_event_detail(self, event_id: UUID) -> EventDetailResponse:
+        """Full event with its join count and review summary (M68 detail)."""
+        event = await self._require_event(event_id)
+        joined = await self.repo.joined_count(event_id)
+        reviews = await self._reviews_summary(event_id)
+        return EventDetailResponse(
+            event=_to_response(event, joined_count=joined, distance_km=None),
+            reviews=reviews,
+        )
+
+    async def _reviews_summary(self, event_id: UUID) -> EventReviewsResponse:
         reviews = await self.repo.list_reviews(event_id)
         items = [_review_response(r) for r in reviews]
         average = round(sum(i.rating for i in items) / len(items), 1) if items else None
@@ -199,6 +222,7 @@ def _to_response(event: Event, *, joined_count: int, distance_km: float | None) 
     """Map an event entity to its DTO, rounding distance to 0.1 km."""
     return EventResponse(
         id=event.id,
+        creator_id=event.creator_id,
         title=event.title,
         description=event.description,
         address=event.address,

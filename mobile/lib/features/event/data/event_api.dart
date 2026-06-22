@@ -21,8 +21,14 @@ abstract class EventApi {
     @Query('page') int page = 1,
   });
 
+  @GET('/events/{eventId}')
+  Future<dynamic> getEventDetail(@Path('eventId') String eventId);
+
   @POST('/events')
   Future<dynamic> createEvent(@Body() Map<String, dynamic> body);
+
+  @DELETE('/events/{eventId}')
+  Future<void> cancelEvent(@Path('eventId') String eventId);
 
   @POST('/events/{eventId}/waitlist')
   Future<dynamic> joinWaitlist(@Path('eventId') String eventId);
