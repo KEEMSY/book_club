@@ -211,3 +211,130 @@ class DiscoveryRepository:
         )
         result = await self._session.execute(stmt)
         return int(result.scalar_one() or 0)
+
+    # ------------------------------------------------------------------
+    # M69 curation channels
+    # ------------------------------------------------------------------
+
+    async def trending(
+        self, *, user_id: UUID, days: int = 7, limit: int = 10
+    ) -> list[tuple[UUID, str, str, str | None]]:
+        """Return books with the most reading sessions started in the last N days.
+
+        Counts ``reading_sessions`` rows (timer + manual) joined back to the
+        catalog via ``user_books``, excluding books already in the caller's
+        library so the channel only surfaces new discoveries.
+        """
+        from app.domains.reading.models import ReadingSession
+
+        since = datetime.now(tz=UTC) - timedelta(days=days)
+        my_books = select(UserBook.book_id).where(UserBook.user_id == user_id)
+        stmt = (
+            select(
+                Book.id,
+                Book.title,
+                Book.author,
+                Book.cover_url,
+                func.count(ReadingSession.id).label("cnt"),
+            )
+            .join(UserBook, UserBook.book_id == Book.id)
+            .join(ReadingSession, ReadingSession.user_book_id == UserBook.id)
+            .where(
+                ReadingSession.started_at >= since,
+                Book.id.not_in(my_books),
+            )
+            .group_by(Book.id, Book.title, Book.author, Book.cover_url)
+            .order_by(func.count(ReadingSession.id).desc())
+            .limit(limit)
+        )
+        rows = await self._session.execute(stmt)
+        return [(r.id, r.title, r.author, r.cover_url) for r in rows]
+
+    async def club_picks(
+        self, *, user_id: UUID, limit: int = 10
+    ) -> list[tuple[UUID, str, str, str | None]]:
+        """Return distinct books read by the clubs the user belongs to.
+
+        Ordered by club size (largest club first) so the most active reading
+        groups surface their book first. Books already in the user's library
+        are excluded.
+        """
+        from app.domains.club.models import ClubMember, ReadingClub
+
+        my_clubs = select(ClubMember.club_id).where(ClubMember.user_id == user_id)
+        my_books = select(UserBook.book_id).where(UserBook.user_id == user_id)
+        member_counts = (
+            select(ClubMember.club_id, func.count().label("mc"))
+            .group_by(ClubMember.club_id)
+            .subquery()
+        )
+        stmt = (
+            select(
+                Book.id,
+                Book.title,
+                Book.author,
+                Book.cover_url,
+                func.max(member_counts.c.mc).label("mc"),
+            )
+            .join(ReadingClub, ReadingClub.book_id == Book.id)
+            .join(member_counts, member_counts.c.club_id == ReadingClub.id)
+            .where(
+                ReadingClub.id.in_(my_clubs),
+                Book.id.not_in(my_books),
+            )
+            .group_by(Book.id, Book.title, Book.author, Book.cover_url)
+            .order_by(func.max(member_counts.c.mc).desc())
+            .limit(limit)
+        )
+        rows = await self._session.execute(stmt)
+        return [(r.id, r.title, r.author, r.cover_url) for r in rows]
+
+    async def recent_completed_books(
+        self, user_id: UUID, *, limit: int = 5
+    ) -> list[tuple[str, str]]:
+        """Return the user's most recently completed books as (title, author).
+
+        Feeds the ai_picks prompt. Ordered by completion time with a fallback
+        to ``updated_at`` for legacy rows that predate ``finished_at``.
+        """
+        stmt = (
+            select(Book.title, Book.author)
+            .join(UserBook, UserBook.book_id == Book.id)
+            .where(
+                UserBook.user_id == user_id,
+                UserBook.status == UserBookStatus.COMPLETED,
+            )
+            .order_by(
+                UserBook.finished_at.desc().nullslast(),
+                UserBook.updated_at.desc(),
+            )
+            .limit(limit)
+        )
+        rows = await self._session.execute(stmt)
+        return [(r.title, r.author) for r in rows]
+
+    async def find_book_by_title(
+        self, title: str, *, user_id: UUID, exclude_ids: set[UUID]
+    ) -> tuple[UUID, str, str, str | None] | None:
+        """Resolve an AI-suggested title to a single catalog row, or ``None``.
+
+        Matches case-insensitively on title, preferring the tightest match
+        (shortest title containing the term) so a generic keyword does not
+        latch onto an unrelated long title. Skips the caller's library and any
+        book already matched in this batch (``exclude_ids``).
+        """
+        my_books = select(UserBook.book_id).where(UserBook.user_id == user_id)
+        stmt = (
+            select(Book.id, Book.title, Book.author, Book.cover_url)
+            .where(
+                Book.title.ilike(f"%{title}%"),
+                Book.id.not_in(my_books),
+            )
+            .order_by(func.length(Book.title))
+            .limit(5)
+        )
+        rows = await self._session.execute(stmt)
+        for r in rows:
+            if r.id not in exclude_ids:
+                return (r.id, r.title, r.author, r.cover_url)
+        return None

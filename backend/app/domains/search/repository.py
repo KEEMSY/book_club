@@ -77,6 +77,34 @@ class SearchRepository:
                 continue
         return []  # unreachable but satisfies type checker
 
+    async def autocomplete(self, query: str, limit: int = 10) -> list[str]:
+        """Return book title/author suggestions ranked by trigram similarity.
+
+        Uses the ``pg_trgm`` ``%`` operator (index-backed by the GIN indexes from
+        migration 0046) to find near matches, then ranks by ``similarity()``.
+        Titles and authors share one ranked list; identical terms are collapsed
+        so "author appears on many books" does not flood the suggestions.
+        """
+        sql = sa.text(
+            """
+            SELECT term, MAX(score) AS score
+            FROM (
+                SELECT title AS term, similarity(title, :q) AS score
+                FROM books
+                WHERE title % :q
+                UNION ALL
+                SELECT author AS term, similarity(author, :q) AS score
+                FROM books
+                WHERE author % :q
+            ) suggestions
+            GROUP BY term
+            ORDER BY score DESC, term ASC
+            LIMIT :limit
+            """
+        )
+        rows = await self._session.execute(sql, {"q": query, "limit": limit})
+        return [row.term for row in rows]
+
     async def search_users(self, query: str, limit: int = 10) -> list[UserSearchItem]:
         """Case-insensitive partial match on nickname (backed by trigram GIN)."""
         stmt = (

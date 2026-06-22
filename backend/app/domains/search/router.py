@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, Query
 
 from app.core.deps import get_current_user_id
 from app.domains.search.providers import get_search_service
-from app.domains.search.schemas import SearchResult
+from app.domains.search.schemas import AutocompleteResult, SearchResult
 from app.domains.search.service import SearchService
 
 router = APIRouter(prefix="/search", tags=["search"])
@@ -36,3 +36,14 @@ async def search(
         include_clubs=include_clubs,
         limit=limit,
     )
+
+
+@router.get("/autocomplete", response_model=AutocompleteResult)
+async def autocomplete(
+    q: Annotated[str, Query(min_length=1, max_length=100, description="검색어 접두사")],
+    limit: Annotated[int, Query(ge=1, le=10, description="최대 제안 수")] = 10,
+    _user_id: Annotated[str, Depends(get_current_user_id)] = "",
+    service: Annotated[SearchService, Depends(get_search_service)] = ...,  # type: ignore[assignment]
+) -> AutocompleteResult:
+    """책 제목·저자 자동완성 — pg_trgm 유사도 기반 제안."""
+    return await service.autocomplete(q, limit=limit)

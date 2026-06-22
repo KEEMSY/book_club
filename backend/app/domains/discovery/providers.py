@@ -15,6 +15,13 @@ from app.domains.book.taste_profile_repository import (
     OnboardingInterestRepository,
     TasteProfileRepository,
 )
+from app.domains.discovery.adapters.claude_recommender_adapter import (
+    ClaudeBookRecommenderAdapter,
+)
+from app.domains.discovery.adapters.stub_recommender_adapter import (
+    StubBookRecommenderAdapter,
+)
+from app.domains.discovery.ai_port import AIBookRecommenderPort
 from app.domains.discovery.ml.recommender import CollaborativeFilteringRecommender
 from app.domains.discovery.onboarding_service import OnboardingService
 from app.domains.discovery.repository import DiscoveryRepository
@@ -35,12 +42,28 @@ def get_cf_recommender() -> CollaborativeFilteringRecommender:
     return CollaborativeFilteringRecommender(_redis=get_redis_client())
 
 
+@lru_cache(maxsize=1)
+def get_ai_book_recommender() -> AIBookRecommenderPort:
+    """Return the process-wide ai_picks recommender (live SDK client reused).
+
+    Selects the live ``ClaudeBookRecommenderAdapter`` when ``ANTHROPIC_API_KEY``
+    is set, otherwise the deterministic stub so dev/test run without a key.
+    """
+    settings = get_settings()
+    if settings.anthropic_api_key:
+        return ClaudeBookRecommenderAdapter(
+            api_key=settings.anthropic_api_key, model=settings.anthropic_model
+        )
+    return StubBookRecommenderAdapter()
+
+
 def get_discovery_service(
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> DiscoveryService:
     return DiscoveryService(
         repo=DiscoveryRepository(session),
         ml=get_cf_recommender(),
+        ai_recommender=get_ai_book_recommender(),
     )
 
 

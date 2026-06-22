@@ -4,7 +4,10 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-from app.domains.discovery.strategies import RecommendationStrategy
+from app.domains.discovery.strategies import (
+    RecommendationChannel,
+    RecommendationStrategy,
+)
 
 
 class RecommendedBookPublic(BaseModel):
@@ -20,15 +23,28 @@ class RecommendationResponse(BaseModel):
     items: list[RecommendedBookPublic]
 
 
+class ChannelBookPublic(BaseModel):
+    """A book surfaced by a curation channel (M69)."""
+
+    id: UUID
+    title: str
+    author: str
+    cover_url: str | None = None
+    reason: str
+
+
+class BookRecommendationsResponse(BaseModel):
+    channel: RecommendationChannel
+    items: list[ChannelBookPublic]
+
+
 # ------------------------------------------------------------------
 # Onboarding interest schemas
 # ------------------------------------------------------------------
 
 
 class OnboardingInterestItem(BaseModel):
-    category: str = Field(
-        description="Interest category: 'genre', 'author', or 'keyword'"
-    )
+    category: str = Field(description="Interest category: 'genre', 'author', or 'keyword'")
     value: str = Field(max_length=64)
 
 

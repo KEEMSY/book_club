@@ -15,6 +15,8 @@ from app.core.deps import get_current_user_id
 from app.domains.discovery.onboarding_service import OnboardingService
 from app.domains.discovery.providers import get_discovery_service, get_onboarding_service
 from app.domains.discovery.schemas import (
+    BookRecommendationsResponse,
+    ChannelBookPublic,
     OnboardingInterestPublic,
     OnboardingInterestsResponse,
     RecommendationResponse,
@@ -22,7 +24,10 @@ from app.domains.discovery.schemas import (
     SaveOnboardingInterestsRequest,
 )
 from app.domains.discovery.service import DiscoveryService
-from app.domains.discovery.strategies import RecommendationStrategy
+from app.domains.discovery.strategies import (
+    RecommendationChannel,
+    RecommendationStrategy,
+)
 
 router = APIRouter(tags=["discovery"])
 
@@ -39,6 +44,22 @@ async def get_recommendations(
     items = await service.get_recommendations(UUID(user_id), strategy=strategy, limit=limit)
     return RecommendationResponse(
         items=[RecommendedBookPublic(**item) for item in items]  # type: ignore[arg-type]
+    )
+
+
+@router.get("/me/book-recommendations", response_model=BookRecommendationsResponse)
+async def get_book_recommendations(
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[DiscoveryService, Depends(get_discovery_service)],
+    channel: Annotated[
+        RecommendationChannel, Query(description="Curation channel")
+    ] = RecommendationChannel.TASTE_MATCH,
+    limit: Annotated[int, Query(ge=1, le=30)] = 10,
+) -> BookRecommendationsResponse:
+    items = await service.get_channel_recommendations(UUID(user_id), channel=channel, limit=limit)
+    return BookRecommendationsResponse(
+        channel=channel,
+        items=[ChannelBookPublic(**item) for item in items],  # type: ignore[arg-type]
     )
 
 

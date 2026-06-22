@@ -17,6 +17,15 @@ abstract class DiscoveryApi {
     @Query('limit') int? limit,
   });
 
+  /// M69 — channel-based curation recommendations.
+  /// [channel]: "taste_match" | "trending" | "club_picks" | "ai_picks".
+  /// Returns a `{channel, items: [...]}` envelope parsed in the repository.
+  @GET('/me/book-recommendations')
+  Future<dynamic> getBookRecommendations({
+    @Query('channel') String? channel,
+    @Query('limit') int? limit,
+  });
+
   /// M44 — persist genre/author interest selections after first-run picker.
   @POST('/me/onboarding/interests')
   Future<void> saveOnboardingInterests(@Body() Map<String, dynamic> body);

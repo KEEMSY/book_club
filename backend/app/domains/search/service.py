@@ -6,7 +6,7 @@ import asyncio
 from dataclasses import dataclass
 
 from app.domains.search.repository import SearchRepository
-from app.domains.search.schemas import SearchResult
+from app.domains.search.schemas import AutocompleteResult, SearchResult
 
 
 @dataclass(slots=True)
@@ -41,6 +41,11 @@ class SearchService:
 
         books, users, clubs = await asyncio.gather(book_task, user_task, club_task)
         return SearchResult(books=books, users=users, clubs=clubs)
+
+    async def autocomplete(self, query: str, *, limit: int = 10) -> AutocompleteResult:
+        """Return up to ``limit`` book title/author suggestions for the query."""
+        suggestions = await self.repo.autocomplete(query, limit=limit)
+        return AutocompleteResult(suggestions=suggestions)
 
 
 async def _empty_list() -> list:  # type: ignore[type-arg]

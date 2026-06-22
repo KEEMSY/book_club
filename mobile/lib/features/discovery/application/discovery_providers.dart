@@ -25,3 +25,17 @@ Future<List<RecommendedBook>> recommendations(
       .watch(discoveryRepositoryProvider)
       .getRecommendations(strategy: strategy, limit: 10);
 }
+
+/// M69 — fetches a single curation channel's books.
+///
+/// [channel] must be one of "taste_match", "trending", "club_picks", or
+/// "ai_picks".
+@riverpod
+Future<List<RecommendedBook>> bookRecommendations(
+  BookRecommendationsRef ref, {
+  required String channel,
+}) {
+  return ref
+      .watch(discoveryRepositoryProvider)
+      .getBookRecommendations(channel: channel, limit: 10);
+}
