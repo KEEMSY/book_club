@@ -55,6 +55,14 @@ class ClubTopicsContent:
 
 
 @dataclass(frozen=True, slots=True)
+class AudioIntroContent:
+    """A ~200-character spoken reading intro script, played in-app via TTS."""
+
+    script: str
+    tokens_used: int = 0
+
+
+@dataclass(frozen=True, slots=True)
 class BookInfo:
     """Minimal book facts the adapter needs to prompt Claude."""
 
@@ -78,7 +86,7 @@ class AIAssistantPort(Protocol):
     """The external generative boundary — Claude, or a deterministic stub."""
 
     async def generate_prep_card(
-        self, *, book_title: str, author: str, description: str | None
+        self, *, book_title: str, author: str, description: str | None, style: str
     ) -> PrepCardContent: ...
 
     async def generate_reflection(
@@ -94,13 +102,29 @@ class AIAssistantPort(Protocol):
         self, *, book_title: str, page_start: int, page_end: int
     ) -> ClubTopicsContent: ...
 
+    async def generate_audio_intro(
+        self, *, book_title: str, author: str, description: str | None
+    ) -> AudioIntroContent: ...
+
 
 class PrepCachePort(Protocol):
-    """Redis-backed 72h cache for prep cards, keyed by ``book_id``."""
+    """Redis-backed 72h cache for prep cards, keyed by ``(book_id, style)``.
 
-    async def get_prep(self, book_id: UUID) -> PrepCardContent | None: ...
+    Keying on style as well as book keeps the per-user persona personalization
+    correct — two readers with different styles never share a cached card.
+    """
 
-    async def set_prep(self, book_id: UUID, content: PrepCardContent) -> None: ...
+    async def get_prep(self, book_id: UUID, style: str) -> PrepCardContent | None: ...
+
+    async def set_prep(self, book_id: UUID, style: str, content: PrepCardContent) -> None: ...
+
+
+class UserPreferencesPort(Protocol):
+    """Reader's chosen prep-card persona style, persisted in Postgres."""
+
+    async def get_prefs(self, user_id: UUID) -> str | None: ...
+
+    async def upsert_prefs(self, *, user_id: UUID, style: str) -> None: ...
 
 
 class ReflectionRepositoryPort(Protocol):

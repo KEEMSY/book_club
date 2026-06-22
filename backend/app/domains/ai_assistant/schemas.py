@@ -8,14 +8,19 @@ billing/limit signal, not user-facing content.
 
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 from app.domains.ai_assistant.ports import (
+    AudioIntroContent,
     ClubTopicsContent,
     PrepCardContent,
     ReflectionContent,
 )
 from app.domains.ai_assistant.service import UsageSummary
+
+CardStyle = Literal["motivational", "analytical", "reflective"]
 
 
 class PrepCardResponse(BaseModel):
@@ -62,6 +67,28 @@ class ClubTopicsResponse(BaseModel):
     @classmethod
     def from_content(cls, content: ClubTopicsContent) -> ClubTopicsResponse:
         return cls(topics=content.topics)
+
+
+class AiPreferencesResponse(BaseModel):
+    card_style: CardStyle
+
+    @classmethod
+    def from_style(cls, style: str) -> AiPreferencesResponse:
+        return cls(card_style=style)  # type: ignore[arg-type]
+
+
+class UpdateAiPreferencesRequest(BaseModel):
+    card_style: CardStyle
+
+
+class AudioIntroResponse(BaseModel):
+    script: str
+    book_id: str
+    tokens_used: int
+
+    @classmethod
+    def from_content(cls, content: AudioIntroContent, *, book_id: str) -> AudioIntroResponse:
+        return cls(script=content.script, book_id=book_id, tokens_used=content.tokens_used)
 
 
 class AIUsageResponse(BaseModel):

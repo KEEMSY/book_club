@@ -35,3 +35,12 @@ Future<AiReflection> aiReflection(
 }) {
   return ref.watch(aiRepositoryProvider).createReflection(userBookId);
 }
+
+/// The reader's prep-card persona style (M67).
+///
+/// keepAlive so the chosen style is read once per session; the prep-card sheet
+/// invalidates it after the user picks a style so the next read reflects it.
+@Riverpod(keepAlive: true)
+Future<AiPreferences> userAiPreferences(UserAiPreferencesRef ref) {
+  return ref.watch(aiRepositoryProvider).getPreferences();
+}

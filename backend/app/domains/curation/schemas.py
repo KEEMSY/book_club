@@ -14,6 +14,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 CardType = Literal["intro", "guide", "context", "quote"]
+FeedbackAction = Literal["helpful", "skip", "dismiss"]
 
 
 class CurationCardPublic(BaseModel):
@@ -36,3 +37,9 @@ class CreateCurationCardRequest(BaseModel):
     title: str = Field(..., max_length=100)
     body: str = Field(..., min_length=1)
     order_index: int = 0
+
+
+class CurationFeedbackRequest(BaseModel):
+    """Reader reaction payload for ``POST /me/curation-cards/{id}/feedback``."""
+
+    action: FeedbackAction

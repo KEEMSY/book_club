@@ -30,4 +30,16 @@ abstract class AiApi {
   /// `GET /me/ai-usage` — this-month usage counts.
   @GET('/me/ai-usage')
   Future<dynamic> getUsage();
+
+  /// `GET /me/ai-preferences` — the reader's prep-card persona style.
+  @GET('/me/ai-preferences')
+  Future<dynamic> getPreferences();
+
+  /// `PATCH /me/ai-preferences` — set the prep-card persona style.
+  @PATCH('/me/ai-preferences')
+  Future<dynamic> updatePreferences(@Body() Map<String, dynamic> body);
+
+  /// `POST /books/{bookId}/ai-audio-intro` — generate a spoken intro script.
+  @POST('/books/{bookId}/ai-audio-intro')
+  Future<dynamic> createAudioIntro(@Path('bookId') String bookId);
 }

@@ -15,11 +15,14 @@ from fastapi import APIRouter, Depends
 from app.core.deps import get_current_user_id
 from app.domains.ai_assistant.providers import get_ai_assistant_service
 from app.domains.ai_assistant.schemas import (
+    AiPreferencesResponse,
     AIUsageResponse,
+    AudioIntroResponse,
     ClubTopicsRequest,
     ClubTopicsResponse,
     PrepCardResponse,
     ReflectionResponse,
+    UpdateAiPreferencesRequest,
 )
 from app.domains.ai_assistant.service import AIAssistantService
 
@@ -60,6 +63,35 @@ async def create_discussion_topics(
         page_end=body.page_end,
     )
     return ClubTopicsResponse.from_content(content)
+
+
+@router.post("/books/{book_id}/ai-audio-intro", response_model=AudioIntroResponse)
+async def create_audio_intro(
+    book_id: UUID,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[AIAssistantService, Depends(get_ai_assistant_service)],
+) -> AudioIntroResponse:
+    content = await service.get_audio_intro(user_id=UUID(user_id), book_id=book_id)
+    return AudioIntroResponse.from_content(content, book_id=str(book_id))
+
+
+@router.get("/me/ai-preferences", response_model=AiPreferencesResponse)
+async def get_ai_preferences(
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[AIAssistantService, Depends(get_ai_assistant_service)],
+) -> AiPreferencesResponse:
+    style = await service.get_card_style(user_id=UUID(user_id))
+    return AiPreferencesResponse.from_style(style)
+
+
+@router.patch("/me/ai-preferences", response_model=AiPreferencesResponse)
+async def update_ai_preferences(
+    body: UpdateAiPreferencesRequest,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[AIAssistantService, Depends(get_ai_assistant_service)],
+) -> AiPreferencesResponse:
+    style = await service.set_card_style(user_id=UUID(user_id), style=body.card_style)
+    return AiPreferencesResponse.from_style(style)
 
 
 @router.get("/me/ai-usage", response_model=AIUsageResponse)

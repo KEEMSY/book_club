@@ -5,6 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../ai_assistant/application/ai_audio_intro_service.dart';
+import '../../ai_assistant/data/ai_repository.dart';
 import '../../ai_assistant/presentation/ai_prep_card_sheet.dart';
 import '../../curation/application/curation_providers.dart';
 import '../../curation/domain/curation_card.dart';
@@ -53,6 +55,10 @@ class TimerScreen extends ConsumerStatefulWidget {
 
 class _TimerScreenState extends ConsumerState<TimerScreen>
     with WidgetsBindingObserver {
+  /// True while the AI audio intro is being fetched/started, so the 🔊 button
+  /// shows a spinner and ignores repeat taps.
+  bool _audioIntroLoading = false;
+
   @override
   void initState() {
     super.initState();
@@ -106,6 +112,8 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    // Don't let an in-progress intro keep speaking after the screen is gone.
+    ref.read(aiAudioIntroServiceProvider).stop();
     super.dispose();
   }
 
@@ -270,13 +278,31 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                     state is! TimerPaused &&
                     state is! TimerEnding) ...<Widget>[
                   SizedBox(height: spacing.sm),
-                  FilledButton.tonalIcon(
-                    icon: const Icon(Icons.auto_awesome, size: 18),
-                    label: const Text('읽기 전 AI 준비'),
-                    onPressed: () => AiPrepCardSheet.show(
-                      context,
-                      bookId: widget.bookId,
-                    ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      FilledButton.tonalIcon(
+                        icon: const Icon(Icons.auto_awesome, size: 18),
+                        label: const Text('읽기 전 AI 준비'),
+                        onPressed: () => AiPrepCardSheet.show(
+                          context,
+                          ref,
+                          bookId: widget.bookId,
+                        ),
+                      ),
+                      SizedBox(width: spacing.sm),
+                      IconButton.filledTonal(
+                        tooltip: '오디오로 듣기',
+                        onPressed: _audioIntroLoading ? null : _playAudioIntro,
+                        icon: _audioIntroLoading
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : const Text('🔊', style: TextStyle(fontSize: 18)),
+                      ),
+                    ],
                   ),
                 ],
                 SizedBox(height: spacing.md),
@@ -334,6 +360,28 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
         child: AddHighlightSheet(userBookId: widget.userBookId),
       ),
     );
+  }
+
+  /// Fetches the AI audio intro for the catalog book and plays it via on-device
+  /// TTS. Shows a spinner while the request is in flight; surfaces a snackbar on
+  /// failure (rate limit / no AI key / network).
+  Future<void> _playAudioIntro() async {
+    setState(() => _audioIntroLoading = true);
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await ref.read(aiAudioIntroServiceProvider).playIntro(widget.bookId);
+    } on AiRepositoryException catch (e) {
+      final String message = e.isRateLimited
+          ? '오늘의 오디오 인트로를 모두 사용했어요. 내일 다시 만나요!'
+          : e.isUnavailable
+              ? 'AI 연결 안 됨\n잠시 후 다시 시도해주세요.'
+              : e.message;
+      messenger
+        ..clearSnackBars()
+        ..showSnackBar(SnackBar(content: Text(message)));
+    } finally {
+      if (mounted) setState(() => _audioIntroLoading = false);
+    }
   }
 
   /// Records the completed session with the review gate and lets it decide
@@ -773,9 +821,11 @@ class _BookmarkSaveModalState extends ConsumerState<_BookmarkSaveModal> {
 
 /// Bottom sheet shown on timer screen entry when a curation card exists.
 ///
-/// Displays the card content and provides a "독서 시작하기" CTA that both
-/// closes the sheet and starts the reading timer.
-class _CurationCardSheet extends StatelessWidget {
+/// Displays the card content with a "독서 시작하기" CTA and a feedback row
+/// ("도움이 됐어요 👍" / "건너뛰기", M67). Helpful keeps the sheet open with a
+/// thanks state; skip records the reaction and dismisses the sheet. The reaction
+/// feeds the backend deprioritization loop.
+class _CurationCardSheet extends ConsumerStatefulWidget {
   const _CurationCardSheet({
     required this.card,
     required this.onStart,
@@ -788,11 +838,36 @@ class _CurationCardSheet extends StatelessWidget {
   final VoidCallback onStart;
 
   @override
+  ConsumerState<_CurationCardSheet> createState() => _CurationCardSheetState();
+}
+
+class _CurationCardSheetState extends ConsumerState<_CurationCardSheet> {
+  bool _helpfulSent = false;
+
+  Future<void> _sendFeedback(String action) {
+    // Fire-and-forget: the repository swallows 404s, and a failed feedback
+    // write must never block the reader from starting their session.
+    return ref
+        .read(curationRepositoryProvider)
+        .postFeedback(widget.card.id, action);
+  }
+
+  void _onHelpful() {
+    setState(() => _helpfulSent = true);
+    _sendFeedback('helpful');
+  }
+
+  void _onSkip() {
+    _sendFeedback('skip');
+    Navigator.of(context).pop();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
     final double bottom = MediaQuery.viewInsetsOf(context).bottom;
-    final meta = _cardTypeMeta(card.cardType);
+    final meta = _cardTypeMeta(widget.card.cardType);
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
@@ -824,23 +899,44 @@ class _CurationCardSheet extends StatelessWidget {
           ),
           SizedBox(height: spacing.md),
           // Title
-          Text(card.title, style: theme.textTheme.titleLarge),
+          Text(widget.card.title, style: theme.textTheme.titleLarge),
           SizedBox(height: spacing.sm),
           // Body
           Text(
-            card.body,
+            widget.card.body,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.75),
             ),
           ),
-          SizedBox(height: spacing.lg),
+          SizedBox(height: spacing.sm),
+          // Feedback row (M67)
+          Row(
+            children: <Widget>[
+              TextButton.icon(
+                icon: Icon(
+                  _helpfulSent
+                      ? Icons.check_circle_rounded
+                      : Icons.thumb_up_alt_outlined,
+                  size: 16,
+                ),
+                label: Text(_helpfulSent ? '고마워요!' : '도움이 됐어요 👍'),
+                onPressed: _helpfulSent ? null : _onHelpful,
+              ),
+              const Spacer(),
+              TextButton(
+                onPressed: _onSkip,
+                child: const Text('건너뛰기'),
+              ),
+            ],
+          ),
+          SizedBox(height: spacing.sm),
           // CTA
           SizedBox(
             width: double.infinity,
             child: FilledButton.icon(
               icon: const Icon(Icons.menu_book_rounded, size: 18),
               label: const Text('독서 시작하기'),
-              onPressed: onStart,
+              onPressed: widget.onStart,
             ),
           ),
         ],

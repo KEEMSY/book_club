@@ -366,5 +366,28 @@ class _AiReflectionProviderElement
   @override
   String get userBookId => (origin as AiReflectionProvider).userBookId;
 }
+
+String _$userAiPreferencesHash() => r'ef2ab7af44685642bb87a80e919e5149a3d9f549';
+
+/// The reader's prep-card persona style (M67).
+///
+/// keepAlive so the chosen style is read once per session; the prep-card sheet
+/// invalidates it after the user picks a style so the next read reflects it.
+///
+/// Copied from [userAiPreferences].
+@ProviderFor(userAiPreferences)
+final userAiPreferencesProvider = FutureProvider<AiPreferences>.internal(
+  userAiPreferences,
+  name: r'userAiPreferencesProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$userAiPreferencesHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef UserAiPreferencesRef = FutureProviderRef<AiPreferences>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -14,6 +14,11 @@ Business rules owned here:
   cap = 1); Pro is unlimited.
 - ``get_club_topics``: Pro club-owner only; generates topics and posts them to
   the club chat as a pinned-style message.
+- ``get_prep_card`` is personalized (M67): the reader's stored persona style
+  feeds both the Claude prompt and the cache key, so two readers with different
+  styles never share a cached card.
+- ``get_audio_intro`` (M67): generates a short spoken reading intro. Free users
+  get one per day (logged under ``audio_intro``); Pro is unmetered.
 """
 
 from __future__ import annotations
@@ -29,6 +34,7 @@ from app.core.exceptions import (
 )
 from app.domains.ai_assistant.ports import (
     AIAssistantPort,
+    AudioIntroContent,
     BookInfoPort,
     ClubCoachPort,
     ClubTopicsContent,
@@ -38,15 +44,21 @@ from app.domains.ai_assistant.ports import (
     ReflectionContent,
     ReflectionRepositoryPort,
     UsageLogRepositoryPort,
+    UserPreferencesPort,
     UserQueryPort,
 )
 
 FEATURE_PREP = "prep_card"
 FEATURE_REFLECTION = "reflection"
 FEATURE_TOPICS = "club_topics"
+FEATURE_AUDIO_INTRO = "audio_intro"
 
 PREP_DAILY_LIMIT = 5
 FREE_REFLECTION_MONTHLY_LIMIT = 1
+AUDIO_INTRO_FREE_DAILY_LIMIT = 1
+
+VALID_CARD_STYLES = ("motivational", "analytical", "reflective")
+DEFAULT_CARD_STYLE = "motivational"
 
 
 @dataclass(frozen=True, slots=True)
@@ -80,9 +92,11 @@ class AIAssistantService:
     users: UserQueryPort
     library: LibraryQueryPort
     clubs: ClubCoachPort
+    preferences: UserPreferencesPort
 
     async def get_prep_card(self, *, user_id: UUID, book_id: UUID) -> PrepCardContent:
-        cached = await self.prep_cache.get_prep(book_id)
+        style = await self._resolve_style(user_id)
+        cached = await self.prep_cache.get_prep(book_id, style)
         if cached is not None:
             return cached
 
@@ -100,9 +114,12 @@ class AIAssistantService:
             raise NotFoundError("book not found", code="BOOK_NOT_FOUND")
 
         content = await self.ai.generate_prep_card(
-            book_title=info.title, author=info.author, description=info.description
+            book_title=info.title,
+            author=info.author,
+            description=info.description,
+            style=style,
         )
-        await self.prep_cache.set_prep(book_id, content)
+        await self.prep_cache.set_prep(book_id, style, content)
         await self.usage.record(
             user_id=user_id,
             feature=FEATURE_PREP,
@@ -110,6 +127,56 @@ class AIAssistantService:
             tokens_used=content.tokens_used,
         )
         return content
+
+    async def get_card_style(self, *, user_id: UUID) -> str:
+        """Return the reader's prep-card style, defaulting when unset."""
+        return await self._resolve_style(user_id)
+
+    async def set_card_style(self, *, user_id: UUID, style: str) -> str:
+        """Persist the reader's prep-card style and echo it back."""
+        if style not in VALID_CARD_STYLES:
+            raise NotFoundError("unknown card style", code="INVALID_CARD_STYLE")
+        await self.preferences.upsert_prefs(user_id=user_id, style=style)
+        return style
+
+    async def get_audio_intro(self, *, user_id: UUID, book_id: UUID) -> AudioIntroContent:
+        """Generate a short spoken reading intro for *book_id*.
+
+        Free users get one generation per day (logged under
+        ``audio_intro`` in ``ai_usage_logs``); Pro users are unmetered. The
+        daily cap is checked before the Claude call so a rate-limited request
+        spends nothing.
+        """
+        if not await self.users.is_pro(user_id):
+            used_today = await self.usage.count_since(
+                user_id=user_id, feature=FEATURE_AUDIO_INTRO, since=_today_start()
+            )
+            if used_today >= AUDIO_INTRO_FREE_DAILY_LIMIT:
+                raise RateLimitedError(
+                    "오늘의 오디오 인트로를 모두 사용했어요. 내일 다시 시도해 주세요.",
+                    code="AUDIO_INTRO_DAILY_LIMIT",
+                )
+
+        info = await self.books.get_book_info(book_id)
+        if info is None:
+            raise NotFoundError("book not found", code="BOOK_NOT_FOUND")
+
+        content = await self.ai.generate_audio_intro(
+            book_title=info.title, author=info.author, description=info.description
+        )
+        await self.usage.record(
+            user_id=user_id,
+            feature=FEATURE_AUDIO_INTRO,
+            book_id=book_id,
+            tokens_used=content.tokens_used,
+        )
+        return content
+
+    async def _resolve_style(self, user_id: UUID) -> str:
+        stored = await self.preferences.get_prefs(user_id)
+        if stored in VALID_CARD_STYLES:
+            return stored
+        return DEFAULT_CARD_STYLE
 
     async def create_reflection(self, *, user_id: UUID, user_book_id: UUID) -> ReflectionContent:
         info = await self.library.get_reflection_input(user_id=user_id, user_book_id=user_book_id)

@@ -9,6 +9,7 @@ references the inputs so it is obviously a stub, never mistaken for real content
 from __future__ import annotations
 
 from app.domains.ai_assistant.ports import (
+    AudioIntroContent,
     ClubTopicsContent,
     NextBookRecommendation,
     PrepCardContent,
@@ -20,10 +21,10 @@ class StubClaudeAdapter:
     """Returns canned content; reports ``tokens_used=0`` so usage logs stay honest."""
 
     async def generate_prep_card(
-        self, *, book_title: str, author: str, description: str | None
+        self, *, book_title: str, author: str, description: str | None, style: str
     ) -> PrepCardContent:
         return PrepCardContent(
-            author_intro=f"《{book_title}》의 저자 {author} 소개 (샘플).",
+            author_intro=f"《{book_title}》의 저자 {author} 소개 ({style} 샘플).",
             theme_keywords=["성장", "관계", "선택"],
             prereading_questions=[
                 "이 책에서 가장 기대되는 부분은 무엇인가요?",
@@ -62,5 +63,16 @@ class StubClaudeAdapter:
                 "등장인물의 선택에 동의하나요? (샘플)",
                 "이번 주 범위의 핵심 메시지는? (샘플)",
             ],
+            tokens_used=0,
+        )
+
+    async def generate_audio_intro(
+        self, *, book_title: str, author: str, description: str | None
+    ) -> AudioIntroContent:
+        return AudioIntroContent(
+            script=(
+                f"안녕하세요. 오늘 함께 읽을 책은 {author}의 《{book_title}》입니다. "
+                "잠시 호흡을 가다듬고, 책장을 넘기며 떠오르는 생각에 귀 기울여 보세요. (샘플)"
+            ),
             tokens_used=0,
         )

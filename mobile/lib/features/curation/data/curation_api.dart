@@ -17,4 +17,13 @@ abstract class CurationApi {
   /// no cards have been generated yet.
   @GET('/books/{bookId}/curation-cards/first')
   Future<dynamic> getFirstCard(@Path('bookId') String bookId);
+
+  /// `POST /me/curation-cards/{cardId}/feedback`
+  ///
+  /// Records the reader's reaction (helpful / skip / dismiss). 204 No Content.
+  @POST('/me/curation-cards/{cardId}/feedback')
+  Future<void> postFeedback(
+    @Path('cardId') String cardId,
+    @Body() Map<String, dynamic> body,
+  );
 }

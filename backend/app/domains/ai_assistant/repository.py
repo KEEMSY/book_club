@@ -26,8 +26,10 @@ if TYPE_CHECKING:
     from app.domains.club.repository import ClubRepository
     from app.domains.club.service import ClubService
 
+from sqlalchemy.dialects.postgresql import insert as pg_insert
+
 from app.core.cache import get_redis
-from app.domains.ai_assistant.models import AIReflectionGuide, AIUsageLog
+from app.domains.ai_assistant.models import AIReflectionGuide, AIUsageLog, UserAiPreference
 from app.domains.ai_assistant.ports import (
     BookInfo,
     NextBookRecommendation,
@@ -44,20 +46,21 @@ _PREP_CACHE_TTL_SECONDS = 72 * 60 * 60
 _MAX_HIGHLIGHTS = 10
 
 
-def _prep_cache_key(book_id: UUID) -> str:
-    return f"ai_prep:{book_id}"
+def _prep_cache_key(book_id: UUID, style: str) -> str:
+    return f"ai_prep:{book_id}:{style}"
 
 
 class RedisPrepCache:
     """:class:`PrepCachePort` backed by the shared async Redis client (72h TTL).
 
-    Redis failures degrade to a cache miss / silent skip so an outage never
-    blocks generation (matching ``core.cache`` semantics).
+    Keyed by ``(book_id, style)`` so per-user persona personalization stays
+    correct (M67). Redis failures degrade to a cache miss / silent skip so an
+    outage never blocks generation (matching ``core.cache`` semantics).
     """
 
-    async def get_prep(self, book_id: UUID) -> PrepCardContent | None:
+    async def get_prep(self, book_id: UUID, style: str) -> PrepCardContent | None:
         try:
-            raw = await get_redis().get(_prep_cache_key(book_id))
+            raw = await get_redis().get(_prep_cache_key(book_id, style))
         except Exception:
             logger.warning("ai_prep cache_read_error book=%s", book_id, exc_info=True)
             return None
@@ -71,7 +74,7 @@ class RedisPrepCache:
             tokens_used=data.get("tokens_used", 0),
         )
 
-    async def set_prep(self, book_id: UUID, content: PrepCardContent) -> None:
+    async def set_prep(self, book_id: UUID, style: str, content: PrepCardContent) -> None:
         payload = json.dumps(
             {
                 "author_intro": content.author_intro,
@@ -81,9 +84,36 @@ class RedisPrepCache:
             }
         )
         try:
-            await get_redis().set(_prep_cache_key(book_id), payload, ex=_PREP_CACHE_TTL_SECONDS)
+            await get_redis().set(
+                _prep_cache_key(book_id, style), payload, ex=_PREP_CACHE_TTL_SECONDS
+            )
         except Exception:
             logger.warning("ai_prep cache_write_error book=%s", book_id, exc_info=True)
+
+
+class UserAiPreferencesRepository:
+    """:class:`UserPreferencesPort` over ``user_ai_preferences``."""
+
+    def __init__(self, session: AsyncSession) -> None:
+        self._session = session
+
+    async def get_prefs(self, user_id: UUID) -> str | None:
+        style: str | None = await self._session.scalar(
+            select(UserAiPreference.card_style).where(UserAiPreference.user_id == user_id)
+        )
+        return style
+
+    async def upsert_prefs(self, *, user_id: UUID, style: str) -> None:
+        stmt = (
+            pg_insert(UserAiPreference)
+            .values(user_id=user_id, card_style=style, updated_at=func.now())
+            .on_conflict_do_update(
+                index_elements=[UserAiPreference.user_id],
+                set_={"card_style": style, "updated_at": func.now()},
+            )
+        )
+        await self._session.execute(stmt)
+        await self._session.flush()
 
 
 class AIReflectionRepository:

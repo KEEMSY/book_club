@@ -62,3 +62,27 @@ Map<String, dynamic> _$AiUsageToJson(_AiUsage instance) => <String, dynamic>{
       'reflection': instance.reflection,
       'club_topics': instance.clubTopics,
     };
+
+_AiPreferences _$AiPreferencesFromJson(Map<String, dynamic> json) =>
+    _AiPreferences(
+      cardStyle: json['card_style'] as String,
+    );
+
+Map<String, dynamic> _$AiPreferencesToJson(_AiPreferences instance) =>
+    <String, dynamic>{
+      'card_style': instance.cardStyle,
+    };
+
+_AiAudioIntro _$AiAudioIntroFromJson(Map<String, dynamic> json) =>
+    _AiAudioIntro(
+      script: json['script'] as String,
+      bookId: json['book_id'] as String,
+      tokensUsed: (json['tokens_used'] as num?)?.toInt() ?? 0,
+    );
+
+Map<String, dynamic> _$AiAudioIntroToJson(_AiAudioIntro instance) =>
+    <String, dynamic>{
+      'script': instance.script,
+      'book_id': instance.bookId,
+      'tokens_used': instance.tokensUsed,
+    };

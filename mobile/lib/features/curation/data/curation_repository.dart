@@ -44,6 +44,18 @@ class CurationRepository {
     }
   }
 
+  /// Records the reader's reaction to a curation card. Fire-and-forget from the
+  /// UI's perspective — a 404 (card gone) is swallowed so a stale sheet never
+  /// surfaces an error for a tap that no longer matters.
+  Future<void> postFeedback(String cardId, String action) async {
+    try {
+      await _api.postFeedback(cardId, <String, dynamic>{'action': action});
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) return;
+      throw _fromDio(e);
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // Helpers
   // ---------------------------------------------------------------------------

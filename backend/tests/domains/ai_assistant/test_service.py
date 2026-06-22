@@ -21,6 +21,9 @@ from app.domains.ai_assistant.ports import (
     ReflectionInput,
 )
 from app.domains.ai_assistant.service import (
+    AUDIO_INTRO_FREE_DAILY_LIMIT,
+    DEFAULT_CARD_STYLE,
+    FEATURE_AUDIO_INTRO,
     FEATURE_PREP,
     FEATURE_REFLECTION,
     PREP_DAILY_LIMIT,
@@ -46,13 +49,26 @@ class CountingStub(StubClaudeAdapter):
 
 class FakePrepCache:
     def __init__(self) -> None:
+        # Keyed by book_id only; the style param is accepted but the test fakes
+        # never exercise two styles for one book, so collapsing the key is safe.
         self.store: dict[UUID, PrepCardContent] = {}
 
-    async def get_prep(self, book_id: UUID) -> PrepCardContent | None:
+    async def get_prep(self, book_id: UUID, style: str) -> PrepCardContent | None:
         return self.store.get(book_id)
 
-    async def set_prep(self, book_id: UUID, content: PrepCardContent) -> None:
+    async def set_prep(self, book_id: UUID, style: str, content: PrepCardContent) -> None:
         self.store[book_id] = content
+
+
+class FakePreferences:
+    def __init__(self, styles: dict[UUID, str] | None = None) -> None:
+        self.styles: dict[UUID, str] = styles or {}
+
+    async def get_prefs(self, user_id: UUID) -> str | None:
+        return self.styles.get(user_id)
+
+    async def upsert_prefs(self, *, user_id: UUID, style: str) -> None:
+        self.styles[user_id] = style
 
 
 class FakeUsageLog:
@@ -143,6 +159,7 @@ def _make_service(
         "users": FakeUsers(pro or set()),
         "library": FakeLibrary(),
         "clubs": FakeClubCoach(),
+        "preferences": FakePreferences(),
     }
     service = AIAssistantService(**deps)  # type: ignore[arg-type]
     return service, deps
@@ -297,3 +314,110 @@ async def test_club_topics_pro_non_owner_blocked() -> None:
     with pytest.raises(PermissionDeniedError) as exc:
         await service.get_club_topics(user_id=user_id, club_id=uuid4(), page_start=1, page_end=50)
     assert exc.value.code == "NOT_CLUB_OWNER"
+
+
+# ---------------------------------------------------------------------------
+# M67 — prep card style personalization
+# ---------------------------------------------------------------------------
+
+
+async def test_card_style_defaults_when_unset() -> None:
+    service, _ = _make_service()
+    assert await service.get_card_style(user_id=uuid4()) == DEFAULT_CARD_STYLE
+
+
+async def test_set_and_get_card_style_round_trips() -> None:
+    user_id = uuid4()
+    service, _ = _make_service()
+
+    returned = await service.set_card_style(user_id=user_id, style="analytical")
+
+    assert returned == "analytical"
+    assert await service.get_card_style(user_id=user_id) == "analytical"
+
+
+async def test_set_invalid_card_style_raises() -> None:
+    service, _ = _make_service()
+    with pytest.raises(NotFoundError) as exc:
+        await service.set_card_style(user_id=uuid4(), style="snarky")
+    assert exc.value.code == "INVALID_CARD_STYLE"
+
+
+async def test_prep_card_passes_stored_style_to_adapter() -> None:
+    book_id = uuid4()
+    user_id = uuid4()
+
+    captured: dict[str, object] = {}
+
+    class StyleCapturingStub(StubClaudeAdapter):
+        async def generate_prep_card(self, **kwargs: object) -> PrepCardContent:  # type: ignore[override]
+            captured.update(kwargs)
+            return await super().generate_prep_card(**kwargs)  # type: ignore[arg-type]
+
+    service, deps = _make_service(
+        ai=StyleCapturingStub(),
+        books={book_id: BookInfo(title="데미안", author="헤세", description=None)},
+    )
+    await deps["preferences"].upsert_prefs(user_id=user_id, style="reflective")  # type: ignore[attr-defined]
+
+    await service.get_prep_card(user_id=user_id, book_id=book_id)
+
+    assert captured["style"] == "reflective"
+
+
+# ---------------------------------------------------------------------------
+# M67 — audio intro
+# ---------------------------------------------------------------------------
+
+
+async def test_audio_intro_free_user_first_call_succeeds() -> None:
+    book_id = uuid4()
+    user_id = uuid4()
+    service, deps = _make_service(
+        books={book_id: BookInfo(title="데미안", author="헤세", description=None)}
+    )
+
+    result = await service.get_audio_intro(user_id=user_id, book_id=book_id)
+
+    assert result.script
+    # one usage row logged under the audio_intro feature
+    assert len(deps["usage"].records) == 1  # type: ignore[attr-defined]
+
+
+async def test_audio_intro_free_user_blocked_after_daily_limit() -> None:
+    book_id = uuid4()
+    user_id = uuid4()
+    service, deps = _make_service(
+        books={book_id: BookInfo(title="데미안", author="헤세", description=None)}
+    )
+    for _ in range(AUDIO_INTRO_FREE_DAILY_LIMIT):
+        await deps["usage"].record(  # type: ignore[attr-defined]
+            user_id=user_id, feature=FEATURE_AUDIO_INTRO, book_id=book_id, tokens_used=0
+        )
+
+    with pytest.raises(RateLimitedError) as exc:
+        await service.get_audio_intro(user_id=user_id, book_id=book_id)
+    assert exc.value.code == "AUDIO_INTRO_DAILY_LIMIT"
+
+
+async def test_audio_intro_pro_user_unmetered() -> None:
+    book_id = uuid4()
+    user_id = uuid4()
+    service, deps = _make_service(
+        books={book_id: BookInfo(title="데미안", author="헤세", description=None)},
+        pro={user_id},
+    )
+    # prior usage that would block a free user
+    await deps["usage"].record(  # type: ignore[attr-defined]
+        user_id=user_id, feature=FEATURE_AUDIO_INTRO, book_id=book_id, tokens_used=0
+    )
+
+    result = await service.get_audio_intro(user_id=user_id, book_id=book_id)
+
+    assert result.script
+
+
+async def test_audio_intro_missing_book_raises_not_found() -> None:
+    service, _ = _make_service(books={})
+    with pytest.raises(NotFoundError):
+        await service.get_audio_intro(user_id=uuid4(), book_id=uuid4())

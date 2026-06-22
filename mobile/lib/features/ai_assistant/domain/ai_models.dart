@@ -56,3 +56,29 @@ abstract class AiUsage with _$AiUsage {
   factory AiUsage.fromJson(Map<String, dynamic> json) =>
       _$AiUsageFromJson(json);
 }
+
+/// Reader's prep-card persona style from `GET/PATCH /me/ai-preferences`.
+///
+/// Known [cardStyle] values: `motivational`, `analytical`, `reflective`.
+@freezed
+abstract class AiPreferences with _$AiPreferences {
+  const factory AiPreferences({
+    required String cardStyle,
+  }) = _AiPreferences;
+
+  factory AiPreferences.fromJson(Map<String, dynamic> json) =>
+      _$AiPreferencesFromJson(json);
+}
+
+/// Spoken reading intro from `POST /books/{id}/ai-audio-intro`.
+@freezed
+abstract class AiAudioIntro with _$AiAudioIntro {
+  const factory AiAudioIntro({
+    required String script,
+    required String bookId,
+    @Default(0) int tokensUsed,
+  }) = _AiAudioIntro;
+
+  factory AiAudioIntro.fromJson(Map<String, dynamic> json) =>
+      _$AiAudioIntroFromJson(json);
+}
