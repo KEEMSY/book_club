@@ -45,6 +45,35 @@ class PromoResponse(BaseModel):
     valid_until: datetime
 
 
+class ApplyCouponRequest(BaseModel):
+    """Body for ``POST /subscriptions/coupons/apply``."""
+
+    code: str
+
+
+class ApplyCouponResponse(BaseModel):
+    """Result of redeeming a coupon — the discount the client should apply."""
+
+    discount_pct: int
+    valid_days: int
+
+
+class CreateCouponRequest(BaseModel):
+    """Body for the admin ``POST /admin/coupons`` endpoint."""
+
+    code: str
+    discount_pct: int
+    valid_days: int = 30
+
+
+class CouponResponse(BaseModel):
+    """A discount coupon, as returned by the admin create endpoint."""
+
+    code: str
+    discount_pct: int
+    valid_days: int
+
+
 class RevenueCatWebhookBody(BaseModel):
     """Minimal representation of a RevenueCat webhook payload.
 

@@ -7,10 +7,16 @@ from datetime import UTC, datetime
 from typing import Protocol
 from uuid import UUID
 
-from app.core.exceptions import ConflictError
+from app.core.exceptions import ConflictError, NotFoundError
 from app.domains.subscription.ports import PurchaseVerifierPort
-from app.domains.subscription.repository import PromoRepository, SubscriptionRepository
+from app.domains.subscription.repository import (
+    CouponRepository,
+    PromoRepository,
+    SubscriptionRepository,
+)
 from app.domains.subscription.schemas import (
+    ApplyCouponResponse,
+    CouponResponse,
     PromoResponse,
     SubscriptionStatus,
     SubscriptionVerifyResponse,
@@ -167,4 +173,36 @@ class PromoService:
             promo_code=promo.promo_code,
             discount_pct=promo.discount_pct,
             valid_until=promo.valid_until,
+        )
+
+
+@dataclass(slots=True)
+class CouponService:
+    """Redeems and issues single-use discount coupons (M70)."""
+
+    repo: CouponRepository
+
+    async def apply_coupon(self, *, user_id: UUID, code: str) -> ApplyCouponResponse:
+        """Redeem a coupon for the user, marking it used.
+
+        The redeemed discount is returned for the client to apply at the next
+        purchase; this MVP only records the redemption (no price mutation here).
+        """
+        coupon = await self.repo.get_by_code(code)
+        if coupon is None:
+            raise NotFoundError("쿠폰을 찾을 수 없어요.", code="COUPON_NOT_FOUND")
+        if coupon.used_by is not None:
+            raise ConflictError("이미 사용된 쿠폰이에요.", code="COUPON_ALREADY_USED")
+        await self.repo.mark_used(code=code, user_id=user_id, used_at=datetime.now(tz=UTC))
+        return ApplyCouponResponse(discount_pct=coupon.discount_pct, valid_days=coupon.valid_days)
+
+    async def create_coupon(
+        self, *, code: str, discount_pct: int, valid_days: int
+    ) -> CouponResponse:
+        """Create a new coupon (admin). Rejects a duplicate code."""
+        if await self.repo.get_by_code(code) is not None:
+            raise ConflictError("이미 존재하는 쿠폰 코드예요.", code="COUPON_EXISTS")
+        coupon = await self.repo.create(code=code, discount_pct=discount_pct, valid_days=valid_days)
+        return CouponResponse(
+            code=coupon.code, discount_pct=coupon.discount_pct, valid_days=coupon.valid_days
         )

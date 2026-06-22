@@ -52,6 +52,28 @@ class SubscriptionPromo(Base):
     )
 
 
+class DiscountCoupon(Base):
+    """A single-use discount code (M70 re-engagement campaign).
+
+    ``code`` is the natural primary key. ``used_by`` / ``used_at`` are NULL
+    until redeemed; redemption marks both. The D+7 expiry batch issues
+    ``REJOIN_*`` codes here before pushing them to lapsed users.
+    """
+
+    __tablename__ = "discount_coupons"
+
+    code: Mapped[str] = mapped_column(String(32), primary_key=True)
+    discount_pct: Mapped[int] = mapped_column(Integer, nullable=False)
+    valid_days: Mapped[int] = mapped_column(Integer, nullable=False, server_default="30")
+    used_by: Mapped[uuid.UUID | None] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("users.id"), nullable=True
+    )
+    used_at: Mapped[datetime | None] = mapped_column(PGTIMESTAMP(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        PGTIMESTAMP(timezone=True), nullable=False, server_default=func.now()
+    )
+
+
 class SubscriptionEvent(Base):
     """A single paywall/subscription lifecycle event for funnel analytics."""
 

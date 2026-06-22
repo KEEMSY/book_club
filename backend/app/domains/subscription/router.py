@@ -20,19 +20,24 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
 
-from app.core.deps import get_current_user_id
+from app.core.deps import get_current_admin_id, get_current_user_id
 from app.domains.subscription.providers import (
+    get_coupon_service,
     get_promo_service,
     get_subscription_service,
 )
 from app.domains.subscription.schemas import (
+    ApplyCouponRequest,
+    ApplyCouponResponse,
+    CouponResponse,
+    CreateCouponRequest,
     PromoResponse,
     RevenueCatWebhookBody,
     SubscriptionStatus,
     SubscriptionVerifyResponse,
     VerifyReceiptRequest,
 )
-from app.domains.subscription.service import PromoService, SubscriptionService
+from app.domains.subscription.service import CouponService, PromoService, SubscriptionService
 
 logger = logging.getLogger(__name__)
 
@@ -68,6 +73,28 @@ async def verify_subscription(
 ) -> SubscriptionVerifyResponse:
     """Verify a purchase receipt and activate Pro for the authenticated user."""
     return await service.verify_and_activate(user_id=UUID(user_id), req=body)
+
+
+@router.post("/subscriptions/coupons/apply", response_model=ApplyCouponResponse)
+async def apply_coupon(
+    body: ApplyCouponRequest,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[CouponService, Depends(get_coupon_service)],
+) -> ApplyCouponResponse:
+    """Redeem a single-use discount coupon for the authenticated user."""
+    return await service.apply_coupon(user_id=UUID(user_id), code=body.code)
+
+
+@router.post("/admin/coupons", response_model=CouponResponse, status_code=status.HTTP_201_CREATED)
+async def create_coupon(
+    body: CreateCouponRequest,
+    _: Annotated[str, Depends(get_current_admin_id)],
+    service: Annotated[CouponService, Depends(get_coupon_service)],
+) -> CouponResponse:
+    """Create a discount coupon (admin only)."""
+    return await service.create_coupon(
+        code=body.code, discount_pct=body.discount_pct, valid_days=body.valid_days
+    )
 
 
 @router.post(
@@ -133,9 +160,7 @@ async def revenuecat_webhook(
     try:
         user_uuid = UUID(app_user_id)
     except ValueError:
-        logger.warning(
-            "revenuecat_webhook invalid app_user_id=%s — ignoring", app_user_id
-        )
+        logger.warning("revenuecat_webhook invalid app_user_id=%s — ignoring", app_user_id)
         return {"status": "ignored", "reason": "invalid_app_user_id"}
 
     await service.apply_webhook_event(

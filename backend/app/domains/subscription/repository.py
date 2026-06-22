@@ -15,7 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import NotFoundError
 from app.domains.auth.models import User
-from app.domains.subscription.models import SubscriptionPromo
+from app.domains.subscription.models import DiscountCoupon, SubscriptionPromo
 
 
 @dataclass(slots=True)
@@ -30,9 +30,7 @@ class SubscriptionRepository:
         Raises ``NotFoundError`` when the user does not exist.
         """
         result = await self.session.execute(
-            select(User.is_pro, User.pro_expires_at, User.pro_product_id).where(
-                User.id == user_id
-            )
+            select(User.is_pro, User.pro_expires_at, User.pro_product_id).where(User.id == user_id)
         )
         row = result.one_or_none()
         if row is None:
@@ -89,3 +87,26 @@ class PromoRepository:
             .limit(1)
         )
         return result.scalar_one_or_none()
+
+
+@dataclass(slots=True)
+class CouponRepository:
+    """Persistence for single-use discount coupons (M70)."""
+
+    session: AsyncSession
+
+    async def get_by_code(self, code: str) -> DiscountCoupon | None:
+        return await self.session.get(DiscountCoupon, code)
+
+    async def create(self, *, code: str, discount_pct: int, valid_days: int) -> DiscountCoupon:
+        coupon = DiscountCoupon(code=code, discount_pct=discount_pct, valid_days=valid_days)
+        self.session.add(coupon)
+        await self.session.flush()
+        return coupon
+
+    async def mark_used(self, *, code: str, user_id: UUID, used_at: datetime) -> None:
+        coupon = await self.session.get(DiscountCoupon, code)
+        if coupon is not None:
+            coupon.used_by = user_id
+            coupon.used_at = used_at
+            await self.session.flush()

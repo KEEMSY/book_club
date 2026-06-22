@@ -22,8 +22,10 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from app.domains.notification.models import Notification, NotificationType
 from app.domains.notification.ports import (
     ActiveUserQueryPort,
+    CouponIssuePort,
     DailyStatQueryPort,
     DeviceTokenQueryPort,
+    LapsedTrialQueryPort,
     PushPort,
     SessionQueryPort,
     TrialExpiryQueryPort,
@@ -45,6 +47,12 @@ _GRADE_NAMES = {
 # Roman numerals for tier display in push notification copy.
 _TIER_ROMAN = {1: "I", 2: "II", 3: "III"}
 
+# M70 re-engagement campaign: target the cohort whose trial lapsed this many
+# days ago and offer this discount for this many days.
+_REENGAGE_AFTER_DAYS = 7
+_REENGAGE_DISCOUNT_PCT = 20
+_REENGAGE_VALID_DAYS = 30
+
 
 @dataclass(slots=True)
 class NotificationService:
@@ -65,6 +73,10 @@ class NotificationService:
     # absent, ``send_expiry_reminders`` is a no-op (e.g. unit tests that don't
     # exercise the reminder path).
     trial_expiry: TrialExpiryQueryPort | None = None
+    # Optional (M70): the D+7 re-engagement leg of the expiry batch. Both must
+    # be wired for the leg to run; absent, only the D-1 reminders are sent.
+    lapsed_trial: LapsedTrialQueryPort | None = None
+    coupon_issuer: CouponIssuePort | None = None
 
     async def on_reaction_added(self, event: object) -> None:
         """Create an in-app notification and push when a reaction is added.
@@ -458,10 +470,55 @@ class NotificationService:
                     user_id=user_id, trial_ends_at=trial_ends_at
                 )
             except Exception:
-                logger.exception(
-                    "trial_expiry_reminder_failed user_id=%s", user_id
-                )
+                logger.exception("trial_expiry_reminder_failed user_id=%s", user_id)
         logger.info("trial_expiry_reminder_batch finished users=%d", len(users))
+
+        await self.send_reengagement_coupons()
+
+    async def send_reengagement_coupons(self) -> None:
+        """Issue a discount coupon and push it to D+7 lapsed-trial users (M70).
+
+        Each lapsed user gets a deterministic ``REJOIN_*`` coupon (20% off,
+        30-day validity) created before the push. No-op unless both the lapsed
+        query and coupon-issue ports are wired. Per-user failures are logged and
+        skipped so one bad token cannot abort the batch.
+        """
+        if self.lapsed_trial is None or self.coupon_issuer is None:
+            return
+
+        users = await self.lapsed_trial.get_users_with_trial_expired_around(_REENGAGE_AFTER_DAYS)
+        logger.info("reengagement_coupon_batch started users=%d", len(users))
+        for user_id in users:
+            try:
+                code = f"REJOIN_{str(user_id)[:8].upper()}"
+                await self.coupon_issuer.issue_coupon(
+                    code=code,
+                    discount_pct=_REENGAGE_DISCOUNT_PCT,
+                    valid_days=_REENGAGE_VALID_DAYS,
+                )
+                await self.send_rejoin_push(user_id=user_id, coupon_code=code)
+            except Exception:
+                logger.exception("reengagement_coupon_failed user_id=%s", user_id)
+        logger.info("reengagement_coupon_batch finished users=%d", len(users))
+
+    async def send_rejoin_push(self, *, user_id: UUID, coupon_code: str) -> None:
+        """Push a re-engagement discount coupon to a lapsed user (M70)."""
+        title = "다시 만나요! 20% 할인 쿠폰이 도착했어요 🎁"
+        body = f"쿠폰 {coupon_code} 으로 Pro를 20% 할인가에 다시 시작해 보세요. (30일 이내)"
+        async with self.sessionmaker() as session:
+            await self._save_notification(
+                session,
+                user_id=user_id,
+                ntype=NotificationType.SUBSCRIPTION_REMINDER,
+                title=title,
+                body=body,
+                data={"coupon_code": coupon_code},
+            )
+            tokens = await self.device_tokens.get_active_tokens(user_id)
+            await session.commit()
+
+        if tokens:
+            await self.push.send_to_tokens(tokens, title, body, {"coupon_code": coupon_code})
 
     @staticmethod
     async def _save_notification(

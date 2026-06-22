@@ -28,6 +28,7 @@ from app.domains.notification.repository import NotificationRepository, WeeklyRe
 from app.domains.notification.service import NotificationService
 from app.domains.notification.service_router import NotificationRouterService
 from app.domains.reading.models import DailyReadingStat, ReadingSession, ReadingSessionSource
+from app.domains.subscription.repository import CouponRepository
 
 # ---------------------------------------------------------------------------
 # Cross-domain query adapters
@@ -207,6 +208,31 @@ def get_notification_service() -> NotificationService:
                 result = await s.execute(stmt)
                 return [(row[0], row[1]) for row in result.all()]
 
+    class _BatchLapsedTrialAdapter:
+        async def get_users_with_trial_expired_around(self, days_ago: int) -> list[UUID]:
+            async with sessionmaker() as s:
+                now = datetime.now(tz=UTC)
+                window_end = now - timedelta(days=days_ago)
+                window_start = window_end - timedelta(days=1)
+                stmt = select(User.id).where(
+                    User.deleted_at.is_(None),
+                    User.is_pro.is_(False),
+                    User.trial_ends_at.isnot(None),
+                    User.trial_ends_at >= window_start,
+                    User.trial_ends_at < window_end,
+                )
+                result = await s.execute(stmt)
+                return list(result.scalars().all())
+
+    class _BatchCouponIssueAdapter:
+        async def issue_coupon(self, *, code: str, discount_pct: int, valid_days: int) -> None:
+            async with sessionmaker() as s:
+                repo = CouponRepository(s)
+                if await repo.get_by_code(code) is not None:
+                    return
+                await repo.create(code=code, discount_pct=discount_pct, valid_days=valid_days)
+                await s.commit()
+
     return NotificationService(
         sessionmaker=sessionmaker,
         push=get_push_port(),
@@ -215,6 +241,8 @@ def get_notification_service() -> NotificationService:
         session_query=_BatchSessionAdapter(),
         active_users=_BatchActiveUserAdapter(),
         trial_expiry=_BatchTrialExpiryAdapter(),
+        lapsed_trial=_BatchLapsedTrialAdapter(),
+        coupon_issuer=_BatchCouponIssueAdapter(),
     )
 
 

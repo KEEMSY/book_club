@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../application/monetization_providers.dart';
@@ -77,6 +78,23 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
   // Annual is preselected — it carries the "가장 인기" badge and best value.
   _PaywallPlan _plan = _PaywallPlan.annual;
   bool _loading = false;
+
+  /// Opens the user's mail client to inquire about a B2B team plan. On a device
+  /// without a mail client the failure is surfaced as a snackbar.
+  Future<void> _inquireTeamPlan() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final uri = Uri(
+      scheme: 'mailto',
+      path: 'team@bookclub.app',
+      queryParameters: const {'subject': 'Book Club 팀 플랜 문의'},
+    );
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!launched && mounted) {
+      messenger.showSnackBar(
+        const SnackBar(content: Text('메일 앱을 열 수 없어요. team@bookclub.app 으로 문의해 주세요.')),
+      );
+    }
+  }
 
   Future<void> _onSubscribe() async {
     setState(() => _loading = true);
@@ -201,6 +219,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                     const _BenefitTile(text: '클럽 최대 3개 운영'),
                     const _BenefitTile(text: '고급 독서 통계'),
                     const _BenefitTile(text: '광고 없는 경험'),
+                    SizedBox(height: spacing.lg),
+                    _TeamPlanCard(spacing: spacing, onInquire: _inquireTeamPlan),
                   ],
                 ),
               ),
@@ -457,6 +477,68 @@ class _BenefitTile extends StatelessWidget {
             child: Text(
               text,
               style: theme.textTheme.bodyLarge,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Team plan (B2B) inquiry card — M70
+// ---------------------------------------------------------------------------
+
+class _TeamPlanCard extends StatelessWidget {
+  const _TeamPlanCard({required this.spacing, required this.onInquire});
+
+  final AppSpacing spacing;
+  final Future<void> Function() onInquire;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: EdgeInsets.all(spacing.lg),
+      decoration: BoxDecoration(
+        color: _kProPurple.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: _kProPurple.withValues(alpha: 0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.groups_rounded, color: _kProPurple, size: 22),
+              const SizedBox(width: 8),
+              Text(
+                '팀 플랜',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: _kProPurple,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: spacing.sm),
+          Text(
+            '기업·독서 모임을 위한 팀 플랜 — 10석 기준 연간 1,188,000원 (월 99,000원). '
+            '멤버 전원이 Pro 혜택을 누립니다.',
+            style: theme.textTheme.bodyMedium,
+          ),
+          SizedBox(height: spacing.md),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: onInquire,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: _kProPurple,
+                side: const BorderSide(color: _kProPurple),
+                padding: EdgeInsets.symmetric(vertical: spacing.sm),
+              ),
+              icon: const Icon(Icons.mail_outline_rounded, size: 18),
+              label: const Text('문의하기'),
             ),
           ),
         ],

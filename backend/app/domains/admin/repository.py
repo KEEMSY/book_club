@@ -7,6 +7,7 @@ database — no business logic, no external HTTP.
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 from uuid import UUID
 
 from sqlalchemy import func, or_, select, update
@@ -15,6 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.domains.auth.models import User
 from app.domains.reading.models import ReadingSession
 from app.domains.subscription.models import SubscriptionEvent
+from app.domains.team.models import TeamSubscription
 
 
 class AdminRepository:
@@ -100,6 +102,34 @@ class AdminRepository:
         result = await self._session.execute(stmt)
         return {row[0]: row[1] for row in result.all()}
 
+    async def sum_active_team_seats(self) -> int:
+        """Total seats across team plans whose validity window covers now (M70)."""
+        now = datetime.now(tz=UTC)
+        stmt = select(func.coalesce(func.sum(TeamSubscription.seat_count), 0)).where(
+            TeamSubscription.valid_from <= now,
+            TeamSubscription.valid_until > now,
+        )
+        result = await self._session.execute(stmt)
+        return result.scalar_one() or 0
+
+    async def monthly_subscription_revenue(self, *, since: datetime) -> dict[str, Decimal]:
+        """Sum ``subscription``-event revenue grouped by ``YYYY-MM`` since ``since`` (M70).
+
+        The subscription-event log is the only historical revenue signal; months
+        with no events are simply absent here and zero-filled by the service.
+        """
+        month = func.to_char(func.date_trunc("month", SubscriptionEvent.created_at), "YYYY-MM")
+        stmt = (
+            select(month, func.coalesce(func.sum(SubscriptionEvent.revenue_amount), 0))
+            .where(
+                SubscriptionEvent.event_type == "subscription",
+                SubscriptionEvent.created_at >= since,
+            )
+            .group_by(month)
+        )
+        result = await self._session.execute(stmt)
+        return {row[0]: Decimal(row[1]) for row in result.all()}
+
     # ------------------------------------------------------------------
     # User management
     # ------------------------------------------------------------------
@@ -109,9 +139,7 @@ class AdminRepository:
         stmt = select(func.count(User.id)).where(User.deleted_at.is_(None))
         if search:
             pattern = f"%{search}%"
-            stmt = stmt.where(
-                or_(User.nickname.ilike(pattern), User.email.ilike(pattern))
-            )
+            stmt = stmt.where(or_(User.nickname.ilike(pattern), User.email.ilike(pattern)))
         result = await self._session.execute(stmt)
         return result.scalar_one() or 0
 
@@ -133,9 +161,7 @@ class AdminRepository:
         )
         if search:
             pattern = f"%{search}%"
-            stmt = stmt.where(
-                or_(User.nickname.ilike(pattern), User.email.ilike(pattern))
-            )
+            stmt = stmt.where(or_(User.nickname.ilike(pattern), User.email.ilike(pattern)))
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 

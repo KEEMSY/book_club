@@ -38,8 +38,17 @@ class ConversionFunnelResponse(BaseModel):
     """subscriptions / paywall_views, in [0, 1]; 0.0 when there are no views."""
 
 
+class MonthlyMrrPoint(BaseModel):
+    """One month of the MRR trend series (M70)."""
+
+    month: str
+    """Calendar month as ``YYYY-MM``."""
+
+    mrr: float
+
+
 class RevenueMetricsResponse(BaseModel):
-    """Recurring-revenue snapshot derived from active subscribers (M65)."""
+    """Recurring-revenue snapshot derived from active subscribers (M65, M70)."""
 
     mrr: float
     """Monthly recurring revenue (KRW), summed from active subscribers' plans."""
@@ -50,6 +59,12 @@ class RevenueMetricsResponse(BaseModel):
     active_subscribers: int
     churned_30d: int
     """Churn events recorded in the last 30 days."""
+
+    team_mrr: float
+    """MRR (KRW) from active B2B team plans (M70)."""
+
+    monthly_trend: list[MonthlyMrrPoint]
+    """Last 6 months of MRR, oldest first (M70)."""
 
 
 class UserAdminItem(BaseModel):

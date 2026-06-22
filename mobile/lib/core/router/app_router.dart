@@ -42,6 +42,7 @@ import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/onboarding/presentation/privacy_policy_screen.dart';
 import '../../features/search/presentation/unified_search_screen.dart';
 import '../../features/subscription/presentation/paywall_screen.dart';
+import '../../features/subscription/presentation/team_admin_screen.dart';
 import '../../features/reading/application/recap_notifier.dart';
 import '../../features/reading/domain/reading_goal.dart';
 import '../../features/reading/presentation/dashboard_screen.dart';
@@ -167,6 +168,9 @@ class AppRoutes {
 
   // M68 — reading-club video call (Pro club owner).
   static String clubVideo(String clubId) => '/clubs/$clubId/video';
+
+  // M70 — B2B team-plan admin console.
+  static String teamAdmin(String teamId) => '/teams/$teamId';
 }
 
 /// Adapter that bridges a Riverpod [ValueNotifier]-free state stream into a
@@ -388,6 +392,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final String eventId = state.pathParameters['eventId']!;
           return EventDetailScreen(eventId: eventId);
+        },
+      ),
+      // M70 — B2B team-plan admin console.
+      GoRoute(
+        path: '/teams/:id',
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) {
+          final String teamId = state.pathParameters['id']!;
+          return TeamAdminScreen(teamId: teamId);
         },
       ),
       // M29 — chapter-gated room list; Club object passed via extra.

@@ -114,3 +114,22 @@ class TrialExpiryQueryPort(Protocol):
     # Returns (user_id, trial_ends_at) for non-deleted, non-Pro users whose
     # trial_ends_at falls between now and now + ``hours``. Excludes users who
     # already converted to Pro.
+
+
+class LapsedTrialQueryPort(Protocol):
+    """Cross-domain query: users whose trial lapsed ~N days ago without converting."""
+
+    async def get_users_with_trial_expired_around(self, days_ago: int) -> list[UUID]: ...
+
+    # Returns user ids of non-deleted, non-Pro users whose trial_ends_at fell in
+    # the one-day window ending ``days_ago`` days before now (the D+7 cohort).
+
+
+class CouponIssuePort(Protocol):
+    """Cross-domain write: issue a re-engagement discount coupon.
+
+    Implemented over the subscription domain's coupon repository. Idempotent —
+    re-issuing an existing code is a no-op so a daily batch never duplicates.
+    """
+
+    async def issue_coupon(self, *, code: str, discount_pct: int, valid_days: int) -> None: ...
