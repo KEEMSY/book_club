@@ -13,6 +13,27 @@
 
 ## Phase 전환 리뷰 기록
 
+### Phase 15 → Phase 16 전환 리뷰 (2026-06-24)
+
+- 리뷰 문서: `docs/plans/2026-06-24-phase16.md`
+
+**Phase 15 완료 확인**: M66(공개 출시 안정화) + M67(AI 개인화 심화) + M68(커뮤니티 2단계) + M69(검색·발견 고도화) + M70(B2B 수익화) 전부 완료. 태그 `v1.2.0`.
+
+**Phase 15 보류 항목 처리**:
+- **편입 (M71)**: (infra) Agora RTC 실 연동 — M68 스텁(AgoraStubAdapter) → 실 Agora SDK 교체
+- **편입 (M71)**: (community) 카카오맵 SDK 실 연동 — M64/M68 지도뷰 플레이스홀더 → kakao_map_plugin 교체
+- **보류 유지 (Phase 17)**: (audio) 실 오디오 코칭 심화(ElevenLabs TTS) — M67 flutter_tts MVP 반응 데이터 3개월 수집 후 결정
+- **보류 유지 (Phase 17)**: (discovery) 딥러닝 추천 — MAU 1만 미달 시 Phase 17 재검토
+- **보류 유지 (Phase 17)**: (social) 인플루언서 독서 챌린지 파트너십 — 마케팅 예산 확정 후
+
+**신규 편입 (Phase 16)**:
+- **편입 (M72)**: (i18n) 국제화 인프라 — flutter_localizations, ARB 파일, 영어·일본어 1차 번역, 백엔드 Accept-Language 처리
+- **편입 (M73)**: (web) Flutter Web MVP — 웹 빌드 파이프라인, 반응형 레이아웃, PWA manifest, GitHub Pages 스테이징
+- **편입 (M74)**: (infra) 인프라 고도화 — Fly.io 멀티 리전(Tokyo + Singapore), DB 커넥션 풀링(PgBouncer), CDN 이미지 최적화
+- **편입 (M75)**: (dx) 개발자 경험 & 품질 강화 — E2E 테스트 인프라(Patrol), 코드 커버리지 게이트, OpenAPI 자동 생성 클라이언트
+
+---
+
 ### Phase 14 → Phase 15 전환 리뷰 (2026-06-22)
 
 - 리뷰 문서: `docs/plans/2026-06-22-phase15.md`
@@ -241,4 +262,4 @@
 
 ### 2026-06-21 (Phase 14 진행 중 발견)
 
-- [ ] (reading) `firstCurationCardProvider`가 `bookId` 파라미터에 `userBookId`(UserBook UUID)를 전달 — 큐레이션 카드 API가 catalog book_id 기준일 경우 404→null로 조용히 무시됨. AI prep card 배선 작업(M63) 중 발견. 실제 404가 나는지 확인 후 `bookId` 파라미터 타입·네이밍 정합성 수정 필요 — 맥락: M63 AI 어시스턴트 진입점 배선 (2026-06-21)
+- [x] (reading) `firstCurationCardProvider`가 `bookId` 파라미터에 `userBookId`(UserBook UUID)를 전달 — M66에서 `widget.bookId`(catalog UUID)로 교체 완료. bookId 없을 때 pre-fetch 스킵 처리 (feat(M66) 68a78a7)
