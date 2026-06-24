@@ -115,17 +115,21 @@ class AuthNotifier extends _$AuthNotifier {
     // FCM setup is best-effort. Firebase may not be initialised yet
     // (GoogleService-Info.plist / google-services.json absent in dev).
     // Failures here must NOT override the authenticated state already set above.
+    // Web push is out of scope for the M73 web MVP (deferred to Phase 17), so
+    // skip the whole FCM dance on web rather than relying on no-op fallbacks.
     // TODO(setup): Call Firebase.initializeApp() in main.dart once platform
     // config files are in place.
-    unawaited(_registerFcmToken());
-    try {
-      await _fcmTokenRefreshSub?.cancel();
-      _fcmTokenRefreshSub =
-          FcmService.instance.tokenRefreshStream.listen(_onFcmTokenRefresh);
-    } catch (e) {
-      if (kDebugMode) {
-        // ignore: avoid_print
-        print('AuthNotifier FCM subscription error (non-fatal): $e');
+    if (!kIsWeb) {
+      unawaited(_registerFcmToken());
+      try {
+        await _fcmTokenRefreshSub?.cancel();
+        _fcmTokenRefreshSub =
+            FcmService.instance.tokenRefreshStream.listen(_onFcmTokenRefresh);
+      } catch (e) {
+        if (kDebugMode) {
+          // ignore: avoid_print
+          print('AuthNotifier FCM subscription error (non-fatal): $e');
+        }
       }
     }
   }

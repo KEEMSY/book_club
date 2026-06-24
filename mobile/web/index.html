@@ -2,44 +2,34 @@
 <html>
 <head>
   <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
+    base href is rewritten by `flutter build web --base-href`. It must start
+    and end with a slash; the default placeholder resolves to the site root.
   -->
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="독서를 함께하는 스마트한 방법">
 
-  <!-- iOS meta tags & icons -->
+  <!-- PWA / iOS home-screen install -->
   <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="book_club">
+  <meta name="apple-mobile-web-app-title" content="북클럽">
+  <meta name="theme-color" content="#FF6B6B">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
-  <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>book_club</title>
+  <title>북클럽</title>
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
   <!--
-    You can customize the "flutter_bootstrap.js" script.
-    This is useful to provide a custom configuration to the Flutter loader
-    or to give the user feedback during the initialization process.
-
-    For more details:
-    * https://docs.flutter.dev/platform-integration/web/initialization
+    flutter_bootstrap.js is the supported entrypoint as of Flutter 3.22+; it
+    injects the build-time service-worker version and loads the engine. We keep
+    the default loader rather than the legacy `_flutter.loader.loadEntrypoint`
+    shim, which was removed in newer Flutter releases.
   -->
   <script src="flutter_bootstrap.js" async></script>
 </body>

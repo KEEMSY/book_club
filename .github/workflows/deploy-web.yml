@@ -1,0 +1,62 @@
+name: deploy-web
+
+# Flutter Web (PWA) build for the M73 web MVP. Builds on every push to main
+# that touches the mobile tree and uploads the static bundle as an artifact.
+# Fly.io deploy is wired but commented out until the FLY_API_TOKEN secret and
+# the book-club-web app exist (see mobile/Dockerfile.web).
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'mobile/**'
+      - '.github/workflows/deploy-web.yml'
+
+concurrency:
+  group: deploy-web-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    name: build flutter web
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Pinned to the same Flutter release the rest of CI uses (see mobile.yml)
+      # so the web bundle is reproducible against the analyzer/test toolchain.
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.41.5
+          cache: true
+          cache-key: 'flutter-:os:-:channel:-:version:-${{ hashFiles(''mobile/pubspec.lock'') }}'
+
+      - name: Resolve packages
+        run: flutter pub get
+
+      # --web-renderer was removed in Flutter 3.29+; CanvasKit is the default web
+      # renderer now, so no renderer flag is needed. FLAVOR marks the bundle as a
+      # production build for any --dart-define-gated code paths.
+      - name: Build web
+        run: flutter build web --release --dart-define=FLAVOR=production
+
+      - name: Upload web artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: mobile/build/web/
+          retention-days: 7
+
+      # Fly.io deploy — activate once FLY_API_TOKEN is set and the book-club-web
+      # app is created (uses mobile/Dockerfile.web as the image).
+      # - name: Set up flyctl
+      #   uses: superfly/flyctl-actions/setup-flyctl@master
+      # - name: Deploy to Fly.io
+      #   run: flyctl deploy --app book-club-web --dockerfile Dockerfile.web --remote-only
+      #   env:
+      #     FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

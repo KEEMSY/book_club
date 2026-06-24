@@ -1,11 +1,11 @@
 {
-    "name": "book_club",
-    "short_name": "book_club",
+    "name": "북클럽",
+    "short_name": "북클럽",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#FFFFFF",
+    "theme_color": "#FF6B6B",
+    "description": "독서를 함께하는 스마트한 방법",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

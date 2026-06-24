@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/notification/application/notification_notifier.dart';
 import '../../features/reading/application/reading_providers.dart';
+import '../layout/adaptive_layout.dart';
+import '../layout/web_navigation_rail.dart';
 import 'app_mode_provider.dart';
 
 /// Root shell that renders the two-mode bottom chrome.
@@ -49,6 +51,25 @@ class _AppShellState extends ConsumerState<AppShell> {
     );
   }
 
+  /// Wide-layout NavigationRail handler. The rail flattens the personal tabs
+  /// (0–2) and the community branch (3) into one list, so selecting 커뮤니티
+  /// flips into community mode while the personal tabs flip back out of it.
+  void _onRailSelected(int index) {
+    if (index == 3) {
+      _switchToCommunity();
+      return;
+    }
+    if (ref.read(appModeNotifierProvider) == AppMode.community) {
+      // Flip the mode flag only — navigation is handled by the goBranch below,
+      // so we avoid the extra hop _switchToPersonal would make to its last tab.
+      ref.read(appModeNotifierProvider.notifier).setMode(AppMode.personal);
+    }
+    widget.navigationShell.goBranch(
+      index,
+      initialLocation: index == widget.navigationShell.currentIndex,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -56,7 +77,7 @@ class _AppShellState extends ConsumerState<AppShell> {
     final AppMode mode = ref.watch(appModeNotifierProvider);
     final int tabIndex = widget.navigationShell.currentIndex.clamp(0, 2);
 
-    return Scaffold(
+    final Widget mobileLayout = Scaffold(
       body: widget.navigationShell,
       bottomNavigationBar: _AppBottomBar(
         mode: mode,
@@ -67,6 +88,35 @@ class _AppShellState extends ConsumerState<AppShell> {
         onModeSwitch: (m) =>
             m == AppMode.community ? _switchToCommunity() : _switchToPersonal(),
       ),
+    );
+
+    // Tablet/desktop (web) replaces the bottom chrome with a left rail showing
+    // all four branches at once; the mode toggle is implicit in the selection.
+    final int railIndex = mode == AppMode.community ? 3 : tabIndex;
+    final Widget wideLayout = Scaffold(
+      body: SafeArea(
+        child: Row(
+          children: <Widget>[
+            WebNavigationRail(
+              selectedIndex: railIndex,
+              accent: accent,
+              onDestinationSelected: _onRailSelected,
+            ),
+            VerticalDivider(
+              width: 1,
+              thickness: 0.5,
+              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+            ),
+            Expanded(child: widget.navigationShell),
+          ],
+        ),
+      ),
+    );
+
+    return AdaptiveLayout(
+      mobile: mobileLayout,
+      tablet: wideLayout,
+      desktop: wideLayout,
     );
   }
 }

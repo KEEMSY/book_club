@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -123,7 +124,10 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
   /// Runs the purchase through RevenueCat when configured, otherwise the
   /// backend test-receipt path used in dev builds.
   Future<_PurchaseOutcome> _purchase() async {
-    if (_kRevenueCatApiKey.isEmpty) {
+    // RevenueCat has no web SDK (M73 web MVP defers IAP to Phase 17), so on web
+    // we route purchases through the backend test-receipt path just like an
+    // unconfigured dev build.
+    if (_kRevenueCatApiKey.isEmpty || kIsWeb) {
       final ok = await ref.read(subscriptionNotifierProvider.notifier).verify(
             platform: 'ios',
             productId: _plan.productId,
