@@ -264,6 +264,13 @@
 
 - [x] (reading) `firstCurationCardProvider`가 `bookId` 파라미터에 `userBookId`(UserBook UUID)를 전달 — M66에서 `widget.bookId`(catalog UUID)로 교체 완료. bookId 없을 때 pre-fetch 스킵 처리 (feat(M66) 68a78a7)
 
+### 2026-06-24 (Phase 16 M71 SDK 연동 중 발견)
+
+- [ ] (video) `AgoraRtcTokenAdapter`는 단순 HMAC-SHA256 서명 토큰 — Agora 공식 AccessToken2 바이너리 포맷이 필요해지면 `agora-token-builder`로 교체 — 맥락: M71 Agora 실 연동 (2026-06-24)
+- [ ] (event) 카카오맵 마커 클러스터링(`Clusterer`) 적용 — 이벤트 밀집 지역 가독성. 현재는 단순 마커 1:1 — 맥락: M71 카카오맵 연동 (2026-06-24)
+- [ ] (video) Agora 카메라/마이크 런타임 권한 거부 시 안내 UX(설정 이동 유도) — 현재는 요청만 하고 거부 시 빈 영상. `permission_handler` openAppSettings 활용 — 맥락: M71 (2026-06-24)
+- [ ] (event) `kakao_map_plugin`은 webview 기반(0.3.x) — 성능/네이티브 마커 필요 시 네이티브 SDK 래퍼로 재검토. 계획서의 `^2.1.1`은 pub.dev 미존재 — 맥락: M71 (2026-06-24)
+
 ### 2026-06-24 (Phase 16 M73 Flutter Web 진행 중 발견)
 
 - [ ] (mobile) `dart:io` 직접 import 7개 파일 웹 호환 처리 — `flutter build web` 컴파일 차단 블로커. `dart:io`는 웹에서 미지원이라 조건부 import(`dart.library.io` / `dart.library.html`) 또는 `kIsWeb` 분기 + 플랫폼 추상화 필요. 대상: `core/network/dio_provider.dart`, `reading/application/timer_lifecycle.dart`, `reading/application/timer_notifier.dart`, `auth/data/apple_login_adapter.dart`, `auth/application/auth_notifier.dart`, `auth/presentation/login_screen.dart`, `auth/data/kakao_login_adapter.dart` — 맥락: M73 웹 빌드 파이프라인 구축 (2026-06-24)
