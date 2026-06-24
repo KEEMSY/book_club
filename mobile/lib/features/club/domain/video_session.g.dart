@@ -17,6 +17,7 @@ _VideoSession _$VideoSessionFromJson(Map<String, dynamic> json) =>
       endedAt: json['ended_at'] == null
           ? null
           : DateTime.parse(json['ended_at'] as String),
+      agoraUid: (json['agora_uid'] as num?)?.toInt(),
       agoraToken: json['agora_token'] as String?,
       channel: json['channel'] as String?,
     );
@@ -30,6 +31,7 @@ Map<String, dynamic> _$VideoSessionToJson(_VideoSession instance) =>
       'max_participants': instance.maxParticipants,
       'started_at': instance.startedAt.toIso8601String(),
       'ended_at': instance.endedAt?.toIso8601String(),
+      'agora_uid': instance.agoraUid,
       'agora_token': instance.agoraToken,
       'channel': instance.channel,
     };

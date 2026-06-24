@@ -21,6 +21,7 @@ mixin _$VideoSession {
   int get maxParticipants;
   DateTime get startedAt;
   DateTime? get endedAt;
+  int? get agoraUid;
   String? get agoraToken;
   String? get channel;
 
@@ -50,6 +51,8 @@ mixin _$VideoSession {
             (identical(other.startedAt, startedAt) ||
                 other.startedAt == startedAt) &&
             (identical(other.endedAt, endedAt) || other.endedAt == endedAt) &&
+            (identical(other.agoraUid, agoraUid) ||
+                other.agoraUid == agoraUid) &&
             (identical(other.agoraToken, agoraToken) ||
                 other.agoraToken == agoraToken) &&
             (identical(other.channel, channel) || other.channel == channel));
@@ -58,11 +61,11 @@ mixin _$VideoSession {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id, clubId, hostId, agoraChannel,
-      maxParticipants, startedAt, endedAt, agoraToken, channel);
+      maxParticipants, startedAt, endedAt, agoraUid, agoraToken, channel);
 
   @override
   String toString() {
-    return 'VideoSession(id: $id, clubId: $clubId, hostId: $hostId, agoraChannel: $agoraChannel, maxParticipants: $maxParticipants, startedAt: $startedAt, endedAt: $endedAt, agoraToken: $agoraToken, channel: $channel)';
+    return 'VideoSession(id: $id, clubId: $clubId, hostId: $hostId, agoraChannel: $agoraChannel, maxParticipants: $maxParticipants, startedAt: $startedAt, endedAt: $endedAt, agoraUid: $agoraUid, agoraToken: $agoraToken, channel: $channel)';
   }
 }
 
@@ -80,6 +83,7 @@ abstract mixin class $VideoSessionCopyWith<$Res> {
       int maxParticipants,
       DateTime startedAt,
       DateTime? endedAt,
+      int? agoraUid,
       String? agoraToken,
       String? channel});
 }
@@ -103,6 +107,7 @@ class _$VideoSessionCopyWithImpl<$Res> implements $VideoSessionCopyWith<$Res> {
     Object? maxParticipants = null,
     Object? startedAt = null,
     Object? endedAt = freezed,
+    Object? agoraUid = freezed,
     Object? agoraToken = freezed,
     Object? channel = freezed,
   }) {
@@ -135,6 +140,10 @@ class _$VideoSessionCopyWithImpl<$Res> implements $VideoSessionCopyWith<$Res> {
           ? _self.endedAt
           : endedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      agoraUid: freezed == agoraUid
+          ? _self.agoraUid
+          : agoraUid // ignore: cast_nullable_to_non_nullable
+              as int?,
       agoraToken: freezed == agoraToken
           ? _self.agoraToken
           : agoraToken // ignore: cast_nullable_to_non_nullable
@@ -248,6 +257,7 @@ extension VideoSessionPatterns on VideoSession {
             int maxParticipants,
             DateTime startedAt,
             DateTime? endedAt,
+            int? agoraUid,
             String? agoraToken,
             String? channel)?
         $default, {
@@ -264,6 +274,7 @@ extension VideoSessionPatterns on VideoSession {
             _that.maxParticipants,
             _that.startedAt,
             _that.endedAt,
+            _that.agoraUid,
             _that.agoraToken,
             _that.channel);
       case _:
@@ -294,6 +305,7 @@ extension VideoSessionPatterns on VideoSession {
             int maxParticipants,
             DateTime startedAt,
             DateTime? endedAt,
+            int? agoraUid,
             String? agoraToken,
             String? channel)
         $default,
@@ -309,6 +321,7 @@ extension VideoSessionPatterns on VideoSession {
             _that.maxParticipants,
             _that.startedAt,
             _that.endedAt,
+            _that.agoraUid,
             _that.agoraToken,
             _that.channel);
       case _:
@@ -338,6 +351,7 @@ extension VideoSessionPatterns on VideoSession {
             int maxParticipants,
             DateTime startedAt,
             DateTime? endedAt,
+            int? agoraUid,
             String? agoraToken,
             String? channel)?
         $default,
@@ -353,6 +367,7 @@ extension VideoSessionPatterns on VideoSession {
             _that.maxParticipants,
             _that.startedAt,
             _that.endedAt,
+            _that.agoraUid,
             _that.agoraToken,
             _that.channel);
       case _:
@@ -372,6 +387,7 @@ class _VideoSession implements VideoSession {
       required this.maxParticipants,
       required this.startedAt,
       this.endedAt,
+      this.agoraUid,
       this.agoraToken,
       this.channel});
   factory _VideoSession.fromJson(Map<String, dynamic> json) =>
@@ -391,6 +407,8 @@ class _VideoSession implements VideoSession {
   final DateTime startedAt;
   @override
   final DateTime? endedAt;
+  @override
+  final int? agoraUid;
   @override
   final String? agoraToken;
   @override
@@ -426,6 +444,8 @@ class _VideoSession implements VideoSession {
             (identical(other.startedAt, startedAt) ||
                 other.startedAt == startedAt) &&
             (identical(other.endedAt, endedAt) || other.endedAt == endedAt) &&
+            (identical(other.agoraUid, agoraUid) ||
+                other.agoraUid == agoraUid) &&
             (identical(other.agoraToken, agoraToken) ||
                 other.agoraToken == agoraToken) &&
             (identical(other.channel, channel) || other.channel == channel));
@@ -434,11 +454,11 @@ class _VideoSession implements VideoSession {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id, clubId, hostId, agoraChannel,
-      maxParticipants, startedAt, endedAt, agoraToken, channel);
+      maxParticipants, startedAt, endedAt, agoraUid, agoraToken, channel);
 
   @override
   String toString() {
-    return 'VideoSession(id: $id, clubId: $clubId, hostId: $hostId, agoraChannel: $agoraChannel, maxParticipants: $maxParticipants, startedAt: $startedAt, endedAt: $endedAt, agoraToken: $agoraToken, channel: $channel)';
+    return 'VideoSession(id: $id, clubId: $clubId, hostId: $hostId, agoraChannel: $agoraChannel, maxParticipants: $maxParticipants, startedAt: $startedAt, endedAt: $endedAt, agoraUid: $agoraUid, agoraToken: $agoraToken, channel: $channel)';
   }
 }
 
@@ -458,6 +478,7 @@ abstract mixin class _$VideoSessionCopyWith<$Res>
       int maxParticipants,
       DateTime startedAt,
       DateTime? endedAt,
+      int? agoraUid,
       String? agoraToken,
       String? channel});
 }
@@ -482,6 +503,7 @@ class __$VideoSessionCopyWithImpl<$Res>
     Object? maxParticipants = null,
     Object? startedAt = null,
     Object? endedAt = freezed,
+    Object? agoraUid = freezed,
     Object? agoraToken = freezed,
     Object? channel = freezed,
   }) {
@@ -514,6 +536,10 @@ class __$VideoSessionCopyWithImpl<$Res>
           ? _self.endedAt
           : endedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      agoraUid: freezed == agoraUid
+          ? _self.agoraUid
+          : agoraUid // ignore: cast_nullable_to_non_nullable
+              as int?,
       agoraToken: freezed == agoraToken
           ? _self.agoraToken
           : agoraToken // ignore: cast_nullable_to_non_nullable
