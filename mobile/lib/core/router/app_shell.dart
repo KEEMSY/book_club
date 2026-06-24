@@ -93,6 +93,9 @@ class _AppShellState extends ConsumerState<AppShell> {
     // Tablet/desktop (web) replaces the bottom chrome with a left rail showing
     // all four branches at once; the mode toggle is implicit in the selection.
     final int railIndex = mode == AppMode.community ? 3 : tabIndex;
+    final int unreadCount = ref.watch(
+      notificationNotifierProvider.select((s) => s.unreadCount),
+    );
     final Widget wideLayout = Scaffold(
       body: SafeArea(
         child: Row(
@@ -100,6 +103,7 @@ class _AppShellState extends ConsumerState<AppShell> {
             WebNavigationRail(
               selectedIndex: railIndex,
               accent: accent,
+              badgeCount: unreadCount,
               onDestinationSelected: _onRailSelected,
             ),
             VerticalDivider(
