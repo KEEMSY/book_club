@@ -11,6 +11,13 @@ dependencies:
   flutter:
     sdk: flutter
 
+  # Localization delegates (M72 · i18n). Bundles the Material/Cupertino/Widgets
+  # localizations for ko/en/ja so date pickers, dialogs, and tooltips render in
+  # the active locale. Pairs with the `generate: true` flag below, which runs
+  # `gen-l10n` over lib/l10n/*.arb on `flutter pub get`.
+  flutter_localizations:
+    sdk: flutter
+
   cupertino_icons: ^1.0.8
 
   # State management
@@ -41,8 +48,9 @@ dependencies:
   kakao_flutter_sdk_user: ^1.9.7
   sign_in_with_apple: ^6.1.4
 
-  # i18n / formatting
-  intl: ^0.19.0
+  # i18n / formatting. Pinned to ^0.20.2 because flutter_localizations (Flutter
+  # 3.41 SDK) hard-pins intl to 0.20.2 — an older constraint fails resolution.
+  intl: ^0.20.2
 
   # Typography — Airbnb design system. Cereal VF is proprietary, so we
   # substitute with two google_fonts families tuned for a Korean 20–30대 여성
@@ -118,6 +126,22 @@ dependencies:
   # Claude-generated intro script in-app; no external TTS API is used.
   flutter_tts: ^4.2.0
 
+  # Real-time video for reading-club calls (M71). The backend issues the join
+  # token (channel + uid) and the App ID is injected via
+  # --dart-define=AGORA_APP_ID; omitting it makes VideoSessionScreen fall back to
+  # the static placeholder grid so dev/test stay buildable without an account.
+  agora_rtc_engine: ^6.3.2
+
+  # Kakao Map for the nearby-events map view (M71). App key is injected via
+  # --dart-define=KAKAO_MAP_KEY (same app as kakao_flutter_sdk_user); omitting it
+  # leaves the map empty rather than crashing. 0.3.x is the latest published line
+  # (the plan's ^2.1.1 does not exist on pub.dev) — a webview-backed wrapper.
+  kakao_map_plugin: ^0.3.7
+
+  # Camera/mic runtime permissions for the Agora call (M71). Agora needs these
+  # granted before joinChannel; geolocator covers only location.
+  permission_handler: ^11.3.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -160,6 +184,10 @@ dependency_overrides:
 
 flutter:
   uses-material-design: true
+
+  # Generate AppLocalizations from lib/l10n/*.arb on `flutter pub get` (M72).
+  # Configuration lives in l10n.yaml at the package root.
+  generate: true
 
   fonts:
     # Noto Sans KR variable font — bundled as an asset so all weights (w100–w900)

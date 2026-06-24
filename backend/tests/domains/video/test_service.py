@@ -22,6 +22,8 @@ class _FakeSession:
     host_id: UUID
     agora_channel: str
     max_participants: int
+    agora_uid: int | None = None
+    agora_token: str | None = None
     started_at: datetime = field(default_factory=lambda: datetime.now(tz=UTC))
     ended_at: datetime | None = None
 
@@ -48,7 +50,14 @@ class FakeVideoRepository:
         return self.sessions.get(session_id)
 
     async def create_session(
-        self, *, club_id: UUID, host_id: UUID, agora_channel: str, max_participants: int
+        self,
+        *,
+        club_id: UUID,
+        host_id: UUID,
+        agora_channel: str,
+        max_participants: int,
+        agora_uid: int,
+        agora_token: str,
     ) -> _FakeSession:
         s = _FakeSession(
             id=uuid4(),
@@ -56,6 +65,8 @@ class FakeVideoRepository:
             host_id=host_id,
             agora_channel=agora_channel,
             max_participants=max_participants,
+            agora_uid=agora_uid,
+            agora_token=agora_token,
         )
         self.sessions[s.id] = s
         return s
@@ -70,8 +81,8 @@ class FakeVideoRepository:
 
 
 class _FakeTokenProvider:
-    def issue_token(self, *, club_id: UUID, session_id: UUID, channel: str) -> str:
-        return f"STUB_{club_id}_{session_id}"
+    def generate_token(self, *, channel: str, uid: int, expiry_secs: int = 3600) -> str:
+        return f"stub_token_{channel}_{uid}"
 
 
 def _svc(
@@ -103,7 +114,8 @@ async def test_start_session_by_pro_owner_creates_and_returns_token() -> None:
     assert res.host_id == owner
     assert res.club_id == club_id
     assert res.ended_at is None
-    assert res.agora_token == f"STUB_{club_id}_{res.id}"
+    assert res.agora_uid is not None
+    assert res.agora_token == f"stub_token_{res.agora_channel}_{res.agora_uid}"
     assert res.channel == res.agora_channel
     assert len(repo.sessions) == 1
 

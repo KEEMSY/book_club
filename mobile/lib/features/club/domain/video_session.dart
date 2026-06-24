@@ -3,11 +3,12 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'video_session.freezed.dart';
 part 'video_session.g.dart';
 
-/// A reading-club video call (M68).
+/// A reading-club video call (M68; real Agora rendering in M71).
 ///
 /// `POST /clubs/{id}/video-sessions` returns the session plus join credentials
 /// ([agoraToken], [channel]); `GET .../active` returns the same shape without
-/// the token fields, so both are nullable.
+/// the token fields, so both are nullable. [agoraUid] is the host's RTC uid the
+/// client passes to `joinChannel` (M71).
 @freezed
 abstract class VideoSession with _$VideoSession {
   const factory VideoSession({
@@ -18,6 +19,7 @@ abstract class VideoSession with _$VideoSession {
     required int maxParticipants,
     required DateTime startedAt,
     DateTime? endedAt,
+    int? agoraUid,
     String? agoraToken,
     String? channel,
   }) = _VideoSession;

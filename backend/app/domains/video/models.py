@@ -11,7 +11,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import ForeignKey, Index, Integer, String, func
+from sqlalchemy import ForeignKey, Index, Integer, String, Text, func
 from sqlalchemy.dialects.postgresql import TIMESTAMP
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column
@@ -39,6 +39,10 @@ class VideoSession(Base):
         nullable=False,
     )
     agora_channel: Mapped[str] = mapped_column(String(64), nullable=False)
+    # The host's Agora RTC uid and the join token issued at session creation
+    # (M71). Nullable so rows created before the migration backfill cleanly.
+    agora_uid: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    agora_token: Mapped[str | None] = mapped_column(Text, nullable=True)
     started_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True), nullable=False, server_default=func.now()
     )

@@ -21,6 +21,8 @@ class NearbyEventsState {
     required this.radiusKm,
     this.category,
     this.onDate,
+    this.originLat,
+    this.originLng,
     this.events = const AsyncValue<List<Event>>.loading(),
   });
 
@@ -33,12 +35,19 @@ class NearbyEventsState {
   /// Optional day filter; only events on this calendar date are kept.
   final DateTime? onDate;
 
+  /// Resolved search origin (device GPS or Seoul fallback); the map centers on
+  /// it. Null until the first [NearbyEventsNotifier.load] resolves it.
+  final double? originLat;
+  final double? originLng;
+
   /// Loaded events (already filtered) or the loading/error state.
   final AsyncValue<List<Event>> events;
 
   NearbyEventsState copyWith({
     double? radiusKm,
     AsyncValue<List<Event>>? events,
+    double? originLat,
+    double? originLng,
     Object? category = _sentinel,
     Object? onDate = _sentinel,
   }) {
@@ -47,6 +56,8 @@ class NearbyEventsState {
       category:
           identical(category, _sentinel) ? this.category : category as String?,
       onDate: identical(onDate, _sentinel) ? this.onDate : onDate as DateTime?,
+      originLat: originLat ?? this.originLat,
+      originLng: originLng ?? this.originLng,
       events: events ?? this.events,
     );
   }
@@ -82,6 +93,7 @@ class NearbyEventsNotifier extends AutoDisposeNotifier<NearbyEventsState> {
           await ref.read(locationServiceProvider).resolveOrigin();
       _originLat = origin.lat;
       _originLng = origin.lng;
+      state = state.copyWith(originLat: origin.lat, originLng: origin.lng);
     }
     final AsyncValue<List<Event>> result =
         await AsyncValue.guard<List<Event>>(() async {

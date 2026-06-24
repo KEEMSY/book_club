@@ -39,15 +39,20 @@ class VideoSessionService:
 
         session = await self.repo.get_active_session(club_id)
         if session is None:
+            uid = _agora_uid(host_id)
+            channel = _channel_name(club_id)
             session = await self.repo.create_session(
                 club_id=club_id,
                 host_id=host_id,
-                agora_channel=_channel_name(club_id),
+                agora_channel=channel,
                 max_participants=_MAX_PARTICIPANTS,
+                agora_uid=uid,
+                agora_token=self.token_provider.generate_token(channel=channel, uid=uid),
             )
 
-        token = self.token_provider.issue_token(
-            club_id=club_id, session_id=session.id, channel=session.agora_channel
+        # Re-issue on every start so a re-joining host never gets an expired token.
+        token = self.token_provider.generate_token(
+            channel=session.agora_channel, uid=session.agora_uid or 0
         )
         return _token_response(session, token)
 
@@ -86,12 +91,22 @@ def _channel_name(club_id: UUID) -> str:
     return f"club-{club_id.hex}"
 
 
+# Agora RTC uids are unsigned 32-bit and 0 means "let the server assign", so we
+# map the host's UUID into 1..2^32-1 for a stable, collision-resistant uid.
+_AGORA_UID_MAX = 0xFFFFFFFF
+
+
+def _agora_uid(user_id: UUID) -> int:
+    return (user_id.int % (_AGORA_UID_MAX - 1)) + 1
+
+
 def _session_response(session: VideoSession) -> VideoSessionResponse:
     return VideoSessionResponse(
         id=session.id,
         club_id=session.club_id,
         host_id=session.host_id,
         agora_channel=session.agora_channel,
+        agora_uid=session.agora_uid,
         started_at=session.started_at,
         ended_at=session.ended_at,
         max_participants=session.max_participants,

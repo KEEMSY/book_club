@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kakao_map_plugin/kakao_map_plugin.dart';
 
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../application/event_notifier.dart';
+import '../data/location_service.dart';
 import '../domain/event.dart';
 import 'event_create_sheet.dart';
 
 /// Location-based meetup discovery (M64). Defaults to a list driven by a
-/// device-resolved origin (Seoul City Hall fallback); M68 adds a map-view
-/// toggle (placeholder until the Kakao Map SDK lands — CLAUDE.md §2).
+/// device-resolved origin (Seoul City Hall fallback); the map-view toggle now
+/// renders a live Kakao Map with one marker per event (M71).
 class NearbyEventsScreen extends ConsumerStatefulWidget {
   const NearbyEventsScreen({super.key});
 
@@ -58,7 +60,7 @@ class _NearbyEventsScreenState extends ConsumerState<NearbyEventsScreen> {
           const Divider(height: 0.5),
           Expanded(
             child: _mapView
-                ? _MapPlaceholder(spacing: spacing)
+                ? _EventsMap(state: state)
                 : RefreshIndicator(
                     onRefresh: notifier.load,
                     child: _Body(events: state.events, spacing: spacing),
@@ -70,38 +72,64 @@ class _NearbyEventsScreenState extends ConsumerState<NearbyEventsScreen> {
   }
 }
 
-/// Stand-in for the map view until the Kakao Map Flutter SDK is approved and
-/// wired (no new map package added — CLAUDE.md §2 / team decision).
-class _MapPlaceholder extends StatelessWidget {
-  const _MapPlaceholder({required this.spacing});
+/// Live Kakao Map of nearby events. Centers on the resolved search origin and
+/// drops one marker per event that has coordinates; tapping a marker opens that
+/// event's detail. Requires `--dart-define=KAKAO_MAP_KEY` (see `main.dart`);
+/// without it the underlying webview renders empty rather than crashing.
+class _EventsMap extends StatefulWidget {
+  const _EventsMap({required this.state});
 
-  final AppSpacing spacing;
+  final NearbyEventsState state;
+
+  @override
+  State<_EventsMap> createState() => _EventsMapState();
+}
+
+class _EventsMapState extends State<_EventsMap> {
+  KakaoMapController? _controller;
+
+  LatLng get _center => LatLng(
+        widget.state.originLat ?? LocationService.fallbackLat,
+        widget.state.originLng ?? LocationService.fallbackLng,
+      );
+
+  /// One marker per event with coordinates; [Marker.markerId] is the event id so
+  /// [onMarkerTap] can route straight to detail.
+  List<Marker> get _markers => <Marker>[
+        for (final Event e in widget.state.events.valueOrNull ?? const <Event>[])
+          if (e.lat != null && e.lng != null)
+            Marker(
+              markerId: e.id,
+              latLng: LatLng(e.lat!, e.lng!),
+              infoWindowContent: e.title,
+            ),
+      ];
+
+  @override
+  void didUpdateWidget(_EventsMap oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Push refreshed markers to the map once events (re)load.
+    final KakaoMapController? controller = _controller;
+    if (controller != null) {
+      controller.clear();
+      final List<Marker> markers = _markers;
+      if (markers.isNotEmpty) {
+        controller.addMarker(markers: markers);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      color: theme.colorScheme.surfaceContainerHighest,
-      alignment: Alignment.center,
-      padding: EdgeInsets.all(spacing.xl),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Icon(
-            Icons.map_outlined,
-            size: 48,
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-          SizedBox(height: spacing.md),
-          Text(
-            '지도 뷰 (카카오맵 SDK 연동 예정)',
-            textAlign: TextAlign.center,
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ],
-      ),
+    return KakaoMap(
+      center: _center,
+      markers: _markers,
+      onMapCreated: (KakaoMapController controller) {
+        _controller = controller;
+      },
+      onMarkerTap: (String markerId, LatLng latLng, int zoomLevel) {
+        context.push(AppRoutes.eventDetail(markerId));
+      },
     );
   }
 }

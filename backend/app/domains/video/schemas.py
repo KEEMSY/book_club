@@ -19,6 +19,7 @@ class VideoSessionResponse(BaseModel):
     club_id: UUID
     host_id: UUID
     agora_channel: str
+    agora_uid: int | None = None
     started_at: datetime
     ended_at: datetime | None
     max_participants: int

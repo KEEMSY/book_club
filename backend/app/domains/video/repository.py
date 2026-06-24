@@ -50,13 +50,22 @@ class VideoSessionRepository:
         return await self.session.get(VideoSession, session_id)
 
     async def create_session(
-        self, *, club_id: UUID, host_id: UUID, agora_channel: str, max_participants: int
+        self,
+        *,
+        club_id: UUID,
+        host_id: UUID,
+        agora_channel: str,
+        max_participants: int,
+        agora_uid: int,
+        agora_token: str,
     ) -> VideoSession:
         session = VideoSession(
             club_id=club_id,
             host_id=host_id,
             agora_channel=agora_channel,
             max_participants=max_participants,
+            agora_uid=agora_uid,
+            agora_token=agora_token,
         )
         self.session.add(session)
         await self.session.flush()

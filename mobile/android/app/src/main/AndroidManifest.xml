@@ -19,6 +19,12 @@
     <!-- Centers the "근처 모임" search on the device location (M66). -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- Agora RTC video call (M71): camera + microphone capture plus the audio
+         routing / network-state access the engine needs. -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <application
         android:label="골방"
         android:name="${applicationName}"

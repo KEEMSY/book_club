@@ -8,8 +8,9 @@ Two boundaries are modelled:
 
 - ``VideoSessionRepositoryPort`` — persistence for ``video_sessions`` plus the
   read-only club-owner / Pro-status lookups the Pro-club-owner gate needs.
-- ``AgoraTokenPort`` — the external video-provider boundary. The MVP ships a
-  stub adapter; a real Agora token builder is a drop-in replacement (§3.2).
+- ``AgoraTokenPort`` — the external video-provider boundary. A real HMAC token
+  builder and a deterministic stub both implement it; the provider picks one by
+  whether the Agora credentials are configured (§3.2).
 """
 
 from __future__ import annotations
@@ -32,13 +33,24 @@ class VideoSessionRepositoryPort(Protocol):
     async def get_session(self, session_id: UUID) -> VideoSession | None: ...
 
     async def create_session(
-        self, *, club_id: UUID, host_id: UUID, agora_channel: str, max_participants: int
+        self,
+        *,
+        club_id: UUID,
+        host_id: UUID,
+        agora_channel: str,
+        max_participants: int,
+        agora_uid: int,
+        agora_token: str,
     ) -> VideoSession: ...
 
     async def end_session(self, session_id: UUID) -> VideoSession | None: ...
 
 
 class AgoraTokenPort(Protocol):
-    """Issues a join token for a video channel (external provider boundary)."""
+    """Issues a join token for a video channel (external provider boundary).
 
-    def issue_token(self, *, club_id: UUID, session_id: UUID, channel: str) -> str: ...
+    The token binds to ``channel`` + ``uid`` only — that is all the Agora RTC
+    client SDK needs to join. Signing is pure CPU, so the method is sync.
+    """
+
+    def generate_token(self, *, channel: str, uid: int, expiry_secs: int = 3600) -> str: ...
