@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/providers/locale_provider.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../core/theme/grade_theme.dart';
 import '../../auth/application/auth_notifier.dart';
 import '../../feed/presentation/comments_sheet.dart';
@@ -77,6 +79,10 @@ class _ProfileContent extends ConsumerWidget {
                 PopupMenuButton<_OwnProfileAction>(
                   icon: const Icon(Icons.more_vert_rounded),
                   onSelected: (action) async {
+                    if (action == _OwnProfileAction.language) {
+                      await _showLanguagePicker(context, ref);
+                      return;
+                    }
                     if (action == _OwnProfileAction.privacy) {
                       context.push(AppRoutes.settingsPrivacy);
                       return;
@@ -116,6 +122,16 @@ class _ProfileContent extends ConsumerWidget {
                     }
                   },
                   itemBuilder: (_) => <PopupMenuEntry<_OwnProfileAction>>[
+                    PopupMenuItem<_OwnProfileAction>(
+                      value: _OwnProfileAction.language,
+                      child: Row(
+                        children: <Widget>[
+                          const Icon(Icons.language_outlined),
+                          const SizedBox(width: 12),
+                          Text(AppLocalizations.of(context).settingsLanguage),
+                        ],
+                      ),
+                    ),
                     const PopupMenuItem<_OwnProfileAction>(
                       value: _OwnProfileAction.privacy,
                       child: Row(
@@ -985,4 +1001,39 @@ class _UserPostsSliverState extends ConsumerState<_UserPostsSliver> {
   }
 }
 
-enum _OwnProfileAction { privacy, terms, logout }
+enum _OwnProfileAction { language, privacy, terms, logout }
+
+/// Lets the signed-in user switch the app language (M72 · i18n). Presented as a
+/// [SimpleDialog] from the own-profile overflow menu; the choice is persisted by
+/// [LocalePod] so it survives cold restarts.
+Future<void> _showLanguagePicker(BuildContext context, WidgetRef ref) async {
+  final Locale current = ref.read(localePodProvider);
+  final Locale? picked = await showDialog<Locale>(
+    context: context,
+    builder: (ctx) => SimpleDialog(
+      title: Text(AppLocalizations.of(ctx).settingsLanguage),
+      children: <Widget>[
+        for (final ({Locale locale, String label}) option in _languageOptions)
+          ListTile(
+            title: Text(option.label),
+            trailing: option.locale.languageCode == current.languageCode
+                ? const Icon(Icons.check_rounded)
+                : null,
+            onTap: () => Navigator.of(ctx).pop(option.locale),
+          ),
+      ],
+    ),
+  );
+  if (picked != null) {
+    await ref.read(localePodProvider.notifier).setLocale(picked);
+  }
+}
+
+/// Endonyms (each language named in itself) so the list is legible regardless
+/// of the currently active locale.
+const List<({Locale locale, String label})> _languageOptions =
+    <({Locale locale, String label})>[
+  (locale: Locale('ko'), label: '한국어'),
+  (locale: Locale('en'), label: 'English'),
+  (locale: Locale('ja'), label: '日本語'),
+];

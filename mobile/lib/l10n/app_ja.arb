@@ -1,0 +1,45 @@
+{
+  "@@locale": "ja",
+  "appName": "ブッククラブ",
+  "loginTitle": "一緒に読書する\nスマートな方法",
+  "loginKakao": "Kakaoで始める",
+  "loginApple": "Appleで続ける",
+  "timerStart": "開始",
+  "timerPause": "一時停止",
+  "timerResume": "再開",
+  "timerStop": "完了",
+  "timerGoal": "今日の目標",
+  "timerAiPrep": "AI読書準備",
+  "homeTabLibrary": "書棚",
+  "homeTabFeed": "フィード",
+  "homeTabClub": "クラブ",
+  "homeTabDiscover": "発見",
+  "homeTabProfile": "プロフィール",
+  "clubCreate": "クラブを作る",
+  "clubJoin": "クラブに参加",
+  "clubMembers": "{count}人",
+  "@clubMembers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "proRequired": "Pro機能です",
+  "proUpgrade": "Proにアップグレード",
+  "commonConfirm": "確認",
+  "commonCancel": "キャンセル",
+  "commonSave": "保存",
+  "commonDelete": "削除",
+  "commonLoading": "読み込み中...",
+  "commonError": "エラーが発生しました",
+  "commonRetry": "再試行",
+  "bookSearch": "本を検索",
+  "bookAdd": "書棚に追加",
+  "readingComplete": "読書完了",
+  "challengeTitle": "チャレンジ",
+  "notificationTitle": "通知",
+  "settingsTitle": "設定",
+  "settingsLanguage": "言語",
+  "settingsLogout": "サインアウト"
+}

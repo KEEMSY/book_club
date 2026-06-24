@@ -1,0 +1,45 @@
+{
+  "@@locale": "en",
+  "appName": "BookClub",
+  "loginTitle": "The smarter way\nto read together",
+  "loginKakao": "Continue with Kakao",
+  "loginApple": "Continue with Apple",
+  "timerStart": "Start",
+  "timerPause": "Pause",
+  "timerResume": "Resume",
+  "timerStop": "Done",
+  "timerGoal": "Today's Goal",
+  "timerAiPrep": "AI Reading Prep",
+  "homeTabLibrary": "Library",
+  "homeTabFeed": "Feed",
+  "homeTabClub": "Club",
+  "homeTabDiscover": "Discover",
+  "homeTabProfile": "Profile",
+  "clubCreate": "Create Club",
+  "clubJoin": "Join Club",
+  "clubMembers": "{count} members",
+  "@clubMembers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "proRequired": "Pro feature",
+  "proUpgrade": "Upgrade to Pro",
+  "commonConfirm": "Confirm",
+  "commonCancel": "Cancel",
+  "commonSave": "Save",
+  "commonDelete": "Delete",
+  "commonLoading": "Loading...",
+  "commonError": "An error occurred",
+  "commonRetry": "Retry",
+  "bookSearch": "Search books",
+  "bookAdd": "Add to Library",
+  "readingComplete": "Reading Complete",
+  "challengeTitle": "Challenges",
+  "notificationTitle": "Notifications",
+  "settingsTitle": "Settings",
+  "settingsLanguage": "Language",
+  "settingsLogout": "Sign Out"
+}

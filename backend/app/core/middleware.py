@@ -19,6 +19,7 @@ from starlette.types import ASGIApp
 
 from app.core.cache import get_redis
 from app.core.security import decode_token
+from app.shared.i18n import DEFAULT_LANG, SUPPORTED_LANGS
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +43,23 @@ def _extract_user_id(authorization: str | None) -> str | None:
         return None
     sub = payload.get("sub")
     return sub if isinstance(sub, str) and sub else None
+
+
+class LanguageMiddleware(BaseHTTPMiddleware):
+    """Resolve the request language into ``request.state.lang`` (M72).
+
+    Parses only the highest-priority tag of ``Accept-Language`` (q-values are
+    ignored — the mobile client sends a single tag matching the in-app language
+    toggle) and normalizes ``en-US`` → ``en``. Unsupported or missing languages
+    fall back to Korean, matching :data:`app.shared.i18n.DEFAULT_LANG`.
+    """
+
+    async def dispatch(self, request: Request, call_next: object) -> Response:
+        accept_lang = request.headers.get("Accept-Language", DEFAULT_LANG)
+        lang = accept_lang.split(",")[0].split("-")[0].strip().lower()
+        request.state.lang = lang if lang in SUPPORTED_LANGS else DEFAULT_LANG
+        response: Response = await call_next(request)  # type: ignore[operator]
+        return response
 
 
 class LastActiveMiddleware(BaseHTTPMiddleware):

@@ -1,0 +1,45 @@
+{
+  "@@locale": "ko",
+  "appName": "북클럽",
+  "loginTitle": "독서를 함께하는\n스마트한 방법",
+  "loginKakao": "카카오로 시작하기",
+  "loginApple": "Apple로 시작하기",
+  "timerStart": "시작",
+  "timerPause": "일시정지",
+  "timerResume": "재개",
+  "timerStop": "완료",
+  "timerGoal": "오늘 목표",
+  "timerAiPrep": "읽기 전 AI 준비",
+  "homeTabLibrary": "서재",
+  "homeTabFeed": "피드",
+  "homeTabClub": "클럽",
+  "homeTabDiscover": "탐색",
+  "homeTabProfile": "프로필",
+  "clubCreate": "클럽 만들기",
+  "clubJoin": "클럽 참여",
+  "clubMembers": "{count}명",
+  "@clubMembers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "proRequired": "Pro 기능입니다",
+  "proUpgrade": "Pro로 업그레이드",
+  "commonConfirm": "확인",
+  "commonCancel": "취소",
+  "commonSave": "저장",
+  "commonDelete": "삭제",
+  "commonLoading": "로딩 중...",
+  "commonError": "오류가 발생했습니다",
+  "commonRetry": "다시 시도",
+  "bookSearch": "책 검색",
+  "bookAdd": "내 서재에 추가",
+  "readingComplete": "독서 완료",
+  "challengeTitle": "챌린지",
+  "notificationTitle": "알림",
+  "settingsTitle": "설정",
+  "settingsLanguage": "언어",
+  "settingsLogout": "로그아웃"
+}

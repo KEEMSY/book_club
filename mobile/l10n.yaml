@@ -1,0 +1,8 @@
+arb-dir: lib/l10n
+template-arb-file: app_ko.arb
+output-localization-file: app_localizations.dart
+output-class: AppLocalizations
+# Generated into the package's own lib/l10n/ tree (the legacy synthetic
+# `flutter_gen` package is deprecated as of Flutter 3.x), so AppLocalizations is
+# imported as `package:book_club/l10n/app_localizations.dart`.
+nullable-getter: false

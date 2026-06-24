@@ -16,7 +16,7 @@ from app.api import health
 from app.api.admin import router as admin_router
 from app.core.config import get_settings
 from app.core.exceptions import register_exception_handlers
-from app.core.middleware import LastActiveMiddleware
+from app.core.middleware import LanguageMiddleware, LastActiveMiddleware
 from app.domains.admin.router import router as admin_dashboard_router
 from app.domains.ai_assistant.router import router as ai_assistant_router
 from app.domains.auth.router import router as auth_router
@@ -129,6 +129,10 @@ def create_app() -> FastAPI:
 
     register_exception_handlers(app)
     app.add_middleware(LastActiveMiddleware)
+    # Registered after LastActive so it runs first on the request path (Starlette
+    # applies middleware in reverse add order) — request.state.lang is then set
+    # before any downstream middleware or route reads it.
+    app.add_middleware(LanguageMiddleware)
     app.include_router(health.router)
     app.include_router(auth_router)
     app.include_router(book_router)

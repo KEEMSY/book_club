@@ -83,6 +83,11 @@ class Settings(BaseSettings):
     # Admin key for privileged management endpoints. Unset → endpoints return 404.
     admin_key: str = Field(default="")
 
+    # Agora RTC credentials for club video calls (M71). Both empty → the
+    # StubAgoraTokenAdapter is selected so dev/test work without a real account.
+    agora_app_id: str = Field(default="")
+    agora_app_certificate: str = Field(default="")
+
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:

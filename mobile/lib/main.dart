@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
+import 'package:kakao_map_plugin/kakao_map_plugin.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
@@ -50,11 +52,20 @@ Future<void> _runApp() async {
 
   KakaoSdk.init(nativeAppKey: _kakaoNativeAppKey);
 
+  // Kakao Map JavaScript key for the nearby-events map view (M71). Injected via
+  // --dart-define=KAKAO_MAP_KEY; left unset in dev so the map renders empty
+  // rather than crashing the rest of the app.
+  const kakaoMapKey = String.fromEnvironment('KAKAO_MAP_KEY', defaultValue: '');
+  if (kakaoMapKey.isNotEmpty) {
+    AuthRepository.initialize(appKey: kakaoMapKey);
+  }
+
   // RevenueCat init (M56). Skipped when the key is absent so local dev cold-
   // starts stay clean; the paywall then falls back to the backend test-receipt
-  // path instead of touching the store SDK.
+  // path instead of touching the store SDK. purchases_flutter has no web
+  // implementation (M73 web MVP defers IAP to Phase 17), so guard on !kIsWeb.
   const rcKey = String.fromEnvironment('REVENUECAT_API_KEY', defaultValue: '');
-  if (rcKey.isNotEmpty) {
+  if (rcKey.isNotEmpty && !kIsWeb) {
     await Purchases.configure(PurchasesConfiguration(rcKey));
   }
 
