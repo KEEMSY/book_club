@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -143,7 +142,9 @@ class AuthNotifier extends _$AuthNotifier {
     if (token == null) return;
     await _repository.registerDeviceToken(
       token: token,
-      platform: kIsWeb ? 'web' : (Platform.isIOS ? 'ios' : 'aos'),
+      platform: kIsWeb
+              ? 'web'
+              : (defaultTargetPlatform == TargetPlatform.iOS ? 'ios' : 'aos'),
     );
   }
 
@@ -152,7 +153,9 @@ class AuthNotifier extends _$AuthNotifier {
   Future<void> _onFcmTokenRefresh(String newToken) async {
     await _repository.registerDeviceToken(
       token: newToken,
-      platform: kIsWeb ? 'web' : (Platform.isIOS ? 'ios' : 'aos'),
+      platform: kIsWeb
+              ? 'web'
+              : (defaultTargetPlatform == TargetPlatform.iOS ? 'ios' : 'aos'),
     );
   }
 

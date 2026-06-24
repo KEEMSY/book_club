@@ -1,5 +1,5 @@
-import 'dart:io' show Platform;
-
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform;
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import 'social_login_port.dart';
@@ -11,7 +11,7 @@ class AppleLoginAdapter {
   const AppleLoginAdapter();
 
   Future<SocialLoginResult> signIn() async {
-    if (!Platform.isIOS) {
+    if (defaultTargetPlatform != TargetPlatform.iOS) {
       throw const SocialLoginFailed(
         'Apple Sign In is only supported on iOS in this build',
       );

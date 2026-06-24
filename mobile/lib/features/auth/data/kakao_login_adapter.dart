@@ -1,6 +1,5 @@
-import 'dart:io' show Platform;
-
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform, kIsWeb;
 import 'package:flutter/services.dart' show PlatformException;
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
@@ -46,7 +45,9 @@ class KakaoLoginAdapter {
 
   Future<OAuthToken> _requestToken() async {
     // Web can't call Platform.isIOS/isAndroid — always use account flow there.
-    if (kIsWeb || (!Platform.isIOS && !Platform.isAndroid)) {
+    if (kIsWeb ||
+        (defaultTargetPlatform != TargetPlatform.iOS &&
+            defaultTargetPlatform != TargetPlatform.android)) {
       return UserApi.instance.loginWithKakaoAccount();
     }
 

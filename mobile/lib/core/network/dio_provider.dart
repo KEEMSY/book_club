@@ -1,5 +1,3 @@
-import 'dart:io' show Platform;
-
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -28,7 +26,7 @@ String resolveApiBaseUrl() {
     // localhost so the backend CORS regex (http://localhost(:\d+)?) matches.
     return 'http://localhost:8000';
   }
-  if (Platform.isAndroid) {
+  if (defaultTargetPlatform == TargetPlatform.android) {
     return 'http://10.0.2.2:8000';
   }
   return 'http://127.0.0.1:8000';

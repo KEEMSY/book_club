@@ -1,5 +1,3 @@
-import 'dart:io' show Platform;
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -45,7 +43,8 @@ class LoginScreen extends ConsumerWidget {
     const bool isDevMode =
         kDebugMode &&
         bool.fromEnvironment('SHOW_DEV_LOGIN', defaultValue: true);
-    final bool showApple = !kIsWeb && Platform.isIOS;
+    final bool showApple =
+        !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,

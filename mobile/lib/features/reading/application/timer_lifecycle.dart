@@ -1,5 +1,3 @@
-import 'dart:io' show Platform;
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -84,7 +82,7 @@ class AndroidForegroundServiceBridge implements BackgroundTimerBridge {
     required String userBookId,
     required String sessionId,
   }) async {
-    if (kIsWeb || !Platform.isAndroid) return;
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) return;
     try {
       await initBackgroundService();
       await FlutterBackgroundService().startService();
@@ -95,7 +93,7 @@ class AndroidForegroundServiceBridge implements BackgroundTimerBridge {
 
   @override
   Future<void> update({required Duration elapsed}) async {
-    if (kIsWeb || !Platform.isAndroid) return;
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) return;
     try {
       final String label = '${elapsed.inHours.toString().padLeft(2, '0')}:'
           '${(elapsed.inMinutes % 60).toString().padLeft(2, '0')}:'
@@ -108,7 +106,7 @@ class AndroidForegroundServiceBridge implements BackgroundTimerBridge {
 
   @override
   Future<void> stop() async {
-    if (kIsWeb || !Platform.isAndroid) return;
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) return;
     try {
       FlutterBackgroundService().invoke('stop');
     } catch (_) {}
@@ -119,7 +117,7 @@ class AndroidForegroundServiceBridge implements BackgroundTimerBridge {
 /// override this provider with a stub bridge via `overrideWithValue`.
 final backgroundTimerBridgeProvider = Provider<BackgroundTimerBridge>((ref) {
   if (kIsWeb) return const IosNullBridge();
-  if (Platform.isAndroid) {
+  if (defaultTargetPlatform == TargetPlatform.android) {
     return const AndroidForegroundServiceBridge();
   }
   return const IosNullBridge();
