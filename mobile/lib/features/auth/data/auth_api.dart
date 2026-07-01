@@ -58,4 +58,9 @@ abstract class AuthApi {
   /// Soft-deletes the current user (backend returns 204).
   @DELETE('/me')
   Future<void> deleteMe();
+
+  /// Dev-only: seeds realistic test data for the current user. Backend returns
+  /// 204 on success, 403 for the protected 개발자 account, 404 outside dev env.
+  @POST('/dev/seed')
+  Future<void> seedTesterData();
 }

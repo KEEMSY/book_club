@@ -14,6 +14,7 @@ from prometheus_fastapi_instrumentator import Instrumentator
 from app import __version__
 from app.api import health
 from app.api.admin import router as admin_router
+from app.api.dev import router as dev_router
 from app.core.config import get_settings
 from app.core.exceptions import register_exception_handlers
 from app.core.middleware import LanguageMiddleware, LastActiveMiddleware
@@ -134,6 +135,7 @@ def create_app() -> FastAPI:
     # before any downstream middleware or route reads it.
     app.add_middleware(LanguageMiddleware)
     app.include_router(health.router)
+    app.include_router(dev_router)
     app.include_router(auth_router)
     app.include_router(book_router)
     app.include_router(reading_router)

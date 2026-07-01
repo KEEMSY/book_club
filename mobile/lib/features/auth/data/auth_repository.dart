@@ -139,6 +139,13 @@ class AuthRepository {
 
   Future<void> logout() => _storage.clearTokens();
 
+  /// Seeds realistic test data for the current dev-login user.
+  ///
+  /// Idempotent — calling it again clears the previous seed and re-creates it.
+  /// Throws [AuthRepositoryException] with code `DEV_SEED_FORBIDDEN` when
+  /// called on the protected 개발자 account.
+  Future<void> seedTesterData() => _call(() => _api.seedTesterData());
+
   /// Updates the authenticated user's profile fields.
   ///
   /// Null values are omitted from the request body so the backend applies

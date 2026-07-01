@@ -72,6 +72,22 @@ class AuthNotifier extends _$AuthNotifier {
     await _performLogin(() => _repository.loginDev(nickname: nickname));
   }
 
+  /// Dev-only: logs in as the tester account and seeds realistic test data.
+  ///
+  /// Equivalent to [loginDev] but also calls `POST /dev/seed` after login so
+  /// the app starts with books, sessions, goals, and notifications pre-populated.
+  Future<void> loginTester() async {
+    await _performLogin(() => _repository.loginDev(nickname: '테스터'));
+    // Seed only if login succeeded (state is now Authenticated).
+    if (state is Authenticated) {
+      try {
+        await _repository.seedTesterData();
+      } on AuthRepositoryException {
+        // Seed failure is non-fatal — the user is still logged in.
+      }
+    }
+  }
+
   Future<void> logout() async {
     await _fcmTokenRefreshSub?.cancel();
     _fcmTokenRefreshSub = null;

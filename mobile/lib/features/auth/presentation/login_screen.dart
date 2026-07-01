@@ -78,6 +78,8 @@ class LoginScreen extends ConsumerWidget {
                         .loginWithApple(),
                     onDevLogin: () =>
                         ref.read(authNotifierProvider.notifier).loginDev(),
+                    onTesterLogin: () =>
+                        ref.read(authNotifierProvider.notifier).loginTester(),
                   ),
                 ],
               ),
@@ -151,6 +153,7 @@ class _BottomCtas extends StatelessWidget {
     required this.onKakao,
     required this.onApple,
     required this.onDevLogin,
+    required this.onTesterLogin,
   });
 
   final AppSpacing spacing;
@@ -161,6 +164,7 @@ class _BottomCtas extends StatelessWidget {
   final VoidCallback onKakao;
   final VoidCallback onApple;
   final VoidCallback onDevLogin;
+  final VoidCallback onTesterLogin;
 
   @override
   Widget build(BuildContext context) {
@@ -191,11 +195,27 @@ class _BottomCtas extends StatelessWidget {
           ],
           if (kDebugMode && showDevLogin) ...<Widget>[
             SizedBox(height: spacing.sm),
-            DevLoginButton(onPressed: onDevLogin, isLoading: isBusy),
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: DevLoginButton(
+                    onPressed: onDevLogin,
+                    isLoading: isBusy,
+                  ),
+                ),
+                SizedBox(width: spacing.sm),
+                Expanded(
+                  child: DevLoginButton(
+                    onPressed: onTesterLogin,
+                    label: '테스트 데이터 로그인',
+                    isLoading: isBusy,
+                  ),
+                ),
+              ],
+            ),
             SizedBox(height: spacing.xs),
             Text(
-              'Dev 환경 전용 · 심사용 테스트 계정\n'
-              'test@bookclub.app / 비밀번호 불필요 (소셜 로그인 대체)',
+              'Dev 환경 전용 · 테스트 데이터 로그인은 샘플 데이터가 자동 생성됩니다',
               textAlign: TextAlign.center,
               style: theme.textTheme.bodySmall?.copyWith(
                 color:

@@ -6,7 +6,7 @@ part of 'auth_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$authNotifierHash() => r'0a7793a16a96cddeb6a13e4ce7b20198ba42cb31';
+String _$authNotifierHash() => r'2ae2110863ba787f5b998b484e5751af58d87258';
 
 /// Holds the [AuthState] sealed union and orchestrates the three public
 /// flows (kakao login · apple login · logout · account delete).
