@@ -40,4 +40,15 @@ class DashboardPrefsNotifier extends _$DashboardPrefsNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_key, jsonEncode(newPrefs.toJson()));
   }
+
+  /// Reorders sections when the user drags a row in the settings sheet.
+  /// [ReorderableListView] passes (oldIndex, newIndex) where newIndex is
+  /// the position AFTER the item has been removed — standard Flutter convention.
+  Future<void> reorder(int oldIndex, int newIndex) async {
+    final List<String> order = List<String>.from(state.sectionOrder);
+    if (newIndex > oldIndex) newIndex -= 1;
+    final String item = order.removeAt(oldIndex);
+    order.insert(newIndex, item);
+    await update(state.copyWith(sectionOrder: order));
+  }
 }
