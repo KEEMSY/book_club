@@ -169,32 +169,36 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   accent: accent,
                 ),
                 SizedBox(height: spacing.md),
-                if (prefs.showStreak) ...<Widget>[
-                  _StreakCardWithRecovery(
-                    streak: _streak(gradeState),
-                    longest: _longest(gradeState),
-                  ),
-                  SizedBox(height: spacing.md),
-                ],
                 _YearStatsCard(
                   accent: accent,
                   onTap: () => _onStatsTap(context),
                 ),
                 SizedBox(height: spacing.md),
-                if (prefs.showGoal) ...<Widget>[
-                  DashboardGoalCard(
-                    items: goalItems,
-                    accent: accent,
-                    onAddGoal: () => GoRouter.of(context).push('/goals'),
-                  ),
-                  SizedBox(height: spacing.md),
-                ],
-                if (prefs.showGrade) ...<Widget>[
-                  _GradeRow(state: gradeState, accent: accent),
-                  SizedBox(height: spacing.md),
-                ],
-                if (prefs.showHeatmap) ...<Widget>[
-                  _HeatmapCard(accent: accent),
+                // Render toggleable sections in user-defined order.
+                for (final String sectionId in prefs.sectionOrder) ...<Widget>[
+                  if (sectionId == 'streak' && prefs.showStreak) ...<Widget>[
+                    _StreakCardWithRecovery(
+                      streak: _streak(gradeState),
+                      longest: _longest(gradeState),
+                    ),
+                    SizedBox(height: spacing.md),
+                  ],
+                  if (sectionId == 'goal' && prefs.showGoal) ...<Widget>[
+                    DashboardGoalCard(
+                      items: goalItems,
+                      accent: accent,
+                      onAddGoal: () => GoRouter.of(context).push('/goals'),
+                    ),
+                    SizedBox(height: spacing.md),
+                  ],
+                  if (sectionId == 'grade' && prefs.showGrade) ...<Widget>[
+                    _GradeRow(state: gradeState, accent: accent),
+                    SizedBox(height: spacing.md),
+                  ],
+                  if (sectionId == 'heatmap' && prefs.showHeatmap) ...<Widget>[
+                    _HeatmapCard(accent: accent),
+                    SizedBox(height: spacing.md),
+                  ],
                 ],
               ],
             ),
