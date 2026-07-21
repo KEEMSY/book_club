@@ -86,11 +86,18 @@ Router  →  Service  →  Repository / External Adapter
 
 ## 6. 브랜치 & 커밋
 
-### 6.1 브랜치
+### 6.1 브랜치 & 워크트리 (티켓 기반)
 
 - 기본 브랜치: `main`
-- 작업 브랜치: `feat/<domain>-<slug>`, `fix/<domain>-<slug>`, `chore/<slug>`, `docs/<slug>`
-- 머지 전략: Squash merge. PR 단위로 의미 있는 커밋 1건을 남긴다.
+- **모든 작업은 Jira 티켓(BC 프로젝트) 단위로 워크트리에서 진행한다.** 티켓 없는 작업 금지.
+- 브랜치 컨벤션: `<type>/<TICKET>` — `type` 은 작업 특성에 따라 구분한다.
+  - `feature/<TICKET>` — 신규 기능·확장·배포 파이프라인 (예: `feature/BC-3`)
+  - `backlog/<TICKET>` — 스코프 정리·기술부채·리팩터링 (예: `backlog/BC-16`)
+  - `hotfix/<TICKET>` — 긴급 수정 (예: `hotfix/BC-42`)
+- 워크트리로 격리 생성하여 독립 티켓은 **병렬** 진행한다:
+  - 생성: `git worktree add ../book_club-<TICKET> -b <type>/<TICKET>`
+  - 정리: 머지 후 `git worktree remove ../book_club-<TICKET>`
+- 머지 전략: Squash merge. **PR 1건 = 티켓 1건.** PR 제목·본문에 티켓 키를 명시하고, 머지 후 해당 Jira 티켓을 완료로 전이한다.
 
 ### 6.2 커밋 메시지
 
@@ -178,5 +185,5 @@ Router  →  Service  →  Repository / External Adapter
 
 ---
 
-**Last updated**: 2026-04-20
-**CLAUDE.md version**: 1.0.0
+**Last updated**: 2026-07-21
+**CLAUDE.md version**: 1.1.0

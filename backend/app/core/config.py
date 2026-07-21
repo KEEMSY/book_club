@@ -88,6 +88,33 @@ class Settings(BaseSettings):
     agora_app_id: str = Field(default="")
     agora_app_certificate: str = Field(default="")
 
+    # --- Feature flags (scope cleanup, BC-1) -------------------------------
+    # Non-MVP domains are gated so they can be deferred (disabled) without
+    # deleting code. MVP core (auth/book/reading/feed/notification) and infra
+    # (health/dev/admin) are always on and have no flag. Default True preserves
+    # current behavior; the scope audit (BC-16~20) flips individual defaults to
+    # False for deferred domains. A disabled domain's router is not mounted, so
+    # its endpoints return 404 while the code stays in place for later review.
+    feature_social_enabled: bool = Field(default=True)
+    feature_community_enabled: bool = Field(default=True)
+    feature_club_enabled: bool = Field(default=True)
+    feature_challenge_enabled: bool = Field(default=True)
+    feature_discovery_enabled: bool = Field(default=True)
+    feature_search_enabled: bool = Field(default=True)
+    feature_curation_enabled: bool = Field(default=True)
+    feature_event_enabled: bool = Field(default=True)
+    feature_referral_enabled: bool = Field(default=True)
+    feature_reminder_enabled: bool = Field(default=True)
+    feature_retention_enabled: bool = Field(default=True)
+    feature_experiment_enabled: bool = Field(default=True)
+    feature_subscription_enabled: bool = Field(default=True)
+    feature_shield_enabled: bool = Field(default=True)
+    feature_review_enabled: bool = Field(default=True)
+    feature_ai_assistant_enabled: bool = Field(default=True)
+    feature_share_enabled: bool = Field(default=True)
+    feature_video_enabled: bool = Field(default=True)
+    feature_team_enabled: bool = Field(default=True)
+
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:

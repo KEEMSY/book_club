@@ -142,28 +142,50 @@ def create_app() -> FastAPI:
     app.include_router(reading_me_router)
     app.include_router(feed_router)
     app.include_router(notification_router)
-    app.include_router(social_router)
-    app.include_router(community_router)
-    app.include_router(challenge_router)
-    app.include_router(discovery_router)
+    # Infra / admin routers are always mounted (not user-facing features).
     app.include_router(admin_router)
     app.include_router(admin_dashboard_router)
-    app.include_router(club_router)
-    app.include_router(club_ws_router)
-    app.include_router(referral_router)
-    app.include_router(reminder_router)
-    app.include_router(subscription_router)
-    app.include_router(search_router)
-    app.include_router(curation_router)
-    app.include_router(experiment_router)
-    app.include_router(event_router)
-    app.include_router(retention_router)
-    app.include_router(shield_router)
-    app.include_router(review_router)
-    app.include_router(ai_assistant_router)
-    app.include_router(share_router)
-    app.include_router(video_router)
-    app.include_router(team_router)
+    # Non-MVP domains are gated by feature flags (BC-1 scope cleanup). Disabling
+    # a flag leaves the domain code intact but stops mounting its router.
+    if settings.feature_social_enabled:
+        app.include_router(social_router)
+    if settings.feature_community_enabled:
+        app.include_router(community_router)
+    if settings.feature_challenge_enabled:
+        app.include_router(challenge_router)
+    if settings.feature_discovery_enabled:
+        app.include_router(discovery_router)
+    if settings.feature_club_enabled:
+        app.include_router(club_router)
+        app.include_router(club_ws_router)
+    if settings.feature_referral_enabled:
+        app.include_router(referral_router)
+    if settings.feature_reminder_enabled:
+        app.include_router(reminder_router)
+    if settings.feature_subscription_enabled:
+        app.include_router(subscription_router)
+    if settings.feature_search_enabled:
+        app.include_router(search_router)
+    if settings.feature_curation_enabled:
+        app.include_router(curation_router)
+    if settings.feature_experiment_enabled:
+        app.include_router(experiment_router)
+    if settings.feature_event_enabled:
+        app.include_router(event_router)
+    if settings.feature_retention_enabled:
+        app.include_router(retention_router)
+    if settings.feature_shield_enabled:
+        app.include_router(shield_router)
+    if settings.feature_review_enabled:
+        app.include_router(review_router)
+    if settings.feature_ai_assistant_enabled:
+        app.include_router(ai_assistant_router)
+    if settings.feature_share_enabled:
+        app.include_router(share_router)
+    if settings.feature_video_enabled:
+        app.include_router(video_router)
+    if settings.feature_team_enabled:
+        app.include_router(team_router)
 
     # Expose /metrics for Prometheus scraping; instrument after all routers are
     # registered so every route is covered from the start.
