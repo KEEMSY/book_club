@@ -50,8 +50,7 @@ IconData _iconFor(MilestoneType type) {
 void checkAndShowMilestoneToasts(BuildContext context, WidgetRef ref) {
   final AsyncValue<List<MilestoneItem>> async = ref.read(milestonesProvider);
   async.whenData((items) {
-    final Set<String> acknowledged =
-        ref.read(_acknowledgedMilestonesProvider);
+    final Set<String> acknowledged = ref.read(_acknowledgedMilestonesProvider);
 
     // Sort descending by achievedAt so the most-recent milestone is shown last
     // (SnackBars stack; last enqueued appears on top).

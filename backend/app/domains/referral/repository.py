@@ -49,9 +49,7 @@ class ReferralRepository:
         Retries on unique-constraint collisions (extremely unlikely for a
         6-char alphanumeric space of 2.18 billion combinations).
         """
-        result = await self.session.execute(
-            select(User.referral_code).where(User.id == user_id)
-        )
+        result = await self.session.execute(select(User.referral_code).where(User.id == user_id))
         existing = result.scalar_one_or_none()
         if existing is not None:
             return existing
@@ -102,9 +100,7 @@ class ReferralRepository:
         )
         referrer_id: UUID | None = referrer_result.scalar_one_or_none()
         if referrer_id is None:
-            raise NotFoundError(
-                f"referral code '{code}' not found", code="REFERRAL_CODE_NOT_FOUND"
-            )
+            raise NotFoundError(f"referral code '{code}' not found", code="REFERRAL_CODE_NOT_FOUND")
 
         # Idempotency: do nothing if this referee already has a referral row.
         existing_result = await self.session.execute(

@@ -13,8 +13,8 @@ import '../domain/dashboard_prefs.dart';
 class DashboardSettingsSheet extends ConsumerWidget {
   const DashboardSettingsSheet({super.key});
 
-  static const Map<String, ({String title, String subtitle})> _meta = <String,
-      ({String title, String subtitle})>{
+  static const Map<String, ({String title, String subtitle})> _meta =
+      <String, ({String title, String subtitle})>{
     'streak': (title: '스트릭 카드', subtitle: '연속 독서 일수'),
     'goal': (title: '목표 진행률', subtitle: '주간 · 월간 · 연간 목표'),
     'grade': (title: '등급 카드', subtitle: '나의 독서 등급'),

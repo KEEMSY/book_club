@@ -95,9 +95,7 @@ async def submit_curation_feedback(
     Returns 404 when the card does not exist. Re-submitting flips the stored
     action rather than stacking rows.
     """
-    await service.record_feedback(
-        user_id=UUID(user_id), card_id=card_id, action=body.action
-    )
+    await service.record_feedback(user_id=UUID(user_id), card_id=card_id, action=body.action)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 

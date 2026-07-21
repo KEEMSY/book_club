@@ -65,8 +65,10 @@ class _ReflectionContent extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Text(reflection.insights[i],
-                      style: theme.textTheme.bodyMedium,),
+                  child: Text(
+                    reflection.insights[i],
+                    style: theme.textTheme.bodyMedium,
+                  ),
                 ),
               ],
             ),
@@ -161,7 +163,8 @@ class _ReflectionError extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final aiError = error is AiRepositoryException ? error as AiRepositoryException : null;
+    final aiError =
+        error is AiRepositoryException ? error as AiRepositoryException : null;
 
     if (aiError != null && aiError.isProRequired) {
       return _ProGate(theme: theme);
@@ -184,8 +187,11 @@ class _ReflectionError extends StatelessWidget {
           children: [
             Icon(Icons.cloud_off, size: 44, color: theme.colorScheme.outline),
             const SizedBox(height: 12),
-            Text(message,
-                textAlign: TextAlign.center, style: theme.textTheme.bodyMedium,),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium,
+            ),
             const SizedBox(height: 16),
             OutlinedButton(onPressed: onRetry, child: const Text('다시 시도')),
           ],
@@ -208,11 +214,17 @@ class _ProGate extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.workspace_premium,
-                size: 48, color: theme.colorScheme.primary,),
+            Icon(
+              Icons.workspace_premium,
+              size: 48,
+              color: theme.colorScheme.primary,
+            ),
             const SizedBox(height: 16),
-            Text('AI 성찰 가이드는 Pro 전용이에요',
-                textAlign: TextAlign.center, style: theme.textTheme.titleMedium,),
+            Text(
+              'AI 성찰 가이드는 Pro 전용이에요',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.titleMedium,
+            ),
             const SizedBox(height: 8),
             Text(
               '완독한 책을 내 삶과 연결해주는 깊이 있는 성찰 가이드를\nPro로 무제한 받아보세요.',

@@ -33,8 +33,7 @@ ProviderContainer _makeContainer({
     overrides: [
       readingRepositoryProvider.overrideWithValue(repo),
       secureStorageProvider.overrideWithValue(st),
-      if (clock != null)
-        timerClockProvider.overrideWith((_) => clock.now),
+      if (clock != null) timerClockProvider.overrideWith((_) => clock.now),
     ],
   );
   addTearDown(container.dispose);

@@ -11,9 +11,7 @@ from dataclasses import dataclass, field
 from uuid import UUID, uuid4
 
 import pytest
-from app.domains.feed.ports import FeedEventRepositoryPort
 from app.domains.feed.service import FeedService
-
 
 # ---------------------------------------------------------------------------
 # Minimal fake
@@ -31,9 +29,7 @@ class FakeFeedEventRepo:
         event_type: str,
         metadata: dict | None,
     ) -> object:
-        self.events.append(
-            {"user_id": user_id, "event_type": event_type, "metadata": metadata}
-        )
+        self.events.append({"user_id": user_id, "event_type": event_type, "metadata": metadata})
         return object()
 
 

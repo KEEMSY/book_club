@@ -72,7 +72,9 @@ class User(Base):
 
     # Pro subscription fields — populated via RevenueCat receipt verification.
     is_pro: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="false")
-    pro_expires_at: Mapped[datetime | None] = mapped_column(PGTIMESTAMP(timezone=True), nullable=True)
+    pro_expires_at: Mapped[datetime | None] = mapped_column(
+        PGTIMESTAMP(timezone=True), nullable=True
+    )
     pro_product_id: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     # New-signup Pro trial window (M65). Both NULL for accounts created before

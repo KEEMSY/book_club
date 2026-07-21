@@ -136,8 +136,7 @@ class ClubChatError extends ClubChatState {
 /// Resolves the WebSocket base URL using the same dart-define pattern as the
 /// HTTP layer (see `dio_provider.dart`). Falls back to localhost:8000.
 String _resolveWsBaseUrl() {
-  const fromDefine =
-      String.fromEnvironment('API_WS_URL', defaultValue: '');
+  const fromDefine = String.fromEnvironment('API_WS_URL', defaultValue: '');
   if (fromDefine.isNotEmpty) return fromDefine;
   // Mirror the HTTP fallback: Android emulator uses 10.0.2.2 while iOS/desktop
   // uses 127.0.0.1. We read the same dart-define that dio_provider checks but
@@ -281,9 +280,8 @@ class ClubChatNotifier extends _$ClubChatNotifier {
 
       // Prepend older messages, deduplicating by id.
       final existingIds = connected.messages.map((m) => m.id).toSet();
-      final older = result.messages
-          .where((m) => !existingIds.contains(m.id))
-          .toList();
+      final older =
+          result.messages.where((m) => !existingIds.contains(m.id)).toList();
 
       state = connected.copyWith(
         messages: [...older, ...connected.messages],
@@ -392,9 +390,7 @@ class ClubChatNotifier extends _$ClubChatNotifier {
     final current = state;
     if (current is! ClubChatConnected) return;
     state = current.copyWith(
-      messages: current.messages
-          .where((m) => m.id != messageId)
-          .toList(),
+      messages: current.messages.where((m) => m.id != messageId).toList(),
     );
   }
 

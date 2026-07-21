@@ -109,6 +109,7 @@ class FakeAuthApi implements AuthApi {
   int getMeCalls = 0;
   int registerDeviceTokenCalls = 0;
   int deleteMeCalls = 0;
+  int seedTesterDataCalls = 0;
 
   @override
   Future<LoginResponse> loginKakao(Map<String, dynamic> body) async {
@@ -156,6 +157,11 @@ class FakeAuthApi implements AuthApi {
 
   @override
   Future<void> updateProfile(Map<String, dynamic> body) async {}
+
+  @override
+  Future<void> seedTesterData() async {
+    seedTesterDataCalls++;
+  }
 }
 
 /// Helper that builds a canonical [AuthUserDto] for test fixtures.

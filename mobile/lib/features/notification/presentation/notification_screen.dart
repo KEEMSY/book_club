@@ -376,10 +376,10 @@ class _NtypeIcon extends StatelessWidget {
       // Chat / club types
       'club_chat' || 'chat_mention' => ('💬', const Color(0xFFE8EAF6)),
       // Challenge types
-      'challenge_started' ||
-      'challenge_completed' ||
-      'challenge_joined' =>
-        ('🏆', const Color(0xFFFFF3E0)),
+      'challenge_started' || 'challenge_completed' || 'challenge_joined' => (
+          '🏆',
+          const Color(0xFFFFF3E0)
+        ),
       'challenge_reminder' => ('⏰', const Color(0xFFFFF3E0)),
       // Club activity
       'club_joined' || 'club_invite' => ('📚', const Color(0xFFE8F5E9)),

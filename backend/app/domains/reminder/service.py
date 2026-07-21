@@ -27,9 +27,7 @@ class ReminderService:
         """Return all reminders owned by the user."""
         return await self.repo.list_by_user(user_id)
 
-    async def create_reminder(
-        self, *, user_id: UUID, data: ReminderCreate
-    ) -> ReadingReminder:
+    async def create_reminder(self, *, user_id: UUID, data: ReminderCreate) -> ReadingReminder:
         """Create a new reminder, enforcing the 7-per-user cap."""
         existing = await self.repo.list_by_user(user_id)
         if len(existing) >= _MAX_REMINDERS_PER_USER:

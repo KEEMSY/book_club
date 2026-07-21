@@ -29,7 +29,8 @@ void main() {
       await notifier.ensureLoaded(BookStatus.reading);
       expect(repo.libraryCalls.length, 1);
       expect(repo.libraryCalls.single.status, BookStatus.reading);
-      expect(c.read(libraryNotifierProvider)[BookStatus.reading], isA<LibraryListLoaded>());
+      expect(c.read(libraryNotifierProvider)[BookStatus.reading],
+          isA<LibraryListLoaded>());
 
       // Second ensureLoaded should be a cache hit.
       await notifier.ensureLoaded(BookStatus.reading);
@@ -71,7 +72,8 @@ void main() {
       await notifier.ensureLoaded(BookStatus.reading);
       await notifier.loadMore(BookStatus.reading);
 
-      final loaded = c.read(libraryNotifierProvider)[BookStatus.reading] as LibraryListLoaded;
+      final loaded = c.read(libraryNotifierProvider)[BookStatus.reading]
+          as LibraryListLoaded;
       expect(loaded.items.map((u) => u.id), <String>['ub1', 'ub2']);
       expect(loaded.nextCursor, isNull);
       expect(repo.libraryCalls.length, 2);
@@ -104,7 +106,8 @@ void main() {
       );
       notifier.upsert(updated);
 
-      final loaded = c.read(libraryNotifierProvider)[BookStatus.reading] as LibraryListLoaded;
+      final loaded = c.read(libraryNotifierProvider)[BookStatus.reading]
+          as LibraryListLoaded;
       expect(loaded.items.single.oneLineReview, '좋았다');
       expect(loaded.items.single.rating, 5);
     });
@@ -135,10 +138,10 @@ void main() {
       );
       notifier.upsert(updated);
 
-      final readingTab =
-          c.read(libraryNotifierProvider)[BookStatus.reading] as LibraryListLoaded;
-      final completedTab =
-          c.read(libraryNotifierProvider)[BookStatus.completed] as LibraryListLoaded;
+      final readingTab = c.read(libraryNotifierProvider)[BookStatus.reading]
+          as LibraryListLoaded;
+      final completedTab = c.read(libraryNotifierProvider)[BookStatus.completed]
+          as LibraryListLoaded;
       expect(readingTab.items, isEmpty);
       expect(completedTab.items.map((u) => u.id), <String>['ub1']);
     });

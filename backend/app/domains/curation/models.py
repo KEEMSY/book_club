@@ -53,9 +53,7 @@ class CurationCard(Base):
     card_type: Mapped[str] = mapped_column(String(16), nullable=False)
     title: Mapped[str] = mapped_column(String(100), nullable=False)
     body: Mapped[str] = mapped_column(Text, nullable=False)
-    order_index: Mapped[int] = mapped_column(
-        Integer, nullable=False, server_default="0"
-    )
+    order_index: Mapped[int] = mapped_column(Integer, nullable=False, server_default="0")
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )

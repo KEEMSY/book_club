@@ -15,11 +15,9 @@ from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
 import pytest
-
 from app.core.exceptions import ConflictError, NotFoundError
 from app.domains.shield.service import ShieldPurchaseService
 from app.domains.subscription.ports import PurchaseVerificationResult
-
 
 # ---------------------------------------------------------------------------
 # Fake domain objects
@@ -189,7 +187,12 @@ def _build_service(
     *,
     verifier_valid: bool = True,
     verifier_error: str | None = None,
-) -> tuple[ShieldPurchaseService, FakeShieldPurchaseRepository, FakePurchaseVerifier, FakeUserGradeRepository]:
+) -> tuple[
+    ShieldPurchaseService,
+    FakeShieldPurchaseRepository,
+    FakePurchaseVerifier,
+    FakeUserGradeRepository,
+]:
     repo = FakeShieldPurchaseRepository()
     grade_repo = FakeUserGradeRepository()
     verifier = FakePurchaseVerifier(is_valid=verifier_valid, error_message=verifier_error)
@@ -205,7 +208,7 @@ def _build_service(
 @pytest.mark.asyncio
 async def test_purchase_shield_1_grants_one_shield() -> None:
     """shield_1 product credits exactly 1 shield and returns total_shields."""
-    svc, repo, verifier, grade_repo = _build_service()
+    svc, repo, _verifier, grade_repo = _build_service()
     user_id = uuid4()
 
     result = await svc.purchase_shields(
@@ -227,7 +230,7 @@ async def test_purchase_shield_1_grants_one_shield() -> None:
 @pytest.mark.asyncio
 async def test_purchase_shield_3_grants_three_shields() -> None:
     """shield_3 product credits 3 shields."""
-    svc, repo, _, grade_repo = _build_service()
+    svc, _repo, _, grade_repo = _build_service()
     user_id = uuid4()
 
     result = await svc.purchase_shields(

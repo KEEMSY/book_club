@@ -35,9 +35,7 @@ class ReadingReminder(Base):
     # ISO weekday list: 0 = Monday … 6 = Sunday.
     days_of_week: Mapped[list[int]] = mapped_column(ARRAY(Integer()), nullable=False)
     remind_at: Mapped[time_type] = mapped_column(Time(), nullable=False)
-    is_active: Mapped[bool] = mapped_column(
-        Boolean(), nullable=False, server_default="true"
-    )
+    is_active: Mapped[bool] = mapped_column(Boolean(), nullable=False, server_default="true")
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )

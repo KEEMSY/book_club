@@ -69,11 +69,7 @@ class FakeHighlightRepo:
         row.visibility = "public"
 
     async def list_public(self, *, limit: int, sort: str) -> list[ExploreHighlightItem]:
-        rows = [
-            h
-            for h in self.by_id.values()
-            if h.visibility == "public" and h.deleted_at is None
-        ]
+        rows = [h for h in self.by_id.values() if h.visibility == "public" and h.deleted_at is None]
         if sort == "popular":
             rows.sort(
                 key=lambda h: (self.reaction_counts.get(h.id, 0), h.created_at),
@@ -111,10 +107,9 @@ class FakeFeedEventRepo:
     async def find_highlight_share(self, highlight_id: UUID) -> FeedEvent | None:
         for ev in self.events:
             md = ev.event_metadata or {}
-            if (
-                ev.event_type == FeedEventType.HIGHLIGHT_SHARED.value
-                and md.get("highlight_id") == str(highlight_id)
-            ):
+            if ev.event_type == FeedEventType.HIGHLIGHT_SHARED.value and md.get(
+                "highlight_id"
+            ) == str(highlight_id):
                 return ev
         return None
 
@@ -248,13 +243,9 @@ async def test_explore_recent_sort_newest_first() -> None:
     repo = FakeHighlightRepo()
     now = datetime.now(tz=UTC)
     older = repo.seed(
-        _make_highlight(
-            user_id=user_id, visibility="public", created_at=now - timedelta(hours=1)
-        )
+        _make_highlight(user_id=user_id, visibility="public", created_at=now - timedelta(hours=1))
     )
-    newer = repo.seed(
-        _make_highlight(user_id=user_id, visibility="public", created_at=now)
-    )
+    newer = repo.seed(_make_highlight(user_id=user_id, visibility="public", created_at=now))
     svc = _make_svc(highlights=repo)
 
     items = await svc.get_explore_highlights(sort="recent")

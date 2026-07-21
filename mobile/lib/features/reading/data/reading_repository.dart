@@ -195,8 +195,7 @@ class ReadingRepository {
   /// M21 — full reading analytics: speed, format breakdown, monthly hours,
   /// genre distribution, avg completion time.
   Future<ReadingStats> getReadingStats() async {
-    final ReadingStatsDto dto =
-        await _call(() => _api.getReadingStats());
+    final ReadingStatsDto dto = await _call(() => _api.getReadingStats());
     return dto.toDomain();
   }
 
@@ -210,8 +209,7 @@ class ReadingRepository {
 
   /// M28 — all achieved milestones for the current user.
   Future<List<MilestoneItem>> getMilestones() async {
-    final List<MilestoneItemDto> dtos =
-        await _call(() => _api.getMilestones());
+    final List<MilestoneItemDto> dtos = await _call(() => _api.getMilestones());
     return dtos.map((d) => d.toDomain()).toList(growable: false);
   }
 

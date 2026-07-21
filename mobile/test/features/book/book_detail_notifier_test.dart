@@ -15,12 +15,17 @@ void main() {
         bookRepositoryProvider.overrideWithValue(repo),
       ]);
       addTearDown(c.dispose);
-      final notifier = c.read(bookDetailNotifierProvider('b1').notifier);
-      // initial state is loading and notifier kicks off load immediately
-      expect(c.read(bookDetailNotifierProvider('b1')), isA<BookDetailLoading>());
+      // Reading the notifier kicks off load() immediately (side-effect only).
+      c.read(bookDetailNotifierProvider('b1').notifier);
+      expect(
+          c.read(bookDetailNotifierProvider('b1')), isA<BookDetailLoading>());
       await Future<void>.delayed(Duration.zero);
       expect(c.read(bookDetailNotifierProvider('b1')), isA<BookDetailLoaded>());
-      expect((c.read(bookDetailNotifierProvider('b1')) as BookDetailLoaded).book.id, 'b1');
+      expect(
+          (c.read(bookDetailNotifierProvider('b1')) as BookDetailLoaded)
+              .book
+              .id,
+          'b1');
     });
 
     test('addToLibrary happy path transitions idle → adding → added', () async {
@@ -37,7 +42,8 @@ void main() {
       final added = await notifier.addToLibrary();
 
       expect(added, isNotNull);
-      final loaded = c.read(bookDetailNotifierProvider('b1')) as BookDetailLoaded;
+      final loaded =
+          c.read(bookDetailNotifierProvider('b1')) as BookDetailLoaded;
       expect(loaded.libraryState, isA<LibraryCtaAdded>());
       expect((loaded.libraryState as LibraryCtaAdded).userBook.id, 'ub1');
       expect(repo.addToLibraryCalls, <String>['b1']);
@@ -61,7 +67,8 @@ void main() {
       final added = await notifier.addToLibrary();
 
       expect(added, isNull);
-      final loaded = c.read(bookDetailNotifierProvider('b1')) as BookDetailLoaded;
+      final loaded =
+          c.read(bookDetailNotifierProvider('b1')) as BookDetailLoaded;
       expect(loaded.libraryState, isA<LibraryCtaDuplicate>());
     });
 
@@ -81,7 +88,8 @@ void main() {
 
       await notifier.addToLibrary();
 
-      final loaded = c.read(bookDetailNotifierProvider('b1')) as BookDetailLoaded;
+      final loaded =
+          c.read(bookDetailNotifierProvider('b1')) as BookDetailLoaded;
       expect(loaded.libraryState, isA<LibraryCtaError>());
     });
   });

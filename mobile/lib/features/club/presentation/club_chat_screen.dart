@@ -323,10 +323,11 @@ class _ClubChatScreenState extends ConsumerState<ClubChatScreen> {
           onRetry: _connectWithToken,
         ),
         Expanded(child: _buildBody(chatState, theme, spacing)),
-        if (_replyTarget != null) _ReplyPreview(
-          message: _replyTarget!,
-          onDismiss: () => setState(() => _replyTarget = null),
-        ),
+        if (_replyTarget != null)
+          _ReplyPreview(
+            message: _replyTarget!,
+            onDismiss: () => setState(() => _replyTarget = null),
+          ),
         _InputBar(
           controller: _controller,
           onSend: _send,
@@ -363,8 +364,7 @@ class _ClubChatScreenState extends ConsumerState<ClubChatScreen> {
                 Text(
                   message,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color:
-                        theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -483,8 +483,7 @@ class _ConnectionBanner extends StatelessWidget {
                     SizedBox(width: 8),
                     Text(
                       '연결 오류 — 재시도',
-                      style:
-                          TextStyle(color: Colors.white, fontSize: 12),
+                      style: TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   ],
                 ),
@@ -519,9 +518,8 @@ class _ChatBubble extends StatelessWidget {
     final bubbleColor = isMe
         ? theme.colorScheme.primary
         : theme.colorScheme.surfaceContainerHighest;
-    final textColor = isMe
-        ? theme.colorScheme.onPrimary
-        : theme.colorScheme.onSurface;
+    final textColor =
+        isMe ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface;
 
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
@@ -546,9 +544,8 @@ class _ChatBubble extends StatelessWidget {
               ],
               Flexible(
                 child: Column(
-                  crossAxisAlignment: isMe
-                      ? CrossAxisAlignment.end
-                      : CrossAxisAlignment.start,
+                  crossAxisAlignment:
+                      isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                   children: [
                     if (!isMe)
                       Padding(
@@ -605,7 +602,8 @@ class _ChatBubble extends StatelessWidget {
                                   placeholder: (_, __) => Container(
                                     width: 200,
                                     height: 120,
-                                    color: theme.colorScheme.surfaceContainerHigh,
+                                    color:
+                                        theme.colorScheme.surfaceContainerHigh,
                                   ),
                                   errorWidget: (_, __, ___) => const Icon(
                                     Icons.broken_image_rounded,
@@ -625,8 +623,7 @@ class _ChatBubble extends StatelessWidget {
                       ),
                     ),
                     Padding(
-                      padding:
-                          const EdgeInsets.only(top: 2, left: 4, right: 4),
+                      padding: const EdgeInsets.only(top: 2, left: 4, right: 4),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -1013,8 +1010,7 @@ class _HighlightPickerSheet extends ConsumerStatefulWidget {
       _HighlightPickerSheetState();
 }
 
-class _HighlightPickerSheetState
-    extends ConsumerState<_HighlightPickerSheet> {
+class _HighlightPickerSheetState extends ConsumerState<_HighlightPickerSheet> {
   late String _selectedUserBookId;
 
   @override
@@ -1116,8 +1112,7 @@ class _HighlightPickerSheetState
                   controller: scrollController,
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
                   itemCount: items.length,
-                  separatorBuilder: (_, __) =>
-                      const Divider(height: 1),
+                  separatorBuilder: (_, __) => const Divider(height: 1),
                   itemBuilder: (_, index) {
                     final h = items[index];
                     return InkWell(
@@ -1148,8 +1143,8 @@ class _HighlightPickerSheetState
                                     const SizedBox(height: 4),
                                     Text(
                                       '${h.pageNumber}p',
-                                      style: theme.textTheme.labelSmall
-                                          ?.copyWith(
+                                      style:
+                                          theme.textTheme.labelSmall?.copyWith(
                                         color: theme.colorScheme.onSurface
                                             .withValues(alpha: 0.45),
                                       ),

@@ -14,9 +14,11 @@ abstract class ClubRoom with _$ClubRoom {
     required String id,
     required String clubId,
     required String name,
+
     /// Minimum progress percentage (0–100) required to enter.
     @Default(0) int progressGate,
     required DateTime createdAt,
+
     /// True when the current user's reading progress meets [progressGate].
     @Default(true) bool canEnter,
   }) = _ClubRoom;

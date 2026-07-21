@@ -11,7 +11,6 @@ from app.core.exceptions import ConflictError, NotFoundError
 from app.domains.reminder.schemas import ReminderCreate
 from app.domains.reminder.service import ReminderService
 
-
 # ---------------------------------------------------------------------------
 # Fake ORM-like object
 # ---------------------------------------------------------------------------

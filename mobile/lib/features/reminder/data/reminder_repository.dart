@@ -35,10 +35,7 @@ class ReminderRepository {
       final dynamic raw = await _api.listReminders();
       final Map<String, dynamic> envelope = raw as Map<String, dynamic>;
       final List<dynamic> items = envelope['items'] as List<dynamic>;
-      return items
-          .cast<Map<String, dynamic>>()
-          .map(_fromJson)
-          .toList();
+      return items.cast<Map<String, dynamic>>().map(_fromJson).toList();
     } on DioException catch (e) {
       throw _fromDio(e);
     }

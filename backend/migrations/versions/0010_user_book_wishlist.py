@@ -29,18 +29,14 @@ def upgrade() -> None:
     op.drop_constraint(_CHECK_NAME, _TABLE, type_="check")
     values_sql = ", ".join(f"'{v}'" for v in _NEW_VALUES)
     op.execute(
-        f"ALTER TABLE {_TABLE} ADD CONSTRAINT {_CHECK_NAME} "
-        f"CHECK ({_COLUMN} IN ({values_sql}))"
+        f"ALTER TABLE {_TABLE} ADD CONSTRAINT {_CHECK_NAME} CHECK ({_COLUMN} IN ({values_sql}))"
     )
 
 
 def downgrade() -> None:
-    op.execute(
-        f"UPDATE {_TABLE} SET {_COLUMN} = 'reading' WHERE {_COLUMN} = 'wishlist'"
-    )
+    op.execute(f"UPDATE {_TABLE} SET {_COLUMN} = 'reading' WHERE {_COLUMN} = 'wishlist'")
     op.drop_constraint(_CHECK_NAME, _TABLE, type_="check")
     values_sql = ", ".join(f"'{v}'" for v in _OLD_VALUES)
     op.execute(
-        f"ALTER TABLE {_TABLE} ADD CONSTRAINT {_CHECK_NAME} "
-        f"CHECK ({_COLUMN} IN ({values_sql}))"
+        f"ALTER TABLE {_TABLE} ADD CONSTRAINT {_CHECK_NAME} CHECK ({_COLUMN} IN ({values_sql}))"
     )

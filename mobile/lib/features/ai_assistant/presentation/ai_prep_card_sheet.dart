@@ -138,7 +138,8 @@ class _PrepContent extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(Icons.auto_awesome, color: theme.colorScheme.primary, size: 20),
+            Icon(Icons.auto_awesome,
+                color: theme.colorScheme.primary, size: 20),
             const SizedBox(width: 8),
             Text('AI 독서 준비', style: theme.textTheme.titleMedium),
           ],
@@ -236,10 +237,10 @@ class _PrepError extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final bool unavailable =
-        error is AiRepositoryException && (error as AiRepositoryException).isUnavailable;
-    final bool rateLimited =
-        error is AiRepositoryException && (error as AiRepositoryException).isRateLimited;
+    final bool unavailable = error is AiRepositoryException &&
+        (error as AiRepositoryException).isUnavailable;
+    final bool rateLimited = error is AiRepositoryException &&
+        (error as AiRepositoryException).isRateLimited;
 
     final String message;
     if (unavailable) {

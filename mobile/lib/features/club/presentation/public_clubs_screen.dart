@@ -150,7 +150,7 @@ class _PublicClubsScreenState extends ConsumerState<PublicClubsScreen> {
                     onSelectionChanged: (val) {
                       setState(() => _sort = val.first);
                     },
-                    style: ButtonStyle(
+                    style: const ButtonStyle(
                       visualDensity: VisualDensity.compact,
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
@@ -306,16 +306,14 @@ class _RecommendedClubCard extends ConsumerStatefulWidget {
       _RecommendedClubCardState();
 }
 
-class _RecommendedClubCardState
-    extends ConsumerState<_RecommendedClubCard> {
+class _RecommendedClubCardState extends ConsumerState<_RecommendedClubCard> {
   bool _joining = false;
 
   Future<void> _join() async {
     setState(() => _joining = true);
     try {
-      final joined = await ref
-          .read(clubRepositoryProvider)
-          .joinPublicClub(widget.club.id);
+      final joined =
+          await ref.read(clubRepositoryProvider).joinPublicClub(widget.club.id);
       if (!mounted) return;
       ref.invalidate(myClubsProvider);
       await Navigator.of(context).push(
@@ -379,8 +377,8 @@ class _RecommendedClubCardState
                 SizedBox(height: spacing.xs),
                 if (club.category != null)
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 6, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
                       color: theme.colorScheme.secondaryContainer,
                       borderRadius: BorderRadius.circular(4),
@@ -413,8 +411,7 @@ class _RecommendedClubCardState
                         ? const SizedBox(
                             width: 14,
                             height: 14,
-                            child:
-                                CircularProgressIndicator(strokeWidth: 2),
+                            child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Text('가입', style: TextStyle(fontSize: 12)),
                   ),
@@ -447,9 +444,8 @@ class _PublicClubCardState extends ConsumerState<_PublicClubCard> {
   Future<void> _join() async {
     setState(() => _joining = true);
     try {
-      final joined = await ref
-          .read(clubRepositoryProvider)
-          .joinPublicClub(widget.club.id);
+      final joined =
+          await ref.read(clubRepositoryProvider).joinPublicClub(widget.club.id);
       if (!mounted) return;
       ref.invalidate(myClubsProvider);
       await Navigator.of(context).push(
@@ -553,8 +549,7 @@ class _PublicClubCardState extends ConsumerState<_PublicClubCard> {
                           child: Text(
                             club.category!,
                             style: theme.textTheme.labelSmall?.copyWith(
-                              color:
-                                  theme.colorScheme.onSecondaryContainer,
+                              color: theme.colorScheme.onSecondaryContainer,
                             ),
                           ),
                         ),
@@ -582,8 +577,7 @@ class _PublicClubCardState extends ConsumerState<_PublicClubCard> {
                               ),
                               child: Text(
                                 '#$tag',
-                                style:
-                                    theme.textTheme.labelSmall?.copyWith(
+                                style: theme.textTheme.labelSmall?.copyWith(
                                   color: theme.colorScheme.onSurface
                                       .withValues(alpha: 0.7),
                                 ),

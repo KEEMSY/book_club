@@ -36,10 +36,8 @@ class ExperimentRepository {
       final dynamic raw = await _api.getMyExperiments();
       final Map<String, dynamic> envelope = raw as Map<String, dynamic>;
       final List<dynamic> items = envelope['assignments'] as List<dynamic>;
-      final assignments = items
-          .cast<Map<String, dynamic>>()
-          .map(_assignmentFromJson)
-          .toList();
+      final assignments =
+          items.cast<Map<String, dynamic>>().map(_assignmentFromJson).toList();
       return UserExperiments(assignments: assignments);
     } on DioException catch (e) {
       throw _fromDio(e);

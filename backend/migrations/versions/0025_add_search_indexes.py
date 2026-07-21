@@ -74,9 +74,7 @@ def upgrade() -> None:
     )
 
     # 4. GIN index on the generated column for full-text book searches.
-    op.execute(
-        "CREATE INDEX IF NOT EXISTS idx_books_search ON books USING GIN(search_vector)"
-    )
+    op.execute("CREATE INDEX IF NOT EXISTS idx_books_search ON books USING GIN(search_vector)")
 
     # 5. GIN trigram index on users.nickname for fast partial-match lookups.
     op.execute(

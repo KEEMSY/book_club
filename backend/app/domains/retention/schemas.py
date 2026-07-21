@@ -36,6 +36,4 @@ class RetentionStatsResponse(BaseModel):
     streak_recoveries_last_30d: int = Field(
         ..., description="Streak recoveries performed in the last 30 days."
     )
-    inactive_users_7d: int = Field(
-        ..., description="Users with no activity in the last 7 days."
-    )
+    inactive_users_7d: int = Field(..., description="Users with no activity in the last 7 days.")

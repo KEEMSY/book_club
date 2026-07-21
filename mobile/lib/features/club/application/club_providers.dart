@@ -49,7 +49,6 @@ final filteredPublicClubsProvider = FutureProvider.autoDispose
 );
 
 /// M48: AI-recommended clubs for the current user.
-final recommendedClubsProvider =
-    FutureProvider.autoDispose<List<Club>>((ref) {
+final recommendedClubsProvider = FutureProvider.autoDispose<List<Club>>((ref) {
   return ref.read(clubRepositoryProvider).getRecommendedClubs();
 });

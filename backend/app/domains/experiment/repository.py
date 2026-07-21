@@ -58,9 +58,7 @@ class ExperimentRepository:
             return existing
 
         # Deterministic variant selection.
-        digest = hashlib.sha256(
-            f"{user_id.hex}{experiment_key}".encode()
-        ).hexdigest()
+        digest = hashlib.sha256(f"{user_id.hex}{experiment_key}".encode()).hexdigest()
         variant = variants[int(digest, 16) % len(variants)]
 
         row = UserExperiment(

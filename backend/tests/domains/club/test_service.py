@@ -136,9 +136,7 @@ class FakeClubRepository:
         self._events[ev.id] = ev
         return ev
 
-    async def get_events(
-        self, club_id: UUID, *, upcoming_only: bool = True
-    ) -> list[_FakeEvent]:
+    async def get_events(self, club_id: UUID, *, upcoming_only: bool = True) -> list[_FakeEvent]:
         return [e for e in self._events.values() if e.club_id == club_id]
 
     async def get_event(self, event_id: UUID) -> _FakeEvent | None:

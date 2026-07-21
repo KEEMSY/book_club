@@ -26,9 +26,7 @@ async def list_reminders(
 ) -> ReminderListResponse:
     """Return all reading reminders for the authenticated user."""
     reminders = await service.list_reminders(UUID(user_id))
-    return ReminderListResponse(
-        items=[ReminderPublic.model_validate(r) for r in reminders]
-    )
+    return ReminderListResponse(items=[ReminderPublic.model_validate(r) for r in reminders])
 
 
 @router.post("/me/reminders", response_model=ReminderPublic, status_code=status.HTTP_201_CREATED)

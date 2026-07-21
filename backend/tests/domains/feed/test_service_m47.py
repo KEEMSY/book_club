@@ -19,7 +19,6 @@ from app.core.exceptions import ConflictError, NotFoundError
 from app.domains.feed.models import FeedComment, FeedEvent, FeedEventReaction
 from app.domains.feed.service import FeedService
 
-
 # ---------------------------------------------------------------------------
 # Fakes
 # ---------------------------------------------------------------------------
@@ -99,16 +98,12 @@ class FakeFeedReactionRepository:
 
     async def get_for_event(self, event_id: UUID) -> list[FeedEventReaction]:
         return [
-            self._make_reaction(
-                event_id=r["event_id"], user_id=r["user_id"], emoji=r["emoji"]
-            )
+            self._make_reaction(event_id=r["event_id"], user_id=r["user_id"], emoji=r["emoji"])
             for r in self._reactions
             if r["event_id"] == event_id
         ]
 
-    async def get_for_events(
-        self, event_ids: list[UUID]
-    ) -> dict[UUID, list[FeedEventReaction]]:
+    async def get_for_events(self, event_ids: list[UUID]) -> dict[UUID, list[FeedEventReaction]]:
         result: dict[UUID, list[FeedEventReaction]] = {eid: [] for eid in event_ids}
         for r in self._reactions:
             if r["event_id"] in result:
@@ -161,9 +156,7 @@ class FakeFeedCommentRepository:
         parent_id: UUID | None,
         body: str,
     ) -> FeedComment:
-        c = self._make_comment(
-            event_id=event_id, user_id=user_id, parent_id=parent_id, body=body
-        )
+        c = self._make_comment(event_id=event_id, user_id=user_id, parent_id=parent_id, body=body)
         self._comments[c.id] = c
         return c
 
@@ -316,9 +309,7 @@ async def test_add_reply() -> None:
     svc = _make_svc(events, comment_repo=comments)
     ev = events.seed(user_id=uuid4())
 
-    root = await svc.add_feed_comment(
-        event_id=ev.id, user_id=uuid4(), parent_id=None, body="Root"
-    )
+    root = await svc.add_feed_comment(event_id=ev.id, user_id=uuid4(), parent_id=None, body="Root")
     replier_id = uuid4()
     reply = await svc.add_feed_comment(
         event_id=ev.id, user_id=replier_id, parent_id=root.id, body="Reply!"
@@ -336,9 +327,7 @@ async def test_comment_body_empty() -> None:
     ev = events.seed(user_id=uuid4())
 
     with pytest.raises(ConflictError) as exc_info:
-        await svc.add_feed_comment(
-            event_id=ev.id, user_id=uuid4(), parent_id=None, body=""
-        )
+        await svc.add_feed_comment(event_id=ev.id, user_id=uuid4(), parent_id=None, body="")
 
     assert exc_info.value.code == "BODY_EMPTY"
 

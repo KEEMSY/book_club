@@ -9,13 +9,12 @@ Covers:
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from uuid import UUID, uuid4
 
 import pytest
 from app.core.exceptions import ConflictError
 from app.domains.retention.service import RetentionService
-
 
 # ---------------------------------------------------------------------------
 # In-memory fakes
@@ -120,7 +119,9 @@ class FakeNotificationService:
 # ---------------------------------------------------------------------------
 
 
-def _build_service() -> tuple[RetentionService, FakeRetentionRepository, FakeNotificationService, FakeUserGradeRepository]:
+def _build_service() -> tuple[
+    RetentionService, FakeRetentionRepository, FakeNotificationService, FakeUserGradeRepository
+]:
     repo = FakeRetentionRepository()
     grades = FakeUserGradeRepository()
     notif = FakeNotificationService()

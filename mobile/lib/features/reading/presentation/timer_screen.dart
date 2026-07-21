@@ -84,7 +84,9 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     final CurationCard? card = widget.bookId.isEmpty
         ? null
         // Read the already-cached result (pre-fetched in build).
-        : ref.read(firstCurationCardProvider(bookId: widget.bookId)).valueOrNull;
+        : ref
+            .read(firstCurationCardProvider(bookId: widget.bookId))
+            .valueOrNull;
     if (card != null && mounted) {
       final container = ProviderScope.containerOf(context);
       await showModalBottomSheet<void>(
@@ -298,7 +300,8 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                             ? const SizedBox(
                                 width: 18,
                                 height: 18,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
                               )
                             : const Text('🔊', style: TextStyle(fontSize: 18)),
                       ),

@@ -25,9 +25,7 @@ class RetentionRepository:
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
 
-    async def get_inactive_users(
-        self, inactive_days: int = 7, limit: int = 1000
-    ) -> list[User]:
+    async def get_inactive_users(self, inactive_days: int = 7, limit: int = 1000) -> list[User]:
         """Return active users whose last_active_at is older than inactive_days.
 
         Excludes soft-deleted accounts. Results are ordered oldest-active-first

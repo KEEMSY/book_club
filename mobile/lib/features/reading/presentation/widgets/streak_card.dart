@@ -54,7 +54,8 @@ class StreakCard extends StatelessWidget {
 
     // Only show the recovery affordance when the streak is broken (0) and
     // the user still has tokens remaining.
-    final bool showRecover = streak == 0 && canRecover && recoveriesRemaining > 0;
+    final bool showRecover =
+        streak == 0 && canRecover && recoveriesRemaining > 0;
 
     final AppShadows shadows = theme.extension<AppShadows>()!;
     return Container(

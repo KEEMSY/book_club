@@ -409,8 +409,7 @@ class HighlightRepository:
             .join(FeedEventReaction, FeedEventReaction.feed_event_id == FeedEvent.id)
             .where(
                 FeedEvent.event_type == FeedEventType.HIGHLIGHT_SHARED.value,
-                FeedEvent.event_metadata["highlight_id"].astext
-                == cast(PostHighlight.id, String),
+                FeedEvent.event_metadata["highlight_id"].astext == cast(PostHighlight.id, String),
             )
             .correlate(PostHighlight)
             .scalar_subquery()
@@ -604,9 +603,7 @@ class FeedEventReactionRepository:
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
-    async def get_for_events(
-        self, event_ids: list[UUID]
-    ) -> dict[UUID, list[FeedEventReaction]]:
+    async def get_for_events(self, event_ids: list[UUID]) -> dict[UUID, list[FeedEventReaction]]:
         """Batch-fetch reactions keyed by feed_event_id."""
         if not event_ids:
             return {}

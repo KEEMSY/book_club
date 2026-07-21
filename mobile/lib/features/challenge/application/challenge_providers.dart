@@ -101,10 +101,7 @@ class BadgePinNotifier extends _$BadgePinNotifier {
   AsyncValue<List<String>> build() {
     final myAsync = ref.watch(myBadgesProvider);
     return myAsync.whenData(
-      (badges) => badges
-          .take(kMaxPinnedBadges)
-          .map((e) => e.badge.id)
-          .toList(),
+      (badges) => badges.take(kMaxPinnedBadges).map((e) => e.badge.id).toList(),
     );
   }
 
@@ -114,9 +111,7 @@ class BadgePinNotifier extends _$BadgePinNotifier {
     // Optimistic update so the UI reflects the change immediately.
     state = AsyncValue.data(orderedIds);
     try {
-      await ref
-          .read(challengeRepositoryProvider)
-          .reorderBadges(orderedIds);
+      await ref.read(challengeRepositoryProvider).reorderBadges(orderedIds);
     } catch (e, st) {
       // Roll back to last known good state on failure.
       state = AsyncValue.error(e, st);

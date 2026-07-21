@@ -56,9 +56,7 @@ class ReferralService:
 
         await self.repo.apply_referral(referee_id=referee_id, code=normalised)
 
-    async def complete_referral_if_eligible(
-        self, *, user_id: UUID, duration_sec: int
-    ) -> None:
+    async def complete_referral_if_eligible(self, *, user_id: UUID, duration_sec: int) -> None:
         """Complete a pending referral when the session meets the duration gate.
 
         Designed to be called unconditionally from the reading router after

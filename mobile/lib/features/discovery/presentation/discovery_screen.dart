@@ -81,27 +81,22 @@ class _DiscoveryScreenState extends ConsumerState<DiscoveryScreen> {
                           child: Container(
                             height: 44,
                             decoration: BoxDecoration(
-                              color:
-                                  theme.colorScheme.surfaceContainerHighest,
-                              borderRadius:
-                                  BorderRadius.circular(spacing.md),
+                              color: theme.colorScheme.surfaceContainerHighest,
+                              borderRadius: BorderRadius.circular(spacing.md),
                             ),
                             child: Row(
                               children: [
                                 SizedBox(width: spacing.md),
                                 Icon(
                                   Icons.search_rounded,
-                                  color:
-                                      theme.colorScheme.onSurfaceVariant,
+                                  color: theme.colorScheme.onSurfaceVariant,
                                   size: 20,
                                 ),
                                 SizedBox(width: spacing.sm),
                                 Text(
                                   '책 제목, 저자, ISBN 검색',
-                                  style:
-                                      theme.textTheme.bodyMedium?.copyWith(
-                                    color:
-                                        theme.colorScheme.onSurfaceVariant,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
                                   ),
                                 ),
                               ],
@@ -114,8 +109,7 @@ class _DiscoveryScreenState extends ConsumerState<DiscoveryScreen> {
                       IconButton(
                         icon: const Icon(Icons.manage_search_rounded),
                         tooltip: '통합 검색',
-                        onPressed: () =>
-                            context.push(AppRoutes.unifiedSearch),
+                        onPressed: () => context.push(AppRoutes.unifiedSearch),
                       ),
                     ],
                   ),
@@ -146,8 +140,7 @@ class _DiscoveryScreenState extends ConsumerState<DiscoveryScreen> {
             SliverToBoxAdapter(
               child: _AiRecommendationSection(
                 selectedStrategy: _selectedStrategy,
-                onStrategyChanged: (s) =>
-                    setState(() => _selectedStrategy = s),
+                onStrategyChanged: (s) => setState(() => _selectedStrategy = s),
               ),
             ),
             // ── 인기차트 (popular/new sections, always the default) ─────────
@@ -436,8 +429,8 @@ class _SectionHeader extends StatelessWidget {
       ),
       child: Text(
         title,
-        style: theme.textTheme.titleMedium
-            ?.copyWith(fontWeight: FontWeight.w700),
+        style:
+            theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
       ),
     );
   }

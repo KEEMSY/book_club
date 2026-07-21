@@ -55,8 +55,7 @@ class ShieldRepository {
         'product_id': productId,
         'receipt_data': receiptData,
       });
-      final dto =
-          ShieldPurchaseResultDto.fromJson(raw as Map<String, dynamic>);
+      final dto = ShieldPurchaseResultDto.fromJson(raw as Map<String, dynamic>);
       return ShieldPurchaseResult(
         shieldsGranted: dto.shieldsGranted,
         totalShields: dto.totalShields,

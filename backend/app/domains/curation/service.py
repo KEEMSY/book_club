@@ -97,9 +97,7 @@ class CurationService:
             cards = sorted(cards, key=lambda c: c.card_type in deprioritized)
         return CurationCardPublic.model_validate(cards[0])
 
-    async def record_feedback(
-        self, *, user_id: UUID, card_id: UUID, action: str
-    ) -> None:
+    async def record_feedback(self, *, user_id: UUID, card_id: UUID, action: str) -> None:
         """Persist a reader's reaction to a curation card.
 
         Raises ``NotFoundError`` when the card does not exist so the router
@@ -113,6 +111,4 @@ class CurationService:
                 "카드를 찾을 수 없어요.",
                 code="CURATION_CARD_NOT_FOUND",
             )
-        await self.feedback_repo.upsert_feedback(
-            user_id=user_id, card_id=card_id, action=action
-        )
+        await self.feedback_repo.upsert_feedback(user_id=user_id, card_id=card_id, action=action)

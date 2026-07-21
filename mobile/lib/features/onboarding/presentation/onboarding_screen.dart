@@ -98,8 +98,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               child: PageView.builder(
                 controller: _controller,
                 itemCount: _slides.length,
-                onPageChanged: (index) =>
-                    setState(() => _currentPage = index),
+                onPageChanged: (index) => setState(() => _currentPage = index),
                 itemBuilder: (context, index) =>
                     _OnboardingPage(slide: _slides[index]),
               ),

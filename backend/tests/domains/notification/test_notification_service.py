@@ -14,11 +14,10 @@ from uuid import UUID, uuid4
 import pytest
 from app.domains.challenge.events import BadgeEarned
 from app.domains.feed.events import CommentAdded, ReactionAdded
-from app.domains.notification.models import Notification, NotificationType, WeeklyReport
+from app.domains.notification.models import Notification, NotificationType
 from app.domains.notification.service import NotificationService
 from app.domains.reading.events import UserGradeRecomputed
 from app.domains.social.events import FollowReceived
-
 
 # ---------------------------------------------------------------------------
 # Fake infrastructure
@@ -79,9 +78,7 @@ class FakeSessionQueryAdapter:
     def __init__(self, longest: dict[UUID, int]) -> None:
         self._longest = longest
 
-    async def get_longest_in_range(
-        self, user_id: UUID, from_date: date, to_date: date
-    ) -> int:
+    async def get_longest_in_range(self, user_id: UUID, from_date: date, to_date: date) -> int:
         return self._longest.get(user_id, 0)
 
 
@@ -536,9 +533,7 @@ async def test_on_badge_earned_no_push_when_no_tokens() -> None:
 
     svc = _TestableNotificationService(push, {})
 
-    await svc.on_badge_earned(
-        BadgeEarned(user_id=user_id, badge_id=uuid4(), badge_name="첫 독서")
-    )
+    await svc.on_badge_earned(BadgeEarned(user_id=user_id, badge_id=uuid4(), badge_name="첫 독서"))
 
     assert len(svc._notifications) == 1
     assert len(push.calls) == 0

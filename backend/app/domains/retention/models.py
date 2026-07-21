@@ -23,9 +23,7 @@ class ReengagementPushLog(Base):
     """Record of a re-engagement push sent to a user."""
 
     __tablename__ = "reengagement_push_logs"
-    __table_args__ = (
-        Index("ix_reengagement_push_logs_user_sent", "user_id", "sent_at"),
-    )
+    __table_args__ = (Index("ix_reengagement_push_logs_user_sent", "user_id", "sent_at"),)
 
     id: Mapped[uuid.UUID] = mapped_column(
         PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4
@@ -46,9 +44,7 @@ class StreakRecoveryLog(Base):
     """Record of a streak recovery applied for a user."""
 
     __tablename__ = "streak_recovery_logs"
-    __table_args__ = (
-        Index("ix_streak_recovery_logs_user_recovered", "user_id", "recovered_at"),
-    )
+    __table_args__ = (Index("ix_streak_recovery_logs_user_recovered", "user_id", "recovered_at"),)
 
     id: Mapped[uuid.UUID] = mapped_column(
         PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4

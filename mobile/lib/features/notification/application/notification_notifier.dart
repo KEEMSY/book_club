@@ -76,12 +76,11 @@ class NotificationNotifier extends _$NotificationNotifier {
     if (!state.hasMore || state.isLoading) return;
     state = state.copyWith(isLoading: true);
     try {
-      final resp = await ref
-          .read(notificationRepositoryProvider)
-          .getNotifications(
-            cursor: state.nextCursor,
-            limit: 20,
-          );
+      final resp =
+          await ref.read(notificationRepositoryProvider).getNotifications(
+                cursor: state.nextCursor,
+                limit: 20,
+              );
       state = state.copyWith(
         items: [...state.items, ...resp.items],
         nextCursor: resp.nextCursor,
@@ -153,8 +152,7 @@ class NotificationNotifier extends _$NotificationNotifier {
   // ---------------------------------------------------------------------------
 
   Future<void> _connectWs() async {
-    final token =
-        await ref.read(secureStorageProvider).readAccessToken();
+    final token = await ref.read(secureStorageProvider).readAccessToken();
     if (token == null) return; // not authenticated yet
     _doConnect(token);
   }
@@ -213,9 +211,8 @@ class NotificationNotifier extends _$NotificationNotifier {
     if (alreadyExists) return;
     state = state.copyWith(
       items: [dto, ...state.items],
-      unreadCount: dto.readAt == null
-          ? state.unreadCount + 1
-          : state.unreadCount,
+      unreadCount:
+          dto.readAt == null ? state.unreadCount + 1 : state.unreadCount,
     );
   }
 

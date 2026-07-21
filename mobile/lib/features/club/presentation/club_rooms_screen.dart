@@ -90,58 +90,59 @@ class _ClubRoomsBodyState extends ConsumerState<ClubRoomsBody> {
               ),
             Expanded(
               child: roomsAsync.when(
-          loading: () =>
-              const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-          error: (_, __) => Center(
-            child: Padding(
-              padding: EdgeInsets.all(spacing.lg),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.error_outline_rounded,
-                    size: 48,
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
-                  ),
-                  SizedBox(height: spacing.md),
-                  Text(
-                    '채팅방 목록을 불러오지 못했어요',
-                    style: theme.textTheme.bodyMedium,
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: spacing.md),
-                  FilledButton.tonal(
-                    onPressed: () =>
-                        ref.invalidate(clubRoomsProvider(widget.club.id)),
-                    child: const Text('다시 시도'),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          data: (rooms) => rooms.isEmpty
-              ? _EmptyState(spacing: spacing, theme: theme)
-              : ListView.builder(
-                  // Extra bottom padding so the last card is not hidden by FAB.
-                  padding: EdgeInsets.only(
-                    left: spacing.md,
-                    right: spacing.md,
-                    top: spacing.sm,
-                    bottom: _isOwner ? 80 : spacing.sm,
-                  ),
-                  itemCount: rooms.length,
-                  itemBuilder: (_, i) => _RoomCard(
-                    room: rooms[i],
-                    clubId: widget.club.id,
-                    onDeleteRequested: _isOwner
-                        ? () => _confirmDelete(context, rooms[i])
-                        : null,
+                loading: () => const Center(
+                    child: CircularProgressIndicator(strokeWidth: 2)),
+                error: (_, __) => Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(spacing.lg),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.error_outline_rounded,
+                          size: 48,
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.4),
+                        ),
+                        SizedBox(height: spacing.md),
+                        Text(
+                          '채팅방 목록을 불러오지 못했어요',
+                          style: theme.textTheme.bodyMedium,
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: spacing.md),
+                        FilledButton.tonal(
+                          onPressed: () =>
+                              ref.invalidate(clubRoomsProvider(widget.club.id)),
+                          child: const Text('다시 시도'),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
+                data: (rooms) => rooms.isEmpty
+                    ? _EmptyState(spacing: spacing, theme: theme)
+                    : ListView.builder(
+                        // Extra bottom padding so the last card is not hidden by FAB.
+                        padding: EdgeInsets.only(
+                          left: spacing.md,
+                          right: spacing.md,
+                          top: spacing.sm,
+                          bottom: _isOwner ? 80 : spacing.sm,
+                        ),
+                        itemCount: rooms.length,
+                        itemBuilder: (_, i) => _RoomCard(
+                          room: rooms[i],
+                          clubId: widget.club.id,
+                          onDeleteRequested: _isOwner
+                              ? () => _confirmDelete(context, rooms[i])
+                              : null,
+                        ),
+                      ),
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
         // FAB for owner — only when the club has a book set.
         if (_isOwner && widget.club.bookId != null)
           Positioned(
@@ -174,7 +175,7 @@ class _ClubRoomsBodyState extends ConsumerState<ClubRoomsBody> {
       ref.invalidate(clubRoomsProvider(widget.club.id));
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(this.context).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('채팅방을 만들지 못했어요. 다시 시도해 주세요.')),
       );
     }
@@ -213,7 +214,7 @@ class _ClubRoomsBodyState extends ConsumerState<ClubRoomsBody> {
       ref.invalidate(clubRoomsProvider(widget.club.id));
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(this.context).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('채팅방 삭제에 실패했어요. 다시 시도해 주세요.')),
       );
     }
@@ -326,9 +327,7 @@ class _RoomCard extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
-                  isLocked
-                      ? Icons.lock_outline_rounded
-                      : Icons.chat_rounded,
+                  isLocked ? Icons.lock_outline_rounded : Icons.chat_rounded,
                   size: 22,
                   color: isLocked
                       ? theme.colorScheme.onSurface.withValues(alpha: 0.4)
@@ -344,8 +343,7 @@ class _RoomCard extends ConsumerWidget {
                       room.name,
                       style: theme.textTheme.titleSmall?.copyWith(
                         color: isLocked
-                            ? theme.colorScheme.onSurface
-                                .withValues(alpha: 0.5)
+                            ? theme.colorScheme.onSurface.withValues(alpha: 0.5)
                             : null,
                       ),
                     ),
@@ -357,8 +355,7 @@ class _RoomCard extends ConsumerWidget {
                             : '${room.progressGate}장 이상 읽은 멤버 전용',
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: isLocked
-                              ? theme.colorScheme.error
-                                  .withValues(alpha: 0.75)
+                              ? theme.colorScheme.error.withValues(alpha: 0.75)
                               : theme.colorScheme.onSurface
                                   .withValues(alpha: 0.5),
                         ),

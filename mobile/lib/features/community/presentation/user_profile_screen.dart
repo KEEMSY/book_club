@@ -115,9 +115,7 @@ class _ProfileContent extends ConsumerWidget {
                         ),
                       );
                       if (confirmed == true && context.mounted) {
-                        await ref
-                            .read(authNotifierProvider.notifier)
-                            .logout();
+                        await ref.read(authNotifierProvider.notifier).logout();
                       }
                     }
                   },
@@ -726,7 +724,8 @@ class _ActionButton extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           OutlinedButton(
-            onPressed: () => context.push(AppRoutes.profileEdit, extra: profile),
+            onPressed: () =>
+                context.push(AppRoutes.profileEdit, extra: profile),
             child: const Text('프로필 편집'),
           ),
           const SizedBox(height: 8),

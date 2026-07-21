@@ -12,7 +12,8 @@ void main() {
   group('AuthNotifier', () {
     test('bootstrap emits Unauthenticated when no session exists', () async {
       final c = ProviderContainer(overrides: [
-        authRepositoryProvider.overrideWithValue(buildRepository(api: FakeAuthApi())),
+        authRepositoryProvider
+            .overrideWithValue(buildRepository(api: FakeAuthApi())),
       ]);
       addTearDown(c.dispose);
       final notifier = c.read(authNotifierProvider.notifier);
@@ -36,7 +37,8 @@ void main() {
       await notifier.bootstrap();
 
       expect(c.read(authNotifierProvider), isA<Authenticated>());
-      final Authenticated authed = c.read(authNotifierProvider) as Authenticated;
+      final Authenticated authed =
+          c.read(authNotifierProvider) as Authenticated;
       expect(authed.user.nickname, '수민');
       expect(api.getMeCalls, 1);
     });
@@ -77,7 +79,8 @@ void main() {
         kakaoError: const SocialLoginCancelled(),
       );
       final c = ProviderContainer(overrides: [
-        authRepositoryProvider.overrideWithValue(buildRepository(social: social)),
+        authRepositoryProvider
+            .overrideWithValue(buildRepository(social: social)),
       ]);
       addTearDown(c.dispose);
       final notifier = c.read(authNotifierProvider.notifier);
@@ -134,7 +137,8 @@ void main() {
       await notifier.loginDev();
 
       expect(c.read(authNotifierProvider), isA<Authenticated>());
-      final Authenticated authed = c.read(authNotifierProvider) as Authenticated;
+      final Authenticated authed =
+          c.read(authNotifierProvider) as Authenticated;
       expect(authed.user.nickname, '개발자');
       expect(await storage.readAccessToken(), 'dev-access');
       expect(await storage.readRefreshToken(), 'dev-refresh');
@@ -170,7 +174,8 @@ void main() {
       await storage.saveAccessToken('a');
       await storage.saveRefreshToken('r');
       final c = ProviderContainer(overrides: [
-        authRepositoryProvider.overrideWithValue(buildRepository(storage: storage)),
+        authRepositoryProvider
+            .overrideWithValue(buildRepository(storage: storage)),
       ]);
       addTearDown(c.dispose);
       final notifier = c.read(authNotifierProvider.notifier);

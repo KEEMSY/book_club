@@ -69,8 +69,11 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["N802", "N803"]
-"migrations/**" = ["N999"]
+# Test helpers alias event classes (N814) and use ×/– in docstrings/comments
+# to describe formulas (RUF002/RUF003) — intentional, not defects.
+"tests/**" = ["N802", "N803", "N814", "RUF002", "RUF003"]
+# Auto-authored migration docstrings contain ambiguous unicode (en dash).
+"migrations/**" = ["N999", "RUF002"]
 # FastAPI WebSocket handlers use Depends() in default arguments — this is the
 # correct FastAPI pattern for injecting session/auth into WebSocket endpoints.
 "app/domains/club/ws_router.py" = ["B008"]
@@ -107,6 +110,12 @@ ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
 module = ["sentry_sdk.*"]
+ignore_missing_imports = true
+
+# scipy / scikit-learn ship no type stubs; the discovery recommender uses them
+# for the collaborative-filtering matrix math.
+[[tool.mypy.overrides]]
+module = ["scipy.*", "sklearn.*"]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]

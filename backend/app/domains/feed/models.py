@@ -289,9 +289,7 @@ class FeedComment(Base):
     """
 
     __tablename__ = "feed_comments"
-    __table_args__ = (
-        Index("ix_feed_comments_event_created", "feed_event_id", "created_at"),
-    )
+    __table_args__ = (Index("ix_feed_comments_event_created", "feed_event_id", "created_at"),)
 
     id: Mapped[uuid.UUID] = mapped_column(
         PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4
@@ -363,12 +361,8 @@ class PostHighlight(Base):
     )
     # Set the first time the highlight is pushed to the feed — a non-null value
     # makes a re-share idempotent (the existing feed event is returned instead).
-    shared_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
-    deleted_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
+    shared_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()

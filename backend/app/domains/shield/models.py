@@ -45,6 +45,4 @@ class ShieldPurchase(Base):
     purchased_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
-    refunded_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
+    refunded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

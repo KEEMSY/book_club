@@ -74,7 +74,7 @@ class _CreateClubSheetState extends ConsumerState<CreateClubSheet> {
           SizedBox(height: spacing.sm),
           // M48: category selector
           DropdownButtonFormField<String>(
-            value: _selectedCategory,
+            initialValue: _selectedCategory,
             decoration: const InputDecoration(labelText: '카테고리 (선택)'),
             items: [
               const DropdownMenuItem(value: null, child: Text('선택 안함')),

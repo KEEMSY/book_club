@@ -16,10 +16,8 @@ from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
 import pytest
-
 from app.domains.club.schemas import CreateClubRequest
 from app.domains.club.service import ClubService
-
 
 # ---------------------------------------------------------------------------
 # Fake domain objects (duck-type ReadingClub without an ORM session)
@@ -160,10 +158,7 @@ class FakeClubRepository:
             # No taste profile — return popular (insertion order here)
             return public[:limit]
 
-        top_genres = [
-            g
-            for g, _ in sorted(profile.items(), key=lambda kv: kv[1], reverse=True)[:2]
-        ]
+        top_genres = [g for g, _ in sorted(profile.items(), key=lambda kv: kv[1], reverse=True)[:2]]
         matched = [c for c in public if c.category in top_genres]
         if len(matched) < limit:
             existing_ids = {c.id for c in matched}
@@ -222,6 +217,7 @@ class FakeClubRepository:
 
     async def get_attendee_counts(self, event_id: UUID):
         from app.domains.club.schemas import AttendeeCount
+
         return AttendeeCount(going=0, maybe=0, not_going=0)
 
     async def get_my_rsvp_status(self, event_id: UUID, user_id: UUID) -> str | None:

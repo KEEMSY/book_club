@@ -35,8 +35,8 @@ class _ReadingRecapScreenState extends ConsumerState<ReadingRecapScreen> {
     if (_sharing) return;
     setState(() => _sharing = true);
     try {
-      final RenderRepaintBoundary boundary = _cardKey.currentContext!
-          .findRenderObject()! as RenderRepaintBoundary;
+      final RenderRepaintBoundary boundary =
+          _cardKey.currentContext!.findRenderObject()! as RenderRepaintBoundary;
       final ui.Image image = await boundary.toImage(pixelRatio: 3.0);
       final ByteData? byteData =
           await image.toByteData(format: ui.ImageByteFormat.png);
@@ -45,8 +45,7 @@ class _ReadingRecapScreenState extends ConsumerState<ReadingRecapScreen> {
 
       final String halfLabel = recap.half == 1 ? '상반기' : '하반기';
       final int hours = recap.totalSeconds ~/ 3600;
-      final String text =
-          '${recap.year}년 $halfLabel 독서 회고\n'
+      final String text = '${recap.year}년 $halfLabel 독서 회고\n'
           '총 ${recap.totalBooks}권 · $hours시간 읽었어요 📚\n'
           '#북클럽 #독서기록';
 
@@ -99,7 +98,8 @@ class _ReadingRecapScreenState extends ConsumerState<ReadingRecapScreen> {
         AsyncLoading() => const Center(child: CircularProgressIndicator()),
         AsyncError(:final error) => _ErrorView(
             error: error,
-            onRetry: () => ref.invalidate(readingRecapProvider(widget.recapKey)),
+            onRetry: () =>
+                ref.invalidate(readingRecapProvider(widget.recapKey)),
           ),
         AsyncData(:final value) => SingleChildScrollView(
             padding: EdgeInsets.all(spacing.lg),
@@ -260,9 +260,8 @@ class _TopBookRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final int minutes = book.readSeconds ~/ 60;
-    final String duration = minutes >= 60
-        ? '${minutes ~/ 60}시간 ${minutes % 60}분'
-        : '$minutes분';
+    final String duration =
+        minutes >= 60 ? '${minutes ~/ 60}시간 ${minutes % 60}분' : '$minutes분';
 
     return Padding(
       padding: EdgeInsets.only(bottom: spacing.sm),

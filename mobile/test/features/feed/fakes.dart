@@ -4,6 +4,8 @@ import 'package:book_club/features/feed/data/feed_repository.dart';
 import 'package:book_club/features/feed/data/image_uploader.dart';
 import 'package:book_club/features/feed/domain/book_highlight_group.dart';
 import 'package:book_club/features/feed/domain/comment.dart';
+import 'package:book_club/features/feed/domain/feed_comment.dart';
+import 'package:book_club/features/feed/domain/feed_event.dart';
 import 'package:book_club/features/feed/domain/highlight.dart';
 import 'package:book_club/features/feed/domain/post.dart';
 import 'package:book_club/features/feed/domain/post_author.dart';
@@ -216,6 +218,43 @@ class FakeFeedRepository implements FeedRepository {
       createdAt: DateTime.utc(2026, 4, 30, 12),
     );
   }
+
+  // -- event feed / feed comments --
+  // Not exercised by current tests; queue-based fakes can be added when a test
+  // needs them. Implemented to satisfy the FeedRepository interface.
+  @override
+  Future<FeedEventPage> getGlobalFeed({String? cursor, int limit = 20}) =>
+      throw UnimplementedError();
+
+  @override
+  Future<FeedEventPage> getFollowingEventFeed({
+    String? cursor,
+    int limit = 20,
+  }) =>
+      throw UnimplementedError();
+
+  @override
+  Future<FeedReactionToggleResult> toggleFeedReaction({
+    required String eventId,
+    required String emoji,
+  }) =>
+      throw UnimplementedError();
+
+  @override
+  Future<List<FeedComment>> getFeedComments(String eventId) =>
+      throw UnimplementedError();
+
+  @override
+  Future<FeedComment> createFeedComment({
+    required String eventId,
+    required String body,
+    String? parentId,
+  }) =>
+      throw UnimplementedError();
+
+  @override
+  Future<void> deleteFeedComment(String commentId) =>
+      throw UnimplementedError();
 }
 
 PostAuthor buildAuthor({

@@ -25,11 +25,13 @@ void main() {
       notifier.changeContent('정말 좋았어요');
       notifier.addImage(buildPickedImage());
       notifier.addImage(buildPickedImage(contentType: 'image/png'));
-      expect(c.read(postComposeNotifierProvider('book-1')), isA<PostComposeEditing>());
+      expect(c.read(postComposeNotifierProvider('book-1')),
+          isA<PostComposeEditing>());
 
       final created = await notifier.submit();
       expect(created, isNotNull);
-      expect(c.read(postComposeNotifierProvider('book-1')), isA<PostComposeSuccess>());
+      expect(c.read(postComposeNotifierProvider('book-1')),
+          isA<PostComposeSuccess>());
       expect(repo.uploadCalls, hasLength(2));
       expect(repo.createPostCalls.single.imageKeys, <String>['k1', 'k2']);
       expect(repo.createPostCalls.single.content, '정말 좋았어요');
@@ -46,9 +48,11 @@ void main() {
 
       final result = await notifier.submit();
       expect(result, isNull);
-      expect(c.read(postComposeNotifierProvider('book-1')), isA<PostComposeFailure>());
+      expect(c.read(postComposeNotifierProvider('book-1')),
+          isA<PostComposeFailure>());
       expect(
-        (c.read(postComposeNotifierProvider('book-1')) as PostComposeFailure).code,
+        (c.read(postComposeNotifierProvider('book-1')) as PostComposeFailure)
+            .code,
         'POST_CONTENT_REQUIRED',
       );
       expect(repo.createPostCalls, isEmpty);
@@ -73,8 +77,10 @@ void main() {
 
       final result = await notifier.submit();
       expect(result, isNull);
-      expect(c.read(postComposeNotifierProvider('book-1')), isA<PostComposeFailure>());
-      final failure = c.read(postComposeNotifierProvider('book-1')) as PostComposeFailure;
+      expect(c.read(postComposeNotifierProvider('book-1')),
+          isA<PostComposeFailure>());
+      final failure =
+          c.read(postComposeNotifierProvider('book-1')) as PostComposeFailure;
       expect(failure.code, 'UPLOAD_FAILED');
       expect(failure.content, '내용');
       expect(failure.images, hasLength(1));
@@ -96,7 +102,8 @@ void main() {
       notifier.changeContent('내용');
       final result = await notifier.submit();
       expect(result, isNull);
-      expect(c.read(postComposeNotifierProvider('book-1')), isA<PostComposeFailure>());
+      expect(c.read(postComposeNotifierProvider('book-1')),
+          isA<PostComposeFailure>());
     });
 
     test('addImage caps at 4 attachments', () async {
@@ -110,7 +117,8 @@ void main() {
         expect(notifier.addImage(buildPickedImage()), isTrue);
       }
       expect(notifier.addImage(buildPickedImage()), isFalse);
-      final editing = c.read(postComposeNotifierProvider('book-1')) as PostComposeEditing;
+      final editing =
+          c.read(postComposeNotifierProvider('book-1')) as PostComposeEditing;
       expect(editing.images, hasLength(4));
     });
 
@@ -122,7 +130,8 @@ void main() {
       addTearDown(c.dispose);
       final notifier = c.read(postComposeNotifierProvider('book-1').notifier);
       notifier.changeType(PostType.discussion);
-      final editing = c.read(postComposeNotifierProvider('book-1')) as PostComposeEditing;
+      final editing =
+          c.read(postComposeNotifierProvider('book-1')) as PostComposeEditing;
       expect(editing.postType, PostType.discussion);
     });
 
@@ -136,7 +145,8 @@ void main() {
       notifier.addImage(buildPickedImage(contentType: 'image/jpeg'));
       notifier.addImage(buildPickedImage(contentType: 'image/png'));
       notifier.removeImage(0);
-      final editing = c.read(postComposeNotifierProvider('book-1')) as PostComposeEditing;
+      final editing =
+          c.read(postComposeNotifierProvider('book-1')) as PostComposeEditing;
       expect(editing.images, hasLength(1));
       expect(editing.images.single.contentType, 'image/png');
     });

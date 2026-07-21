@@ -43,12 +43,8 @@ class _FakeChallenge:
     challenge_type: str = "books_count"
     target_value: int = 5
     genre_filter: str | None = None
-    starts_at: datetime = field(
-        default_factory=lambda: datetime.now(tz=UTC) - timedelta(days=1)
-    )
-    ends_at: datetime = field(
-        default_factory=lambda: datetime.now(tz=UTC) + timedelta(days=30)
-    )
+    starts_at: datetime = field(default_factory=lambda: datetime.now(tz=UTC) - timedelta(days=1))
+    ends_at: datetime = field(default_factory=lambda: datetime.now(tz=UTC) + timedelta(days=30))
     badge_id: UUID | None = None
     # M41 limited-edition fields (defaults keep pre-M41 tests unchanged)
     is_limited: bool = False
@@ -119,9 +115,7 @@ class FakeChallengeRepository:
     async def get_challenge(self, challenge_id: UUID) -> _FakeChallenge | None:
         return self._challenges.get(challenge_id)
 
-    async def get_participant(
-        self, challenge_id: UUID, user_id: UUID
-    ) -> _FakeParticipant | None:
+    async def get_participant(self, challenge_id: UUID, user_id: UUID) -> _FakeParticipant | None:
         return self._participants.get((challenge_id, user_id))
 
     async def join(self, challenge_id: UUID, user_id: UUID) -> _FakeParticipant:
@@ -132,9 +126,7 @@ class FakeChallengeRepository:
     async def leave(self, challenge_id: UUID, user_id: UUID) -> None:
         self._participants.pop((challenge_id, user_id), None)
 
-    async def leaderboard(
-        self, challenge_id: UUID, limit: int = 50
-    ) -> list[Any]:
+    async def leaderboard(self, challenge_id: UUID, limit: int = 50) -> list[Any]:
         from dataclasses import dataclass as dc
 
         @dc
@@ -152,9 +144,7 @@ class FakeChallengeRepository:
         rows.sort(key=lambda r: r[0].current_value, reverse=True)
         return rows[:limit]
 
-    async def my_challenges(
-        self, user_id: UUID, limit: int = 20
-    ) -> list[Any]:
+    async def my_challenges(self, user_id: UUID, limit: int = 20) -> list[Any]:
         rows = [
             (self._challenges[p.challenge_id], p)
             for p in self._participants.values()
@@ -171,19 +161,14 @@ class FakeChallengeRepository:
         challenge_ids: list[UUID],
         user_id: UUID,
     ) -> dict[UUID, Any]:
-        return {
-            cid: self._participants.get((cid, user_id))
-            for cid in challenge_ids
-        }
+        return {cid: self._participants.get((cid, user_id)) for cid in challenge_ids}
 
     async def batch_participant_counts(
         self,
         challenge_ids: list[UUID],
     ) -> dict[UUID, int]:
         return {
-            cid: sum(
-                1 for p in self._participants.values() if p.challenge_id == cid
-            )
+            cid: sum(1 for p in self._participants.values() if p.challenge_id == cid)
             for cid in challenge_ids
         }
 
@@ -252,9 +237,7 @@ class FakeChallengeRepository:
 
     # M41 — exclusive badge deadline guard
 
-    async def get_limited_challenge_by_exclusive_badge(
-        self, badge_id: UUID
-    ) -> Any | None:
+    async def get_limited_challenge_by_exclusive_badge(self, badge_id: UUID) -> Any | None:
         """Return the limited challenge whose badge_id_exclusive matches badge_id."""
         for ch in self._challenges.values():
             if ch.is_limited and ch.badge_id_exclusive == badge_id:
@@ -511,7 +494,9 @@ async def test_advance_books_count_increments_progress() -> None:
     repo.add_challenge(ch)
     await repo.join(ch.id, user_id)
 
-    staged = await _advance(repo, user_id=user_id, challenge_type="books_count", delta=1, mode="add")
+    staged = await _advance(
+        repo, user_id=user_id, challenge_type="books_count", delta=1, mode="add"
+    )
 
     p = await repo.get_participant(ch.id, user_id)
     assert p is not None
@@ -532,7 +517,9 @@ async def test_advance_books_count_awards_badge_on_target() -> None:
     await repo.join(ch.id, user_id)
     await repo.update_progress(ch.id, user_id, 1, None)
 
-    staged = await _advance(repo, user_id=user_id, challenge_type="books_count", delta=1, mode="add")
+    staged = await _advance(
+        repo, user_id=user_id, challenge_type="books_count", delta=1, mode="add"
+    )
 
     p = await repo.get_participant(ch.id, user_id)
     assert p is not None
@@ -557,7 +544,9 @@ async def test_advance_already_achieved_skipped() -> None:
     # Manually mark as achieved
     await repo.update_progress(ch.id, user_id, 1, datetime.now(tz=UTC))
 
-    staged = await _advance(repo, user_id=user_id, challenge_type="books_count", delta=1, mode="add")
+    staged = await _advance(
+        repo, user_id=user_id, challenge_type="books_count", delta=1, mode="add"
+    )
 
     assert staged == []
     p = await repo.get_participant(ch.id, user_id)
@@ -609,6 +598,8 @@ async def test_advance_no_badge_when_challenge_has_none() -> None:
     repo.add_challenge(ch)
     await repo.join(ch.id, user_id)
 
-    staged = await _advance(repo, user_id=user_id, challenge_type="books_count", delta=1, mode="add")
+    staged = await _advance(
+        repo, user_id=user_id, challenge_type="books_count", delta=1, mode="add"
+    )
 
     assert staged == []

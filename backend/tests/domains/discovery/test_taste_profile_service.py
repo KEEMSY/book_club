@@ -5,13 +5,11 @@ All tests use a FakeTasteProfileRepository — no DB required (CLAUDE.md §5).
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from uuid import UUID, uuid4
 
 import pytest
-
 from app.domains.discovery.taste_profile_service import TasteProfileService
-
 
 # ---------------------------------------------------------------------------
 # Minimal stub mirroring UserTasteProfile model fields

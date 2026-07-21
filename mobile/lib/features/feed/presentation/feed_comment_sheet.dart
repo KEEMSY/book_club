@@ -206,9 +206,7 @@ class _FeedCommentSheetState extends ConsumerState<FeedCommentSheet> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref
-          .read(eventCommentNotifierProvider(widget.eventId).notifier)
-          .load();
+      ref.read(eventCommentNotifierProvider(widget.eventId).notifier).load();
     });
   }
 
@@ -230,8 +228,7 @@ class _FeedCommentSheetState extends ConsumerState<FeedCommentSheet> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
-    final state =
-        ref.watch(eventCommentNotifierProvider(widget.eventId));
+    final state = ref.watch(eventCommentNotifierProvider(widget.eventId));
 
     final int displayCount = switch (state) {
       EventCommentLoaded(:final comments) => comments.length,
@@ -256,8 +253,7 @@ class _FeedCommentSheetState extends ConsumerState<FeedCommentSheet> {
                 onDelete: (commentId) async {
                   final removed = await ref
                       .read(
-                        eventCommentNotifierProvider(widget.eventId)
-                            .notifier,
+                        eventCommentNotifierProvider(widget.eventId).notifier,
                       )
                       .deleteComment(commentId);
                   if (removed) {
@@ -280,8 +276,7 @@ class _FeedCommentSheetState extends ConsumerState<FeedCommentSheet> {
             const Divider(height: 1),
             _CommentComposer(
               busy: state is EventCommentLoaded && state.isPosting,
-              errorText:
-                  state is EventCommentLoaded ? state.postError : null,
+              errorText: state is EventCommentLoaded ? state.postError : null,
               replyNickname: _replyNickname,
               onClearReply: _clearReply,
               onChanged: (_) {
@@ -645,8 +640,7 @@ class _CommentComposerState extends State<_CommentComposer> {
     if (widget.replyNickname == null && oldWidget.replyNickname != null) {
       // Clear the @prefix if the reply target was cleared externally.
       final String current = _controller.text;
-      final String prefix =
-          '@${oldWidget.replyNickname} ';
+      final String prefix = '@${oldWidget.replyNickname} ';
       if (current.startsWith(prefix)) {
         _controller.text = current.substring(prefix.length);
       }
@@ -772,9 +766,7 @@ List<_CommentGroup> _buildGroups(List<FeedComment> comments) {
       // Server may embed replies in root.replies or return them as siblings.
       final List<FeedComment> serverReplies = root.replies.isNotEmpty
           ? root.replies
-          : comments
-              .where((FeedComment c) => c.parentId == root.id)
-              .toList();
+          : comments.where((FeedComment c) => c.parentId == root.id).toList();
       return _CommentGroup(root, serverReplies);
     }).toList();
   }

@@ -427,9 +427,7 @@ class FeedService:
         row.visibility = visibility
         return row
 
-    async def share_highlight_to_feed(
-        self, user_id: UUID, highlight_id: UUID
-    ) -> FeedEvent:
+    async def share_highlight_to_feed(self, user_id: UUID, highlight_id: UUID) -> FeedEvent:
         """Push a highlight to the activity feed, idempotently.
 
         A highlight that was already shared (``shared_at`` set) returns its
@@ -576,7 +574,6 @@ class FeedService:
             )
         return result
 
-
     # ------------------------------------------------------------------
     # M47 — Social feed: following feed, reactions & comments on events
     # ------------------------------------------------------------------
@@ -631,14 +628,10 @@ class FeedService:
             event_id=event_id, user_id=user_id, emoji=emoji
         )
         if already:
-            await self.feed_event_reactions.remove(
-                event_id=event_id, user_id=user_id, emoji=emoji
-            )
+            await self.feed_event_reactions.remove(event_id=event_id, user_id=user_id, emoji=emoji)
             state = "removed"
         else:
-            await self.feed_event_reactions.add(
-                event_id=event_id, user_id=user_id, emoji=emoji
-            )
+            await self.feed_event_reactions.add(event_id=event_id, user_id=user_id, emoji=emoji)
             state = "added"
             # Fire-and-forget push to event author (non-self only).
             if user_id != event.user_id:
@@ -711,13 +704,10 @@ class FeedService:
     # Private helpers
     # ------------------------------------------------------------------
 
-    async def _enrich_events(
-        self, events: list[FeedEvent]
-    ) -> list[FeedEventWithReactionsItem]:
+    async def _enrich_events(self, events: list[FeedEvent]) -> list[FeedEventWithReactionsItem]:
         if not events or self.feed_events is None or self.feed_event_reactions is None:
             return [
-                FeedEventWithReactionsItem(event=ev, reactions=[], comment_count=0)
-                for ev in events
+                FeedEventWithReactionsItem(event=ev, reactions=[], comment_count=0) for ev in events
             ]
         event_ids = [ev.id for ev in events]
         reactions_map = await self.feed_event_reactions.get_for_events(event_ids)
@@ -745,6 +735,7 @@ class FeedService:
             svc = get_notification_service()
             async with svc.sessionmaker() as session:
                 from app.domains.auth.repository import UserRepository
+
                 user = await UserRepository(session).get_by_id(actor_id)
                 nickname = (user.nickname or "누군가") if user else "누군가"
             tokens = await svc.device_tokens.get_active_tokens(target_user_id)
@@ -772,6 +763,7 @@ class FeedService:
             svc = get_notification_service()
             async with svc.sessionmaker() as session:
                 from app.domains.auth.repository import UserRepository
+
                 user = await UserRepository(session).get_by_id(actor_id)
                 nickname = (user.nickname or "누군가") if user else "누군가"
             tokens = await svc.device_tokens.get_active_tokens(target_user_id)

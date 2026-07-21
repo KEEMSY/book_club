@@ -197,7 +197,8 @@ class _AgoraStageState extends State<_AgoraStage> {
       return _ErrorView(onClose: widget.onLeave);
     }
     if (engine == null || !_joined) {
-      return const Center(child: CircularProgressIndicator(color: Colors.white));
+      return const Center(
+          child: CircularProgressIndicator(color: Colors.white));
     }
 
     final List<Widget> tiles = <Widget>[
@@ -219,8 +220,7 @@ class _AgoraStageState extends State<_AgoraStage> {
             controller: VideoViewController.remote(
               rtcEngine: engine,
               canvas: VideoCanvas(uid: uid),
-              connection:
-                  RtcConnection(channelId: widget.session.agoraChannel),
+              connection: RtcConnection(channelId: widget.session.agoraChannel),
             ),
           ),
         ),

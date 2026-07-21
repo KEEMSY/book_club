@@ -18,12 +18,11 @@ import sys
 # Ensure the project root (backend/) is on sys.path
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
+from app.core.config import get_settings
+from app.domains.auth.models import AuthProvider, User
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
-
-from app.core.config import get_settings
-from app.domains.auth.models import AuthProvider, User
 
 _TEST_USERS = [
     {
@@ -92,35 +91,34 @@ async def seed() -> None:
     created = 0
     skipped = 0
 
-    async with async_session() as session:
-        async with session.begin():
-            for data in _TEST_USERS:
-                stmt = select(User).where(
-                    User.nickname == data["nickname"],
-                    User.deleted_at.is_(None),
-                )
-                result = await session.execute(stmt)
-                existing = result.scalar_one_or_none()
+    async with async_session() as session, session.begin():
+        for data in _TEST_USERS:
+            stmt = select(User).where(
+                User.nickname == data["nickname"],
+                User.deleted_at.is_(None),
+            )
+            result = await session.execute(stmt)
+            existing = result.scalar_one_or_none()
 
-                if existing is not None:
-                    print(f"SKIP  {data['nickname']:30s}  id={existing.id}")
-                    skipped += 1
-                    continue
+            if existing is not None:
+                print(f"SKIP  {data['nickname']:30s}  id={existing.id}")
+                skipped += 1
+                continue
 
-                user = User(
-                    provider=AuthProvider.KAKAO,
-                    provider_sub=f"test_{data['nickname']}",
-                    email=data["email"],
-                    nickname=data["nickname"],
-                    bio=data["bio"],
-                    profile_image_url=data["profile_image_url"],
-                )
-                session.add(user)
-                await session.flush()
-                await session.refresh(user)
+            user = User(
+                provider=AuthProvider.KAKAO,
+                provider_sub=f"test_{data['nickname']}",
+                email=data["email"],
+                nickname=data["nickname"],
+                bio=data["bio"],
+                profile_image_url=data["profile_image_url"],
+            )
+            session.add(user)
+            await session.flush()
+            await session.refresh(user)
 
-                print(f"  OK  {data['nickname']:30s}  id={user.id}")
-                created += 1
+            print(f"  OK  {data['nickname']:30s}  id={user.id}")
+            created += 1
 
     print("-" * 60)
     print(f"Created: {created}  Skipped (already exists): {skipped}")

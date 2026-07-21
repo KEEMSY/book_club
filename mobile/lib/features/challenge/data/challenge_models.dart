@@ -105,9 +105,10 @@ class ChallengeDto {
           : null,
       badge: badgeJson != null ? BadgeDto.fromJson(badgeJson) : null,
       isLimited: (json['is_limited'] as bool?) ?? false,
-      limitedEndsAt: json['ends_at'] != null && ((json['is_limited'] as bool?) ?? false)
-          ? DateTime.tryParse(json['ends_at'] as String)
-          : null,
+      limitedEndsAt:
+          json['ends_at'] != null && ((json['is_limited'] as bool?) ?? false)
+              ? DateTime.tryParse(json['ends_at'] as String)
+              : null,
       daysRemaining: json['days_remaining'] as int?,
     );
   }
@@ -200,8 +201,8 @@ class BadgeEarnedDto {
     final badge = BadgeDto.fromJson(json['badge'] as Map<String, dynamic>);
     // The API signals exclusivity when the badge id starts with "badge_id_exclusive"
     // or when the response carries an explicit "is_exclusive" field.
-    final bool isExclusive =
-        (json['is_exclusive'] as bool?) ?? badge.id.startsWith('badge_id_exclusive');
+    final bool isExclusive = (json['is_exclusive'] as bool?) ??
+        badge.id.startsWith('badge_id_exclusive');
     return BadgeEarnedDto(
       badge: badge,
       earnedAt: DateTime.parse(json['earned_at'] as String),

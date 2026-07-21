@@ -148,4 +148,3 @@ abstract class DiscoverResponseDto with _$DiscoverResponseDto {
   factory DiscoverResponseDto.fromJson(Map<String, dynamic> json) =>
       _$DiscoverResponseDtoFromJson(json);
 }
-

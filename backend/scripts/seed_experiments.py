@@ -15,11 +15,10 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-
 from app.core.config import get_settings
 from app.domains.experiment.models import Experiment
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 # 실험 1: 페이월 진입 시점 A/B
 # stats_tab  — 독서 통계 탭에서 Pro 잠금 유도
@@ -47,9 +46,7 @@ _EXPERIMENTS = [_EXPERIMENT_1, _EXPERIMENT_2]
 async def seed(session: AsyncSession) -> None:
     for data in _EXPERIMENTS:
         existing = await session.scalar(
-            select(Experiment).where(
-                Experiment.experiment_key == data["experiment_key"]
-            )
+            select(Experiment).where(Experiment.experiment_key == data["experiment_key"])
         )
         if existing is not None:
             print(f"  실험 이미 존재: {data['experiment_key']}")

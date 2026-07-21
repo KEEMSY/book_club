@@ -11,7 +11,6 @@ from app.domains.subscription.adapters.stub_verifier import StubPurchaseVerifier
 from app.domains.subscription.schemas import VerifyReceiptRequest
 from app.domains.subscription.service import SubscriptionService
 
-
 # ---------------------------------------------------------------------------
 # Fake repository
 # ---------------------------------------------------------------------------

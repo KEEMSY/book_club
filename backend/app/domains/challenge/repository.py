@@ -239,9 +239,7 @@ class ChallengeRepository:
         result = await self._session.execute(stmt)
         return [(row.Challenge, row.ChallengeParticipant) for row in result]
 
-    async def get_limited_challenge_by_exclusive_badge(
-        self, badge_id: UUID
-    ) -> Challenge | None:
+    async def get_limited_challenge_by_exclusive_badge(self, badge_id: UUID) -> Challenge | None:
         """Return the limited-edition challenge that owns badge_id as its exclusive badge.
 
         Used by the service to check whether a badge is locked behind an expired

@@ -65,9 +65,7 @@ class RetentionService:
                 await self.repo.log_push(user.id, push_type)
                 sent += 1
             except Exception:
-                logger.exception(
-                    "reengagement_campaign_user_failed user_id=%s", user.id
-                )
+                logger.exception("reengagement_campaign_user_failed user_id=%s", user.id)
 
         logger.info("reengagement_campaign_finished sent=%d", sent)
         return sent

@@ -30,7 +30,12 @@ def upgrade() -> None:
             primary_key=True,
             server_default=sa.text("gen_random_uuid()"),
         ),
-        sa.Column("user_id", UUID(as_uuid=True), sa.ForeignKey("users.id", ondelete="CASCADE"), nullable=False),
+        sa.Column(
+            "user_id",
+            UUID(as_uuid=True),
+            sa.ForeignKey("users.id", ondelete="CASCADE"),
+            nullable=False,
+        ),
         sa.Column("days_of_week", ARRAY(sa.Integer()), nullable=False),
         sa.Column("remind_at", sa.Time(), nullable=False),
         sa.Column("is_active", sa.Boolean(), nullable=False, server_default=sa.text("true")),

@@ -81,7 +81,5 @@ class ReminderRepository:
 
     async def delete(self, reminder_id: UUID) -> None:
         """Delete a reminder row by primary key."""
-        await self.session.execute(
-            delete(ReadingReminder).where(ReadingReminder.id == reminder_id)
-        )
+        await self.session.execute(delete(ReadingReminder).where(ReadingReminder.id == reminder_id))
         await self.session.flush()

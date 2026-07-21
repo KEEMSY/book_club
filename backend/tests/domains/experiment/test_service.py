@@ -8,9 +8,7 @@ from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
 import pytest
-
 from app.domains.experiment.service import ExperimentService
-
 
 # ---------------------------------------------------------------------------
 # Fake domain objects (mirror real ORM models, no SQLAlchemy dependency)
@@ -64,9 +62,7 @@ class FakeExperimentRepository:
                 return row
 
         # Deterministic variant selection — mirrors repository.py exactly.
-        digest = hashlib.sha256(
-            f"{user_id.hex}{experiment_key}".encode()
-        ).hexdigest()
+        digest = hashlib.sha256(f"{user_id.hex}{experiment_key}".encode()).hexdigest()
         variant = variants[int(digest, 16) % len(variants)]
 
         row = _FakeUserExperiment(
@@ -82,9 +78,7 @@ class FakeExperimentRepository:
     async def get_assignments(self, user_id: UUID) -> list[_FakeUserExperiment]:
         return [a for a in self._assignments if a.user_id == user_id]
 
-    async def record_conversion(
-        self, *, user_id: UUID, experiment_key: str
-    ) -> None:
+    async def record_conversion(self, *, user_id: UUID, experiment_key: str) -> None:
         for row in self._assignments:
             if (
                 row.user_id == user_id
@@ -95,9 +89,7 @@ class FakeExperimentRepository:
                 return
         # Missing row → silent no-op (matches real implementation).
 
-    async def get_experiment_stats(
-        self, experiment_key: str
-    ) -> dict[str, dict[str, int | float]]:
+    async def get_experiment_stats(self, experiment_key: str) -> dict[str, dict[str, int | float]]:
         rows = [a for a in self._assignments if a.experiment_key == experiment_key]
         stats: dict[str, dict[str, int | float]] = {}
         for row in rows:
@@ -107,7 +99,7 @@ class FakeExperimentRepository:
             bucket["total"] = int(bucket["total"]) + 1
             if row.converted_at is not None:
                 bucket["converted"] = int(bucket["converted"]) + 1
-        for variant, data in stats.items():
+        for _variant, data in stats.items():
             total = int(data["total"])
             converted = int(data["converted"])
             data["conversion_rate"] = round(converted / total, 4) if total > 0 else 0.0
@@ -177,9 +169,7 @@ async def test_get_user_assignments_skips_inactive() -> None:
     """Inactive experiments must not appear in the returned assignments."""
     svc, repo = _svc()
     repo._experiments = [
-        _FakeExperiment(
-            id=uuid4(), experiment_key="active_exp", variants=["control", "treatment"]
-        ),
+        _FakeExperiment(id=uuid4(), experiment_key="active_exp", variants=["control", "treatment"]),
         _FakeExperiment(
             id=uuid4(),
             experiment_key="inactive_exp",
@@ -252,9 +242,7 @@ async def test_get_user_assignments_existing_not_reassigned() -> None:
     """A pre-existing assignment row must be returned as-is, with no new row created."""
     svc, repo = _svc()
     repo._experiments = [
-        _FakeExperiment(
-            id=uuid4(), experiment_key="stable_exp", variants=["alpha", "beta"]
-        ),
+        _FakeExperiment(id=uuid4(), experiment_key="stable_exp", variants=["alpha", "beta"]),
     ]
     user = uuid4()
 

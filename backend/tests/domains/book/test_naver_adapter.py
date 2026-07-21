@@ -141,7 +141,9 @@ async def test_naver_http_image_url_upgraded_to_https(
         mock.get(_NAVER_URL).mock(return_value=httpx.Response(200, json=payload))
         result = await naver_adapter.search("query")
 
-    assert result.items[0].cover_url == "https://bookthumb-phinf.pstatic.net/cover/001/001/cover1.jpg"
+    assert (
+        result.items[0].cover_url == "https://bookthumb-phinf.pstatic.net/cover/001/001/cover1.jpg"
+    )
 
 
 @pytest.mark.asyncio

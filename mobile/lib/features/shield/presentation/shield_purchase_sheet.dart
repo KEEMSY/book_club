@@ -43,12 +43,11 @@ class _ShieldPurchaseSheetState extends ConsumerState<ShieldPurchaseSheet> {
         'mock_receipt_${_selected.id}_${DateTime.now().millisecondsSinceEpoch}';
 
     try {
-      final ShieldPurchaseResult result = await ref
-          .read(shieldRepositoryProvider)
-          .purchaseShield(
-            productId: _selected.id,
-            receiptData: receiptData,
-          );
+      final ShieldPurchaseResult result =
+          await ref.read(shieldRepositoryProvider).purchaseShield(
+                productId: _selected.id,
+                receiptData: receiptData,
+              );
 
       if (!mounted) return;
       // Invalidate cached balance so any other widget re-fetches.
@@ -115,7 +114,8 @@ class _ShieldPurchaseSheetState extends ConsumerState<ShieldPurchaseSheet> {
                   data: (n) => Text(
                     '🛡️ 현재 $n개',
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.72),
+                      color:
+                          theme.colorScheme.onSurface.withValues(alpha: 0.72),
                     ),
                   ),
                   loading: () => const SizedBox(
@@ -135,9 +135,8 @@ class _ShieldPurchaseSheetState extends ConsumerState<ShieldPurchaseSheet> {
               _ProductCard(
                 product: product,
                 selected: _selected.id == product.id,
-                onTap: _loading
-                    ? null
-                    : () => setState(() => _selected = product),
+                onTap:
+                    _loading ? null : () => setState(() => _selected = product),
               ),
               SizedBox(height: spacing.sm),
             ],

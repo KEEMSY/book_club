@@ -61,6 +61,4 @@ class UserExperiment(Base):
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
     # Populated when the user converts to Pro after being assigned to this experiment.
-    converted_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
+    converted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

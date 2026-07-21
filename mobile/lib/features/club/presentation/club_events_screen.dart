@@ -444,9 +444,8 @@ class _RsvpButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final bgColor = selected
-        ? selectedColor
-        : theme.colorScheme.surfaceContainerHighest;
+    final bgColor =
+        selected ? selectedColor : theme.colorScheme.surfaceContainerHighest;
     final fgColor = selected
         ? theme.colorScheme.onPrimary
         : theme.colorScheme.onSurface.withValues(alpha: 0.7);
@@ -592,7 +591,9 @@ class _CreateEventSheetState extends ConsumerState<_CreateEventSheet> {
                 ),
                 onTap: _pickDateTime,
               ),
-              Divider(height: 1, color: theme.colorScheme.outline.withValues(alpha: 0.3)),
+              Divider(
+                  height: 1,
+                  color: theme.colorScheme.outline.withValues(alpha: 0.3)),
               SizedBox(height: spacing.sm),
 
               // Location field (optional)

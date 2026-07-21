@@ -9,7 +9,6 @@ import pytest
 from app.core.exceptions import ConflictError, NotFoundError
 from app.domains.referral.service import ReferralService
 
-
 # ---------------------------------------------------------------------------
 # Fake repository
 # ---------------------------------------------------------------------------
@@ -36,9 +35,7 @@ class FakeReferralRepository:
 
     async def get_stats(self, user_id: UUID) -> tuple[int, int]:
         invited = len(self._invitations.get(user_id, []))
-        completed = sum(
-            1 for r, owner in self._completed.items() if owner == user_id
-        )
+        completed = sum(1 for r, owner in self._completed.items() if owner == user_id)
         return invited, completed
 
     async def apply_referral(self, *, referee_id: UUID, code: str) -> None:
@@ -70,7 +67,7 @@ def _svc() -> tuple[ReferralService, FakeReferralRepository]:
 
 @pytest.mark.asyncio
 async def test_get_my_referral_creates_code_on_first_call() -> None:
-    svc, repo = _svc()
+    svc, _repo = _svc()
     user = uuid4()
     result = await svc.get_my_referral(user)
     assert result.code  # non-empty code was generated

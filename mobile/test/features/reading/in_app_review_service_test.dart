@@ -65,8 +65,7 @@ void main() {
   });
 
   test('skips the request when the OS reports it unavailable', () async {
-    InAppReviewPlatform.instance =
-        _FakeInAppReviewPlatform(available: false);
+    InAppReviewPlatform.instance = _FakeInAppReviewPlatform(available: false);
     final prefs = await SharedPreferences.getInstance();
     // Counter still advances so we do not retry availability every session.
     await completeSessions(5);

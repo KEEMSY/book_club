@@ -65,8 +65,7 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen>
   void _onSuggestionSelected(String suggestion) {
     _debounceTimer?.cancel();
     _controller.text = suggestion;
-    _controller.selection =
-        TextSelection.collapsed(offset: suggestion.length);
+    _controller.selection = TextSelection.collapsed(offset: suggestion.length);
     setState(() {
       _debouncedQuery = suggestion;
       _showSuggestions = false;

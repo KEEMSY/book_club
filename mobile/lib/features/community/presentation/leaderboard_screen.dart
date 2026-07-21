@@ -44,8 +44,8 @@ class LeaderboardScreen extends ConsumerWidget {
           ),
           Expanded(
             child: async.when(
-              loading: () =>
-                  const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+              loading: () => const Center(
+                  child: CircularProgressIndicator(strokeWidth: 2)),
               error: (e, _) => _ErrorBody(
                 onRetry: () => ref.invalidate(weeklyLeaderboardProvider),
               ),
@@ -88,8 +88,7 @@ class _LeaderboardList extends ConsumerWidget {
         ),
         itemCount: entries.length,
         separatorBuilder: (_, __) => SizedBox(height: spacing.xs),
-        itemBuilder: (context, index) =>
-            _EntryTile(entry: entries[index]),
+        itemBuilder: (context, index) => _EntryTile(entry: entries[index]),
       ),
     );
   }

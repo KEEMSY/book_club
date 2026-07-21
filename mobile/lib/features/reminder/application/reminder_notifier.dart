@@ -61,7 +61,9 @@ class ReminderList extends _$ReminderList {
     final target = current.firstWhere((r) => r.id == id);
 
     state = AsyncData(
-      current.map((r) => r.id == id ? r.copyWith(isActive: active) : r).toList(),
+      current
+          .map((r) => r.id == id ? r.copyWith(isActive: active) : r)
+          .toList(),
     );
 
     try {

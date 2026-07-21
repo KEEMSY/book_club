@@ -19,11 +19,9 @@ from typing import Any
 from uuid import UUID, uuid4
 
 import pytest
-
 from app.core.exceptions import ConflictError
 from app.domains.challenge.events import BadgeEarned
 from app.domains.challenge.service import (
-    ChallengeEndedError,
     ChallengeService,
 )
 
@@ -50,12 +48,8 @@ class _FakeChallenge:
     challenge_type: str = "books_count"
     target_value: int = 5
     genre_filter: str | None = None
-    starts_at: datetime = field(
-        default_factory=lambda: datetime.now(tz=UTC) - timedelta(days=1)
-    )
-    ends_at: datetime = field(
-        default_factory=lambda: datetime.now(tz=UTC) + timedelta(days=30)
-    )
+    starts_at: datetime = field(default_factory=lambda: datetime.now(tz=UTC) - timedelta(days=1))
+    ends_at: datetime = field(default_factory=lambda: datetime.now(tz=UTC) + timedelta(days=30))
     badge_id: UUID | None = None
     # M41 fields
     is_limited: bool = False
@@ -126,9 +120,7 @@ class FakeChallengeRepositoryM41:
     async def get_challenge(self, challenge_id: UUID) -> _FakeChallenge | None:
         return self._challenges.get(challenge_id)
 
-    async def get_participant(
-        self, challenge_id: UUID, user_id: UUID
-    ) -> _FakeParticipant | None:
+    async def get_participant(self, challenge_id: UUID, user_id: UUID) -> _FakeParticipant | None:
         return self._participants.get((challenge_id, user_id))
 
     async def join(self, challenge_id: UUID, user_id: UUID) -> _FakeParticipant:
@@ -141,7 +133,19 @@ class FakeChallengeRepositoryM41:
 
     async def leaderboard(self, challenge_id: UUID, limit: int = 50) -> list[Any]:
         rows = [
-            (p, type("_FakeUser", (), {"id": p.user_id, "nickname": "user", "profile_image_url": None, "deleted_at": None})())
+            (
+                p,
+                type(
+                    "_FakeUser",
+                    (),
+                    {
+                        "id": p.user_id,
+                        "nickname": "user",
+                        "profile_image_url": None,
+                        "deleted_at": None,
+                    },
+                )(),
+            )
             for p in self._participants.values()
             if p.challenge_id == challenge_id
         ]

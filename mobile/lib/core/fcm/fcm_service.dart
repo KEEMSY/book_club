@@ -1,5 +1,8 @@
 import 'dart:developer' as dev;
 
+// firebase_core is pulled in transitively via firebase_messaging and used
+// directly for Firebase.initializeApp().
+// ignore: depend_on_referenced_packages
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -56,10 +59,9 @@ class FcmService {
   ///
   /// [onTokenRefresh] receives the new token string and is responsible for
   /// sending it to the backend.
-  Stream<String> get tokenRefreshStream =>
-      Firebase.apps.isEmpty
-          ? const Stream<String>.empty()
-          : FirebaseMessaging.instance.onTokenRefresh;
+  Stream<String> get tokenRefreshStream => Firebase.apps.isEmpty
+      ? const Stream<String>.empty()
+      : FirebaseMessaging.instance.onTokenRefresh;
 
   /// Requests push notification permission from the OS.
   ///

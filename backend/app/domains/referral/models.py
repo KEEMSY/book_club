@@ -48,6 +48,4 @@ class Referral(Base):
         TIMESTAMP(timezone=True), nullable=False, server_default=func.now()
     )
     # Set when the referee finishes their first qualifying session.
-    completed_at: Mapped[datetime | None] = mapped_column(
-        TIMESTAMP(timezone=True), nullable=True
-    )
+    completed_at: Mapped[datetime | None] = mapped_column(TIMESTAMP(timezone=True), nullable=True)

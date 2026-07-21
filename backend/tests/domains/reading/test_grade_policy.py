@@ -17,7 +17,6 @@ from app.domains.reading.grade_policy import (
     next_tier_threshold,
 )
 
-
 # ---------------------------------------------------------------------------
 # calculate_grade_tier — primary function
 # ---------------------------------------------------------------------------

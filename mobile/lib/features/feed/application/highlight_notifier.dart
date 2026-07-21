@@ -37,12 +37,13 @@ class HighlightNotifier extends _$HighlightNotifier {
     String? noteText,
   }) async {
     try {
-      final Highlight h = await ref.read(feedRepositoryProvider).createHighlight(
-            userBookId: userBookId,
-            quoteText: quoteText,
-            pageNumber: pageNumber,
-            noteText: noteText,
-          );
+      final Highlight h =
+          await ref.read(feedRepositoryProvider).createHighlight(
+                userBookId: userBookId,
+                quoteText: quoteText,
+                pageNumber: pageNumber,
+                noteText: noteText,
+              );
       // Guard against autoDispose: the provider may have been collected while
       // the HTTP call was in flight (e.g. opened from library sheet with no
       // watcher). Skip the optimistic state update rather than throwing.

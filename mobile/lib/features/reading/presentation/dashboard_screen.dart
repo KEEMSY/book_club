@@ -949,95 +949,95 @@ class _YearStatsCard extends ConsumerWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-      padding: EdgeInsets.all(spacing.lg),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerLowest,
-        borderRadius: BorderRadius.all(Radius.circular(radii.lg)),
-        border: Border.all(color: theme.colorScheme.outlineVariant),
-        boxShadow: theme.extension<AppShadows>()!.elevated,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            '$year년 독서 여정',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          SizedBox(height: spacing.md),
-          async.when(
-            loading: () => const SizedBox(
-              height: 48,
-              child: Center(
-                child: CircularProgressIndicator(strokeWidth: 2),
+        padding: EdgeInsets.all(spacing.lg),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surfaceContainerLowest,
+          borderRadius: BorderRadius.all(Radius.circular(radii.lg)),
+          border: Border.all(color: theme.colorScheme.outlineVariant),
+          boxShadow: theme.extension<AppShadows>()!.elevated,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              '$year년 독서 여정',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
               ),
             ),
-            error: (_, __) => Row(
-              children: <Widget>[
-                Icon(
-                  Icons.cloud_off_rounded,
-                  size: 18,
-                  color: theme.colorScheme.onSurfaceVariant,
+            SizedBox(height: spacing.md),
+            async.when(
+              loading: () => const SizedBox(
+                height: 48,
+                child: Center(
+                  child: CircularProgressIndicator(strokeWidth: 2),
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    '통계를 불러오지 못했어요',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
+              ),
+              error: (_, __) => Row(
+                children: <Widget>[
+                  Icon(
+                    Icons.cloud_off_rounded,
+                    size: 18,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      '통계를 불러오지 못했어요',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ),
-                ),
-                TextButton(
-                  onPressed: () => ref.invalidate(yearStatsProvider(year)),
-                  style: TextButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                    minimumSize: const Size(0, 0),
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    visualDensity: VisualDensity.compact,
+                  TextButton(
+                    onPressed: () => ref.invalidate(yearStatsProvider(year)),
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      minimumSize: const Size(0, 0),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      visualDensity: VisualDensity.compact,
+                    ),
+                    child: const Text('다시 시도'),
                   ),
-                  child: const Text('다시 시도'),
-                ),
-              ],
-            ),
-            data: (ReadingYearStats stats) => Row(
-              children: <Widget>[
-                Expanded(
-                  child: _YearStatItem(
-                    label: '완독한 책',
-                    value: '${stats.yearBooks}권',
-                    accent: accent,
-                  ),
-                ),
-                Expanded(
-                  child: _YearStatItem(
-                    label: '읽은 시간',
-                    value: _fmtHours(stats.yearSeconds),
-                    accent: accent,
-                  ),
-                ),
-                Expanded(
-                  child: _YearStatItem(
-                    label: '최장 연속',
-                    value: '${stats.longestStreak}일',
-                    accent: accent,
-                  ),
-                ),
-                if (stats.yearBestDaySeconds != null)
+                ],
+              ),
+              data: (ReadingYearStats stats) => Row(
+                children: <Widget>[
                   Expanded(
                     child: _YearStatItem(
-                      label: '하루 최고',
-                      value: _fmtMinutes(stats.yearBestDaySeconds!),
+                      label: '완독한 책',
+                      value: '${stats.yearBooks}권',
                       accent: accent,
                     ),
                   ),
-              ],
+                  Expanded(
+                    child: _YearStatItem(
+                      label: '읽은 시간',
+                      value: _fmtHours(stats.yearSeconds),
+                      accent: accent,
+                    ),
+                  ),
+                  Expanded(
+                    child: _YearStatItem(
+                      label: '최장 연속',
+                      value: '${stats.longestStreak}일',
+                      accent: accent,
+                    ),
+                  ),
+                  if (stats.yearBestDaySeconds != null)
+                    Expanded(
+                      child: _YearStatItem(
+                        label: '하루 최고',
+                        value: _fmtMinutes(stats.yearBestDaySeconds!),
+                        accent: accent,
+                      ),
+                    ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
     );
   }
 
@@ -1348,9 +1348,8 @@ class _StartReadingSheetState extends ConsumerState<_StartReadingSheet> {
     final readingState = libraryMap[BookStatus.reading];
     final bool isLoading = readingState is LibraryListLoading ||
         readingState is LibraryListInitial;
-    final List<UserBook> books = readingState is LibraryListLoaded
-        ? readingState.items
-        : <UserBook>[];
+    final List<UserBook> books =
+        readingState is LibraryListLoaded ? readingState.items : <UserBook>[];
 
     return Padding(
       padding: EdgeInsets.fromLTRB(

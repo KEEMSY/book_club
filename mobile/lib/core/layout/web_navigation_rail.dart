@@ -185,9 +185,8 @@ class _RailItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool selected = index == selectedIndex;
-    final Color fg = selected
-        ? tint
-        : theme.colorScheme.onSurface.withValues(alpha: 0.6);
+    final Color fg =
+        selected ? tint : theme.colorScheme.onSurface.withValues(alpha: 0.6);
 
     final Widget iconWidget = Badge(
       isLabelVisible: badgeCount > 0,
@@ -213,9 +212,8 @@ class _RailItem extends StatelessWidget {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             decoration: BoxDecoration(
-              color: selected
-                  ? tint.withValues(alpha: 0.12)
-                  : Colors.transparent,
+              color:
+                  selected ? tint.withValues(alpha: 0.12) : Colors.transparent,
               borderRadius: BorderRadius.circular(12),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -227,8 +225,7 @@ class _RailItem extends StatelessWidget {
                   label,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: fg,
-                    fontWeight:
-                        selected ? FontWeight.w600 : FontWeight.w400,
+                    fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
                   ),
                 ),
               ],
@@ -304,8 +301,7 @@ class _SectionSeparator extends StatelessWidget {
               child: Text(
                 '커뮤니티',
                 style: theme.textTheme.labelSmall?.copyWith(
-                  color:
-                      theme.colorScheme.onSurface.withValues(alpha: 0.38),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.38),
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.5,
                   fontSize: 10,

@@ -81,9 +81,7 @@ def upgrade() -> None:
         sa.Column("total_seconds", sa.Integer(), nullable=False, server_default="0"),
         sa.Column("session_count", sa.Integer(), nullable=False, server_default="0"),
         sa.Column("best_day", sa.Date(), nullable=True),
-        sa.Column(
-            "longest_session_sec", sa.Integer(), nullable=False, server_default="0"
-        ),
+        sa.Column("longest_session_sec", sa.Integer(), nullable=False, server_default="0"),
         sa.Column("push_sent_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column(
             "created_at",
@@ -91,9 +89,7 @@ def upgrade() -> None:
             server_default=sa.func.now(),
             nullable=False,
         ),
-        sa.UniqueConstraint(
-            "user_id", "week_start", name="uq_weekly_reports_user_week"
-        ),
+        sa.UniqueConstraint("user_id", "week_start", name="uq_weekly_reports_user_week"),
     )
     op.create_index("ix_weekly_reports_user_id", "weekly_reports", ["user_id"])
 

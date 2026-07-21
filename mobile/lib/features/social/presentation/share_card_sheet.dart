@@ -103,7 +103,8 @@ class _ShareCardSheetState extends ConsumerState<ShareCardSheet> {
       final ShareResult result = await SharePlus.instance.share(
         ShareParams(
           files: <XFile>[
-            XFile.fromData(pngBytes, mimeType: 'image/png', name: 'bookclub_card.png'),
+            XFile.fromData(pngBytes,
+                mimeType: 'image/png', name: 'bookclub_card.png'),
           ],
           text: meta.caption,
         ),

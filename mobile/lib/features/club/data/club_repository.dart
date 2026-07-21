@@ -216,17 +216,13 @@ class ClubRepository {
       cursor: cursor,
     );
     final items = (data['items'] as List? ?? []);
-    return items
-        .map((e) => Club.fromJson(e as Map<String, dynamic>))
-        .toList();
+    return items.map((e) => Club.fromJson(e as Map<String, dynamic>)).toList();
   }
 
   Future<List<Club>> getRecommendedClubs() async {
     final data = await _api.getRecommendedClubs();
     final items = (data['items'] as List? ?? []);
-    return items
-        .map((e) => Club.fromJson(e as Map<String, dynamic>))
-        .toList();
+    return items.map((e) => Club.fromJson(e as Map<String, dynamic>)).toList();
   }
 
   Future<Club> joinPublicClub(String clubId) async {

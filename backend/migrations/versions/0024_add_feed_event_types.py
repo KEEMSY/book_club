@@ -44,9 +44,7 @@ _EVENT_TYPES = (
     "BOOK_COMPLETED",
     "CLUB_JOINED",
 )
-_CHECK_EXPR = "event_type IN ({})".format(
-    ", ".join(f"'{t}'" for t in _EVENT_TYPES)
-)
+_CHECK_EXPR = "event_type IN ({})".format(", ".join(f"'{t}'" for t in _EVENT_TYPES))
 
 
 def upgrade() -> None:

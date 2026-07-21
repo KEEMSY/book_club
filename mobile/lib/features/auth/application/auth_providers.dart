@@ -7,7 +7,6 @@ import '../data/auth_repository.dart';
 import '../data/default_social_login_port.dart';
 import '../data/social_login_port.dart';
 
-
 /// retrofit client — built once per Dio instance.
 final authApiProvider = Provider<AuthApi>((ref) {
   final dio = ref.watch(dioProvider);

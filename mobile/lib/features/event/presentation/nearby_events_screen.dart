@@ -96,7 +96,8 @@ class _EventsMapState extends State<_EventsMap> {
   /// One marker per event with coordinates; [Marker.markerId] is the event id so
   /// [onMarkerTap] can route straight to detail.
   List<Marker> get _markers => <Marker>[
-        for (final Event e in widget.state.events.valueOrNull ?? const <Event>[])
+        for (final Event e
+            in widget.state.events.valueOrNull ?? const <Event>[])
           if (e.lat != null && e.lng != null)
             Marker(
               markerId: e.id,

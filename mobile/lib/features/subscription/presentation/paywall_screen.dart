@@ -92,7 +92,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
     if (!launched && mounted) {
       messenger.showSnackBar(
-        const SnackBar(content: Text('메일 앱을 열 수 없어요. team@bookclub.app 으로 문의해 주세요.')),
+        const SnackBar(
+            content: Text('메일 앱을 열 수 없어요. team@bookclub.app 으로 문의해 주세요.')),
       );
     }
   }
@@ -140,6 +141,9 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
       final Package? package = _packageFor(offerings, _plan.productId);
       if (package == null) return _PurchaseOutcome.failure;
 
+      // RevenueCat purchase(PurchaseParams) migration is tracked separately;
+      // subscription is a deferred domain (BC-19).
+      // ignore: deprecated_member_use
       final PurchaseResult result = await Purchases.purchasePackage(package);
       final bool isPro =
           result.customerInfo.entitlements.active.containsKey(_kProEntitlement);
@@ -224,7 +228,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                     const _BenefitTile(text: '고급 독서 통계'),
                     const _BenefitTile(text: '광고 없는 경험'),
                     SizedBox(height: spacing.lg),
-                    _TeamPlanCard(spacing: spacing, onInquire: _inquireTeamPlan),
+                    _TeamPlanCard(
+                        spacing: spacing, onInquire: _inquireTeamPlan),
                   ],
                 ),
               ),
@@ -617,7 +622,8 @@ class _EarlyBirdBannerState extends State<_EarlyBirdBanner> {
       ),
       child: Row(
         children: [
-          const Icon(Icons.local_fire_department_rounded, color: _kEarlyBird, size: 28),
+          const Icon(Icons.local_fire_department_rounded,
+              color: _kEarlyBird, size: 28),
           const SizedBox(width: 12),
           Expanded(
             child: Column(

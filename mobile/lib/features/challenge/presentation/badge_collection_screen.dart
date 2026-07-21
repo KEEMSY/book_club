@@ -107,8 +107,9 @@ class _BadgeBody extends ConsumerWidget {
                   pinnedIds: pinnedIds,
                   earnedMap: earnedMap,
                   allBadgeMap: allBadgeMap,
-                  onReorder: (newIds) =>
-                      ref.read(badgePinNotifierProvider.notifier).reorder(newIds),
+                  onReorder: (newIds) => ref
+                      .read(badgePinNotifierProvider.notifier)
+                      .reorder(newIds),
                 ),
               ),
             );
@@ -637,7 +638,8 @@ class _BadgeDetailSheet extends StatelessWidget {
             if (earned && isExclusive) ...<Widget>[
               SizedBox(height: spacing.xs),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: Colors.amber.shade600.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(12),

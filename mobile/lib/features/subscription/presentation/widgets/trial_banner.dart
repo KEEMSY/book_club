@@ -50,7 +50,8 @@ class _Banner extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.workspace_premium_rounded, color: _kProPurple, size: 22),
+          const Icon(Icons.workspace_premium_rounded,
+              color: _kProPurple, size: 22),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
@@ -67,7 +68,8 @@ class _Banner extends StatelessWidget {
               foregroundColor: _kProPurple,
               padding: const EdgeInsets.symmetric(horizontal: 8),
             ),
-            child: const Text('구독하기', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text('구독하기',
+                style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
       ),

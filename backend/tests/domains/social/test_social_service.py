@@ -96,9 +96,7 @@ class FakeSocialRepository:
         limit: int,
     ) -> tuple[list[Any], str | None]:
         followers = [
-            self._users[fr]
-            for (fr, fe) in self._follows
-            if fe == user_id and fr in self._users
+            self._users[fr] for (fr, fe) in self._follows if fe == user_id and fr in self._users
         ]
         return followers[:limit], None
 
@@ -110,9 +108,7 @@ class FakeSocialRepository:
         limit: int,
     ) -> tuple[list[Any], str | None]:
         following = [
-            self._users[fe]
-            for (fr, fe) in self._follows
-            if fr == user_id and fe in self._users
+            self._users[fe] for (fr, fe) in self._follows if fr == user_id and fe in self._users
         ]
         return following[:limit], None
 

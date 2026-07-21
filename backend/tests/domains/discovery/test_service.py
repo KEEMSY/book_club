@@ -14,8 +14,6 @@ from uuid import UUID, uuid4
 
 import pytest
 from app.domains.discovery.service import DiscoveryService
-from app.domains.discovery.strategies import RecommendationStrategy
-
 
 # ---------------------------------------------------------------------------
 # Minimal stubs
@@ -102,7 +100,9 @@ def _svc(
     similar: list[_Row] | None = None,
     recent: list[_Row] | None = None,
 ) -> DiscoveryService:
-    return DiscoveryService(repo=FakeDiscoveryRepository(popular=popular, similar=similar, recent=recent))  # type: ignore[arg-type]
+    return DiscoveryService(
+        repo=FakeDiscoveryRepository(popular=popular, similar=similar, recent=recent)
+    )  # type: ignore[arg-type]
 
 
 # ---------------------------------------------------------------------------

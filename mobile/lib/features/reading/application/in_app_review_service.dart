@@ -43,7 +43,8 @@ class InAppReviewService {
 
     await prefs.setInt(_countKey, 0);
     await prefs.setString(_lastRequestKey, _todayKey());
-    await prefs.setInt(_totalRequestKey, (prefs.getInt(_totalRequestKey) ?? 0) + 1);
+    await prefs.setInt(
+        _totalRequestKey, (prefs.getInt(_totalRequestKey) ?? 0) + 1);
   }
 
   bool _canRequest(SharedPreferences prefs) {

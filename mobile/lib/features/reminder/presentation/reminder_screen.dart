@@ -186,9 +186,7 @@ class _ReminderList extends ConsumerWidget {
           },
           onDismissed: (_) async {
             try {
-              await ref
-                  .read(reminderListProvider.notifier)
-                  .delete(reminder.id);
+              await ref.read(reminderListProvider.notifier).delete(reminder.id);
             } on ReminderRepositoryException catch (e) {
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -345,8 +343,7 @@ class _DayChips extends StatelessWidget {
                 color: isSelected
                     ? selectedColor
                     : theme.colorScheme.onSurface.withValues(alpha: 0.3),
-                fontWeight:
-                    isSelected ? FontWeight.bold : FontWeight.normal,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
             ),
           ),
@@ -514,8 +511,7 @@ class _AddReminderSheetState extends ConsumerState<_AddReminderSheet> {
       _errorMessage = null;
     });
 
-    final timeStr =
-        '${_time.hour.toString().padLeft(2, '0')}:'
+    final timeStr = '${_time.hour.toString().padLeft(2, '0')}:'
         '${_time.minute.toString().padLeft(2, '0')}:00';
 
     try {

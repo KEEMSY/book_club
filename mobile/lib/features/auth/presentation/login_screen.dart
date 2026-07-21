@@ -40,8 +40,7 @@ class LoginScreen extends ConsumerWidget {
     // Dev-mode flag: show DevLoginButton only in debug builds so the button is
     // compiled out entirely in release. kDebugMode is a compile-time constant,
     // so tree-shaking removes the branch in --release mode.
-    const bool isDevMode =
-        kDebugMode &&
+    const bool isDevMode = kDebugMode &&
         bool.fromEnvironment('SHOW_DEV_LOGIN', defaultValue: true);
     final bool showApple =
         !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
@@ -141,7 +140,6 @@ class _Illustration extends StatelessWidget {
     );
   }
 }
-
 
 class _BottomCtas extends StatelessWidget {
   const _BottomCtas({

@@ -15,10 +15,8 @@ from dataclasses import dataclass, field
 from uuid import UUID, uuid4
 
 import pytest
-
 from app.domains.discovery.service import DiscoveryService
 from app.domains.discovery.strategies import RecommendationStrategy, cosine_similarity
-
 
 # ---------------------------------------------------------------------------
 # Minimal stubs for ORM models
@@ -193,7 +191,7 @@ async def test_strategy_similar_readers_returns_books() -> None:
     my_profile = _FakeProfile(user_id=user_id, genre_vector={"소설": 3, "에세이": 1})
     other_profile = _FakeProfile(user_id=other_id, genre_vector={"소설": 2, "에세이": 2})
 
-    _, genre_row, read_row = _book4("Similar User Book", "소설")
+    _, _genre_row, read_row = _book4("Similar User Book", "소설")
 
     repo = FakeDiscoveryRepository(
         profiles=[my_profile, other_profile],
@@ -359,5 +357,6 @@ def test_cosine_similarity_zero_vectors() -> None:
 
     # Normal case: identical vectors → similarity == 1.0
     import math
+
     result = cosine_similarity({"소설": 2, "에세이": 1}, {"소설": 2, "에세이": 1})
     assert math.isclose(result, 1.0, rel_tol=1e-6)

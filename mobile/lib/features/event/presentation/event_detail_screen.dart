@@ -150,7 +150,9 @@ class _Content extends StatelessWidget {
           SizedBox(height: spacing.md),
         ],
         _InfoLine(
-            icon: Icons.schedule_rounded, text: _formatDateTime(e.eventAt),),
+          icon: Icons.schedule_rounded,
+          text: _formatDateTime(e.eventAt),
+        ),
         if (e.address != null && e.address!.isNotEmpty)
           _InfoLine(icon: Icons.place_outlined, text: e.address!),
         _InfoLine(
@@ -249,8 +251,11 @@ class _ReviewsSection extends StatelessWidget {
             Text('후기', style: theme.textTheme.titleMedium),
             const Spacer(),
             if (reviews.averageRating != null) ...<Widget>[
-              Icon(Icons.star_rounded,
-                  size: 18, color: theme.colorScheme.primary,),
+              Icon(
+                Icons.star_rounded,
+                size: 18,
+                color: theme.colorScheme.primary,
+              ),
               const SizedBox(width: 4),
               Text(
                 '${reviews.averageRating!.toStringAsFixed(1)} (${reviews.count})',
@@ -276,11 +281,16 @@ class _ReviewsSection extends StatelessWidget {
                 children: <Widget>[
                   Row(
                     children: <Widget>[
-                      Icon(Icons.star_rounded,
-                          size: 16, color: theme.colorScheme.primary,),
+                      Icon(
+                        Icons.star_rounded,
+                        size: 16,
+                        color: theme.colorScheme.primary,
+                      ),
                       const SizedBox(width: 4),
-                      Text(r.rating.toStringAsFixed(1),
-                          style: theme.textTheme.labelLarge,),
+                      Text(
+                        r.rating.toStringAsFixed(1),
+                        style: theme.textTheme.labelLarge,
+                      ),
                     ],
                   ),
                   if (r.body != null && r.body!.isNotEmpty)

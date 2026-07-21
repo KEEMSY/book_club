@@ -5,7 +5,6 @@ import 'feed_models.dart';
 
 part 'feed_api.g.dart';
 
-
 /// Typed HTTP bindings for the M4 feed router plus M47 global event feed.
 ///
 /// All paths sit outside `/auth/*`, so [AuthInterceptor] attaches the bearer

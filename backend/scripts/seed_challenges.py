@@ -13,16 +13,14 @@ from __future__ import annotations
 import asyncio
 import os
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
-
 from app.core.config import get_settings
 from app.domains.challenge.models import Badge, BadgeCategory, Challenge, ChallengeType
-
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 _BADGES = [
     {
@@ -46,12 +44,12 @@ _BADGES = [
 ]
 
 # Challenges are defined relative to the script run date; adjust dates as needed.
-_NOW = datetime.now(tz=timezone.utc)
+_NOW = datetime.now(tz=UTC)
 _YEAR = _NOW.year
 
 
 def _dt(month: int, day: int) -> datetime:
-    return datetime(_YEAR, month, day, 0, 0, 0, tzinfo=timezone.utc)
+    return datetime(_YEAR, month, day, 0, 0, 0, tzinfo=UTC)
 
 
 _CHALLENGES = [

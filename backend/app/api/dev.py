@@ -68,9 +68,7 @@ _SEED_BOOKS = [
 async def _clear_tester_data(user_id: object, session: AsyncSession) -> None:
     """Remove all seeded data for *user_id* so the endpoint is idempotent."""
     seed_isbns = [b["isbn13"] for b in _SEED_BOOKS]
-    seed_book_ids_result = await session.execute(
-        select(Book.id).where(Book.isbn13.in_(seed_isbns))
-    )
+    seed_book_ids_result = await session.execute(select(Book.id).where(Book.isbn13.in_(seed_isbns)))
     seed_book_ids = [row[0] for row in seed_book_ids_result.fetchall()]
 
     if seed_book_ids:
@@ -204,76 +202,82 @@ async def seed_tester_data(
     month_start = today.replace(day=1)
     month_end = today.replace(day=calendar.monthrange(today.year, today.month)[1])
 
-    session.add_all([
-        Goal(
-            user_id=user_id,
-            period=GoalPeriod.WEEKLY,
-            target_seconds=3 * 3600,
-            target_books=0,
-            start_date=week_start,
-            end_date=week_end,
-        ),
-        Goal(
-            user_id=user_id,
-            period=GoalPeriod.MONTHLY,
-            target_seconds=15 * 3600,
-            target_books=2,
-            start_date=month_start,
-            end_date=month_end,
-        ),
-        Goal(
-            user_id=user_id,
-            period=GoalPeriod.YEARLY,
-            target_seconds=100 * 3600,
-            target_books=12,
-            start_date=date(today.year, 1, 1),
-            end_date=date(today.year, 12, 31),
-        ),
-    ])
+    session.add_all(
+        [
+            Goal(
+                user_id=user_id,
+                period=GoalPeriod.WEEKLY,
+                target_seconds=3 * 3600,
+                target_books=0,
+                start_date=week_start,
+                end_date=week_end,
+            ),
+            Goal(
+                user_id=user_id,
+                period=GoalPeriod.MONTHLY,
+                target_seconds=15 * 3600,
+                target_books=2,
+                start_date=month_start,
+                end_date=month_end,
+            ),
+            Goal(
+                user_id=user_id,
+                period=GoalPeriod.YEARLY,
+                target_seconds=100 * 3600,
+                target_books=12,
+                start_date=date(today.year, 1, 1),
+                end_date=date(today.year, 12, 31),
+            ),
+        ]
+    )
 
     # ── Feed events ────────────────────────────────────────────────────────────
-    session.add_all([
-        FeedEvent(
-            user_id=user_id,
-            event_type=FeedEventType.BOOK_COMPLETED,
-            event_metadata={"book_title": "파친코", "book_author": "이민진"},
-        ),
-        FeedEvent(
-            user_id=user_id,
-            event_type=FeedEventType.BOOK_COMPLETED,
-            event_metadata={"book_title": "채식주의자", "book_author": "한강"},
-        ),
-        FeedEvent(
-            user_id=user_id,
-            event_type=FeedEventType.STREAK_MILESTONE,
-            event_metadata={"streak_days": 7},
-        ),
-    ])
+    session.add_all(
+        [
+            FeedEvent(
+                user_id=user_id,
+                event_type=FeedEventType.BOOK_COMPLETED,
+                event_metadata={"book_title": "파친코", "book_author": "이민진"},
+            ),
+            FeedEvent(
+                user_id=user_id,
+                event_type=FeedEventType.BOOK_COMPLETED,
+                event_metadata={"book_title": "채식주의자", "book_author": "한강"},
+            ),
+            FeedEvent(
+                user_id=user_id,
+                event_type=FeedEventType.STREAK_MILESTONE,
+                event_metadata={"streak_days": 7},
+            ),
+        ]
+    )
 
     # ── Notifications (mix of unread and already-read) ─────────────────────────
-    session.add_all([
-        Notification(
-            user_id=user_id,
-            ntype=NotificationType.GRADE_UP,
-            title="등급 상승!",
-            body="독서량이 늘어 등급이 올랐습니다. 계속 읽어보세요!",
-            data={},
-        ),
-        Notification(
-            user_id=user_id,
-            ntype=NotificationType.STREAK_WARNING,
-            title="스트릭 위기!",
-            body="오늘 독서를 기록하지 않으면 스트릭이 끊깁니다.",
-            data={},
-        ),
-        Notification(
-            user_id=user_id,
-            ntype=NotificationType.WEEKLY_REPORT,
-            title="이번 주 독서 리포트",
-            body="이번 주 총 3시간 30분을 읽었습니다. 훌륭해요!",
-            data={},
-            read_at=now - timedelta(hours=2),
-        ),
-    ])
+    session.add_all(
+        [
+            Notification(
+                user_id=user_id,
+                ntype=NotificationType.GRADE_UP,
+                title="등급 상승!",
+                body="독서량이 늘어 등급이 올랐습니다. 계속 읽어보세요!",
+                data={},
+            ),
+            Notification(
+                user_id=user_id,
+                ntype=NotificationType.STREAK_WARNING,
+                title="스트릭 위기!",
+                body="오늘 독서를 기록하지 않으면 스트릭이 끊깁니다.",
+                data={},
+            ),
+            Notification(
+                user_id=user_id,
+                ntype=NotificationType.WEEKLY_REPORT,
+                title="이번 주 독서 리포트",
+                body="이번 주 총 3시간 30분을 읽었습니다. 훌륭해요!",
+                data={},
+                read_at=now - timedelta(hours=2),
+            ),
+        ]
+    )
 
     await session.commit()

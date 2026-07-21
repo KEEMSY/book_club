@@ -664,8 +664,7 @@ class _RecentCompletedSection extends ConsumerWidget {
 
     final Map<BookStatus, LibraryListState> libraryMap =
         ref.watch(libraryNotifierProvider);
-    final LibraryListState? completedState =
-        libraryMap[BookStatus.completed];
+    final LibraryListState? completedState = libraryMap[BookStatus.completed];
     if (completedState is! LibraryListLoaded) return const SizedBox.shrink();
     final List<UserBook> recent = completedState.items.take(6).toList();
     if (recent.isEmpty) return const SizedBox.shrink();

@@ -123,8 +123,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: <Override>[
-          readingRepositoryProvider
-              .overrideWithValue(readingRepo),
+          readingRepositoryProvider.overrideWithValue(readingRepo),
           bookRepositoryProvider.overrideWithValue(bookRepo),
           // Force the auth state to Authenticated so the greeting can render
           // the user's nickname without actually running the auth bootstrap.
@@ -239,8 +238,7 @@ Future<void> _pumpDashboard(
   await tester.pumpWidget(
     ProviderScope(
       overrides: <Override>[
-        readingRepositoryProvider
-            .overrideWithValue(readingRepo),
+        readingRepositoryProvider.overrideWithValue(readingRepo),
         bookRepositoryProvider.overrideWithValue(FakeBookRepository()),
         authRepositoryProvider.overrideWithValue(auth_fakes.buildRepository()),
         authNotifierProvider.overrideWith(

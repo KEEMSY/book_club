@@ -78,9 +78,7 @@ class ShareRepository:
             .order_by(func.count().desc())
         )
         return [
-            ShareStatRow(
-                card_type=row.card_type, platform=row.platform, count=row.share_count
-            )
+            ShareStatRow(card_type=row.card_type, platform=row.platform, count=row.share_count)
             for row in result.all()
         ]
 

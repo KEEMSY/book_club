@@ -23,8 +23,7 @@ class MonthlyRecapScreen extends ConsumerStatefulWidget {
   final int? month;
 
   @override
-  ConsumerState<MonthlyRecapScreen> createState() =>
-      _MonthlyRecapScreenState();
+  ConsumerState<MonthlyRecapScreen> createState() => _MonthlyRecapScreenState();
 }
 
 class _MonthlyRecapScreenState extends ConsumerState<MonthlyRecapScreen> {
@@ -35,8 +34,8 @@ class _MonthlyRecapScreenState extends ConsumerState<MonthlyRecapScreen> {
     if (_sharing) return;
     setState(() => _sharing = true);
     try {
-      final RenderRepaintBoundary boundary = _cardKey.currentContext!
-          .findRenderObject()! as RenderRepaintBoundary;
+      final RenderRepaintBoundary boundary =
+          _cardKey.currentContext!.findRenderObject()! as RenderRepaintBoundary;
       final ui.Image image = await boundary.toImage(pixelRatio: 3.0);
       final ByteData? byteData =
           await image.toByteData(format: ui.ImageByteFormat.png);
@@ -45,11 +44,9 @@ class _MonthlyRecapScreenState extends ConsumerState<MonthlyRecapScreen> {
 
       final int hours = recap.totalHours.floor();
       final int minutes = ((recap.totalHours - hours) * 60).round();
-      final String timeLabel =
-          hours > 0 ? '$hours시간 $minutes분' : '$minutes분';
+      final String timeLabel = hours > 0 ? '$hours시간 $minutes분' : '$minutes분';
 
-      final String text =
-          '${recap.fullLabel} 독서 회고\n'
+      final String text = '${recap.fullLabel} 독서 회고\n'
           '총 ${recap.booksCompleted}권 · $timeLabel 읽었어요 📚\n'
           '#북클럽 #독서기록';
 

@@ -159,8 +159,8 @@ class AuthNotifier extends _$AuthNotifier {
     await _repository.registerDeviceToken(
       token: token,
       platform: kIsWeb
-              ? 'web'
-              : (defaultTargetPlatform == TargetPlatform.iOS ? 'ios' : 'aos'),
+          ? 'web'
+          : (defaultTargetPlatform == TargetPlatform.iOS ? 'ios' : 'aos'),
     );
   }
 
@@ -170,8 +170,8 @@ class AuthNotifier extends _$AuthNotifier {
     await _repository.registerDeviceToken(
       token: newToken,
       platform: kIsWeb
-              ? 'web'
-              : (defaultTargetPlatform == TargetPlatform.iOS ? 'ios' : 'aos'),
+          ? 'web'
+          : (defaultTargetPlatform == TargetPlatform.iOS ? 'ios' : 'aos'),
     );
   }
 

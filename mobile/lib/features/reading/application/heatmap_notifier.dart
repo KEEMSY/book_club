@@ -47,8 +47,7 @@ class HeatmapNotifier extends _$HeatmapNotifier {
     state = const HeatmapState.loading();
     final repo = ref.read(readingRepositoryProvider);
     try {
-      final List<HeatmapDay> days =
-          await repo.getHeatmap(from: from, to: to);
+      final List<HeatmapDay> days = await repo.getHeatmap(from: from, to: to);
       state = HeatmapState.loaded(days: days, from: from, to: to);
     } on ReadingRepositoryException catch (e) {
       state = HeatmapState.error(code: e.code, message: e.message);

@@ -29,8 +29,7 @@ class ClubRoomChatScreen extends ConsumerStatefulWidget {
   final String roomName;
 
   @override
-  ConsumerState<ClubRoomChatScreen> createState() =>
-      _ClubRoomChatScreenState();
+  ConsumerState<ClubRoomChatScreen> createState() => _ClubRoomChatScreenState();
 }
 
 class _ClubRoomChatScreenState extends ConsumerState<ClubRoomChatScreen> {
@@ -535,7 +534,8 @@ class _ChatBubble extends StatelessWidget {
                                   placeholder: (_, __) => Container(
                                     width: 200,
                                     height: 120,
-                                    color: theme.colorScheme.surfaceContainerHigh,
+                                    color:
+                                        theme.colorScheme.surfaceContainerHigh,
                                   ),
                                   errorWidget: (_, __, ___) =>
                                       const Icon(Icons.broken_image_rounded),
@@ -552,8 +552,7 @@ class _ChatBubble extends StatelessWidget {
                       ),
                     ),
                     Padding(
-                      padding:
-                          const EdgeInsets.only(top: 2, left: 4, right: 4),
+                      padding: const EdgeInsets.only(top: 2, left: 4, right: 4),
                       child: Text(
                         _formatTime(message.createdAt),
                         style: theme.textTheme.labelSmall?.copyWith(

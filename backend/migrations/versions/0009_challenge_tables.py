@@ -115,9 +115,7 @@ def upgrade() -> None:
             server_default=sa.text("now()"),
         ),
         sa.PrimaryKeyConstraint("challenge_id", "user_id", name="pk_challenge_participants"),
-        sa.UniqueConstraint(
-            "challenge_id", "user_id", name="uq_challenge_participants_pair"
-        ),
+        sa.UniqueConstraint("challenge_id", "user_id", name="uq_challenge_participants_pair"),
     )
     # Leaderboard index: WHERE challenge_id = ? ORDER BY current_value DESC.
     op.create_index(
@@ -157,9 +155,7 @@ def upgrade() -> None:
 def downgrade() -> None:
     op.drop_index("ix_user_badges_badge_id", table_name="user_badges")
     op.drop_table("user_badges")
-    op.drop_index(
-        "ix_challenge_participants_leaderboard", table_name="challenge_participants"
-    )
+    op.drop_index("ix_challenge_participants_leaderboard", table_name="challenge_participants")
     op.drop_table("challenge_participants")
     op.drop_index("ix_challenges_window", table_name="challenges")
     op.drop_table("challenges")

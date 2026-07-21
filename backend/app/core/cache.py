@@ -30,7 +30,7 @@ F = TypeVar("F", bound=Callable[..., Coroutine[Any, Any, Any]])
 
 
 @lru_cache(maxsize=1)
-def get_redis() -> aioredis.Redis:  # type: ignore[type-arg]
+def get_redis() -> aioredis.Redis:
     """Return the process-wide Redis client.
 
     The client is connection-pool-backed; each coroutine borrows a
@@ -67,9 +67,7 @@ def cache_response(*, key_pattern: str, ttl: int) -> Callable[[F], F]:
             # interpolate {param_name} placeholders in key_pattern.
             bound = sig.bind(*args, **kwargs)
             bound.apply_defaults()
-            resolved_key = key_pattern.format_map(
-                {k: str(v) for k, v in bound.arguments.items()}
-            )
+            resolved_key = key_pattern.format_map({k: str(v) for k, v in bound.arguments.items()})
 
             redis_client = get_redis()
             try:

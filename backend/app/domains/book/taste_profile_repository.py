@@ -140,9 +140,7 @@ class OnboardingInterestRepository:
         set — partial updates are not needed for this use case.
         """
         await self._session.execute(
-            delete(UserOnboardingInterest).where(
-                UserOnboardingInterest.user_id == user_id
-            )
+            delete(UserOnboardingInterest).where(UserOnboardingInterest.user_id == user_id)
         )
         rows: list[UserOnboardingInterest] = []
         for category, value in interests:
@@ -153,16 +151,12 @@ class OnboardingInterestRepository:
             await self._session.flush()
         except IntegrityError as exc:
             await self._session.rollback()
-            raise ConflictError(
-                "duplicate interest entry", code="DUPLICATE_INTEREST"
-            ) from exc
+            raise ConflictError("duplicate interest entry", code="DUPLICATE_INTEREST") from exc
         for row in rows:
             await self._session.refresh(row)
         return rows
 
     async def list_for_user(self, user_id: UUID) -> list[UserOnboardingInterest]:
-        stmt = select(UserOnboardingInterest).where(
-            UserOnboardingInterest.user_id == user_id
-        )
+        stmt = select(UserOnboardingInterest).where(UserOnboardingInterest.user_id == user_id)
         result = await self._session.execute(stmt)
         return list(result.scalars().all())

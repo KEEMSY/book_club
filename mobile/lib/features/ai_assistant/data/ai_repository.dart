@@ -23,7 +23,8 @@ class AiRepositoryException implements Exception {
 
   bool get isProRequired => code == 'PRO_REQUIRED';
   bool get isRateLimited => code == 'PREP_DAILY_LIMIT' || statusCode == 429;
-  bool get isUnavailable => code == 'NOT_CONFIGURED' || (statusCode ?? 0) >= 500;
+  bool get isUnavailable =>
+      code == 'NOT_CONFIGURED' || (statusCode ?? 0) >= 500;
 
   @override
   String toString() =>

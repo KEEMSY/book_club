@@ -110,7 +110,8 @@ class PostCard extends StatelessWidget {
                 height: 1.5,
               ),
             ),
-          if (post.imageUrls.isNotEmpty && !post.postType.isActivity) ...<Widget>[
+          if (post.imageUrls.isNotEmpty &&
+              !post.postType.isActivity) ...<Widget>[
             SizedBox(height: spacing.sm),
             ImageGrid(urls: post.imageUrls),
           ],

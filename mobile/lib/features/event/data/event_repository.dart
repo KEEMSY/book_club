@@ -71,8 +71,9 @@ class EventRepository {
         event: Event.fromJson(data['event'] as Map<String, dynamic>),
         reviews: EventReviewsResult(
           items: items
-              .map((dynamic e) =>
-                  EventReview.fromJson(e as Map<String, dynamic>),)
+              .map(
+                (dynamic e) => EventReview.fromJson(e as Map<String, dynamic>),
+              )
               .toList(growable: false),
           averageRating: (reviews['average_rating'] as num?)?.toDouble(),
           count: (reviews['count'] as int?) ?? items.length,

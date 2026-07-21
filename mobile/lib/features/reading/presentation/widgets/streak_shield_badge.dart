@@ -26,8 +26,7 @@ class StreakShieldBadge extends StatelessWidget {
     final radii = theme.extension<AppRadius>()!;
 
     return Tooltip(
-      message:
-          '스트릭 쉴드 $streakShields개 보유 중 — 하루를 건너뛰어도 스트릭이 유지돼요',
+      message: '스트릭 쉴드 $streakShields개 보유 중 — 하루를 건너뛰어도 스트릭이 유지돼요',
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(

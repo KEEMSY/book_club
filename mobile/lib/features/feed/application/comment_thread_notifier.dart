@@ -48,10 +48,11 @@ class CommentThreadNotifier extends _$CommentThreadNotifier {
     state = snapshot.copyWith(isLoadingMore: true);
     final int seq = ++_requestSeq;
     try {
-      final CommentPage page = await ref.read(feedRepositoryProvider).listComments(
-            postId: postId,
-            cursor: snapshot.nextCursor,
-          );
+      final CommentPage page =
+          await ref.read(feedRepositoryProvider).listComments(
+                postId: postId,
+                cursor: snapshot.nextCursor,
+              );
       if (seq != _requestSeq) return;
       state = CommentThreadState.loaded(
         items: <Comment>[...snapshot.items, ...page.items],
@@ -78,11 +79,12 @@ class CommentThreadNotifier extends _$CommentThreadNotifier {
     }
     state = snapshot.copyWith(isPosting: true, postError: null);
     try {
-      final Comment created = await ref.read(feedRepositoryProvider).createComment(
-            postId: postId,
-            content: trimmed,
-            parentId: parentId,
-          );
+      final Comment created =
+          await ref.read(feedRepositoryProvider).createComment(
+                postId: postId,
+                content: trimmed,
+                parentId: parentId,
+              );
       // ASC order, so a freshly written comment goes at the end.
       state = snapshot.copyWith(
         items: <Comment>[...snapshot.items, created],

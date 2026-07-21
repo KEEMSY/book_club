@@ -30,6 +30,7 @@ class TimerRing extends StatelessWidget {
   final double strokeWidth;
   final Widget? child;
   final bool indeterminate;
+
   /// When true, the foreground arc is drawn at reduced opacity to signal
   /// that the timer is suspended without losing the current progress marker.
   final bool paused;

@@ -18,8 +18,13 @@ void main() {
       addTearDown(c.dispose);
       final notifier = c.read(commentThreadNotifierProvider('post-1').notifier);
       await notifier.load();
-      expect(c.read(commentThreadNotifierProvider('post-1')), isA<CommentThreadLoaded>());
-      expect((c.read(commentThreadNotifierProvider('post-1')) as CommentThreadLoaded).items, isEmpty);
+      expect(c.read(commentThreadNotifierProvider('post-1')),
+          isA<CommentThreadLoaded>());
+      expect(
+          (c.read(commentThreadNotifierProvider('post-1'))
+                  as CommentThreadLoaded)
+              .items,
+          isEmpty);
     });
 
     test('postComment appends to the items list', () async {
@@ -37,11 +42,16 @@ void main() {
       addTearDown(c.dispose);
       final notifier = c.read(commentThreadNotifierProvider('post-1').notifier);
       await notifier.load();
-      expect((c.read(commentThreadNotifierProvider('post-1')) as CommentThreadLoaded).items, hasLength(1));
+      expect(
+          (c.read(commentThreadNotifierProvider('post-1'))
+                  as CommentThreadLoaded)
+              .items,
+          hasLength(1));
 
       final created = await notifier.postComment(content: '재밌어요');
       expect(created, isNotNull);
-      final loaded = c.read(commentThreadNotifierProvider('post-1')) as CommentThreadLoaded;
+      final loaded = c.read(commentThreadNotifierProvider('post-1'))
+          as CommentThreadLoaded;
       expect(loaded.items, hasLength(2));
       expect(loaded.items.last.id, 'c2');
       expect(loaded.postError, isNull);
@@ -67,7 +77,8 @@ void main() {
         parentId: 'c1',
       );
       expect(result, isNull);
-      final loaded = c.read(commentThreadNotifierProvider('post-1')) as CommentThreadLoaded;
+      final loaded = c.read(commentThreadNotifierProvider('post-1'))
+          as CommentThreadLoaded;
       expect(loaded.postError, '답글은 한 번까지만 달 수 있어요.');
     });
 
@@ -92,7 +103,8 @@ void main() {
 
       final ok = await notifier.deleteComment('root-1');
       expect(ok, isTrue);
-      final loaded = c.read(commentThreadNotifierProvider('post-1')) as CommentThreadLoaded;
+      final loaded = c.read(commentThreadNotifierProvider('post-1'))
+          as CommentThreadLoaded;
       expect(loaded.items.map((c) => c.id), <String>['root-2']);
     });
 
@@ -110,10 +122,18 @@ void main() {
       final notifier = c.read(commentThreadNotifierProvider('post-1').notifier);
       await notifier.load();
       await notifier.postComment(content: 'hi');
-      expect((c.read(commentThreadNotifierProvider('post-1')) as CommentThreadLoaded).postError, isNotNull);
+      expect(
+          (c.read(commentThreadNotifierProvider('post-1'))
+                  as CommentThreadLoaded)
+              .postError,
+          isNotNull);
 
       notifier.clearPostError();
-      expect((c.read(commentThreadNotifierProvider('post-1')) as CommentThreadLoaded).postError, isNull);
+      expect(
+          (c.read(commentThreadNotifierProvider('post-1'))
+                  as CommentThreadLoaded)
+              .postError,
+          isNull);
     });
 
     test('loadMore appends and stops at null cursor', () async {
@@ -135,7 +155,8 @@ void main() {
       final notifier = c.read(commentThreadNotifierProvider('post-1').notifier);
       await notifier.load();
       await notifier.loadMore();
-      final loaded = c.read(commentThreadNotifierProvider('post-1')) as CommentThreadLoaded;
+      final loaded = c.read(commentThreadNotifierProvider('post-1'))
+          as CommentThreadLoaded;
       expect(loaded.items.map((c) => c.id), <String>['c1', 'c2']);
       expect(loaded.nextCursor, isNull);
     });

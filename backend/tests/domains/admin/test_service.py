@@ -8,9 +8,7 @@ from uuid import UUID, uuid4
 
 import pytest
 from app.core.exceptions import NotFoundError
-from app.domains.admin.schemas import StatsResponse, UserAdminItem
 from app.domains.admin.service import AdminService
-
 
 # ---------------------------------------------------------------------------
 # Fake repository

@@ -11,7 +11,6 @@ from app.core.exceptions import ConflictError, NotFoundError
 from app.domains.share.repository import ShareCardContext, ShareStatRow
 from app.domains.share.service import ShareService
 
-
 # ---------------------------------------------------------------------------
 # Fakes
 # ---------------------------------------------------------------------------
@@ -54,10 +53,7 @@ class FakeShareRepository:
         buckets: dict[tuple[str, str | None], int] = {}
         for e in self.events:
             buckets[(e.card_type, e.platform)] = buckets.get((e.card_type, e.platform), 0) + 1
-        rows = [
-            ShareStatRow(card_type=ct, platform=pf, count=n)
-            for (ct, pf), n in buckets.items()
-        ]
+        rows = [ShareStatRow(card_type=ct, platform=pf, count=n) for (ct, pf), n in buckets.items()]
         rows.sort(key=lambda r: r.count, reverse=True)
         return rows
 

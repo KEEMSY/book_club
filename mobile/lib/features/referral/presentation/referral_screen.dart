@@ -28,7 +28,8 @@ class ReferralScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('친구 초대')),
       body: statsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, _) => _ErrorBody(onRetry: () => ref.invalidate(referralStatsProvider)),
+        error: (err, _) =>
+            _ErrorBody(onRetry: () => ref.invalidate(referralStatsProvider)),
         data: (stats) => _ReferralBody(stats: stats),
       ),
     );
@@ -82,8 +83,7 @@ class _ReferralBody extends StatelessWidget {
 
   static String _inviteUrl(String code) => 'https://bookclub.app/invite/$code';
 
-  static String _shareText(String code) =>
-      '독서 앱 Book Club에서 함께 책 읽어요! 📚\n'
+  static String _shareText(String code) => '독서 앱 Book Club에서 함께 책 읽어요! 📚\n'
       '초대 코드: $code\n'
       '${_inviteUrl(code)}';
 

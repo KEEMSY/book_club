@@ -11,5 +11,7 @@ linter:
   rules:
     prefer_const_constructors: true
     prefer_final_locals: true
-    require_trailing_commas: true
+    # require_trailing_commas removed: the pinned dart formatter (Flutter 3.41.5)
+    # manages commas and its output conflicts with this lint, making it
+    # impossible to satisfy both `dart format --set-exit-if-changed` and analyze.
     avoid_print: true

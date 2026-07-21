@@ -79,8 +79,7 @@ def downgrade() -> None:
     op.drop_constraint("ck_event_attendees_status", "event_attendees", type_="check")
     op.execute("ALTER TABLE event_attendees DROP CONSTRAINT pk_event_attendees")
     op.execute(
-        "ALTER TABLE event_attendees"
-        " ADD CONSTRAINT pk_event_rsvps PRIMARY KEY (event_id, user_id)"
+        "ALTER TABLE event_attendees ADD CONSTRAINT pk_event_rsvps PRIMARY KEY (event_id, user_id)"
     )
     op.alter_column(
         "event_attendees",
