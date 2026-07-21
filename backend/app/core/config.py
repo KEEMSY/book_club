@@ -99,12 +99,12 @@ class Settings(BaseSettings):
     # MVP feed/notification reference it only via lazy model/event imports that
     # stay importable, so the app still builds; the follow-based feed tab and the
     # follow-received notification simply go dormant.
-    feature_social_enabled: bool = Field(default=False)
+    feature_social_enabled: bool = Field(default=True)
     # Deferred (BC-16): community posts/profiles domain; no MVP-core dependency.
     feature_community_enabled: bool = Field(default=False)
     # Deferred (BC-16): reading clubs (group feature) exceed MVP; only non-MVP
     # domains (video/ai_assistant/discovery/search) depend on it.
-    feature_club_enabled: bool = Field(default=False)
+    feature_club_enabled: bool = Field(default=True)
     feature_challenge_enabled: bool = Field(default=True)
     feature_discovery_enabled: bool = Field(default=True)
     feature_search_enabled: bool = Field(default=True)
