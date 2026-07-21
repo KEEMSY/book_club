@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/config/feature_flags.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../shield/presentation/shield_purchase_sheet.dart';
 
@@ -104,8 +105,12 @@ class StreakCard extends StatelessWidget {
                         recoveriesRemaining: recoveriesRemaining,
                         onRecover: onRecover,
                       ),
-                      const SizedBox(width: 8),
-                      _ShieldPurchaseButton(),
+                      // Shield IAP deferred (BC-20 scope cleanup): hide the
+                      // purchase entry point while the backend router is off.
+                      if (FeatureFlags.shield) ...<Widget>[
+                        const SizedBox(width: 8),
+                        _ShieldPurchaseButton(),
+                      ],
                     ],
                   ),
                 ],
