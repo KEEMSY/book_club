@@ -231,8 +231,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     // so a null variant falls through to opening the stats screen directly.
     final variant = FeatureFlags.experiment
         ? ref.read(userExperimentsProvider).valueOrNull?.variantFor(
-            'paywall_entry_v1',
-          )
+              'paywall_entry_v1',
+            )
         : null;
 
     if (variant == 'stats_tab') {
