@@ -117,12 +117,16 @@ class Settings(BaseSettings):
     feature_subscription_enabled: bool = Field(default=True)
     feature_shield_enabled: bool = Field(default=True)
     feature_review_enabled: bool = Field(default=True)
-    feature_ai_assistant_enabled: bool = Field(default=True)
+    # Deferred by BC-18 (advanced features): ai_assistant/video carry large
+    # external SDK cost, team is out of consumer MVP scope. Router stays
+    # mounted-conditional; code is untouched. Flip back to True to re-scope.
+    feature_ai_assistant_enabled: bool = Field(default=False)  # Claude API billing
     feature_share_enabled: bool = Field(default=True)
     # Deferred (BC-16): club video calls (M71, Agora); coupled to club, which is
     # deferred, so video is deferred with it.
     feature_video_enabled: bool = Field(default=False)
-    feature_team_enabled: bool = Field(default=True)
+    # Deferred (BC-18): B2B team plan, out of consumer MVP scope.
+    feature_team_enabled: bool = Field(default=False)
 
 
 @lru_cache(maxsize=1)

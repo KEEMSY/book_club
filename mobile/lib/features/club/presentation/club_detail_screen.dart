@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/config/feature_flags.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../ai_assistant/application/ai_providers.dart';
@@ -500,7 +501,7 @@ class _ClubBookCardState extends ConsumerState<_ClubBookCard> {
               ],
             ],
           ),
-          if (_isOwner && hasBook && isPro) ...[
+          if (FeatureFlags.aiAssistant && _isOwner && hasBook && isPro) ...[
             SizedBox(height: spacing.sm),
             OutlinedButton.icon(
               onPressed: _generateAiTopics,
@@ -509,7 +510,7 @@ class _ClubBookCardState extends ConsumerState<_ClubBookCard> {
             ),
           ],
           // Video reading meetup — Pro club owner only (backend re-checks both).
-          if (_isOwner && isPro) ...[
+          if (FeatureFlags.video && _isOwner && isPro) ...[
             SizedBox(height: spacing.sm),
             OutlinedButton.icon(
               onPressed: () =>
