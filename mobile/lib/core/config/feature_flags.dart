@@ -17,7 +17,7 @@ class FeatureFlags {
   static const bool search = true;
   static const bool curation = true;
   static const bool event = true;
-  static const bool referral = false;
+  static const bool referral = true;
   static const bool reminder = true;
   static const bool retention = false;
   static const bool experiment = false;

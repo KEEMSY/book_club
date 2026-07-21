@@ -103,7 +103,7 @@ class Settings(BaseSettings):
     feature_search_enabled: bool = Field(default=True)
     feature_curation_enabled: bool = Field(default=True)
     feature_event_enabled: bool = Field(default=True)
-    feature_referral_enabled: bool = Field(default=False)
+    feature_referral_enabled: bool = Field(default=True)
     feature_reminder_enabled: bool = Field(default=True)
     feature_retention_enabled: bool = Field(default=False)
     feature_experiment_enabled: bool = Field(default=False)
