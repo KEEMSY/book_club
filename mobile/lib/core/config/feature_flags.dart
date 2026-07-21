@@ -17,11 +17,11 @@ class FeatureFlags {
   static const bool search = true;
   static const bool curation = true;
   static const bool event = true;
-  static const bool referral = true;
+  static const bool referral = false;
   static const bool reminder = true;
-  static const bool retention = true;
-  static const bool experiment = true;
-  static const bool subscription = true;
+  static const bool retention = false;
+  static const bool experiment = false;
+  static const bool subscription = false;
   static const bool shield = true;
   static const bool review = true;
   static const bool aiAssistant = true;

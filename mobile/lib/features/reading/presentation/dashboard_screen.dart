@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/config/feature_flags.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../auth/application/auth_notifier.dart';
@@ -158,7 +159,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 SizedBox(height: spacing.lg),
                 // Pro free-trial nudge — renders nothing unless the user is
                 // mid-trial, so it sits silently above the sections otherwise.
-                const TrialBanner(),
+                // Deferred (BC-19): hidden entirely while subscription is off.
+                if (FeatureFlags.subscription) const TrialBanner(),
                 // RecapBanner returns SizedBox.shrink outside June / December,
                 // so no extra spacing guard is needed.
                 const RecapBanner(),
@@ -225,9 +227,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   /// stats_tab variant: non-Pro users are redirected to the paywall on tap.
   /// All other variants (or no assignment): stats screen opens directly.
   void _onStatsTap(BuildContext context) {
-    final experimentsAsync = ref.read(userExperimentsProvider);
-    final variant =
-        experimentsAsync.valueOrNull?.variantFor('paywall_entry_v1');
+    // Deferred (BC-19): skip the A/B lookup when the experiment feature is off
+    // so a null variant falls through to opening the stats screen directly.
+    final variant = FeatureFlags.experiment
+        ? ref.read(userExperimentsProvider).valueOrNull?.variantFor(
+            'paywall_entry_v1',
+          )
+        : null;
 
     if (variant == 'stats_tab') {
       final subAsync = ref.read(subscriptionNotifierProvider);
@@ -876,7 +882,9 @@ class _StreakCardWithRecovery extends ConsumerWidget {
     bool canRecover = false;
     int remaining = 0;
 
-    if (streak == 0) {
+    // Deferred (BC-19): the streak-recovery entry point is hidden while the
+    // retention feature is off, so no recovery status is fetched.
+    if (streak == 0 && FeatureFlags.retention) {
       final recoveryAsync = ref.watch(streakRecoveryStatusProvider);
       canRecover = recoveryAsync.valueOrNull?.canRecover ?? false;
       remaining = recoveryAsync.valueOrNull?.recoveriesRemaining ?? 0;
