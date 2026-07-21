@@ -16,10 +16,10 @@ class FeatureFlags {
   // Deferred (BC-16): reading clubs (group feature).
   static const bool club = true;
   static const bool challenge = true;
-  static const bool discovery = true;
-  static const bool search = true;
-  static const bool curation = true;
-  static const bool event = true;
+  static const bool discovery = false;
+  static const bool search = false;
+  static const bool curation = false;
+  static const bool event = false;
   static const bool referral = true;
   static const bool reminder = true;
   static const bool retention = true;
