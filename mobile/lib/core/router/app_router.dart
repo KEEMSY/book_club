@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../config/feature_flags.dart';
 import '../../features/auth/application/auth_notifier.dart';
 import '../../features/auth/domain/auth_state.dart';
 import '../../features/auth/presentation/login_screen.dart';
@@ -377,10 +378,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
       // M68 — reading-club video call; Pro club owner only (backend re-checks).
+      // Deferred by BC-18 (Agora RTC cost); guard the deep-link entry too since
+      // the club-detail button is flag-gated.
       GoRoute(
         path: '/clubs/:clubId/video',
         parentNavigatorKey: _rootKey,
         builder: (context, state) {
+          if (!FeatureFlags.video) return const _DeferredFeatureScreen();
           final String clubId = state.pathParameters['clubId']!;
           return VideoSessionScreen(clubId: clubId);
         },
@@ -394,11 +398,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return EventDetailScreen(eventId: eventId);
         },
       ),
-      // M70 — B2B team-plan admin console.
+      // M70 — B2B team-plan admin console. Deferred by BC-18 (non-MVP scope);
+      // this route is the feature's only entry point, so guard it here.
       GoRoute(
         path: '/teams/:id',
         parentNavigatorKey: _rootKey,
         builder: (context, state) {
+          if (!FeatureFlags.team) return const _DeferredFeatureScreen();
           final String teamId = state.pathParameters['id']!;
           return TeamAdminScreen(teamId: teamId);
         },
@@ -656,3 +662,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     ],
   );
 });
+
+/// Shown when a deep-link targets a feature deferred by the scope cleanup
+/// (BC-18). The route stays registered so the code path is intact; only the
+/// screen is withheld while its [FeatureFlags] entry is false.
+class _DeferredFeatureScreen extends StatelessWidget {
+  const _DeferredFeatureScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(),
+      body: const Center(
+        child: Text('현재 사용할 수 없는 기능입니다.'),
+      ),
+    );
+  }
+}

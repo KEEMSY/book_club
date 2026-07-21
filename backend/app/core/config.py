@@ -110,10 +110,13 @@ class Settings(BaseSettings):
     feature_subscription_enabled: bool = Field(default=True)
     feature_shield_enabled: bool = Field(default=True)
     feature_review_enabled: bool = Field(default=True)
-    feature_ai_assistant_enabled: bool = Field(default=True)
+    # Deferred by BC-18 (advanced features): ai_assistant/video carry large
+    # external SDK cost, team is out of consumer MVP scope. Router stays
+    # mounted-conditional; code is untouched. Flip back to True to re-scope.
+    feature_ai_assistant_enabled: bool = Field(default=False)  # Claude API billing
     feature_share_enabled: bool = Field(default=True)
-    feature_video_enabled: bool = Field(default=True)
-    feature_team_enabled: bool = Field(default=True)
+    feature_video_enabled: bool = Field(default=False)  # Agora RTC cost; club-scoped
+    feature_team_enabled: bool = Field(default=False)  # B2B team plan, non-MVP
 
 
 @lru_cache(maxsize=1)

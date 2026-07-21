@@ -24,8 +24,11 @@ class FeatureFlags {
   static const bool subscription = true;
   static const bool shield = true;
   static const bool review = true;
-  static const bool aiAssistant = true;
+  // Deferred by BC-18: ai_assistant/video carry large external SDK cost
+  // (Claude API / Agora RTC), team is out of consumer MVP scope. Entry points
+  // read these; code stays in place. Flip back to true to re-scope.
+  static const bool aiAssistant = false;
   static const bool share = true;
-  static const bool video = true;
-  static const bool team = true;
+  static const bool video = false;
+  static const bool team = false;
 }

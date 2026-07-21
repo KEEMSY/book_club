@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../core/config/feature_flags.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../ai_assistant/application/ai_audio_intro_service.dart';
@@ -273,7 +274,8 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                     onPressed: () => _showHighlightSheet(context),
                   ),
                 ],
-                if (widget.bookId.isNotEmpty &&
+                if (FeatureFlags.aiAssistant &&
+                    widget.bookId.isNotEmpty &&
                     state is! TimerRunning &&
                     state is! TimerPaused &&
                     state is! TimerEnding) ...<Widget>[
