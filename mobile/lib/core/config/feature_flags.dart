@@ -18,14 +18,14 @@ class FeatureFlags {
   static const bool curation = true;
   static const bool event = true;
   static const bool referral = true;
-  static const bool reminder = false;
+  static const bool reminder = true;
   static const bool retention = true;
   static const bool experiment = true;
   static const bool subscription = true;
   static const bool shield = false;
-  static const bool review = false;
+  static const bool review = true;
   static const bool aiAssistant = true;
-  static const bool share = false;
+  static const bool share = true;
   static const bool video = true;
   static const bool team = true;
 }
