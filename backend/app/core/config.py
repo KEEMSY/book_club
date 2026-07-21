@@ -95,8 +95,15 @@ class Settings(BaseSettings):
     # current behavior; the scope audit (BC-16~20) flips individual defaults to
     # False for deferred domains. A disabled domain's router is not mounted, so
     # its endpoints return 404 while the code stays in place for later review.
+    # Deferred (BC-16): social graph (follow/block) exceeds the reading-log MVP.
+    # MVP feed/notification reference it only via lazy model/event imports that
+    # stay importable, so the app still builds; the follow-based feed tab and the
+    # follow-received notification simply go dormant.
     feature_social_enabled: bool = Field(default=True)
-    feature_community_enabled: bool = Field(default=True)
+    # Deferred (BC-16): community posts/profiles domain; no MVP-core dependency.
+    feature_community_enabled: bool = Field(default=False)
+    # Deferred (BC-16): reading clubs (group feature) exceed MVP; only non-MVP
+    # domains (video/ai_assistant/discovery/search) depend on it.
     feature_club_enabled: bool = Field(default=True)
     feature_challenge_enabled: bool = Field(default=True)
     feature_discovery_enabled: bool = Field(default=True)
@@ -112,7 +119,9 @@ class Settings(BaseSettings):
     feature_review_enabled: bool = Field(default=True)
     feature_ai_assistant_enabled: bool = Field(default=True)
     feature_share_enabled: bool = Field(default=True)
-    feature_video_enabled: bool = Field(default=True)
+    # Deferred (BC-16): club video calls (M71, Agora); coupled to club, which is
+    # deferred, so video is deferred with it.
+    feature_video_enabled: bool = Field(default=False)
     feature_team_enabled: bool = Field(default=True)
 
 

@@ -9,8 +9,11 @@
 class FeatureFlags {
   const FeatureFlags._();
 
+  // Deferred (BC-16): social graph (follow/block) — exceeds reading-log MVP.
   static const bool social = true;
-  static const bool community = true;
+  // Deferred (BC-16): community posts/profiles domain.
+  static const bool community = false;
+  // Deferred (BC-16): reading clubs (group feature).
   static const bool club = true;
   static const bool challenge = true;
   static const bool discovery = true;
@@ -26,6 +29,7 @@ class FeatureFlags {
   static const bool review = true;
   static const bool aiAssistant = true;
   static const bool share = true;
-  static const bool video = true;
+  // Deferred (BC-16): club video calls (M71); coupled to club.
+  static const bool video = false;
   static const bool team = true;
 }
