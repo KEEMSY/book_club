@@ -22,9 +22,9 @@ class FeatureFlags {
   static const bool event = false;
   static const bool referral = true;
   static const bool reminder = true;
-  static const bool retention = true;
-  static const bool experiment = true;
-  static const bool subscription = true;
+  static const bool retention = false;
+  static const bool experiment = false;
+  static const bool subscription = false;
   static const bool shield = true;
   static const bool review = true;
   // Deferred by BC-18: ai_assistant/video carry large external SDK cost

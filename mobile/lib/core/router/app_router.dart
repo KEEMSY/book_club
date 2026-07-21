@@ -490,9 +490,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
       // M31 — friend invite / referral screen, pushed above the shell.
+      // Deferred (BC-19): when the referral feature is off, block the route.
       GoRoute(
         path: AppRoutes.referral,
         parentNavigatorKey: _rootKey,
+        redirect: (context, state) =>
+            FeatureFlags.referral ? null : AppRoutes.home,
         builder: (context, state) => const ReferralScreen(),
       ),
       // M33 — personalized reading reminders, pushed above the shell.
@@ -502,9 +505,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const ReminderScreen(),
       ),
       // M34 — Pro subscription paywall, reachable from any tab.
+      // Deferred (BC-19): when subscription is off, block the route.
       GoRoute(
         path: AppRoutes.paywall,
         parentNavigatorKey: _rootKey,
+        redirect: (context, state) =>
+            FeatureFlags.subscription ? null : AppRoutes.home,
         builder: (context, state) => const PaywallScreen(),
       ),
       // M38 — unified search (books + users + clubs), pushed above the shell.
@@ -544,6 +550,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/invite/:code',
         parentNavigatorKey: _rootKey,
         redirect: (context, state) {
+          // Deferred (BC-19): skip applying referral codes when the feature is
+          // off; land the user on home regardless.
+          if (!FeatureFlags.referral) return AppRoutes.home;
           final String code = state.pathParameters['code']!;
           // Obtain the repository via ProviderScope without a ref by reading
           // through the container exposed on the root element. We use a
