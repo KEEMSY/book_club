@@ -12,11 +12,11 @@ class FeatureFlags {
   static const bool social = true;
   static const bool community = true;
   static const bool club = true;
-  static const bool challenge = true;
-  static const bool discovery = true;
-  static const bool search = true;
-  static const bool curation = true;
-  static const bool event = true;
+  static const bool challenge = false;
+  static const bool discovery = false;
+  static const bool search = false;
+  static const bool curation = false;
+  static const bool event = false;
   static const bool referral = true;
   static const bool reminder = true;
   static const bool retention = true;
