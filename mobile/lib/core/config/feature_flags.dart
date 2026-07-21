@@ -25,7 +25,7 @@ class FeatureFlags {
   static const bool retention = false;
   static const bool experiment = false;
   static const bool subscription = false;
-  static const bool shield = true;
+  static const bool shield = false;
   static const bool review = true;
   // Deferred by BC-18: ai_assistant/video carry large external SDK cost
   // (Claude API / Agora RTC), team is out of consumer MVP scope. Entry points

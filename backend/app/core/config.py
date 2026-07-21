@@ -115,7 +115,7 @@ class Settings(BaseSettings):
     feature_retention_enabled: bool = Field(default=False)
     feature_experiment_enabled: bool = Field(default=False)
     feature_subscription_enabled: bool = Field(default=False)
-    feature_shield_enabled: bool = Field(default=True)
+    feature_shield_enabled: bool = Field(default=False)
     feature_review_enabled: bool = Field(default=True)
     # Deferred by BC-18 (advanced features): ai_assistant/video carry large
     # external SDK cost, team is out of consumer MVP scope. Router stays

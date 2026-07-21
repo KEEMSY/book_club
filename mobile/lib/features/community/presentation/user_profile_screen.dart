@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/config/feature_flags.dart';
 import '../../../core/providers/locale_provider.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
@@ -728,12 +729,16 @@ class _ActionButton extends ConsumerWidget {
                 context.push(AppRoutes.profileEdit, extra: profile),
             child: const Text('프로필 편집'),
           ),
-          const SizedBox(height: 8),
-          OutlinedButton.icon(
-            onPressed: () => context.push(AppRoutes.reminders),
-            icon: const Icon(Icons.alarm_outlined),
-            label: const Text('독서 리마인더'),
-          ),
+          // Reminder deferred (BC-20 scope cleanup): hide entry point when the
+          // feature flag is off so no navigation to a disabled backend surface.
+          if (FeatureFlags.reminder) ...[
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              onPressed: () => context.push(AppRoutes.reminders),
+              icon: const Icon(Icons.alarm_outlined),
+              label: const Text('독서 리마인더'),
+            ),
+          ],
           const SizedBox(height: 8),
           OutlinedButton.icon(
             onPressed: () => context.push(AppRoutes.referral),
