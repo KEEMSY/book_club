@@ -98,7 +98,7 @@ class Settings(BaseSettings):
     feature_social_enabled: bool = Field(default=True)
     feature_community_enabled: bool = Field(default=True)
     feature_club_enabled: bool = Field(default=True)
-    feature_challenge_enabled: bool = Field(default=False)
+    feature_challenge_enabled: bool = Field(default=True)
     feature_discovery_enabled: bool = Field(default=False)
     feature_search_enabled: bool = Field(default=False)
     feature_curation_enabled: bool = Field(default=False)

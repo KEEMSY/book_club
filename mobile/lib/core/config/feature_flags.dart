@@ -12,7 +12,7 @@ class FeatureFlags {
   static const bool social = true;
   static const bool community = true;
   static const bool club = true;
-  static const bool challenge = false;
+  static const bool challenge = true;
   static const bool discovery = false;
   static const bool search = false;
   static const bool curation = false;
