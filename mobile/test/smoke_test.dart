@@ -4,6 +4,7 @@ import 'package:book_club/core/storage/secure_storage.dart';
 import 'package:book_club/features/auth/application/auth_providers.dart';
 import 'package:book_club/features/auth/data/auth_repository.dart';
 import 'package:book_club/features/auth/data/social_login_port.dart';
+import 'package:book_club/features/onboarding/application/onboarding_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -39,6 +40,9 @@ void main() {
           dioProvider.overrideWithValue(fakeDio),
           secureStorageProvider.overrideWithValue(storage),
           authRepositoryProvider.overrideWithValue(repository),
+          // main.dart pre-warms this before the router first evaluates; tests
+          // skip main(), so override it to complete synchronously → /login.
+          onboardingCompletedProvider.overrideWith((ref) => true),
         ],
         child: const BookClubApp(),
       ),
@@ -48,7 +52,7 @@ void main() {
 
     // Router guard resolves Unauthenticated → /login. The login screen
     // renders the Playfair "Book Club" hero + the warm subhead copy.
-    expect(find.text('Book Club'), findsOneWidget);
+    expect(find.text('골방'), findsOneWidget);
     expect(find.text('책으로 연결되는 모든 순간'), findsOneWidget);
   });
 }

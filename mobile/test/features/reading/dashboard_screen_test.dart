@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../auth/fakes.dart' as auth_fakes;
 import '../book/fakes.dart' show FakeBookRepository;
@@ -91,6 +92,12 @@ void main() {
   setUpAll(() {
     GoogleFonts.config.allowRuntimeFetching = false;
   });
+  setUp(() {
+    // DashboardPrefsNotifier._load reads SharedPreferences on build; without a
+    // mock the platform channel throws and tears down the section list before
+    // the grade row builds. Empty initial values make getInstance() succeed.
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+  });
 
   testWidgets(
       'DashboardScreen renders greeting, daily card, streak, grade, heatmap',
@@ -132,6 +139,16 @@ void main() {
           authNotifierProvider.overrideWith(
             () => _StubAuthNotifier(AuthState.authenticated(pinnedUser)),
           ),
+          // Pin the grade to Loaded so the grade row + streak render
+          // deterministically rather than depending on the real notifier's
+          // async load completing within the pump window.
+          gradeNotifierProvider.overrideWith(
+            () => _StubGradeNotifier(
+              GradeState.loaded(
+                summary: buildGradeSummary(grade: 2, streakDays: 3),
+              ),
+            ),
+          ),
           notificationRepositoryProvider
               .overrideWithValue(const _FakeNotificationRepository()),
         ],
@@ -151,14 +168,33 @@ void main() {
     expect(find.textContaining('수민'), findsOneWidget);
     expect(find.text('오늘의 독서'), findsOneWidget);
 
+    // Sections below the fold live in a lazy ListView, so scroll each into view
+    // before asserting (off-screen children aren't built yet).
+    final scrollable = find.byType(Scrollable).first;
+
     // Streak card surfaces "연속 3일 독서 중" when streakDays == 3.
+    await tester.scrollUntilVisible(
+      find.textContaining('연속 3일'),
+      120,
+      scrollable: scrollable,
+    );
     expect(find.textContaining('연속 3일'), findsOneWidget);
 
     // Grade row shows the tier label.
-    expect(find.text('탐독자'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.textContaining('탐독자'),
+      120,
+      scrollable: scrollable,
+    );
+    expect(find.textContaining('탐독자'), findsWidgets);
 
     // Heatmap card header — uses "독서 캘린더" (renamed from the earlier
     // slangy "독서 잔디") to match the editorial tone for 20-30대 readers.
+    await tester.scrollUntilVisible(
+      find.text('독서 캘린더'),
+      120,
+      scrollable: scrollable,
+    );
     expect(find.text('독서 캘린더'), findsOneWidget);
 
     // Primary CTA — scroll the ListView until it becomes visible.
@@ -182,8 +218,13 @@ void main() {
       tester,
       gradeState: const GradeState.initial(),
     );
-    await tester.pump();
+    await tester.pumpAndSettle();
 
+    await tester.scrollUntilVisible(
+      find.byType(GradeBadge),
+      120,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.byType(GradeBadge), findsOneWidget);
     expect(find.text('등급을 불러오고 있어요'), findsOneWidget);
     expect(find.byIcon(Icons.chevron_right_rounded), findsOneWidget);
@@ -194,8 +235,15 @@ void main() {
       tester,
       gradeState: const GradeState.loading(),
     );
-    await tester.pump();
+    // The loading placeholder runs an infinite shimmer, so pumpAndSettle would
+    // never return — use a bounded pump before scrolling the row into view.
+    await tester.pump(const Duration(milliseconds: 50));
 
+    await tester.scrollUntilVisible(
+      find.byType(GradeBadge),
+      120,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.byType(GradeBadge), findsOneWidget);
     expect(find.text('등급을 불러오고 있어요'), findsOneWidget);
   });
@@ -207,8 +255,13 @@ void main() {
       gradeState:
           const GradeState.error(code: 'INTERNAL_ERROR', message: 'boom'),
     );
-    await tester.pump();
+    await tester.pumpAndSettle();
 
+    await tester.scrollUntilVisible(
+      find.byType(GradeBadge),
+      120,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.byType(GradeBadge), findsOneWidget);
     expect(
       find.textContaining('등급을 불러오지 못했어요'),
