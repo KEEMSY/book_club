@@ -33,13 +33,17 @@ void main() {
         ),
       ]);
       addTearDown(c.dispose);
-      final notifier = c.read(authNotifierProvider.notifier);
-      await notifier.bootstrap();
+      // A subscription keeps the auto-dispose provider alive so build()'s
+      // auto-bootstrap microtask can settle; without it, each read rebuilds and
+      // re-schedules bootstrap. We wait for that microtask rather than calling
+      // bootstrap() again (which would double-count getMe).
+      final sub = c.listen(authNotifierProvider, (_, __) {});
+      while (sub.read() is AuthInitial) {
+        await Future<void>.delayed(Duration.zero);
+      }
 
-      expect(c.read(authNotifierProvider), isA<Authenticated>());
-      final Authenticated authed =
-          c.read(authNotifierProvider) as Authenticated;
-      expect(authed.user.nickname, '수민');
+      expect(sub.read(), isA<Authenticated>());
+      expect((sub.read() as Authenticated).user.nickname, '수민');
       expect(api.getMeCalls, 1);
     });
 
@@ -173,16 +177,23 @@ void main() {
       final storage = InMemorySecureStorage();
       await storage.saveAccessToken('a');
       await storage.saveRefreshToken('r');
+      // Provide a /me response so the build() auto-bootstrap rehydrates cleanly
+      // (the stored tokens make rehydrate call getMe) before we test logout.
+      final api = FakeAuthApi(meResponse: buildUserDto(nickname: '수민'));
       final c = ProviderContainer(overrides: [
         authRepositoryProvider
-            .overrideWithValue(buildRepository(storage: storage)),
+            .overrideWithValue(buildRepository(api: api, storage: storage)),
       ]);
       addTearDown(c.dispose);
+      final sub = c.listen(authNotifierProvider, (_, __) {});
+      while (sub.read() is AuthInitial) {
+        await Future<void>.delayed(Duration.zero);
+      }
       final notifier = c.read(authNotifierProvider.notifier);
 
       await notifier.logout();
 
-      expect(c.read(authNotifierProvider), isA<Unauthenticated>());
+      expect(sub.read(), isA<Unauthenticated>());
       expect(await storage.readAccessToken(), isNull);
       expect(await storage.readRefreshToken(), isNull);
     });

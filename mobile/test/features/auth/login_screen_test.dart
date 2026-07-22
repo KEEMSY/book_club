@@ -57,13 +57,13 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Book Club'), findsOneWidget);
+    expect(find.text('골방'), findsOneWidget);
     expect(find.text('책으로 연결되는 모든 순간'), findsOneWidget);
-    expect(find.byType(DevLoginButton), findsOneWidget);
+    expect(find.byType(DevLoginButton), findsNWidgets(2));
     expect(find.text('개발용 로그인'), findsOneWidget);
-    expect(find.text('Dev 환경 전용'), findsOneWidget);
+    expect(find.textContaining('Dev 환경 전용'), findsOneWidget);
     expect(
-      find.text('로그인하면 Book Club 이용약관 및 개인정보처리방침에 동의합니다.'),
+      find.text('로그인하면 골방 이용약관 및 개인정보처리방침에 동의합니다.'),
       findsOneWidget,
     );
   });
@@ -86,7 +86,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byType(DevLoginButton));
+    await tester.tap(find.byType(DevLoginButton).first);
     await tester.pump();
     await tester.pumpAndSettle();
 

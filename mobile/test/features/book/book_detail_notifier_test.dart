@@ -15,11 +15,12 @@ void main() {
         bookRepositoryProvider.overrideWithValue(repo),
       ]);
       addTearDown(c.dispose);
-      // Reading the notifier kicks off load() immediately (side-effect only).
-      c.read(bookDetailNotifierProvider('b1').notifier);
+      final notifier = c.read(bookDetailNotifierProvider('b1').notifier);
       expect(
           c.read(bookDetailNotifierProvider('b1')), isA<BookDetailLoading>());
-      await Future<void>.delayed(Duration.zero);
+      // Await load() explicitly rather than relying on microtask timing, which
+      // a single Duration.zero turn does not reliably drain.
+      await notifier.load();
       expect(c.read(bookDetailNotifierProvider('b1')), isA<BookDetailLoaded>());
       expect(
           (c.read(bookDetailNotifierProvider('b1')) as BookDetailLoaded)
@@ -37,7 +38,7 @@ void main() {
       ]);
       addTearDown(c.dispose);
       final notifier = c.read(bookDetailNotifierProvider('b1').notifier);
-      await Future<void>.delayed(Duration.zero);
+      await notifier.load();
 
       final added = await notifier.addToLibrary();
 
@@ -62,7 +63,7 @@ void main() {
       ]);
       addTearDown(c.dispose);
       final notifier = c.read(bookDetailNotifierProvider('b1').notifier);
-      await Future<void>.delayed(Duration.zero);
+      await notifier.load();
 
       final added = await notifier.addToLibrary();
 
@@ -84,7 +85,7 @@ void main() {
       ]);
       addTearDown(c.dispose);
       final notifier = c.read(bookDetailNotifierProvider('b1').notifier);
-      await Future<void>.delayed(Duration.zero);
+      await notifier.load();
 
       await notifier.addToLibrary();
 
