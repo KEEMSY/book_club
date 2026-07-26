@@ -1,4 +1,6 @@
-platform :ios, '13.0'
+# Raised from 13.0 to 15.0: firebase_core (via firebase_messaging) requires a
+# higher minimum iOS deployment target (BC-24).
+platform :ios, '15.0'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
@@ -38,5 +40,10 @@ end
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
+    # Force every pod to the app's minimum (15.0); some pods otherwise inherit a
+    # lower default that trips firebase_core's requirement (BC-24).
+    target.build_configurations.each do |config|
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
+    end
   end
 end
