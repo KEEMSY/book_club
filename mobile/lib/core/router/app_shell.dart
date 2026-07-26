@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/notification/application/notification_notifier.dart';
 import '../../features/reading/application/reading_providers.dart';
+import '../config/feature_flags.dart';
 import '../layout/adaptive_layout.dart';
 import '../layout/web_navigation_rail.dart';
 import 'app_mode_provider.dart';
@@ -161,20 +162,23 @@ class _AppBottomBar extends StatelessWidget {
             thickness: 0.5,
             color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
           ),
-          if (mode == AppMode.personal)
+          // With community deferred (BC-23) the app only has personal mode, so
+          // the tab row is always shown and the mode toggle is dropped.
+          if (mode == AppMode.personal || !FeatureFlags.community)
             _PersonalNavRow(
               tabIndex: tabIndex,
               accent: accent,
               theme: theme,
               onTabSelected: onTabSelected,
             ),
-          _ModeToggle(
-            mode: mode,
-            accent: accent,
-            theme: theme,
-            bottomPad: bottomPad,
-            onModeSwitch: onModeSwitch,
-          ),
+          if (FeatureFlags.community)
+            _ModeToggle(
+              mode: mode,
+              accent: accent,
+              theme: theme,
+              bottomPad: bottomPad,
+              onModeSwitch: onModeSwitch,
+            ),
         ],
       ),
     );
@@ -217,15 +221,17 @@ class _PersonalNavRow extends ConsumerWidget {
           badgeCount: unreadCount,
           onTap: () => onTabSelected(0),
         ),
-        _NavItem(
-          icon: Icons.explore_outlined,
-          selectedIcon: Icons.explore_rounded,
-          label: '탐색',
-          selected: tabIndex == 1,
-          accent: accent,
-          theme: theme,
-          onTap: () => onTabSelected(1),
-        ),
+        // Deferred (BC-23): 탐색/discovery gated; branch index 1 stays reserved.
+        if (FeatureFlags.discovery)
+          _NavItem(
+            icon: Icons.explore_outlined,
+            selectedIcon: Icons.explore_rounded,
+            label: '탐색',
+            selected: tabIndex == 1,
+            accent: accent,
+            theme: theme,
+            onTap: () => onTabSelected(1),
+          ),
         _NavItem(
           icon: CupertinoIcons.book,
           selectedIcon: CupertinoIcons.book_fill,
