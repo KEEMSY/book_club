@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../config/feature_flags.dart';
 import 'adaptive_layout.dart';
 
 /// Side navigation for tablet/desktop widths.
@@ -67,17 +68,21 @@ class WebNavigationRail extends StatelessWidget {
             badgeCount: badgeCount,
             onTap: () => onDestinationSelected(0),
           ),
-          _RailItem(
-            index: 1,
-            selectedIndex: selectedIndex,
-            icon: Icons.explore_outlined,
-            selectedIcon: Icons.explore_rounded,
-            label: '탐색',
-            extended: extended,
-            tint: tint,
-            theme: theme,
-            onTap: () => onDestinationSelected(1),
-          ),
+          // Deferred (BC-23): 탐색/discovery is gated behind its feature flag.
+          // Branch indices stay fixed (0 홈 · 1 탐색 · 2 서재 · 3 커뮤니티) so
+          // hiding an item never renumbers the others.
+          if (FeatureFlags.discovery)
+            _RailItem(
+              index: 1,
+              selectedIndex: selectedIndex,
+              icon: Icons.explore_outlined,
+              selectedIcon: Icons.explore_rounded,
+              label: '탐색',
+              extended: extended,
+              tint: tint,
+              theme: theme,
+              onTap: () => onDestinationSelected(1),
+            ),
           _RailItem(
             index: 2,
             selectedIndex: selectedIndex,
@@ -89,18 +94,22 @@ class WebNavigationRail extends StatelessWidget {
             theme: theme,
             onTap: () => onDestinationSelected(2),
           ),
-          _SectionSeparator(extended: extended, theme: theme),
-          _RailItem(
-            index: 3,
-            selectedIndex: selectedIndex,
-            icon: CupertinoIcons.person_2,
-            selectedIcon: CupertinoIcons.person_2_fill,
-            label: '커뮤니티',
-            extended: extended,
-            tint: tint,
-            theme: theme,
-            onTap: () => onDestinationSelected(3),
-          ),
+          // Deferred (BC-23): 커뮤니티/community section is gated together with
+          // its separator.
+          if (FeatureFlags.community) ...<Widget>[
+            _SectionSeparator(extended: extended, theme: theme),
+            _RailItem(
+              index: 3,
+              selectedIndex: selectedIndex,
+              icon: CupertinoIcons.person_2,
+              selectedIcon: CupertinoIcons.person_2_fill,
+              label: '커뮤니티',
+              extended: extended,
+              tint: tint,
+              theme: theme,
+              onTap: () => onDestinationSelected(3),
+            ),
+          ],
           const Spacer(),
         ],
       ),

@@ -222,6 +222,24 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         return AppRoutes.home;
       }
 
+      // Deferred features (BC-23): their nav entry points are hidden, but guard
+      // direct/persisted navigation so a deep link doesn't land on a screen
+      // whose backend router is unmounted (404). Only unambiguous stand-alone
+      // routes are listed — kept features that share a prefix (e.g.
+      // /community/challenges, /discover/clubs) are intentionally excluded.
+      if (authenticated) {
+        const Set<String> deferredRoutes = <String>{
+          AppRoutes.discovery,
+          AppRoutes.community,
+          AppRoutes.search,
+          AppRoutes.unifiedSearch,
+          AppRoutes.paywall,
+        };
+        if (deferredRoutes.contains(canonical)) {
+          return AppRoutes.home;
+        }
+      }
+
       // Unauthenticated: decide between onboarding and login.
       if (!authenticated && !onLogin && !onOnboarding) {
         // Check the onboarding-complete flag synchronously from the cache.
