@@ -166,15 +166,15 @@ class NotificationNotifier extends _$NotificationNotifier {
       _channel = WebSocketChannel.connect(uri);
       _subscription = _channel!.stream.listen(
         _onWsMessage,
-        onError: (_) => _scheduleReconnect(token),
-        onDone: () => _scheduleReconnect(token),
+        onError: (_) => _scheduleReconnect(),
+        onDone: () => _scheduleReconnect(),
         cancelOnError: false,
       );
       _retryCount = 0;
       state = state.copyWith(wsConnected: true);
       _startPing();
     } catch (_) {
-      _scheduleReconnect(token);
+      _scheduleReconnect();
     }
   }
 
@@ -216,7 +216,7 @@ class NotificationNotifier extends _$NotificationNotifier {
     );
   }
 
-  void _scheduleReconnect(String token) {
+  void _scheduleReconnect() {
     if (_retryCount >= _notifMaxRetries) {
       state = state.copyWith(wsConnected: false);
       return;
@@ -227,9 +227,11 @@ class NotificationNotifier extends _$NotificationNotifier {
     final delaySeconds = min(30, pow(2, _retryCount).toInt());
     _retryCount++;
 
-    _reconnectTimer = Timer(Duration(seconds: delaySeconds), () {
-      _doConnect(token);
-    });
+    // Re-read the access token via _connectWs on every reconnect rather than
+    // reusing the token captured at first connect. The REST refresh interceptor
+    // rotates the access token; a stale token would keep failing the /ws/me
+    // handshake with 403 after it expires (BC-25).
+    _reconnectTimer = Timer(Duration(seconds: delaySeconds), _connectWs);
   }
 
   void _startPing() {
