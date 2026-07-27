@@ -106,7 +106,7 @@ class AuthNotifier extends _$AuthNotifier {
     } on SocialLoginFailed catch (e) {
       _setState(
         AuthState.failure(
-          code: 'SOCIAL_LOGIN_FAILED',
+          code: e.code ?? 'SOCIAL_LOGIN_FAILED',
           message: _readableSocialMessage(e),
         ),
       );
@@ -178,6 +178,10 @@ class AuthNotifier extends _$AuthNotifier {
   String _readableSocialMessage(SocialLoginFailed e) {
     // Keep SDK error strings out of user copy — the cause is kept for logs
     // but the surface message stays 2030 여성 friendly.
+    if (e.code == socialLoginMisconfiguredCode) {
+      // Retrying cannot clear a console misconfiguration, so don't ask for it.
+      return '카카오 로그인 설정에 문제가 있어 로그인할 수 없어요. 잠시 후 다시 접속하거나 고객센터로 알려주세요.';
+    }
     return '로그인을 완료하지 못했습니다. 잠시 후 다시 시도해주세요.';
   }
 
