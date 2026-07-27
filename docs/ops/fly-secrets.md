@@ -5,6 +5,9 @@ Book Club 백엔드를 Fly.io 에 배포할 때 필요한 시크릿(secret)·환
 
 > **원칙 (CLAUDE.md §9)**: 시크릿은 `.env` + Fly.io secrets 로만 관리하고 레포에 커밋하지 않는다.
 > `backend/fly.toml` 에는 비밀이 아닌 값(앱 이름, 리전, 포트)만 둔다.
+>
+> 관련: 클라이언트(웹/Android/iOS) 배포용 GitHub Actions 시크릿은
+> [`app-deploy-secrets.md`](./app-deploy-secrets.md) 를 참조한다.
 
 ---
 
