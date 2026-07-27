@@ -31,12 +31,18 @@ worktrees so their working trees never collide.
    - mobile: `cd mobile && dart analyze` (0 warnings) + affected widget/unit tests
 5. **Commit** — 제목 한국어, `<type>: <요약>`, 본문에 왜. End commit body with the
    Co-Authored-By trailer.
-6. **Push + PR** — `git push -u origin <type>/<TICKET>` then `gh pr create` with the
-   ticket key in the title/body. PR 1건 = 티켓 1건 (Squash merge).
-7. **Sync Jira** — post a summary comment on the ticket
+6. **Push + PR** — `git push -u origin <type>/<TICKET>`, then open the PR using the
+   **`pr-description`** skill's review-friendly format (요약·Jira·변경사항·배경/왜·검증·
+   리뷰포인트·리스크/롤아웃·체크리스트). Write the body to a file and pass it with
+   `gh pr create --title "<type>/<TICKET> <요약>" --body-file <file>`. Include the
+   ticket key. PR 1건 = 티켓 1건 (Squash merge).
+7. **Gate merge on CI green** — never merge until the full CI suite (lint/type/test
+   **and** release-build jobs where applicable) is green. Watch with
+   `gh pr checks <n> --watch`. A red or pending check blocks the merge.
+8. **Sync Jira** — post a summary comment on the ticket
    (`jira_add_comment`) and, on merge, transition it to 완료
    (`jira_transition_issue`, transition id `41` on the BC board).
-8. **Clean up** after merge: `git worktree remove ../book_club-<TICKET>`.
+9. **Clean up** after merge: `git worktree remove ../book_club-<TICKET>`.
 
 ## Parallel execution
 
