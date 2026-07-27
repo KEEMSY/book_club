@@ -2,9 +2,18 @@ name: mobile
 
 # Scope to mobile-only concerns: mobile/ tree or this workflow file.
 # Backend-only PRs should not spin up Flutter.
+#
+# Trigger split (BC-7):
+#   - PRs run the cheap verification builds (apk / ios --no-codesign) so a broken
+#     release toolchain is caught before merge without producing artifacts.
+#   - push-to-main runs the release-artifact builds (Android AAB / iOS archive)
+#     and uploads them. Signing + store upload is layered on separately (BC-8/9).
 on:
   push:
     branches: [main]
+    paths:
+      - 'mobile/**'
+      - '.github/workflows/mobile.yml'
   pull_request:
     paths:
       - 'mobile/**'
@@ -52,6 +61,9 @@ jobs:
   build-android:
     name: build android (release apk)
     runs-on: ubuntu-latest
+    # PR-only verification: compile the release toolchain without producing a
+    # store artifact. The AAB release build runs on push-to-main instead.
+    if: github.event_name == 'pull_request'
     # Gate the build behind analyze & test so we don't burn runner time
     # compiling a tree that already fails the cheap checks.
     needs: analyze-and-test
@@ -78,13 +90,14 @@ jobs:
 
       # Release build without signing config / dart-defines: this verifies the
       # release toolchain compiles. Store secrets (Sentry/RevenueCat keys,
-      # signing) are injected only in the publish pipeline (M60), not here.
+      # signing) are injected only in the publish pipeline, not here.
       - name: flutter build apk --release
         run: flutter build apk --release
 
   build-ios:
     name: build ios (no codesign)
     runs-on: macos-latest
+    if: github.event_name == 'pull_request'
     needs: analyze-and-test
     steps:
       - name: Checkout
@@ -102,7 +115,84 @@ jobs:
         run: flutter pub get
 
       # --no-codesign compiles the iOS app without provisioning profiles /
-      # certificates, which CI does not hold. Signing + TestFlight upload is a
-      # separate M60 release job that runs with the Apple credentials.
+      # certificates, which PR CI does not hold. Signing + TestFlight upload is
+      # a separate release job that runs with the Apple credentials (BC-9).
       - name: flutter build ios --no-codesign --release
         run: flutter build ios --no-codesign --release
+
+  release-android:
+    name: release android (aab)
+    runs-on: ubuntu-latest
+    # Store-format artifact build. Runs only on push-to-main so every merged
+    # change yields a downloadable AAB with a monotonically increasing build
+    # number (Play requires unique build numbers per upload).
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: analyze-and-test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.41.5
+          cache: true
+          cache-key: 'flutter-:os:-:channel:-:version:-${{ hashFiles(''mobile/pubspec.lock'') }}'
+
+      - name: Resolve packages
+        run: flutter pub get
+
+      # version name comes from pubspec.yaml; the build number is the CI run
+      # number so each merged build is uniquely identifiable and store-uploadable.
+      # This AAB is unsigned here — signing + Play upload is layered on in BC-8.
+      - name: flutter build appbundle --release
+        run: flutter build appbundle --release --build-number=${{ github.run_number }}
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-aab
+          path: mobile/build/app/outputs/bundle/release/*.aab
+          retention-days: 14
+
+  release-ios:
+    name: release ios (archive)
+    runs-on: macos-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: analyze-and-test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.41.5
+          cache: true
+          cache-key: 'flutter-:os:-:channel:-:version:-${{ hashFiles(''mobile/pubspec.lock'') }}'
+
+      - name: Resolve packages
+        run: flutter pub get
+
+      # --no-codesign produces an unsigned .xcarchive (CI holds no Apple certs).
+      # A signed, TestFlight-uploadable IPA is produced by the BC-9 job that runs
+      # with the Apple signing credentials; here we archive + upload for
+      # traceability and to validate the release build compiles on main.
+      - name: flutter build ipa --no-codesign --release
+        run: flutter build ipa --no-codesign --release --build-number=${{ github.run_number }}
+
+      - name: Upload iOS archive artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-ios-archive
+          path: mobile/build/ios/archive/*.xcarchive
+          retention-days: 14
+          if-no-files-found: warn
