@@ -3,6 +3,29 @@
 본 문서는 Book Club 앱을 개발하는 모든 협업 주체(사람·에이전트)가 따라야 하는 프로젝트 규칙이다.
 설계 배경과 의사결정 기록은 `docs/plans/2026-04-20-book-club-design.md` 를 참조한다.
 
+## 0. 작업 착수 절차 (강제 · 기본 동작)
+
+**코드·문서를 수정하는 모든 요청은 아래 절차로 시작한다. 사용자가 "지라에 등록해",
+"워크트리 만들어" 라고 말하지 않아도 기본값이며, 착수 여부를 되묻지 않는다.**
+
+1. **Jira 티켓 등록** — BC 프로젝트에 이슈 생성 (`버그` / `작업` / `스토리`).
+   요청 내용·재현 조건·작업 범위·완료 조건을 본문에 남긴다.
+   기존 티켓이 이미 있으면 새로 만들지 않고 그 티켓을 쓴다.
+2. **워크트리 생성** — `git worktree add ../book_club-<TICKET> -b <type>/<TICKET>`
+   (`type` 은 §6.1 규칙). `main` 워크트리에서 직접 작업하지 않는다.
+3. **티켓을 `진행 중` 으로 전이** 하고 워크트리 경로를 코멘트로 남긴다.
+4. **작업 → 품질 게이트 green → PR** (§6.3). PR 1건 = 티켓 1건.
+5. **머지 후 정리** — `git worktree remove ../book_club-<TICKET>`,
+   Jira 티켓 `완료` 전이.
+
+성격이 다른 요청이 한 번에 들어오면 **티켓을 나누고 워크트리도 나눠** 병렬로 진행한다.
+
+**예외 (티켓·워크트리 없이 진행 가능)**
+
+- 파일을 수정하지 않는 질문·조사·리뷰·설명
+- 이미 열린 티켓의 워크트리 안에서 이어지는 후속 수정 (리뷰 반영, CI 수정 등)
+- 사용자가 명시적으로 "티켓 없이" 를 요구한 경우
+
 ## 1. 커뮤니케이션 & 언어
 
 - 소스 코드 식별자·주석·커밋 본문은 **영문**, 사용자 대화·문서·커밋 제목은 **한국어**.
@@ -86,11 +109,18 @@ Router  →  Service  →  Repository / External Adapter
 
 ## 6. 브랜치 & 커밋
 
-### 6.1 브랜치
+### 6.1 브랜치 & 워크트리 (티켓 기반)
 
 - 기본 브랜치: `main`
-- 작업 브랜치: `feat/<domain>-<slug>`, `fix/<domain>-<slug>`, `chore/<slug>`, `docs/<slug>`
-- 머지 전략: Squash merge. PR 단위로 의미 있는 커밋 1건을 남긴다.
+- **모든 작업은 Jira 티켓(BC 프로젝트) 단위로 워크트리에서 진행한다.** 티켓 없는 작업 금지.
+- 브랜치 컨벤션: `<type>/<TICKET>` — `type` 은 작업 특성에 따라 구분한다.
+  - `feature/<TICKET>` — 신규 기능·확장·배포 파이프라인 (예: `feature/BC-3`)
+  - `backlog/<TICKET>` — 스코프 정리·기술부채·리팩터링 (예: `backlog/BC-16`)
+  - `hotfix/<TICKET>` — 긴급 수정 (예: `hotfix/BC-42`)
+- 워크트리로 격리 생성하여 독립 티켓은 **병렬** 진행한다:
+  - 생성: `git worktree add ../book_club-<TICKET> -b <type>/<TICKET>`
+  - 정리: 머지 후 `git worktree remove ../book_club-<TICKET>`
+- 머지 전략: Squash merge. **PR 1건 = 티켓 1건.** PR 제목·본문에 티켓 키를 명시하고, 머지 후 해당 Jira 티켓을 완료로 전이한다.
 
 ### 6.2 커밋 메시지
 
@@ -98,10 +128,19 @@ Router  →  Service  →  Repository / External Adapter
 - 형식: `<type>: <간결한 요약>` — type 은 `feat`, `fix`, `refactor`, `chore`, `docs`, `test`, `perf`.
 - 큰 변경은 본문에 **왜** 변경했는지 기록 (무엇은 diff 로 충분).
 
-### 6.3 PR 체크리스트
+### 6.3 PR 작성 & 체크리스트
+
+- PR 본문은 **`pr-description` 스킬**의 리뷰 친화적 표준 포맷으로 작성한다
+  (요약 · Jira · 변경사항 · 배경/왜 · 검증 · 리뷰 포인트 · 리스크/롤아웃 · 체크리스트).
+  본문을 파일로 작성해 `gh pr create --body-file` 로 넘겨 마크다운이 깨지지 않게 한다.
+- **머지는 CI green 게이트를 통과한 뒤에만** 한다 — lint·type·test + (해당 시) 릴리즈 빌드
+  잡까지 모두 green. red/pending 체크가 있으면 머지 금지.
+
+체크리스트:
 
 - [ ] 도메인 경계·레이어 규칙 준수
 - [ ] 새 Service 에 단위 테스트 추가
+- [ ] 품질 게이트 green (lint / type / test + 해당 시 릴리즈 빌드 · CI)
 - [ ] 설계 변경이 동반되면 `docs/plans/` 갱신
 - [ ] 백로그에 아이디어가 새로 추가되었다면 `docs/backlog/IDEAS.md` 반영
 
@@ -172,11 +211,13 @@ Router  →  Service  →  Repository / External Adapter
 ## 10. 에이전트 작업 규칙
 
 - 영역별 작업은 **글로벌 에이전트** 로 분배 (백엔드 / 프론트 / 인프라 / QA 등).
-- 에이전트는 작업 시작 전 `AGENTS.md` 와 관련 `docs/plans/*.md` 를 반드시 읽는다.
+- 에이전트는 작업 시작 전 본 규칙 문서(`CLAUDE.md` / `AGENTS.md`)와 관련 `docs/plans/*.md` 를 반드시 읽는다.
 - 작업 결과물은 본 규칙을 위반하지 않아야 하며, 위반 시 리뷰에서 반려한다.
 - 에이전트가 새로운 아이디어를 제안하는 경우 본 문서 §8 절차를 따라 백로그에 기록한다.
+- `CLAUDE.md` 와 `AGENTS.md` 는 **동일한 규칙 문서** 다 (제목과 버전 표기만 다름).
+  규칙을 고칠 때는 두 파일을 함께 갱신한다.
 
 ---
 
-**Last updated**: 2026-04-20
-**AGENTS.md version**: 1.0.0
+**Last updated**: 2026-07-27
+**AGENTS.md version**: 1.3.0
