@@ -1,0 +1,4 @@
+# Cloudflare Pages SPA fallback (BC-5). Existing static files are served first;
+# any unmatched path falls back to index.html so deep links / path-strategy
+# routes resolve to the Flutter app instead of a 404.
+/*  /index.html  200
