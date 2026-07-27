@@ -105,10 +105,19 @@ Router  →  Service  →  Repository / External Adapter
 - 형식: `<type>: <간결한 요약>` — type 은 `feat`, `fix`, `refactor`, `chore`, `docs`, `test`, `perf`.
 - 큰 변경은 본문에 **왜** 변경했는지 기록 (무엇은 diff 로 충분).
 
-### 6.3 PR 체크리스트
+### 6.3 PR 작성 & 체크리스트
+
+- PR 본문은 **`pr-description` 스킬**의 리뷰 친화적 표준 포맷으로 작성한다
+  (요약 · Jira · 변경사항 · 배경/왜 · 검증 · 리뷰 포인트 · 리스크/롤아웃 · 체크리스트).
+  본문을 파일로 작성해 `gh pr create --body-file` 로 넘겨 마크다운이 깨지지 않게 한다.
+- **머지는 CI green 게이트를 통과한 뒤에만** 한다 — lint·type·test + (해당 시) 릴리즈 빌드
+  잡까지 모두 green. red/pending 체크가 있으면 머지 금지.
+
+체크리스트:
 
 - [ ] 도메인 경계·레이어 규칙 준수
 - [ ] 새 Service 에 단위 테스트 추가
+- [ ] 품질 게이트 green (lint / type / test + 해당 시 릴리즈 빌드 · CI)
 - [ ] 설계 변경이 동반되면 `docs/plans/` 갱신
 - [ ] 백로그에 아이디어가 새로 추가되었다면 `docs/backlog/IDEAS.md` 반영
 
@@ -185,5 +194,5 @@ Router  →  Service  →  Repository / External Adapter
 
 ---
 
-**Last updated**: 2026-07-21
-**CLAUDE.md version**: 1.1.0
+**Last updated**: 2026-07-27
+**CLAUDE.md version**: 1.2.0
