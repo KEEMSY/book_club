@@ -1,0 +1,16 @@
+# Cloudflare Pages cache policy (BC-5).
+# Flutter's entrypoints are not content-hashed, so they must revalidate each
+# load or users get stuck on a stale build after a deploy. The hashed asset
+# bundle under /assets can be cached for a week.
+/index.html
+  Cache-Control: no-cache
+/flutter_bootstrap.js
+  Cache-Control: no-cache
+/flutter_service_worker.js
+  Cache-Control: no-cache
+/main.dart.js
+  Cache-Control: no-cache
+/assets/*
+  Cache-Control: public, max-age=604800
+/canvaskit/*
+  Cache-Control: public, max-age=604800
