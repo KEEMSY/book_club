@@ -128,6 +128,16 @@ jobs:
     # number (Play requires unique build numbers per upload).
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: analyze-and-test
+    # Secrets are surfaced as env so step-level `if` can gate on their presence
+    # (a step `if` cannot read `secrets.*` directly). When the signing secret is
+    # absent the build still runs (debug-signed, per build.gradle.kts fallback)
+    # and the Play upload is skipped, so CI stays green before BC-10 injects them.
+    env:
+      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -149,9 +159,17 @@ jobs:
       - name: Resolve packages
         run: flutter pub get
 
+      # Decode the upload keystore from the base64 secret and point the Gradle
+      # release signingConfig at it via KEYSTORE_PATH (read in build.gradle.kts).
+      # Skipped when unset → Gradle falls back to debug signing.
+      - name: Decode signing keystore
+        if: env.ANDROID_KEYSTORE_BASE64 != ''
+        run: |
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/upload-keystore.jks"
+          echo "KEYSTORE_PATH=$RUNNER_TEMP/upload-keystore.jks" >> "$GITHUB_ENV"
+
       # version name comes from pubspec.yaml; the build number is the CI run
       # number so each merged build is uniquely identifiable and store-uploadable.
-      # This AAB is unsigned here — signing + Play upload is layered on in BC-8.
       - name: flutter build appbundle --release
         run: flutter build appbundle --release --build-number=${{ github.run_number }}
 
@@ -161,6 +179,20 @@ jobs:
           name: app-release-aab
           path: mobile/build/app/outputs/bundle/release/*.aab
           retention-days: 14
+
+      # Upload to the Play internal test track only when BOTH the signing key and
+      # the service account exist — Play rejects a debug-signed AAB, so uploading
+      # an unsigned build would just fail. Requires the app to already exist in
+      # Play Console with one manual upload (API cannot create the first version).
+      - name: Upload to Play internal track
+        if: env.ANDROID_KEYSTORE_BASE64 != '' && env.PLAY_SERVICE_ACCOUNT_JSON != ''
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: kr.missiondriven.bookclub
+          releaseFiles: mobile/build/app/outputs/bundle/release/*.aab
+          track: internal
+          status: completed
 
   release-ios:
     name: release ios (archive)
