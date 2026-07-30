@@ -19,6 +19,16 @@ const String _kakaoNativeAppKey = String.fromEnvironment(
   defaultValue: '82781f9e394c2f5f3e29e499c080c956',
 );
 
+/// Kakao JavaScript key. On web `KakaoSdk.appKey` resolves to this value rather
+/// than the native key, and it is what gets sent as the OAuth `client_id` — so
+/// leaving it empty makes every web login fail with KOE101 (BC-26). The Kakao
+/// Map JS key belongs to the same Kakao app, so it doubles as the fallback when
+/// only `KAKAO_MAP_KEY` is defined.
+const String _kakaoJavaScriptAppKey = String.fromEnvironment(
+  'KAKAO_JAVASCRIPT_APP_KEY',
+  defaultValue: String.fromEnvironment('KAKAO_MAP_KEY', defaultValue: ''),
+);
+
 Future<void> main() async {
   const dsn = String.fromEnvironment('SENTRY_DSN', defaultValue: '');
 
@@ -50,7 +60,18 @@ Future<void> _runApp() async {
   // Flutter font asset and is always available without a network fetch.
   await GoogleFonts.pendingFonts([GoogleFonts.playfairDisplay()]);
 
-  KakaoSdk.init(nativeAppKey: _kakaoNativeAppKey);
+  KakaoSdk.init(
+    nativeAppKey: _kakaoNativeAppKey,
+    javaScriptAppKey: _kakaoJavaScriptAppKey,
+  );
+
+  if (kIsWeb && _kakaoJavaScriptAppKey.isEmpty && kDebugMode) {
+    // ignore: avoid_print
+    print(
+      'KAKAO_JAVASCRIPT_APP_KEY (or KAKAO_MAP_KEY) is unset — web Kakao login '
+      'will fail with KOE101. See docs/ops/kakao-login-setup.md.',
+    );
+  }
 
   // Kakao Map JavaScript key for the nearby-events map view (M71). Injected via
   // --dart-define=KAKAO_MAP_KEY; left unset in dev so the map renders empty

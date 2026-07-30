@@ -94,6 +94,52 @@ void main() {
       expect(c.read(authNotifierProvider), isA<Unauthenticated>());
     });
 
+    test(
+        'loginWithKakao reports a KOE101 misconfiguration as non-retryable '
+        '(BC-26)', () async {
+      final social = FakeSocialLoginPort(
+        kakaoError: const SocialLoginFailed(
+          'Kakao auth error: AuthErrorCause.misconfigured',
+          code: socialLoginMisconfiguredCode,
+        ),
+      );
+      final c = ProviderContainer(overrides: [
+        authRepositoryProvider
+            .overrideWithValue(buildRepository(social: social)),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(authNotifierProvider.notifier);
+
+      await notifier.loginWithKakao();
+
+      final failure = c.read(authNotifierProvider) as AuthFailure;
+      expect(failure.code, socialLoginMisconfiguredCode);
+      // The copy must not ask the user to retry — retrying cannot fix a
+      // console misconfiguration.
+      expect(failure.message, isNot(contains('다시 시도')));
+    });
+
+    test(
+        'loginWithKakao falls back to SOCIAL_LOGIN_FAILED for uncoded SDK '
+        'failures', () async {
+      final social = FakeSocialLoginPort(
+        kakaoError: const SocialLoginFailed('Kakao SDK failed'),
+      );
+      final c = ProviderContainer(overrides: [
+        authRepositoryProvider
+            .overrideWithValue(buildRepository(social: social)),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(authNotifierProvider.notifier);
+
+      await notifier.loginWithKakao();
+
+      expect(
+        (c.read(authNotifierProvider) as AuthFailure).code,
+        'SOCIAL_LOGIN_FAILED',
+      );
+    });
+
     test('loginWithKakao surfaces the backend error code on 4xx failure',
         () async {
       final api = FakeAuthApi(

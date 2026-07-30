@@ -34,7 +34,12 @@ class KakaoLoginAdapter {
       if (e.error == AuthErrorCause.accessDenied) {
         throw const SocialLoginCancelled();
       }
-      throw SocialLoginFailed('Kakao auth error: ${e.error}', cause: e);
+      throw SocialLoginFailed(
+        'Kakao auth error: ${e.error}',
+        code:
+            _isMisconfiguration(e.error) ? socialLoginMisconfiguredCode : null,
+        cause: e,
+      );
     } on PlatformException catch (e) {
       if (e.code == 'CANCELED') throw const SocialLoginCancelled();
       throw SocialLoginFailed('Kakao platform error: ${e.code}', cause: e);
@@ -42,6 +47,13 @@ class KakaoLoginAdapter {
       throw SocialLoginFailed('Kakao SDK failed', cause: e);
     }
   }
+
+  /// KOE101 surfaces as `misconfigured` (platform settings) or
+  /// `invalid_client` (unknown app key). Both mean the console registration is
+  /// wrong, never that the user did something wrong.
+  static bool _isMisconfiguration(AuthErrorCause cause) =>
+      cause == AuthErrorCause.misconfigured ||
+      cause == AuthErrorCause.invalidClient;
 
   Future<OAuthToken> _requestToken() async {
     // Web can't call Platform.isIOS/isAndroid — always use account flow there.

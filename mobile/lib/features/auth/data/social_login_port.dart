@@ -31,11 +31,24 @@ class SocialLoginCancelled implements Exception {
 /// network unreachable, etc.). Wraps the underlying cause so repositories can
 /// surface platform-specific error codes to the UI.
 class SocialLoginFailed implements Exception {
-  const SocialLoginFailed(this.message, {this.cause});
+  const SocialLoginFailed(this.message, {this.code, this.cause});
 
   final String message;
+
+  /// Stable classifier for the failure, used to pick user copy and to group
+  /// crash reports. Null means "unclassified SDK failure"; see
+  /// [socialLoginMisconfiguredCode] for the one case that must not be shown
+  /// to the user as retryable.
+  final String? code;
+
   final Object? cause;
 }
+
+/// The provider rejected the app's own registration — Kakao KOE101: wrong app
+/// key, unregistered package name / bundle id / Android key hash, or Kakao
+/// Login disabled in the developer console. Retrying never clears it, so the
+/// UI must not tell the user to try again (BC-26).
+const String socialLoginMisconfiguredCode = 'SOCIAL_LOGIN_MISCONFIGURED';
 
 /// Abstraction over the two social SDKs (Kakao, Apple) so AuthRepository can
 /// be unit-tested without plugging either vendor SDK into test binaries.
