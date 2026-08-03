@@ -52,8 +52,17 @@ jobs:
       # CanvasKit is the default web renderer (--web-renderer removed in 3.29+).
       # FLAVOR marks the bundle as production for any --dart-define-gated paths.
       # web/_redirects and web/_headers are copied into build/web automatically.
+      #
+      # KAKAO_JAVASCRIPT_APP_KEY is the value KakaoSdk sends as the OAuth
+      # client_id on web — without it the web bundle logs in with an empty key
+      # and every Kakao login fails with KOE101 (BC-34, completing BC-26). When
+      # the secret is unset it expands to an empty string, i.e. the prior
+      # behavior (no regression); set the secret to activate web login.
       - name: Build web
-        run: flutter build web --release --dart-define=FLAVOR=production
+        run: >-
+          flutter build web --release
+          --dart-define=FLAVOR=production
+          --dart-define=KAKAO_JAVASCRIPT_APP_KEY=${{ secrets.KAKAO_JAVASCRIPT_APP_KEY }}
 
       - name: Upload web artifact
         uses: actions/upload-artifact@v4
