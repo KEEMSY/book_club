@@ -33,8 +33,10 @@ Book Club **클라이언트**(Flutter 웹/모바일)를 배포할 때 GitHub Act
 |---|---|---|
 | `CLOUDFLARE_API_TOKEN` | Pages 배포 권한 | Cloudflare 대시보드 → My Profile → API Tokens → **Create Token** → "Edit Cloudflare Pages" 템플릿 |
 | `CLOUDFLARE_ACCOUNT_ID` | 배포 대상 계정 | Cloudflare 대시보드 우측 사이드바 Account ID |
+| `KAKAO_JAVASCRIPT_APP_KEY` | 웹 카카오 로그인의 OAuth `client_id`. 미설정 시 웹 로그인 KOE101 (BC-34) | 카카오 developers → 내 앱 → 앱 키 → **JavaScript 키** |
 
 선행 조건: Cloudflare Pages 프로젝트 `book-club-web` 이 미리 생성돼 있어야 한다(BC-4).
+카카오 로그인은 추가로 콘솔 플랫폼 설정이 필요하다 — [`kakao-login-setup.md`](./kakao-login-setup.md) 참조.
 
 ---
 
@@ -103,7 +105,9 @@ App Store Connect API 키까지 있으면 TestFlight 에 업로드한다.
 **웹 (BC-4)**
 - [ ] `CLOUDFLARE_API_TOKEN`
 - [ ] `CLOUDFLARE_ACCOUNT_ID`
+- [ ] `KAKAO_JAVASCRIPT_APP_KEY` (웹 카카오 로그인)
 - [ ] Cloudflare Pages 프로젝트 `book-club-web` 생성
+- [ ] 카카오 콘솔 웹 플랫폼 도메인 등록 (kakao-login-setup.md)
 
 **Android (BC-8)**
 - [ ] `ANDROID_KEYSTORE_BASE64` / `ANDROID_KEYSTORE_PASSWORD` / `ANDROID_KEY_ALIAS` / `ANDROID_KEY_PASSWORD`
