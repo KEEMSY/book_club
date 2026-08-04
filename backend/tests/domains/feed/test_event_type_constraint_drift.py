@@ -27,9 +27,7 @@ _CONSTRAINT = "ck_feed_events_event_type"
 @pytest.mark.asyncio
 async def test_feed_event_type_check_matches_enum(session: AsyncSession) -> None:
     result = await session.execute(
-        text(
-            "SELECT pg_get_constraintdef(oid) FROM pg_constraint WHERE conname = :name"
-        ),
+        text("SELECT pg_get_constraintdef(oid) FROM pg_constraint WHERE conname = :name"),
         {"name": _CONSTRAINT},
     )
     constraintdef = result.scalar_one_or_none()
