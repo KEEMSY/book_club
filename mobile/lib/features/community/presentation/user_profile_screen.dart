@@ -59,10 +59,7 @@ class UserProfileScreen extends ConsumerWidget {
 }
 
 class _ProfileContent extends ConsumerWidget {
-  const _ProfileContent({
-    required this.profile,
-    required this.userId,
-  });
+  const _ProfileContent({required this.profile, required this.userId});
 
   final UserProfile profile;
   final String userId;
@@ -165,9 +162,7 @@ class _ProfileContent extends ConsumerWidget {
                   ],
                 ),
               ]
-            : <Widget>[
-                _ThreeDotMenu(profile: profile),
-              ],
+            : <Widget>[_ThreeDotMenu(profile: profile)],
       ),
       body: CustomScrollView(
         slivers: [
@@ -202,10 +197,7 @@ class _ProfileContent extends ConsumerWidget {
           if (profile.badges.isNotEmpty)
             SliverToBoxAdapter(
               child: Padding(
-                padding: EdgeInsets.only(
-                  top: spacing.sm,
-                  bottom: spacing.md,
-                ),
+                padding: EdgeInsets.only(top: spacing.sm, bottom: spacing.md),
                 child: _BadgeShowcase(badges: profile.badges),
               ),
             ),
@@ -226,20 +218,28 @@ class _ProfileContent extends ConsumerWidget {
               ),
               child: Column(
                 children: [
-                  _FollowCounts(profile: profile, userId: userId),
-                  SizedBox(height: spacing.lg),
+                  // Follow counts are a community feature; hidden when deferred
+                  // (BC-40) so the profile still shows the "프로필 편집" action.
+                  if (FeatureFlags.community) ...[
+                    _FollowCounts(profile: profile, userId: userId),
+                    SizedBox(height: spacing.lg),
+                  ],
                   _ActionButton(profile: profile, userId: userId),
                 ],
               ),
             ),
           ),
-          SliverToBoxAdapter(
-            child: Divider(
-              height: 1,
-              color: theme.colorScheme.outlineVariant,
+          // Posts feed hits the community endpoint; hidden when community is
+          // deferred (BC-40).
+          if (FeatureFlags.community) ...[
+            SliverToBoxAdapter(
+              child: Divider(
+                height: 1,
+                color: theme.colorScheme.outlineVariant,
+              ),
             ),
-          ),
-          _UserPostsSliver(userId: userId),
+            _UserPostsSliver(userId: userId),
+          ],
         ],
       ),
     );
@@ -591,8 +591,9 @@ class _HighlightCard extends StatelessWidget {
                     Text(
                       highlight.bookTitle!,
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color:
-                            theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.5,
+                        ),
                       ),
                     ),
                   ],
@@ -611,10 +612,7 @@ class _HighlightCard extends StatelessWidget {
 // ---------------------------------------------------------------------------
 
 class _ProfileAvatar extends StatelessWidget {
-  const _ProfileAvatar({
-    required this.profileImageUrl,
-    required this.nickname,
-  });
+  const _ProfileAvatar({required this.profileImageUrl, required this.nickname});
 
   final String? profileImageUrl;
   final String nickname;
@@ -836,14 +834,8 @@ class _ThreeDotMenu extends ConsumerWidget {
       icon: const Icon(CupertinoIcons.ellipsis_vertical),
       onSelected: (action) => _onSelected(context, ref, action),
       itemBuilder: (_) => const [
-        PopupMenuItem(
-          value: _MenuAction.report,
-          child: Text('신고하기'),
-        ),
-        PopupMenuItem(
-          value: _MenuAction.block,
-          child: Text('차단하기'),
-        ),
+        PopupMenuItem(value: _MenuAction.report, child: Text('신고하기')),
+        PopupMenuItem(value: _MenuAction.block, child: Text('차단하기')),
       ],
     );
   }
@@ -859,24 +851,24 @@ class _ThreeDotMenu extends ConsumerWidget {
         case _MenuAction.report:
           await repo.reportUser(profile.id, reason: 'spam');
           if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('신고가 접수되었습니다.')),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('신고가 접수되었습니다.')));
           }
         case _MenuAction.block:
           await repo.block(profile.id);
           if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('차단되었습니다.')),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('차단되었습니다.')));
             context.pop();
           }
       }
     } on SocialRepositoryException catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.message)));
       }
     }
   }
@@ -956,50 +948,44 @@ class _UserPostsSliverState extends ConsumerState<_UserPostsSliver> {
     return SliverPadding(
       padding: EdgeInsets.all(spacing.md),
       sliver: SliverList(
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            if (index == feedState.posts.length) {
-              if (feedState.isLoading) {
-                return const Padding(
-                  padding: EdgeInsets.all(16),
-                  child:
-                      Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                );
-              }
-              return null;
+        delegate: SliverChildBuilderDelegate((context, index) {
+          if (index == feedState.posts.length) {
+            if (feedState.isLoading) {
+              return const Padding(
+                padding: EdgeInsets.all(16),
+                child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+              );
             }
-            if (index == feedState.posts.length - 1 &&
-                feedState.hasMore &&
-                !feedState.isLoading) {
-              ref
-                  .read(userPostsFeedProvider(widget.userId).notifier)
-                  .fetchMore();
-            }
-            final post = feedState.posts[index];
-            return Padding(
-              padding: EdgeInsets.only(bottom: spacing.md),
-              child: PostCard(
+            return null;
+          }
+          if (index == feedState.posts.length - 1 &&
+              feedState.hasMore &&
+              !feedState.isLoading) {
+            ref.read(userPostsFeedProvider(widget.userId).notifier).fetchMore();
+          }
+          final post = feedState.posts[index];
+          return Padding(
+            padding: EdgeInsets.only(bottom: spacing.md),
+            child: PostCard(
+              bookId: post.bookId,
+              post: post,
+              onTapComments: () => CommentsSheet.show(
+                context,
                 bookId: post.bookId,
-                post: post,
-                onTapComments: () => CommentsSheet.show(
-                  context,
-                  bookId: post.bookId,
-                  postId: post.id,
-                  initialCommentCount: post.commentCount,
-                ),
-                onReactionApplied: (postId, type, toggleState, counts) => ref
-                    .read(userPostsFeedProvider(widget.userId).notifier)
-                    .applyReactionResult(
-                      postId: postId,
-                      reactionType: type,
-                      toggleState: toggleState,
-                      counts: counts,
-                    ),
+                postId: post.id,
+                initialCommentCount: post.commentCount,
               ),
-            );
-          },
-          childCount: feedState.posts.length + (feedState.hasMore ? 1 : 0),
-        ),
+              onReactionApplied: (postId, type, toggleState, counts) => ref
+                  .read(userPostsFeedProvider(widget.userId).notifier)
+                  .applyReactionResult(
+                    postId: postId,
+                    reactionType: type,
+                    toggleState: toggleState,
+                    counts: counts,
+                  ),
+            ),
+          );
+        }, childCount: feedState.posts.length + (feedState.hasMore ? 1 : 0)),
       ),
     );
   }
@@ -1037,7 +1023,7 @@ Future<void> _showLanguagePicker(BuildContext context, WidgetRef ref) async {
 /// of the currently active locale.
 const List<({Locale locale, String label})> _languageOptions =
     <({Locale locale, String label})>[
-  (locale: Locale('ko'), label: '한국어'),
-  (locale: Locale('en'), label: 'English'),
-  (locale: Locale('ja'), label: '日本語'),
-];
+      (locale: Locale('ko'), label: '한국어'),
+      (locale: Locale('en'), label: 'English'),
+      (locale: Locale('ja'), label: '日本語'),
+    ];

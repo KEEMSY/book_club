@@ -1,8 +1,12 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/config/feature_flags.dart';
 import '../../../core/network/dio_provider.dart';
+import '../../auth/application/auth_notifier.dart';
+import '../../auth/domain/auth_state.dart';
 import '../../feed/domain/post.dart';
 import '../../feed/domain/reaction_type.dart';
+import '../../reading/application/reading_providers.dart';
 import '../../social/domain/user_summary.dart';
 import '../data/community_api.dart';
 import '../data/community_repository.dart';
@@ -18,10 +22,42 @@ final communityRepositoryProvider = Provider<CommunityRepository>((ref) {
 });
 
 /// Fetches and caches a user's full profile.
+///
+/// When the community feature is deferred (BC-40) its `/community/users/{id}/
+/// profile` endpoint is unmounted (404), so the profile is rebuilt from `/me`
+/// + the reading grade for the current user. Community-only fields (follow
+/// counts, posts) are zeroed/empty and the profile screen hides those sections.
 final userProfileProvider =
-    AutoDisposeFutureProvider.family<UserProfile, String>((ref, userId) {
-  return ref.watch(communityRepositoryProvider).getUserProfile(userId);
-});
+    AutoDisposeFutureProvider.family<UserProfile, String>((ref, userId) async {
+      if (FeatureFlags.community) {
+        return ref.watch(communityRepositoryProvider).getUserProfile(userId);
+      }
+      final AuthState auth = ref.watch(authNotifierProvider);
+      final user = auth is Authenticated ? auth.user : null;
+      if (user == null) {
+        throw StateError('cannot load profile: not authenticated');
+      }
+      final grade = await ref.watch(readingRepositoryProvider).getGrade();
+      return UserProfile(
+        id: user.id,
+        nickname: user.nickname,
+        profileImageUrl: user.profileImageUrl,
+        bio: null,
+        followerCount: 0,
+        followingCount: 0,
+        isFollowing: false,
+        isMe: true,
+        gradeStats: GradeStats(
+          grade: grade.grade,
+          tier: grade.tier,
+          totalBooks: grade.totalBooks,
+          totalSeconds: grade.totalSeconds,
+          streakDays: grade.streakDays,
+        ),
+        badges: const <BadgeSummary>[],
+        recentHighlights: const <HighlightSummary>[],
+      );
+    });
 
 // ---------------------------------------------------------------------------
 // Feed notifiers — following timeline + explore
@@ -37,10 +73,10 @@ class FeedState {
   });
 
   const FeedState.initial()
-      : posts = const <Post>[],
-        nextCursor = null,
-        isLoading = false,
-        error = null;
+    : posts = const <Post>[],
+      nextCursor = null,
+      isLoading = false,
+      error = null;
 
   final List<Post> posts;
   final String? nextCursor;
@@ -87,8 +123,9 @@ class FollowingFeed extends _$FollowingFeed {
       clearError: true,
     );
     try {
-      final page =
-          await ref.read(communityRepositoryProvider).getFollowingFeed();
+      final page = await ref
+          .read(communityRepositoryProvider)
+          .getFollowingFeed();
       state = state.copyWith(
         posts: page.items,
         nextCursor: page.nextCursor,
@@ -159,8 +196,9 @@ class UserPostsFeed extends _$UserPostsFeed {
       clearError: true,
     );
     try {
-      final page =
-          await ref.read(communityRepositoryProvider).getUserPosts(userId);
+      final page = await ref
+          .read(communityRepositoryProvider)
+          .getUserPosts(userId);
       state = state.copyWith(
         posts: page.items,
         nextCursor: page.nextCursor,
@@ -321,7 +359,9 @@ class HighlightFeed extends _$HighlightFeed {
     if (state.isLoading || !state.hasMore) return;
     state = state.copyWith(isLoading: true, clearError: true);
     try {
-      final page = await ref.read(communityRepositoryProvider).getExploreFeed(
+      final page = await ref
+          .read(communityRepositoryProvider)
+          .getExploreFeed(
             sort: 'latest',
             postType: 'highlight',
             cursor: state.nextCursor,
