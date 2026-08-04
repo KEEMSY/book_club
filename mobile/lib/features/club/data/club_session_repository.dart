@@ -10,6 +10,11 @@ import '../domain/topic_comment.dart';
 /// and the fake data agree on who "I" am.
 const fakeCurrentUserId = 'user-host';
 
+/// Display name for [fakeCurrentUserId] — used to stamp newly-created
+/// comments in [FakeClubSessionRepository] so they match the seeded
+/// persona's name shown elsewhere in the fixtures (session-1/2's presenter).
+const fakeCurrentUserName = '유진';
+
 /// Read/write seam for the session/agenda/discussion domain (BC-42).
 ///
 /// The backing REST endpoints (`club_sessions` / `session_agendas` /
@@ -72,6 +77,44 @@ abstract class ClubSessionRepository {
   Future<void> reorderAgendaTopics({
     required String agendaId,
     required List<String> orderedTopicIds,
+  });
+
+  /// Posts a new reply in [topicId]'s thread, authored by the current user.
+  ///
+  /// When [parentCommentId] is given it must reference a *root* comment
+  /// (one whose own [TopicComment.parentCommentId] is `null`) — the design
+  /// doc caps threads at one level of nesting (§2 비목표). Implementations
+  /// should reject a [parentCommentId] that itself has a parent.
+  ///
+  /// TODO(BC-46): wire retrofit client — this currently only ever writes to
+  /// [FakeClubSessionRepository]'s in-memory store.
+  Future<TopicComment> addComment({
+    required String topicId,
+    required String body,
+    String? parentCommentId,
+  });
+
+  /// Updates [commentId]'s body and stamps [TopicComment.editedAt].
+  ///
+  /// Callers are expected to have already checked authorship/host permission
+  /// (design doc §5) via `canModerateCommentProvider` — this method itself
+  /// does not re-validate who is asking.
+  ///
+  /// TODO(BC-46): wire retrofit client.
+  Future<TopicComment> editComment({
+    required String topicId,
+    required String commentId,
+    required String body,
+  });
+
+  /// Removes [commentId] from [topicId]'s thread. Deleting a root comment
+  /// also removes its replies, mirroring the FK cascade the real
+  /// `topic_comments` table is expected to have.
+  ///
+  /// TODO(BC-46): wire retrofit client.
+  Future<void> deleteComment({
+    required String topicId,
+    required String commentId,
   });
 }
 
@@ -233,6 +276,11 @@ class FakeClubSessionRepository implements ClubSessionRepository {
   /// with them.
   int _topicIdSeq = 100;
 
+  /// Counter for synthetic ids handed out by [addComment] — starts well past
+  /// the seeded `comment-1`..`comment-3` ids so new comments never collide
+  /// with them.
+  int _commentIdSeq = 100;
+
   @override
   Future<List<ClubSession>> listSessions(String clubId) async {
     return _sessionsFor(clubId);
@@ -304,8 +352,9 @@ class FakeClubSessionRepository implements ClubSessionRepository {
       prompt: prompt,
       createdAt: DateTime.now(),
     );
-    _agendasBySessionId[sessionId] =
-        agenda.copyWith(topics: [...agenda.topics, topic]);
+    _agendasBySessionId[sessionId] = agenda.copyWith(
+      topics: [...agenda.topics, topic],
+    );
     return topic;
   }
 
@@ -318,8 +367,9 @@ class FakeClubSessionRepository implements ClubSessionRepository {
     final agenda = _agendasBySessionId[sessionId]!;
     final remaining =
         agenda.topics.where((topic) => topic.id != topicId).toList();
-    _agendasBySessionId[sessionId] =
-        agenda.copyWith(topics: _renumbered(remaining));
+    _agendasBySessionId[sessionId] = agenda.copyWith(
+      topics: _renumbered(remaining),
+    );
   }
 
   @override
@@ -331,8 +381,77 @@ class FakeClubSessionRepository implements ClubSessionRepository {
     final agenda = _agendasBySessionId[sessionId]!;
     final byId = {for (final topic in agenda.topics) topic.id: topic};
     final reordered = orderedTopicIds.map((id) => byId[id]!).toList();
-    _agendasBySessionId[sessionId] =
-        agenda.copyWith(topics: _renumbered(reordered));
+    _agendasBySessionId[sessionId] = agenda.copyWith(
+      topics: _renumbered(reordered),
+    );
+  }
+
+  @override
+  Future<TopicComment> addComment({
+    required String topicId,
+    required String body,
+    String? parentCommentId,
+  }) async {
+    final existing = _commentsByTopicId[topicId] ?? const [];
+    if (parentCommentId != null) {
+      TopicComment? parent;
+      for (final candidate in existing) {
+        if (candidate.id == parentCommentId) {
+          parent = candidate;
+          break;
+        }
+      }
+      if (parent == null) {
+        throw ArgumentError('알 수 없는 답글입니다: $parentCommentId');
+      }
+      if (parent.parentCommentId != null) {
+        throw ArgumentError('대댓글에는 답글을 달 수 없어요 (1단계까지만 지원돼요)');
+      }
+    }
+    final comment = TopicComment(
+      id: 'comment-fake-${_commentIdSeq++}',
+      topicId: topicId,
+      authorId: fakeCurrentUserId,
+      authorName: fakeCurrentUserName,
+      parentCommentId: parentCommentId,
+      body: body,
+      createdAt: DateTime.now(),
+    );
+    _commentsByTopicId[topicId] = [...existing, comment];
+    return comment;
+  }
+
+  @override
+  Future<TopicComment> editComment({
+    required String topicId,
+    required String commentId,
+    required String body,
+  }) async {
+    final existing = _commentsByTopicId[topicId] ?? const [];
+    final index = existing.indexWhere((c) => c.id == commentId);
+    if (index == -1) {
+      throw ArgumentError('알 수 없는 답글입니다: $commentId');
+    }
+    final updated = existing[index].copyWith(
+      body: body,
+      editedAt: DateTime.now(),
+    );
+    _commentsByTopicId[topicId] = [
+      for (var i = 0; i < existing.length; i++)
+        i == index ? updated : existing[i],
+    ];
+    return updated;
+  }
+
+  @override
+  Future<void> deleteComment({
+    required String topicId,
+    required String commentId,
+  }) async {
+    final existing = _commentsByTopicId[topicId] ?? const [];
+    _commentsByTopicId[topicId] = existing
+        .where((c) => c.id != commentId && c.parentCommentId != commentId)
+        .toList();
   }
 
   /// Every agenda in this fake is 1:1 with its session, so topic mutations
