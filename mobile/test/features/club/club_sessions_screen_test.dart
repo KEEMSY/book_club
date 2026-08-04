@@ -1,6 +1,7 @@
 import 'package:book_club/core/theme/app_theme.dart';
 import 'package:book_club/features/club/application/session_providers.dart';
 import 'package:book_club/features/club/data/club_session_repository.dart';
+import 'package:book_club/features/club/domain/agenda_topic.dart';
 import 'package:book_club/features/club/domain/club.dart';
 import 'package:book_club/features/club/domain/club_session.dart';
 import 'package:book_club/features/club/domain/session_agenda.dart';
@@ -91,4 +92,40 @@ class _EmptyClubSessionRepository implements ClubSessionRepository {
   @override
   Future<List<TopicComment>> listComments(String topicId) async =>
       const <TopicComment>[];
+
+  @override
+  Future<SessionAgenda> loadAgendaForEdit(String sessionId) =>
+      throw UnimplementedError();
+
+  @override
+  Future<SessionAgenda> saveAgendaDraft({
+    required String sessionId,
+    required String body,
+  }) =>
+      throw UnimplementedError();
+
+  @override
+  Future<SessionAgenda> publishAgenda(String sessionId) =>
+      throw UnimplementedError();
+
+  @override
+  Future<AgendaTopic> addAgendaTopic({
+    required String agendaId,
+    required String prompt,
+  }) =>
+      throw UnimplementedError();
+
+  @override
+  Future<void> removeAgendaTopic({
+    required String agendaId,
+    required String topicId,
+  }) =>
+      throw UnimplementedError();
+
+  @override
+  Future<void> reorderAgendaTopics({
+    required String agendaId,
+    required List<String> orderedTopicIds,
+  }) =>
+      throw UnimplementedError();
 }

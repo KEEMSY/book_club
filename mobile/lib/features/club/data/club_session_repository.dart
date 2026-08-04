@@ -3,7 +3,14 @@ import '../domain/club_session.dart';
 import '../domain/session_agenda.dart';
 import '../domain/topic_comment.dart';
 
-/// Read-side seam for the session/agenda/discussion domain (BC-42).
+/// Stand-in "current user" id until real auth-session/role data is wired
+/// (TODO(BC-44/45)). Shared by [FakeClubSessionRepository] (as the seeded
+/// author of two of its three demo sessions) and
+/// `session_providers.dart`'s `canAuthorAgendaProvider`, so the fake gate
+/// and the fake data agree on who "I" am.
+const fakeCurrentUserId = 'user-host';
+
+/// Read/write seam for the session/agenda/discussion domain (BC-42).
 ///
 /// The backing REST endpoints (`club_sessions` / `session_agendas` /
 /// `agenda_topics` / `topic_comments` — BC-44/45/46) don't exist yet, so this
@@ -25,6 +32,47 @@ abstract class ClubSessionRepository {
   /// `.length` (reply count) and the last item (preview) from this; the full
   /// threaded reply UI is BC-51.
   Future<List<TopicComment>> listComments(String topicId);
+
+  /// The agenda for [sessionId] to prefill the BC-50 editor — draft or
+  /// published, whichever exists — or a freshly-created empty draft if
+  /// [sessionId] has no agenda at all yet.
+  ///
+  /// Unlike [getAgenda] (read-only detail screen: published-only, `null`
+  /// otherwise), the editor must be able to resume unpublished work.
+  Future<SessionAgenda> loadAgendaForEdit(String sessionId);
+
+  /// Persists [body] as [sessionId]'s agenda draft, creating the agenda via
+  /// [loadAgendaForEdit] semantics first if it doesn't exist yet. Does not
+  /// touch [SessionAgenda.status] — publishing is a separate, explicit call.
+  Future<SessionAgenda> saveAgendaDraft({
+    required String sessionId,
+    required String body,
+  });
+
+  /// Marks [sessionId]'s agenda as published, stamping `publishedAt`. The
+  /// design doc (§4.1) has no unpublish action.
+  Future<SessionAgenda> publishAgenda(String sessionId);
+
+  /// Appends a new topic with [prompt] to the end of [agendaId]'s topic list.
+  Future<AgendaTopic> addAgendaTopic({
+    required String agendaId,
+    required String prompt,
+  });
+
+  /// Removes [topicId] from [agendaId] and re-numbers the remaining topics'
+  /// [AgendaTopic.position] to stay contiguous.
+  Future<void> removeAgendaTopic({
+    required String agendaId,
+    required String topicId,
+  });
+
+  /// Reorders [agendaId]'s topics to match [orderedTopicIds] (the full
+  /// front-to-back id order after a drag) and re-numbers
+  /// [AgendaTopic.position] to match.
+  Future<void> reorderAgendaTopics({
+    required String agendaId,
+    required List<String> orderedTopicIds,
+  });
 }
 
 /// In-memory stand-in for [ClubSessionRepository] until BC-44/45/46 land.
@@ -180,6 +228,11 @@ class FakeClubSessionRepository implements ClubSessionRepository {
     'topic-4': const [],
   };
 
+  /// Counter for synthetic ids handed out by [addAgendaTopic] — starts well
+  /// past the seeded `topic-1`..`topic-4` ids so new topics never collide
+  /// with them.
+  int _topicIdSeq = 100;
+
   @override
   Future<List<ClubSession>> listSessions(String clubId) async {
     return _sessionsFor(clubId);
@@ -187,11 +240,114 @@ class FakeClubSessionRepository implements ClubSessionRepository {
 
   @override
   Future<SessionAgenda?> getAgenda(String sessionId) async {
-    return _agendasBySessionId[sessionId];
+    final agenda = _agendasBySessionId[sessionId];
+    // Guards the documented contract now that saveAgendaDraft/loadAgendaForEdit
+    // can actually create non-published entries — the seeded fixtures above
+    // happened to be published already, which used to mask this gap.
+    return agenda?.status == AgendaStatus.published ? agenda : null;
   }
 
   @override
   Future<List<TopicComment>> listComments(String topicId) async {
     return _commentsByTopicId[topicId] ?? const [];
   }
+
+  @override
+  Future<SessionAgenda> loadAgendaForEdit(String sessionId) async {
+    final existing = _agendasBySessionId[sessionId];
+    if (existing != null) return existing;
+    final draft = SessionAgenda(
+      id: 'agenda-draft-$sessionId',
+      sessionId: sessionId,
+      authorId: fakeCurrentUserId,
+      body: '',
+      status: AgendaStatus.draft,
+      createdAt: DateTime.now(),
+    );
+    _agendasBySessionId[sessionId] = draft;
+    return draft;
+  }
+
+  @override
+  Future<SessionAgenda> saveAgendaDraft({
+    required String sessionId,
+    required String body,
+  }) async {
+    final current = await loadAgendaForEdit(sessionId);
+    final saved = current.copyWith(body: body);
+    _agendasBySessionId[sessionId] = saved;
+    return saved;
+  }
+
+  @override
+  Future<SessionAgenda> publishAgenda(String sessionId) async {
+    final current = await loadAgendaForEdit(sessionId);
+    final published = current.copyWith(
+      status: AgendaStatus.published,
+      publishedAt: DateTime.now(),
+    );
+    _agendasBySessionId[sessionId] = published;
+    return published;
+  }
+
+  @override
+  Future<AgendaTopic> addAgendaTopic({
+    required String agendaId,
+    required String prompt,
+  }) async {
+    final sessionId = _sessionIdForAgenda(agendaId);
+    final agenda = _agendasBySessionId[sessionId]!;
+    final topic = AgendaTopic(
+      id: 'topic-fake-${_topicIdSeq++}',
+      agendaId: agendaId,
+      position: agenda.topics.length + 1,
+      prompt: prompt,
+      createdAt: DateTime.now(),
+    );
+    _agendasBySessionId[sessionId] =
+        agenda.copyWith(topics: [...agenda.topics, topic]);
+    return topic;
+  }
+
+  @override
+  Future<void> removeAgendaTopic({
+    required String agendaId,
+    required String topicId,
+  }) async {
+    final sessionId = _sessionIdForAgenda(agendaId);
+    final agenda = _agendasBySessionId[sessionId]!;
+    final remaining =
+        agenda.topics.where((topic) => topic.id != topicId).toList();
+    _agendasBySessionId[sessionId] =
+        agenda.copyWith(topics: _renumbered(remaining));
+  }
+
+  @override
+  Future<void> reorderAgendaTopics({
+    required String agendaId,
+    required List<String> orderedTopicIds,
+  }) async {
+    final sessionId = _sessionIdForAgenda(agendaId);
+    final agenda = _agendasBySessionId[sessionId]!;
+    final byId = {for (final topic in agenda.topics) topic.id: topic};
+    final reordered = orderedTopicIds.map((id) => byId[id]!).toList();
+    _agendasBySessionId[sessionId] =
+        agenda.copyWith(topics: _renumbered(reordered));
+  }
+
+  /// Every agenda in this fake is 1:1 with its session, so topic mutations
+  /// (keyed by agenda id per the design doc's `agenda_topics.agenda_id`)
+  /// resolve back to the session-keyed backing map via a linear scan — fine
+  /// at this fixture's size.
+  String _sessionIdForAgenda(String agendaId) {
+    for (final entry in _agendasBySessionId.entries) {
+      if (entry.value?.id == agendaId) return entry.key;
+    }
+    throw StateError('알 수 없는 발제문입니다: $agendaId');
+  }
+
+  List<AgendaTopic> _renumbered(List<AgendaTopic> topics) => [
+        for (var i = 0; i < topics.length; i++)
+          topics[i].copyWith(position: i + 1),
+      ];
 }

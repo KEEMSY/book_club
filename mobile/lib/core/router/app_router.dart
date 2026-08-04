@@ -33,6 +33,7 @@ import '../../features/club/presentation/club_rooms_screen.dart';
 import '../../features/club/presentation/club_sessions_screen.dart';
 import '../../features/club/presentation/public_clubs_screen.dart';
 import '../../features/club/presentation/session_detail_screen.dart';
+import '../../features/club/presentation/agenda_editor_screen.dart';
 import '../../features/club/domain/club.dart';
 import '../../features/club/domain/club_session.dart';
 import '../../features/notification/presentation/notification_screen.dart';
@@ -133,12 +134,18 @@ class AppRoutes {
   static String clubRoomChat(String clubId, String roomId) =>
       '/clubs/$clubId/rooms/$roomId/chat';
 
-  // BC-49 — session (회차) list and detail. Route seams for BC-50 (agenda
-  // editor) and BC-51 (topic thread) are intentionally left unregistered
-  // here; they'll nest under these same paths once their screens exist.
+  // BC-49 — session (회차) list and detail. BC-51's topic-thread route seam
+  // is intentionally left unregistered here; it'll nest under sessionDetail
+  // once that screen exists.
   static String clubSessions(String clubId) => '/clubs/$clubId/sessions';
   static String sessionDetail(String clubId, String sessionId) =>
       '/clubs/$clubId/sessions/$sessionId';
+
+  // BC-50 — agenda editor, opened from SessionDetailScreen's AppBar action
+  // (host/presenter only — gated by canAuthorAgendaProvider both there and
+  // inside the editor screen itself).
+  static String agendaEditor(String clubId, String sessionId) =>
+      '/clubs/$clubId/sessions/$sessionId/agenda/edit';
 
   // M32 — public club discovery screen.
   static const publicClubs = '/discover/clubs';
@@ -479,6 +486,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final ClubSession session = state.extra! as ClubSession;
           return SessionDetailScreen(session: session);
+        },
+      ),
+      // BC-50 — agenda editor; ClubSession passed via extra from the detail
+      // screen's AppBar action.
+      GoRoute(
+        path: '/clubs/:clubId/sessions/:sessionId/agenda/edit',
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) {
+          final ClubSession session = state.extra! as ClubSession;
+          return AgendaEditorScreen(session: session);
         },
       ),
       // Club-level chat — opened directly from chat notifications/deeplinks.
