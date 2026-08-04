@@ -1023,7 +1023,7 @@ Future<void> _showLanguagePicker(BuildContext context, WidgetRef ref) async {
 /// of the currently active locale.
 const List<({Locale locale, String label})> _languageOptions =
     <({Locale locale, String label})>[
-      (locale: Locale('ko'), label: '한국어'),
-      (locale: Locale('en'), label: 'English'),
-      (locale: Locale('ja'), label: '日本語'),
-    ];
+  (locale: Locale('ko'), label: '한국어'),
+  (locale: Locale('en'), label: 'English'),
+  (locale: Locale('ja'), label: '日本語'),
+];
