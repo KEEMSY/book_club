@@ -33,6 +33,7 @@ import '../application/heatmap_notifier.dart';
 import '../application/heatmap_state.dart';
 import '../application/reading_providers.dart';
 import '../application/timer_notifier.dart';
+import '../application/timer_state.dart';
 import '../domain/dashboard_prefs.dart';
 import '../domain/goal_period.dart';
 import '../domain/grade_summary.dart';
@@ -60,6 +61,9 @@ import '../../notification/presentation/notification_screen.dart';
 ///   4. Compact GradeBadge + "다음 등급까지" line.
 ///   5. 52×7 Jan-dee heatmap.
 ///   6. "지금 읽기 시작" pill FAB.
+/// User's choice in the active-session confirmation dialog (BC-39).
+enum _ActiveSessionAction { resume, endAndStart, cancel }
+
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
 
@@ -99,8 +103,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final spacing = theme.extension<AppSpacing>()!;
     final Color accent = ref.watch(gradePrimaryProvider);
     final GradeState gradeState = ref.watch(gradeNotifierProvider);
-    final HeatmapState heatmapState =
-        ref.watch(heatmapNotifierProvider(DateTime.now().year));
+    final HeatmapState heatmapState = ref.watch(
+      heatmapNotifierProvider(DateTime.now().year),
+    );
     final GoalState goalState = ref.watch(goalNotifierProvider);
     final AuthState authState = ref.watch(authNotifierProvider);
     // Bootstrap completes asynchronously — fire loads once auth settles.
@@ -230,9 +235,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     // Deferred (BC-19): skip the A/B lookup when the experiment feature is off
     // so a null variant falls through to opening the stats screen directly.
     final variant = FeatureFlags.experiment
-        ? ref.read(userExperimentsProvider).valueOrNull?.variantFor(
-              'paywall_entry_v1',
-            )
+        ? ref
+            .read(userExperimentsProvider)
+            .valueOrNull
+            ?.variantFor('paywall_entry_v1')
         : null;
 
     if (variant == 'stats_tab') {
@@ -250,6 +256,39 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     if (!mounted) return;
     // Capture the router before the async gap to avoid BuildContext warnings.
     final GoRouter router = GoRouter.of(context);
+
+    // Pre-check (BC-39): if a reading session is already in progress, confirm
+    // before starting a new one. Otherwise the new start hits a backend 409
+    // (ACTIVE_SESSION_EXISTS) and the user only learns after navigating in.
+    final TimerState timerState = ref.read(timerNotifierProvider);
+    final bool hasActiveSession = timerState is TimerRunning ||
+        timerState is TimerPaused ||
+        timerState is TimerEnding;
+    if (hasActiveSession) {
+      final _ActiveSessionAction? action = await _showActiveSessionDialog(
+        context,
+      );
+      if (!mounted || action == null || action == _ActiveSessionAction.cancel) {
+        return;
+      }
+      if (action == _ActiveSessionAction.resume) {
+        // Resume: the timer screen renders the global running state, no params.
+        router.push('/reading/timer');
+        return;
+      }
+      // endAndStart: end the current session (elapsed time is still recorded),
+      // then fall through to the normal new-session flow.
+      final TimerNotifier notifier = ref.read(timerNotifierProvider.notifier);
+      await notifier.end();
+      if (!mounted) return;
+      if (ref.read(timerNotifierProvider) is TimerFailure) {
+        // End failed (e.g. network) — abort so we never open two sessions.
+        return;
+      }
+      notifier.acknowledgeCompletion();
+    }
+
+    if (!context.mounted) return;
     // null → cancelled; ('', null) → free session, no limit; ('id', 1800) → book + countdown.
     final (String, int?)? result = await _StartReadingSheet.show(
       context,
@@ -264,6 +303,34 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     router.push('/reading/timer?${params.join('&')}');
   }
 
+  /// Confirmation shown when "지금 읽기 시작" is tapped while a session is
+  /// already in progress (BC-39). Lets the user resume it, end it and start a
+  /// new one, or cancel.
+  Future<_ActiveSessionAction?> _showActiveSessionDialog(BuildContext context) {
+    return showDialog<_ActiveSessionAction>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('진행 중인 독서가 있어요'),
+        content: const Text('지금 읽던 세션을 이어서 볼까요, 아니면 종료하고 새로 시작할까요?'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(_ActiveSessionAction.cancel),
+            child: const Text('취소'),
+          ),
+          TextButton(
+            onPressed: () =>
+                Navigator.of(ctx).pop(_ActiveSessionAction.endAndStart),
+            child: const Text('종료하고 새로 시작'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(_ActiveSessionAction.resume),
+            child: const Text('이어서 보기'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _onManualLog() async {
     final readingMap = ref.read(libraryNotifierProvider);
     final readingState = readingMap[BookStatus.reading];
@@ -271,11 +338,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         readingState is LibraryListLoaded ? readingState.items : <UserBook>[];
     if (reading.isEmpty) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('서재에 읽는 중인 책이 없어요'),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('서재에 읽는 중인 책이 없어요')));
       return;
     }
     final UserBook target = reading.first;
@@ -444,9 +509,7 @@ class _GradeRow extends ConsumerWidget {
         decoration: BoxDecoration(
           color: theme.colorScheme.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: theme.colorScheme.outlineVariant,
-          ),
+          border: Border.all(color: theme.colorScheme.outlineVariant),
           boxShadow: theme.extension<AppShadows>()!.elevated,
         ),
         child: Row(
@@ -469,8 +532,9 @@ class _GradeRow extends ConsumerWidget {
                     // Secondary reading copy — onSurface at 0.72 keeps AA on
                     // both the warm light card and the #1F1F1F dark card.
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color:
-                          theme.colorScheme.onSurface.withValues(alpha: 0.72),
+                      color: theme.colorScheme.onSurface.withValues(
+                        alpha: 0.72,
+                      ),
                     ),
                   ),
                 ],
@@ -534,10 +598,14 @@ class _GradeRow extends ConsumerWidget {
   String _loadedSubtitle(GradeSummary summary) {
     final next = summary.nextGradeThresholds;
     if (next == null) return '최고 등급에 도달했어요';
-    final int bookDiff =
-        (next.targetBooks - summary.totalBooks).clamp(0, next.targetBooks);
-    final int secDiff = (next.targetSeconds - summary.totalSeconds)
-        .clamp(0, next.targetSeconds);
+    final int bookDiff = (next.targetBooks - summary.totalBooks).clamp(
+      0,
+      next.targetBooks,
+    );
+    final int secDiff = (next.targetSeconds - summary.totalSeconds).clamp(
+      0,
+      next.targetSeconds,
+    );
     final int hours = secDiff ~/ 3600;
     // tier가 1보다 크면 아직 같은 등급 내 구간을 이동 중
     final String label = summary.tier > 1 ? '다음 구간까지' : '다음 등급까지';
@@ -570,10 +638,12 @@ class _HeatmapCardState extends ConsumerState<_HeatmapCard> {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
     final int thisYear = DateTime.now().year;
-    final Color mutedColor =
-        theme.colorScheme.onSurface.withValues(alpha: 0.72);
-    final Color disabledColor =
-        theme.colorScheme.onSurface.withValues(alpha: 0.24);
+    final Color mutedColor = theme.colorScheme.onSurface.withValues(
+      alpha: 0.72,
+    );
+    final Color disabledColor = theme.colorScheme.onSurface.withValues(
+      alpha: 0.24,
+    );
 
     return Container(
       padding: EdgeInsets.all(spacing.lg),
@@ -618,8 +688,9 @@ class _HeatmapCardState extends ConsumerState<_HeatmapCard> {
                   ),
                   Text(
                     '$_year년',
-                    style:
-                        theme.textTheme.bodySmall?.copyWith(color: mutedColor),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: mutedColor,
+                    ),
                   ),
                   SizedBox(
                     width: 28,
@@ -652,8 +723,9 @@ class _HeatmapCardState extends ConsumerState<_HeatmapCard> {
                   padding: EdgeInsets.symmetric(vertical: spacing.md),
                   child: Text(
                     '독서 캘린더를 불러오지 못했어요',
-                    style:
-                        theme.textTheme.bodyMedium?.copyWith(color: mutedColor),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: mutedColor,
+                    ),
                   ),
                 ),
               ),
@@ -811,8 +883,9 @@ class _SessionRow extends StatelessWidget {
             children: <Widget>[
               Text(
                 session.bookTitle,
-                style: theme.textTheme.bodyMedium
-                    ?.copyWith(fontWeight: FontWeight.w600),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -847,10 +920,7 @@ class _SessionRow extends StatelessWidget {
 /// confirmation it calls `POST /me/streak/recover` and invalidates the grade
 /// and recovery-status providers so the dashboard refreshes automatically.
 class _StreakCardWithRecovery extends ConsumerWidget {
-  const _StreakCardWithRecovery({
-    required this.streak,
-    required this.longest,
-  });
+  const _StreakCardWithRecovery({required this.streak, required this.longest});
 
   final int streak;
   final int longest;
@@ -862,15 +932,15 @@ class _StreakCardWithRecovery extends ConsumerWidget {
       ref.invalidate(gradeNotifierProvider);
       ref.invalidate(streakRecoveryStatusProvider);
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('스트릭이 복구되었어요!')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('스트릭이 복구되었어요!')));
       }
     } on RetentionRepositoryException catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.message)));
       }
     }
   }
@@ -951,8 +1021,9 @@ class _YearStatsCard extends ConsumerWidget {
     final spacing = theme.extension<AppSpacing>()!;
     final radii = theme.extension<AppRadius>()!;
     final int year = DateTime.now().year;
-    final AsyncValue<ReadingYearStats> async =
-        ref.watch(yearStatsProvider(year));
+    final AsyncValue<ReadingYearStats> async = ref.watch(
+      yearStatsProvider(year),
+    );
 
     return GestureDetector(
       onTap: onTap,
@@ -977,9 +1048,7 @@ class _YearStatsCard extends ConsumerWidget {
             async.when(
               loading: () => const SizedBox(
                 height: 48,
-                child: Center(
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
+                child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
               ),
               error: (_, __) => Row(
                 children: <Widget>[
@@ -1104,10 +1173,7 @@ class _YearStatItem extends StatelessWidget {
 /// The blur + semi-transparent backdrop prevents the button from visually
 /// clashing with list content that scrolls beneath it.
 class _StartReadingButton extends StatelessWidget {
-  const _StartReadingButton({
-    required this.accent,
-    required this.onPressed,
-  });
+  const _StartReadingButton({required this.accent, required this.onPressed});
 
   final Color accent;
   final VoidCallback onPressed;
@@ -1209,8 +1275,10 @@ class _StartReadingSheetState extends ConsumerState<_StartReadingSheet> {
     setState(() => _addingBookId = book.id);
     try {
       final repo = ref.read(bookRepositoryProvider);
-      final UserBook added =
-          await repo.addToLibrary(book.id, status: BookStatus.reading);
+      final UserBook added = await repo.addToLibrary(
+        book.id,
+        status: BookStatus.reading,
+      );
       ref.read(libraryNotifierProvider.notifier).refresh(BookStatus.reading);
       if (mounted) Navigator.of(context).pop((added.id, _targetSec));
     } on BookRepositoryException catch (e) {
@@ -1398,10 +1466,7 @@ class _StartReadingSheetState extends ConsumerState<_StartReadingSheet> {
             )
           else ...<Widget>[
             ...books.map(
-              (book) => _BookTile(
-                book: book,
-                onTap: () => _start(book.id),
-              ),
+              (book) => _BookTile(book: book, onTap: () => _start(book.id)),
             ),
           ],
           // ── Book search ──────────────────────────────────────────────────
@@ -1507,8 +1572,10 @@ class _StartReadingSheetState extends ConsumerState<_StartReadingSheet> {
                   )
                 : OutlinedButton.icon(
                     onPressed: () => _start(''),
-                    icon:
-                        const Icon(Icons.play_circle_outline_rounded, size: 18),
+                    icon: const Icon(
+                      Icons.play_circle_outline_rounded,
+                      size: 18,
+                    ),
                     label: const Text('책 없이 시작하기'),
                   ),
           ),
