@@ -13,15 +13,21 @@ import redis.asyncio as aioredis
 from app.core.exceptions import ConflictError, NotFoundError, PermissionDeniedError
 from app.core.ws_manager import ws_manager
 from app.domains.club.models import (
+    AgendaStatus,
+    AgendaTopic,
     ClubMember,
     ClubReadingPlan,
     ClubRole,
     ClubSession,
     ReadingClub,
+    SessionAgenda,
     SessionStatus,
 )
 from app.domains.club.repository import ClubRepository
 from app.domains.club.schemas import (
+    AgendaTopicCreate,
+    AgendaTopicPublic,
+    AgendaTopicUpdate,
     AttendeeCount,
     AttendeeListResponse,
     ClubEventCreate,
@@ -38,6 +44,9 @@ from app.domains.club.schemas import (
     MemberProgressItem,
     MessageListResponse,
     ReadingPlanResponse,
+    SessionAgendaCreate,
+    SessionAgendaPublic,
+    SessionAgendaUpdate,
 )
 
 # Fallback page count when the catalog row carries no page total — keeps plan
@@ -810,4 +819,209 @@ class ClubService:
             status=session_row.status,
             created_by=session_row.created_by,
             created_at=session_row.created_at,
+        )
+
+    # --- agendas (BC-45) ---
+
+    async def create_agenda(
+        self, *, club_id: UUID, session_id: UUID, user_id: UUID, req: SessionAgendaCreate
+    ) -> SessionAgendaPublic:
+        await self._assert_host_or_presenter(
+            club_id=club_id, session_id=session_id, user_id=user_id
+        )
+        agenda = await self.repo.create_agenda(
+            session_id=session_id, author_id=user_id, body=req.body
+        )
+        return self._to_agenda_public(agenda, [])
+
+    async def update_agenda(
+        self,
+        *,
+        club_id: UUID,
+        session_id: UUID,
+        agenda_id: UUID,
+        user_id: UUID,
+        req: SessionAgendaUpdate,
+    ) -> SessionAgendaPublic:
+        # Design §5 확정: 발제문 작성/수정은 회차 status(draft/open/closed)와 무관하게
+        # 허용한다 — 여기서 세션 상태를 게이팅하지 않는다.
+        await self._assert_host_or_presenter(
+            club_id=club_id, session_id=session_id, user_id=user_id
+        )
+        agenda = await self._get_agenda_in_session(session_id, agenda_id)
+        updated = await self.repo.update_agenda_body(agenda.id, req.body)
+        if updated is None:
+            raise NotFoundError("agenda not found", code="AGENDA_NOT_FOUND")
+        topics = await self.repo.list_topics_by_agenda(updated.id)
+        return self._to_agenda_public(updated, topics)
+
+    async def publish_agenda(
+        self, *, club_id: UUID, session_id: UUID, agenda_id: UUID, user_id: UUID
+    ) -> SessionAgendaPublic:
+        await self._assert_host_or_presenter(
+            club_id=club_id, session_id=session_id, user_id=user_id
+        )
+        agenda = await self._get_agenda_in_session(session_id, agenda_id)
+        if agenda.status == AgendaStatus.PUBLISHED:
+            raise ConflictError("이미 게시된 발제문입니다", code="ALREADY_PUBLISHED")
+        updated = await self.repo.publish_agenda(agenda.id, published_at=datetime.now())
+        if updated is None:
+            raise NotFoundError("agenda not found", code="AGENDA_NOT_FOUND")
+        topics = await self.repo.list_topics_by_agenda(updated.id)
+        return self._to_agenda_public(updated, topics)
+
+    async def list_agendas(
+        self, *, club_id: UUID, session_id: UUID, caller_user_id: UUID
+    ) -> list[SessionAgendaPublic]:
+        await self._assert_can_view_club(club_id, caller_user_id)
+        await self._get_session_in_club(club_id, session_id)
+        agendas = await self.repo.list_agendas_by_session(session_id)
+        return [self._to_agenda_public(a, a.topics) for a in agendas]
+
+    async def get_agenda(
+        self, *, club_id: UUID, session_id: UUID, agenda_id: UUID, caller_user_id: UUID
+    ) -> SessionAgendaPublic:
+        await self._assert_can_view_club(club_id, caller_user_id)
+        await self._get_session_in_club(club_id, session_id)
+        agenda = await self._get_agenda_with_topics_in_session(session_id, agenda_id)
+        return self._to_agenda_public(agenda, agenda.topics)
+
+    # --- topics (BC-45) ---
+
+    async def add_topic(
+        self,
+        *,
+        club_id: UUID,
+        session_id: UUID,
+        agenda_id: UUID,
+        user_id: UUID,
+        req: AgendaTopicCreate,
+    ) -> AgendaTopicPublic:
+        await self._get_session_in_club(club_id, session_id)
+        agenda = await self._get_agenda_in_session(session_id, agenda_id)
+        self._assert_agenda_author(agenda, user_id)
+        position = await self.repo.get_next_topic_position(agenda.id)
+        topic = await self.repo.create_topic(
+            agenda_id=agenda.id, position=position, prompt=req.prompt
+        )
+        return self._to_topic_public(topic)
+
+    async def update_topic(
+        self,
+        *,
+        club_id: UUID,
+        session_id: UUID,
+        agenda_id: UUID,
+        topic_id: UUID,
+        user_id: UUID,
+        req: AgendaTopicUpdate,
+    ) -> AgendaTopicPublic:
+        await self._get_session_in_club(club_id, session_id)
+        agenda = await self._get_agenda_in_session(session_id, agenda_id)
+        self._assert_agenda_author(agenda, user_id)
+        await self._get_topic_in_agenda(agenda.id, topic_id)
+        updated = await self.repo.update_topic_prompt(topic_id, req.prompt)
+        if updated is None:
+            raise NotFoundError("topic not found", code="TOPIC_NOT_FOUND")
+        return self._to_topic_public(updated)
+
+    async def delete_topic(
+        self,
+        *,
+        club_id: UUID,
+        session_id: UUID,
+        agenda_id: UUID,
+        topic_id: UUID,
+        user_id: UUID,
+    ) -> None:
+        await self._get_session_in_club(club_id, session_id)
+        agenda = await self._get_agenda_in_session(session_id, agenda_id)
+        self._assert_agenda_author(agenda, user_id)
+        await self._get_topic_in_agenda(agenda.id, topic_id)
+        await self.repo.delete_topic(topic_id)
+
+    async def reorder_topics(
+        self,
+        *,
+        club_id: UUID,
+        session_id: UUID,
+        agenda_id: UUID,
+        user_id: UUID,
+        topic_ids: list[UUID],
+    ) -> list[AgendaTopicPublic]:
+        await self._get_session_in_club(club_id, session_id)
+        agenda = await self._get_agenda_in_session(session_id, agenda_id)
+        self._assert_agenda_author(agenda, user_id)
+        existing = await self.repo.list_topics_by_agenda(agenda.id)
+        existing_ids = {t.id for t in existing}
+        if set(topic_ids) != existing_ids:
+            raise ConflictError("논제 목록이 일치하지 않습니다", code="INVALID_TOPIC_SET")
+        reordered = await self.repo.reorder_topics(agenda.id, topic_ids)
+        return [self._to_topic_public(t) for t in reordered]
+
+    async def _assert_host_or_presenter(
+        self, *, club_id: UUID, session_id: UUID, user_id: UUID
+    ) -> ClubSession:
+        """발제문 작성·수정·게시 권한 = 해당 회차의 host 또는 presenter (design §5)."""
+        club = await self.repo.get_by_id(club_id)
+        if club is None:
+            raise NotFoundError("club not found", code="CLUB_NOT_FOUND")
+        session_row = await self._get_session_in_club(club_id, session_id)
+        is_host = club.owner_id == user_id
+        is_presenter = session_row.presenter_id is not None and session_row.presenter_id == user_id
+        if not (is_host or is_presenter):
+            raise PermissionDeniedError(
+                "호스트 또는 발제자만 발제문을 작성할 수 있습니다", code="PERMISSION_DENIED"
+            )
+        return session_row
+
+    async def _get_agenda_in_session(self, session_id: UUID, agenda_id: UUID) -> SessionAgenda:
+        agenda = await self.repo.get_agenda(agenda_id)
+        if agenda is None or agenda.session_id != session_id:
+            raise NotFoundError("agenda not found", code="AGENDA_NOT_FOUND")
+        return agenda
+
+    async def _get_agenda_with_topics_in_session(
+        self, session_id: UUID, agenda_id: UUID
+    ) -> SessionAgenda:
+        agenda = await self.repo.get_agenda_with_topics(agenda_id)
+        if agenda is None or agenda.session_id != session_id:
+            raise NotFoundError("agenda not found", code="AGENDA_NOT_FOUND")
+        return agenda
+
+    async def _get_topic_in_agenda(self, agenda_id: UUID, topic_id: UUID) -> AgendaTopic:
+        topic = await self.repo.get_topic(topic_id)
+        if topic is None or topic.agenda_id != agenda_id:
+            raise NotFoundError("topic not found", code="TOPIC_NOT_FOUND")
+        return topic
+
+    @staticmethod
+    def _assert_agenda_author(agenda: SessionAgenda, user_id: UUID) -> None:
+        """논제 추가·수정·삭제·순서 변경 권한 = 발제문 author (design §5)."""
+        if agenda.author_id != user_id:
+            raise PermissionDeniedError(
+                "발제문 작성자만 논제를 관리할 수 있습니다", code="PERMISSION_DENIED"
+            )
+
+    @staticmethod
+    def _to_agenda_public(agenda: SessionAgenda, topics: list[AgendaTopic]) -> SessionAgendaPublic:
+        return SessionAgendaPublic(
+            id=agenda.id,
+            session_id=agenda.session_id,
+            author_id=agenda.author_id,
+            body=agenda.body,
+            status=agenda.status,
+            published_at=agenda.published_at,
+            created_at=agenda.created_at,
+            topics=[ClubService._to_topic_public(t) for t in topics],
+        )
+
+    @staticmethod
+    def _to_topic_public(topic: AgendaTopic) -> AgendaTopicPublic:
+        return AgendaTopicPublic(
+            id=topic.id,
+            agenda_id=topic.agenda_id,
+            position=topic.position,
+            prompt=topic.prompt,
+            created_at=topic.created_at,
         )

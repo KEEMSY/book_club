@@ -7,9 +7,12 @@ from uuid import UUID, uuid4
 
 from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.domains.auth.models import User
 from app.domains.club.models import (
+    AgendaStatus,
+    AgendaTopic,
     ClubEvent,
     ClubMember,
     ClubMessage,
@@ -21,6 +24,7 @@ from app.domains.club.models import (
     EventAttendee,
     MessageRead,
     ReadingClub,
+    SessionAgenda,
     SessionStatus,
 )
 from app.domains.club.schemas import AttendeeCount, AttendeePublic
@@ -736,3 +740,126 @@ class ClubRepository:
         session_row.presenter_id = presenter_id
         await self._session.flush()
         return session_row
+
+    # --- agendas (BC-45) ---
+
+    async def create_agenda(self, *, session_id: UUID, author_id: UUID, body: str) -> SessionAgenda:
+        agenda = SessionAgenda(
+            id=uuid4(),
+            session_id=session_id,
+            author_id=author_id,
+            body=body,
+            status=AgendaStatus.DRAFT,
+            created_at=datetime.now(),
+        )
+        self._session.add(agenda)
+        await self._session.flush()
+        return agenda
+
+    async def get_agenda(self, agenda_id: UUID) -> SessionAgenda | None:
+        return await self._session.get(SessionAgenda, agenda_id)
+
+    async def get_agenda_with_topics(self, agenda_id: UUID) -> SessionAgenda | None:
+        stmt = (
+            select(SessionAgenda)
+            .options(selectinload(SessionAgenda.topics))
+            .where(SessionAgenda.id == agenda_id)
+        )
+        row = await self._session.execute(stmt)
+        return row.scalar_one_or_none()
+
+    async def list_agendas_by_session(self, session_id: UUID) -> list[SessionAgenda]:
+        """Return the session's agendas, oldest-first, with topics eager-loaded.
+
+        selectinload avoids N+1 queries when the service serializes each
+        agenda's topic list.
+        """
+        stmt = (
+            select(SessionAgenda)
+            .options(selectinload(SessionAgenda.topics))
+            .where(SessionAgenda.session_id == session_id)
+            .order_by(SessionAgenda.created_at.asc())
+        )
+        rows = await self._session.execute(stmt)
+        return list(rows.scalars().all())
+
+    async def update_agenda_body(self, agenda_id: UUID, body: str) -> SessionAgenda | None:
+        agenda = await self._session.get(SessionAgenda, agenda_id)
+        if agenda is None:
+            return None
+        agenda.body = body
+        await self._session.flush()
+        return agenda
+
+    async def publish_agenda(
+        self, agenda_id: UUID, *, published_at: datetime
+    ) -> SessionAgenda | None:
+        agenda = await self._session.get(SessionAgenda, agenda_id)
+        if agenda is None:
+            return None
+        agenda.status = AgendaStatus.PUBLISHED
+        agenda.published_at = published_at
+        await self._session.flush()
+        return agenda
+
+    # --- topics (BC-45) ---
+
+    async def create_topic(self, *, agenda_id: UUID, position: int, prompt: str) -> AgendaTopic:
+        topic = AgendaTopic(
+            id=uuid4(),
+            agenda_id=agenda_id,
+            position=position,
+            prompt=prompt,
+            created_at=datetime.now(),
+        )
+        self._session.add(topic)
+        await self._session.flush()
+        return topic
+
+    async def get_topic(self, topic_id: UUID) -> AgendaTopic | None:
+        return await self._session.get(AgendaTopic, topic_id)
+
+    async def list_topics_by_agenda(self, agenda_id: UUID) -> list[AgendaTopic]:
+        stmt = (
+            select(AgendaTopic)
+            .where(AgendaTopic.agenda_id == agenda_id)
+            .order_by(AgendaTopic.position.asc())
+        )
+        rows = await self._session.execute(stmt)
+        return list(rows.scalars().all())
+
+    async def get_next_topic_position(self, agenda_id: UUID) -> int:
+        """Return the position to append a new topic at (max + 1, or 0 if none)."""
+        stmt = select(func.max(AgendaTopic.position)).where(AgendaTopic.agenda_id == agenda_id)
+        result = await self._session.execute(stmt)
+        current_max: int | None = result.scalar_one_or_none()
+        return 0 if current_max is None else current_max + 1
+
+    async def update_topic_prompt(self, topic_id: UUID, prompt: str) -> AgendaTopic | None:
+        topic = await self._session.get(AgendaTopic, topic_id)
+        if topic is None:
+            return None
+        topic.prompt = prompt
+        await self._session.flush()
+        return topic
+
+    async def delete_topic(self, topic_id: UUID) -> None:
+        stmt = delete(AgendaTopic).where(AgendaTopic.id == topic_id)
+        await self._session.execute(stmt)
+
+    async def reorder_topics(
+        self, agenda_id: UUID, topic_id_order: list[UUID]
+    ) -> list[AgendaTopic]:
+        """Assign 0-based positions to *agenda_id*'s topics per topic_id_order.
+
+        Callers (service layer) are expected to have already validated that
+        topic_id_order is exactly the agenda's existing topic-id set.
+        """
+        topics = await self.list_topics_by_agenda(agenda_id)
+        by_id = {t.id: t for t in topics}
+        for position, topic_id in enumerate(topic_id_order):
+            topic = by_id.get(topic_id)
+            if topic is not None:
+                topic.position = position
+        await self._session.flush()
+        return await self.list_topics_by_agenda(agenda_id)
