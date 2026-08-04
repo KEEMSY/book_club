@@ -12,7 +12,14 @@ import redis.asyncio as aioredis
 
 from app.core.exceptions import ConflictError, NotFoundError, PermissionDeniedError
 from app.core.ws_manager import ws_manager
-from app.domains.club.models import ClubMember, ClubReadingPlan, ClubRole, ReadingClub
+from app.domains.club.models import (
+    ClubMember,
+    ClubReadingPlan,
+    ClubRole,
+    ClubSession,
+    ReadingClub,
+    SessionStatus,
+)
 from app.domains.club.repository import ClubRepository
 from app.domains.club.schemas import (
     AttendeeCount,
@@ -25,6 +32,8 @@ from app.domains.club.schemas import (
     ClubRoomCreate,
     ClubRoomListResponse,
     ClubRoomPublic,
+    ClubSessionCreate,
+    ClubSessionPublic,
     CreateClubRequest,
     MemberProgressItem,
     MessageListResponse,
@@ -34,6 +43,10 @@ from app.domains.club.schemas import (
 # Fallback page count when the catalog row carries no page total — keeps plan
 # generation deterministic for books that predate page-count ingestion.
 _DEFAULT_PAGE_COUNT = 200
+
+# Forward-only lifecycle (design §5) — a transition is valid only when it moves
+# exactly one step ahead in this order; skips and reversals are rejected.
+_SESSION_STATUS_ORDER = (SessionStatus.DRAFT, SessionStatus.OPEN, SessionStatus.CLOSED)
 
 logger = logging.getLogger(__name__)
 
@@ -666,3 +679,135 @@ class ClubService:
                     )
         except Exception:
             pass  # fire-and-forget: push failure must not affect the main flow
+
+    # --- sessions (BC-44) ---
+
+    async def create_session(
+        self, *, club_id: UUID, user_id: UUID, req: ClubSessionCreate
+    ) -> ClubSessionPublic:
+        await self._assert_host(club_id, user_id)
+        await self._assert_presenter_is_member(club_id, req.presenter_id)
+        session_row = await self.repo.create_session(
+            club_id=club_id,
+            book_id=req.book_id,
+            title=req.title,
+            scope=req.scope,
+            presenter_id=req.presenter_id,
+            scheduled_at=req.scheduled_at,
+            created_by=user_id,
+        )
+        return self._to_session_public(session_row)
+
+    async def list_sessions(
+        self,
+        *,
+        club_id: UUID,
+        caller_user_id: UUID,
+        book_id: UUID | None = None,
+    ) -> list[ClubSessionPublic]:
+        await self._assert_can_view_club(club_id, caller_user_id)
+        sessions = await self.repo.list_sessions(club_id, book_id=book_id)
+        return [self._to_session_public(s) for s in sessions]
+
+    async def get_session(
+        self, *, club_id: UUID, session_id: UUID, caller_user_id: UUID
+    ) -> ClubSessionPublic:
+        await self._assert_can_view_club(club_id, caller_user_id)
+        session_row = await self._get_session_in_club(club_id, session_id)
+        return self._to_session_public(session_row)
+
+    async def set_session_presenter(
+        self,
+        *,
+        club_id: UUID,
+        session_id: UUID,
+        user_id: UUID,
+        presenter_id: UUID | None,
+    ) -> ClubSessionPublic:
+        await self._assert_host(club_id, user_id)
+        await self._get_session_in_club(club_id, session_id)
+        await self._assert_presenter_is_member(club_id, presenter_id)
+        updated = await self.repo.update_session_presenter(session_id, presenter_id)
+        if updated is None:
+            raise NotFoundError("session not found", code="SESSION_NOT_FOUND")
+        return self._to_session_public(updated)
+
+    async def transition_session_status(
+        self,
+        *,
+        club_id: UUID,
+        session_id: UUID,
+        user_id: UUID,
+        status: str,
+    ) -> ClubSessionPublic:
+        await self._assert_host(club_id, user_id)
+        session_row = await self._get_session_in_club(club_id, session_id)
+        self._validate_status_transition(session_row.status, status)
+        updated = await self.repo.update_session_status(session_id, status)
+        if updated is None:
+            raise NotFoundError("session not found", code="SESSION_NOT_FOUND")
+        return self._to_session_public(updated)
+
+    async def _assert_host(self, club_id: UUID, user_id: UUID) -> ReadingClub:
+        """Only the club owner (host) may manage sessions (design §5)."""
+        club = await self.repo.get_by_id(club_id)
+        if club is None:
+            raise NotFoundError("club not found", code="CLUB_NOT_FOUND")
+        role = await self.repo.get_member_role(club_id, user_id)
+        if role != ClubRole.OWNER:
+            raise PermissionDeniedError(
+                "호스트만 회차를 관리할 수 있습니다", code="PERMISSION_DENIED"
+            )
+        return club
+
+    async def _assert_can_view_club(self, club_id: UUID, user_id: UUID) -> ReadingClub:
+        """Members can always view; non-members only when the club is public."""
+        club = await self.repo.get_by_id(club_id)
+        if club is None:
+            raise NotFoundError("club not found", code="CLUB_NOT_FOUND")
+        if club.is_public:
+            return club
+        if not await self.repo.is_member(club_id, user_id):
+            raise PermissionDeniedError("클럽 멤버만 조회할 수 있습니다", code="NOT_MEMBER")
+        return club
+
+    async def _assert_presenter_is_member(self, club_id: UUID, presenter_id: UUID | None) -> None:
+        if presenter_id is None:
+            return
+        if not await self.repo.is_member(club_id, presenter_id):
+            raise ConflictError("발제자는 클럽 멤버여야 합니다", code="PRESENTER_NOT_MEMBER")
+
+    async def _get_session_in_club(self, club_id: UUID, session_id: UUID) -> ClubSession:
+        session_row = await self.repo.get_session(session_id)
+        if session_row is None or session_row.club_id != club_id:
+            raise NotFoundError("session not found", code="SESSION_NOT_FOUND")
+        return session_row
+
+    @staticmethod
+    def _validate_status_transition(current: str, target: str) -> None:
+        """Reject anything but the next step in draft→open→closed (design §5)."""
+        try:
+            cur_idx = _SESSION_STATUS_ORDER.index(current)
+            tgt_idx = _SESSION_STATUS_ORDER.index(target)
+        except ValueError as exc:
+            raise ConflictError("유효하지 않은 상태입니다", code="INVALID_SESSION_STATUS") from exc
+        if tgt_idx != cur_idx + 1:
+            raise ConflictError(
+                f"{current}에서 {target}로 전이할 수 없습니다",
+                code="INVALID_STATUS_TRANSITION",
+            )
+
+    @staticmethod
+    def _to_session_public(session_row: ClubSession) -> ClubSessionPublic:
+        return ClubSessionPublic(
+            id=session_row.id,
+            club_id=session_row.club_id,
+            book_id=session_row.book_id,
+            title=session_row.title,
+            scope=session_row.scope,
+            presenter_id=session_row.presenter_id,
+            scheduled_at=session_row.scheduled_at,
+            status=session_row.status,
+            created_by=session_row.created_by,
+            created_at=session_row.created_at,
+        )
