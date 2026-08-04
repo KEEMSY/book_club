@@ -283,3 +283,43 @@ class AgendaTopicListResponse(BaseModel):
 
 class ReorderTopicsRequest(BaseModel):
     topic_ids: list[UUID] = Field(min_length=1)
+
+
+# --- topic comments (BC-46) ---
+
+
+class TopicCommentCreate(BaseModel):
+    body: str = Field(min_length=1, max_length=2000)
+    # Set to reply to an existing top-level comment. Replying to a reply is
+    # rejected by the service layer — single-level threads only (design §2).
+    parent_comment_id: UUID | None = None
+
+
+class TopicCommentUpdate(BaseModel):
+    body: str = Field(min_length=1, max_length=2000)
+
+
+class TopicCommentPublic(BaseModel):
+    id: UUID
+    topic_id: UUID
+    author_id: UUID
+    parent_comment_id: UUID | None
+    body: str
+    created_at: datetime
+    edited_at: datetime | None
+
+
+class TopicCommentThreadPublic(BaseModel):
+    """A top-level reply plus its single-level sub-replies (design §2 비목표)."""
+
+    id: UUID
+    topic_id: UUID
+    author_id: UUID
+    body: str
+    created_at: datetime
+    edited_at: datetime | None
+    replies: list[TopicCommentPublic] = Field(default_factory=list)
+
+
+class TopicCommentThreadListResponse(BaseModel):
+    items: list[TopicCommentThreadPublic]
