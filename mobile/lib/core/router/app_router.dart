@@ -30,8 +30,11 @@ import '../../features/club/presentation/club_events_screen.dart';
 import '../../features/club/presentation/club_loader.dart';
 import '../../features/club/presentation/club_room_chat_screen.dart';
 import '../../features/club/presentation/club_rooms_screen.dart';
+import '../../features/club/presentation/club_sessions_screen.dart';
 import '../../features/club/presentation/public_clubs_screen.dart';
+import '../../features/club/presentation/session_detail_screen.dart';
 import '../../features/club/domain/club.dart';
+import '../../features/club/domain/club_session.dart';
 import '../../features/notification/presentation/notification_screen.dart';
 import '../../features/notification/presentation/weekly_report_screen.dart';
 import '../../features/referral/application/referral_providers.dart';
@@ -129,6 +132,13 @@ class AppRoutes {
   static String clubRooms(String clubId) => '/clubs/$clubId/rooms';
   static String clubRoomChat(String clubId, String roomId) =>
       '/clubs/$clubId/rooms/$roomId/chat';
+
+  // BC-49 — session (회차) list and detail. Route seams for BC-50 (agenda
+  // editor) and BC-51 (topic thread) are intentionally left unregistered
+  // here; they'll nest under these same paths once their screens exist.
+  static String clubSessions(String clubId) => '/clubs/$clubId/sessions';
+  static String sessionDetail(String clubId, String sessionId) =>
+      '/clubs/$clubId/sessions/$sessionId';
 
   // M32 — public club discovery screen.
   static const publicClubs = '/discover/clubs';
@@ -450,6 +460,25 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             roomId: roomId,
             roomName: roomName,
           );
+        },
+      ),
+      // BC-49 — session list; Club passed via extra (same convention as the
+      // room list above — no id-only loader yet, that lands with BC-52).
+      GoRoute(
+        path: '/clubs/:clubId/sessions',
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) {
+          final Club club = state.extra! as Club;
+          return ClubSessionsScreen(club: club);
+        },
+      ),
+      // BC-49 — session detail; ClubSession passed via extra from the list.
+      GoRoute(
+        path: '/clubs/:clubId/sessions/:sessionId',
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) {
+          final ClubSession session = state.extra! as ClubSession;
+          return SessionDetailScreen(session: session);
         },
       ),
       // Club-level chat — opened directly from chat notifications/deeplinks.
