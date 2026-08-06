@@ -809,7 +809,16 @@ def test_compute_window_end_of_year_monthly_wraps_correctly() -> None:
 @pytest.fixture(autouse=True)
 def _drain_tasks() -> None:
     yield
-    loop = asyncio.get_event_loop_policy().get_event_loop()
-    pending = [t for t in asyncio.all_tasks(loop) if not t.done()]
-    for t in pending:
-        t.cancel()
+    # This sync teardown runs AFTER pytest-asyncio has closed the test's event
+    # loop, so there may be no current loop (`get_event_loop()` raises under
+    # newer pytest-asyncio / Python 3.12) or a closed one. Guard both so the
+    # teardown can never raise and turn into a per-test error (BC-56).
+    try:
+        loop = asyncio.get_event_loop_policy().get_event_loop()
+    except RuntimeError:
+        return
+    if loop.is_closed():
+        return
+    for t in asyncio.all_tasks(loop):
+        if not t.done():
+            t.cancel()
