@@ -42,7 +42,19 @@ worktrees so their working trees never collide.
 8. **Sync Jira** — post a summary comment on the ticket
    (`jira_add_comment`) and, on merge, transition it to 완료
    (`jira_transition_issue`, transition id `41` on the BC board).
-9. **Clean up** after merge: `git worktree remove ../book_club-<TICKET>`.
+9. **Clean up** after merge: stop any process started from the worktree (dev
+   servers etc.) FIRST, then `git worktree remove ../book_club-<TICKET>`. Removing
+   a worktree while a server serves from it breaks that server.
+
+## main protection & shared-resource isolation (CLAUDE.md §6.4)
+
+- `main` is GitHub-branch-protected: **PR-merge only** (direct `git push origin main`
+  is rejected with `GH006`), no force-push/deletion, `enforce_admins`. No worktree
+  or session can change main except by merging a green-CI PR.
+- Shared local resources are session-common: run the Flutter web dev server from the
+  **main worktree** (not a per-ticket worktree); do destructive DB work only on a
+  throwaway `book_club_test` DB (never `TRUNCATE`/`UPDATE` the shared dev DB); don't
+  kill another session's server/port.
 
 ## Parallel execution
 
