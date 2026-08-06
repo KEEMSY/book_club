@@ -36,7 +36,9 @@ class SessionDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
-    final agendaAsync = ref.watch(sessionAgendaProvider(session.id));
+    final agendaAsync = ref.watch(
+      sessionAgendaProvider((clubId: session.clubId, sessionId: session.id)),
+    );
     final canAuthorAgenda = ref.watch(canAuthorAgendaProvider(session));
 
     return Scaffold(
@@ -75,8 +77,11 @@ class SessionDetailScreen extends ConsumerWidget {
                 Text('발제문을 불러오지 못했어요', style: theme.textTheme.bodyMedium),
                 SizedBox(height: spacing.md),
                 FilledButton.tonal(
-                  onPressed: () =>
-                      ref.invalidate(sessionAgendaProvider(session.id)),
+                  onPressed: () => ref.invalidate(
+                    sessionAgendaProvider(
+                      (clubId: session.clubId, sessionId: session.id),
+                    ),
+                  ),
                   child: const Text('다시 시도'),
                 ),
               ],
@@ -176,6 +181,8 @@ class _AgendaBody extends StatelessWidget {
         ...agenda.topics.map(
           (topic) => _TopicAccordionTile(
             key: ValueKey('topic-tile-${topic.id}'),
+            clubId: session.clubId,
+            sessionId: session.id,
             topic: topic,
             isFocused: topic.id == focusTopicId,
           ),
@@ -198,10 +205,14 @@ class _AgendaBody extends StatelessWidget {
 class _TopicAccordionTile extends ConsumerStatefulWidget {
   const _TopicAccordionTile({
     super.key,
+    required this.clubId,
+    required this.sessionId,
     required this.topic,
     this.isFocused = false,
   });
 
+  final String clubId;
+  final String sessionId;
   final AgendaTopic topic;
 
   /// Set when this tile is the target of a BC-52 deep link
@@ -220,6 +231,13 @@ class _TopicAccordionTileState extends ConsumerState<_TopicAccordionTile> {
   TopicComment? _replyTarget;
   String? _editingCommentId;
   bool _isSubmitting = false;
+
+  TopicCommentsKey get _commentsKey => (
+        clubId: widget.clubId,
+        sessionId: widget.sessionId,
+        agendaId: widget.topic.agendaId,
+        topicId: widget.topic.id,
+      );
 
   @override
   void initState() {
@@ -251,7 +269,7 @@ class _TopicAccordionTileState extends ConsumerState<_TopicAccordionTile> {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
     final topic = widget.topic;
-    final commentsAsync = ref.watch(topicCommentsProvider(topic.id));
+    final commentsAsync = ref.watch(topicCommentsProvider(_commentsKey));
 
     return Card(
       margin: EdgeInsets.only(bottom: spacing.sm),
@@ -305,7 +323,11 @@ class _TopicAccordionTileState extends ConsumerState<_TopicAccordionTile> {
                 for (final root in roots) ...[
                   _CommentTile(
                     comment: root,
-                    canModerate: ref.watch(canModerateCommentProvider(root)),
+                    canModerate: ref.watch(
+                      canModerateCommentProvider(
+                        (comment: root, clubId: widget.clubId),
+                      ),
+                    ),
                     isEditing: _editingCommentId == root.id,
                     editController: _editController,
                     onReply: () => _startReply(root),
@@ -323,7 +345,9 @@ class _TopicAccordionTileState extends ConsumerState<_TopicAccordionTile> {
                         // caps threads at one level (§2 비목표).
                         onReply: null,
                         canModerate: ref.watch(
-                          canModerateCommentProvider(reply),
+                          canModerateCommentProvider(
+                            (comment: reply, clubId: widget.clubId),
+                          ),
                         ),
                         isEditing: _editingCommentId == reply.id,
                         editController: _editController,
@@ -335,7 +359,7 @@ class _TopicAccordionTileState extends ConsumerState<_TopicAccordionTile> {
                     ),
                 ],
               SizedBox(height: spacing.sm),
-              if (ref.watch(canReplyToTopicProvider))
+              if (ref.watch(canReplyToTopicProvider(widget.clubId)))
                 _ReplyComposer(
                   topicId: topic.id,
                   controller: _composerController,
@@ -376,11 +400,14 @@ class _TopicAccordionTileState extends ConsumerState<_TopicAccordionTile> {
     setState(() => _isSubmitting = true);
     try {
       await ref.read(clubSessionRepositoryProvider).editComment(
+            clubId: widget.clubId,
+            sessionId: widget.sessionId,
+            agendaId: widget.topic.agendaId,
             topicId: widget.topic.id,
             commentId: comment.id,
             body: body,
           );
-      ref.invalidate(topicCommentsProvider(widget.topic.id));
+      ref.invalidate(topicCommentsProvider(_commentsKey));
       if (mounted) setState(() => _editingCommentId = null);
     } catch (_) {
       _showError('답글 수정에 실패했어요. 다시 시도해 주세요.');
@@ -391,10 +418,14 @@ class _TopicAccordionTileState extends ConsumerState<_TopicAccordionTile> {
 
   Future<void> _delete(TopicComment comment) async {
     try {
-      await ref
-          .read(clubSessionRepositoryProvider)
-          .deleteComment(topicId: widget.topic.id, commentId: comment.id);
-      ref.invalidate(topicCommentsProvider(widget.topic.id));
+      await ref.read(clubSessionRepositoryProvider).deleteComment(
+            clubId: widget.clubId,
+            sessionId: widget.sessionId,
+            agendaId: widget.topic.agendaId,
+            topicId: widget.topic.id,
+            commentId: comment.id,
+          );
+      ref.invalidate(topicCommentsProvider(_commentsKey));
     } catch (_) {
       _showError('답글 삭제에 실패했어요. 다시 시도해 주세요.');
     }
@@ -406,11 +437,14 @@ class _TopicAccordionTileState extends ConsumerState<_TopicAccordionTile> {
     setState(() => _isSubmitting = true);
     try {
       await ref.read(clubSessionRepositoryProvider).addComment(
+            clubId: widget.clubId,
+            sessionId: widget.sessionId,
+            agendaId: widget.topic.agendaId,
             topicId: widget.topic.id,
             body: body,
             parentCommentId: _replyTarget?.id,
           );
-      ref.invalidate(topicCommentsProvider(widget.topic.id));
+      ref.invalidate(topicCommentsProvider(_commentsKey));
       _composerController.clear();
       if (mounted) setState(() => _replyTarget = null);
     } catch (_) {

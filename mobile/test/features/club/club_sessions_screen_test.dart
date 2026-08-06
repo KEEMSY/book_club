@@ -87,33 +87,83 @@ class _EmptyClubSessionRepository implements ClubSessionRepository {
       const <ClubSession>[];
 
   @override
-  Future<ClubSession> getSession(String sessionId) =>
+  Future<ClubSession> createSession({
+    required String clubId,
+    required String bookId,
+    required String title,
+    String? scope,
+    String? presenterId,
+    DateTime? scheduledAt,
+  }) =>
       throw UnimplementedError();
 
   @override
-  Future<SessionAgenda?> getAgenda(String sessionId) async => null;
+  Future<ClubSession> getSession({
+    required String clubId,
+    required String sessionId,
+  }) =>
+      throw UnimplementedError();
 
   @override
-  Future<List<TopicComment>> listComments(String topicId) async =>
+  Future<ClubSession> setSessionPresenter({
+    required String clubId,
+    required String sessionId,
+    String? presenterId,
+  }) =>
+      throw UnimplementedError();
+
+  @override
+  Future<ClubSession> updateSessionStatus({
+    required String clubId,
+    required String sessionId,
+    required ClubSessionStatus status,
+  }) =>
+      throw UnimplementedError();
+
+  @override
+  Future<SessionAgenda?> getAgenda({
+    required String clubId,
+    required String sessionId,
+  }) async =>
+      null;
+
+  @override
+  Future<List<TopicComment>> listComments({
+    required String clubId,
+    required String sessionId,
+    required String agendaId,
+    required String topicId,
+  }) async =>
       const <TopicComment>[];
 
   @override
-  Future<SessionAgenda> loadAgendaForEdit(String sessionId) =>
+  Future<SessionAgenda> loadAgendaForEdit({
+    required String clubId,
+    required String sessionId,
+  }) =>
       throw UnimplementedError();
 
   @override
   Future<SessionAgenda> saveAgendaDraft({
+    required String clubId,
     required String sessionId,
+    required String agendaId,
     required String body,
   }) =>
       throw UnimplementedError();
 
   @override
-  Future<SessionAgenda> publishAgenda(String sessionId) =>
+  Future<SessionAgenda> publishAgenda({
+    required String clubId,
+    required String sessionId,
+    required String agendaId,
+  }) =>
       throw UnimplementedError();
 
   @override
   Future<AgendaTopic> addAgendaTopic({
+    required String clubId,
+    required String sessionId,
     required String agendaId,
     required String prompt,
   }) =>
@@ -121,6 +171,8 @@ class _EmptyClubSessionRepository implements ClubSessionRepository {
 
   @override
   Future<void> removeAgendaTopic({
+    required String clubId,
+    required String sessionId,
     required String agendaId,
     required String topicId,
   }) =>
@@ -128,13 +180,28 @@ class _EmptyClubSessionRepository implements ClubSessionRepository {
 
   @override
   Future<void> reorderAgendaTopics({
+    required String clubId,
+    required String sessionId,
     required String agendaId,
     required List<String> orderedTopicIds,
   }) =>
       throw UnimplementedError();
 
   @override
+  Future<List<String>> recommendTopicDrafts({
+    required String clubId,
+    required String sessionId,
+    required String agendaId,
+    required String bookId,
+    required String scope,
+  }) =>
+      throw UnimplementedError();
+
+  @override
   Future<TopicComment> addComment({
+    required String clubId,
+    required String sessionId,
+    required String agendaId,
     required String topicId,
     required String body,
     String? parentCommentId,
@@ -143,6 +210,9 @@ class _EmptyClubSessionRepository implements ClubSessionRepository {
 
   @override
   Future<TopicComment> editComment({
+    required String clubId,
+    required String sessionId,
+    required String agendaId,
     required String topicId,
     required String commentId,
     required String body,
@@ -151,6 +221,9 @@ class _EmptyClubSessionRepository implements ClubSessionRepository {
 
   @override
   Future<void> deleteComment({
+    required String clubId,
+    required String sessionId,
+    required String agendaId,
     required String topicId,
     required String commentId,
   }) =>
