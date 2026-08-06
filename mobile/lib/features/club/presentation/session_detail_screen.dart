@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../application/session_agenda_notifier.dart';
+import '../application/session_providers.dart';
 import '../application/topic_comments_notifier.dart';
 import '../domain/agenda_topic.dart';
 import '../domain/club_session.dart';
@@ -24,12 +27,25 @@ class SessionDetailScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
     final agendaAsync = ref.watch(sessionAgendaProvider(session.id));
+    final canAuthorAgenda = ref.watch(canAuthorAgendaProvider(session));
 
     return Scaffold(
       appBar: AppBar(
         title: Text(session.title),
-        // TODO(BC-50): host/presenter-only "발제문 작성·수정" entry point goes
-        // here once the editor screen and session-role permission checks land.
+        actions: [
+          if (canAuthorAgenda)
+            IconButton(
+              // Distinct from _NoAgendaState's edit_note_rounded below, so
+              // widget tests can tell the AppBar action apart from the
+              // empty-state illustration.
+              icon: const Icon(Icons.edit_rounded),
+              tooltip: '발제문 작성',
+              onPressed: () => context.push(
+                AppRoutes.agendaEditor(session.clubId, session.id),
+                extra: session,
+              ),
+            ),
+        ],
       ),
       body: agendaAsync.when(
         loading: () =>

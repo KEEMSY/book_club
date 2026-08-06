@@ -110,4 +110,18 @@ void main() {
 
     expect(find.text('아직 발제문이 게시되지 않았어요'), findsOneWidget);
   });
+
+  testWidgets(
+      'the agenda-editor AppBar action only appears for the session\'s '
+      'presenter (BC-50 entry seam)', (tester) async {
+    // openSession's presenterId matches FakeClubSessionRepository's fake
+    // "current user" (user-host); draftSession has no presenterId set.
+    await tester.pumpWidget(buildApp(openSession));
+    await tester.pumpAndSettle();
+    expect(find.byIcon(Icons.edit_rounded), findsOneWidget);
+
+    await tester.pumpWidget(buildApp(draftSession));
+    await tester.pumpAndSettle();
+    expect(find.byIcon(Icons.edit_rounded), findsNothing);
+  });
 }
