@@ -221,17 +221,17 @@ class _PersonalNavRow extends ConsumerWidget {
           badgeCount: unreadCount,
           onTap: () => onTabSelected(0),
         ),
-        // Deferred (BC-23): 탐색/discovery gated; branch index 1 stays reserved.
-        if (FeatureFlags.discovery)
-          _NavItem(
-            icon: Icons.explore_outlined,
-            selectedIcon: Icons.explore_rounded,
-            label: '탐색',
-            selected: tabIndex == 1,
-            accent: accent,
-            theme: theme,
-            onTap: () => onTabSelected(1),
-          ),
+        // BC-79: 검색 is MVP core (book domain) — always shown, independent of
+        // the deferred discovery flag. Branch index 1 hosts SearchScreen.
+        _NavItem(
+          icon: CupertinoIcons.search,
+          selectedIcon: CupertinoIcons.search,
+          label: '검색',
+          selected: tabIndex == 1,
+          accent: accent,
+          theme: theme,
+          onTap: () => onTabSelected(1),
+        ),
         _NavItem(
           icon: CupertinoIcons.book,
           selectedIcon: CupertinoIcons.book_fill,

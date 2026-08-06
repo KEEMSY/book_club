@@ -9,7 +9,6 @@ import '../../features/auth/presentation/login_screen.dart';
 import '../../features/book/presentation/book_detail_screen.dart';
 import '../../features/book/presentation/library_screen.dart';
 import '../../features/book/presentation/search_screen.dart';
-import '../../features/discovery/presentation/discovery_screen.dart';
 import '../../features/event/presentation/event_detail_screen.dart';
 import '../../features/club/presentation/video_session_screen.dart';
 import '../../features/challenge/presentation/badge_collection_screen.dart';
@@ -260,7 +259,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         const Set<String> deferredRoutes = <String>{
           AppRoutes.discovery,
           AppRoutes.community,
-          AppRoutes.search,
           AppRoutes.unifiedSearch,
           AppRoutes.paywall,
         };
@@ -290,13 +288,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.login,
         builder: (context, state) => const LoginScreen(),
-      ),
-      // Search is pushed from DiscoveryScreen — lives on the root navigator
-      // so it slides on top of the discovery tab without disrupting the shell.
-      GoRoute(
-        path: AppRoutes.search,
-        parentNavigatorKey: _rootKey,
-        builder: (context, state) => const SearchScreen(),
       ),
       // Book detail is pushed on top of whichever shell branch the user is on
       // (home vs search vs library), so it lives on the root navigator.
@@ -712,9 +703,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             navigatorKey: _shellSearchKey,
             routes: <RouteBase>[
+              // BC-79: middle tab is book search (MVP core), not the deferred
+              // discovery tab. Restores 홈·검색·서재 after BC-23's discovery
+              // deferral removed the only search entry point.
               GoRoute(
-                path: AppRoutes.discovery,
-                builder: (context, state) => const DiscoveryScreen(),
+                path: AppRoutes.search,
+                builder: (context, state) => const SearchScreen(),
               ),
             ],
           ),
