@@ -204,6 +204,10 @@ async def get_user_profile(
             )
             for h in profile.recent_highlights
         ],
+        cover_image_url=profile.cover_image_url,
+        theme=profile.theme,
+        featured_book_id=profile.featured_book_id,
+        featured_quote=profile.featured_quote,
     )
 
 

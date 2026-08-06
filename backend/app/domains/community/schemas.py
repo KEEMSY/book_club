@@ -43,6 +43,12 @@ class UserProfileResponse(BaseModel):
     grade_stats: GradeStatsPublic | None = None
     badges: list[BadgeSummaryPublic] = Field(default_factory=list)
     recent_highlights: list[HighlightSummaryPublic] = Field(default_factory=list)
+    # Profile expressiveness (BC-81). featured_book_id is a bare id — fetch
+    # title/cover via the existing GET /books/{id} if the client needs them.
+    cover_image_url: str | None = None
+    theme: str | None = None
+    featured_book_id: UUID | None = None
+    featured_quote: str | None = None
 
 
 # --- BC-80: "내 활동" (my activity) summary ---

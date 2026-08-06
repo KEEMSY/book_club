@@ -15,7 +15,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import ConflictError
-from app.domains.auth.models import AuthProvider, DevicePlatform, DeviceToken, User
+from app.domains.auth.models import AuthProvider, DevicePlatform, DeviceToken, ProfileTheme, User
 
 
 class UserRepository:
@@ -90,6 +90,11 @@ class UserRepository:
         user_id: UUID,
         nickname: str | None,
         bio: str | None,
+        *,
+        cover_image_url: str | None = None,
+        theme: ProfileTheme | None = None,
+        featured_book_id: UUID | None = None,
+        featured_quote: str | None = None,
     ) -> User:
         from app.core.exceptions import NotFoundError
 
@@ -100,7 +105,23 @@ class UserRepository:
             user.nickname = nickname
         if bio is not None:
             user.bio = bio
-        await self._session.flush()
+        if cover_image_url is not None:
+            user.cover_image_url = cover_image_url
+        if theme is not None:
+            user.theme = theme
+        if featured_book_id is not None:
+            user.featured_book_id = featured_book_id
+        if featured_quote is not None:
+            user.featured_quote = featured_quote
+        try:
+            await self._session.flush()
+        except IntegrityError as exc:
+            await self._session.rollback()
+            # Defense in depth: the service layer already validates
+            # featured_book_id existence, but a race (book removed between
+            # that check and this write) should still surface as a clean
+            # domain error rather than a raw FK-violation 500.
+            raise NotFoundError("book not found", code="BOOK_NOT_FOUND") from exc
         await self._session.refresh(user)
         return user
 

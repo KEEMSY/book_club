@@ -14,7 +14,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 
 from app.core.config import Settings, get_settings
 from app.core.deps import get_current_user_id
-from app.domains.auth.models import DevicePlatform
+from app.domains.auth.models import DevicePlatform, ProfileTheme
 from app.domains.auth.providers import get_auth_service
 from app.domains.auth.schemas import (
     AppleLoginRequest,
@@ -144,6 +144,10 @@ async def update_me(
         user_id=UUID(user_id),
         nickname=body.nickname,
         bio=body.bio,
+        cover_image_url=body.cover_image_url,
+        theme=ProfileTheme(body.theme) if body.theme is not None else None,
+        featured_book_id=body.featured_book_id,
+        featured_quote=body.featured_quote,
     )
     return UserPublic.model_validate(user)
 

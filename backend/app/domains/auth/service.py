@@ -31,10 +31,11 @@ from app.core.security import (
     create_refresh_token,
     decode_token,
 )
-from app.domains.auth.models import AuthProvider, DevicePlatform, User
+from app.domains.auth.models import AuthProvider, DevicePlatform, ProfileTheme, User
 from app.domains.auth.ports import (
     AppleOAuthPort,
     DeviceTokenRepositoryPort,
+    FeaturedBookLookupPort,
     KakaoOAuthPort,
     UserRepositoryPort,
 )
@@ -81,6 +82,7 @@ class AuthService:
     device_tokens: DeviceTokenRepositoryPort
     kakao: KakaoOAuthPort
     apple: AppleOAuthPort
+    featured_books: FeaturedBookLookupPort
 
     async def login_with_kakao(self, *, access_token: str) -> LoginResult:
         profile = await self.kakao.fetch_user_by_access_token(access_token)
@@ -221,8 +223,25 @@ class AuthService:
         user_id: UUID,
         nickname: str | None,
         bio: str | None,
+        cover_image_url: str | None = None,
+        theme: ProfileTheme | None = None,
+        featured_book_id: UUID | None = None,
+        featured_quote: str | None = None,
     ) -> User:
-        return await self.users.update_profile(user_id, nickname, bio)
+        # A book must exist to be featured — a stale/typo'd id would render
+        # nothing sensible on the profile screen. Validated here (not at the
+        # 422 boundary) because it's a business rule, not a shape check.
+        if featured_book_id is not None and not await self.featured_books.exists(featured_book_id):
+            raise NotFoundError("book not found", code="BOOK_NOT_FOUND")
+        return await self.users.update_profile(
+            user_id,
+            nickname,
+            bio,
+            cover_image_url=cover_image_url,
+            theme=theme,
+            featured_book_id=featured_book_id,
+            featured_quote=featured_quote,
+        )
 
     async def delete_account(self, *, user_id: UUID) -> None:
         now = datetime.now(tz=UTC)

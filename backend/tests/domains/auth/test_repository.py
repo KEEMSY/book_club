@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
+from uuid import uuid4
 
 import pytest
-from app.core.exceptions import ConflictError
-from app.domains.auth.models import AuthProvider, DevicePlatform
+from app.core.exceptions import ConflictError, NotFoundError
+from app.domains.auth.models import AuthProvider, DevicePlatform, ProfileTheme
 from app.domains.auth.repository import DeviceTokenRepository, UserRepository
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -84,6 +85,56 @@ async def test_soft_delete_hides_user(session: AsyncSession) -> None:
 
     assert await repo.get_by_provider_sub(AuthProvider.KAKAO, "k-delete") is None
     assert await repo.get_by_id(user.id) is None
+
+
+@pytest.mark.asyncio
+async def test_update_profile_persists_expressiveness_fields(session: AsyncSession) -> None:
+    repo = UserRepository(session)
+    user = await repo.create(
+        provider=AuthProvider.KAKAO,
+        sub="k-profile",
+        email=None,
+        nickname="표현하는사람",
+        profile_image_url=None,
+    )
+
+    updated = await repo.update_profile(
+        user.id,
+        None,
+        None,
+        cover_image_url="https://cdn.example.com/cover.jpg",
+        theme=ProfileTheme.MIDNIGHT,
+        featured_quote="오늘도 한 페이지.",
+    )
+    await session.refresh(updated)
+
+    assert updated.cover_image_url == "https://cdn.example.com/cover.jpg"
+    assert updated.theme is ProfileTheme.MIDNIGHT
+    assert updated.featured_quote == "오늘도 한 페이지."
+    assert updated.featured_book_id is None
+
+
+@pytest.mark.asyncio
+async def test_update_profile_rejects_nonexistent_featured_book_at_db_level(
+    session: AsyncSession,
+) -> None:
+    """Defense in depth: even bypassing the service-layer existence check,
+    the FK constraint added in migration 0053 must still stop a bogus
+    featured_book_id from persisting — mapped to a clean domain error rather
+    than a raw IntegrityError (CLAUDE.md §3.1)."""
+    repo = UserRepository(session)
+    user = await repo.create(
+        provider=AuthProvider.KAKAO,
+        sub="k-bad-book",
+        email=None,
+        nickname="가짜책선택",
+        profile_image_url=None,
+    )
+
+    with pytest.raises(NotFoundError) as exc_info:
+        await repo.update_profile(user.id, None, None, featured_book_id=uuid4())
+
+    assert exc_info.value.code == "BOOK_NOT_FOUND"
 
 
 @pytest.mark.asyncio

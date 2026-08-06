@@ -53,6 +53,9 @@ class DeviceTokenRegisterRequest(BaseModel):
     platform: Literal["ios", "aos"]
 
 
+ProfileThemeLiteral = Literal["classic", "sepia", "midnight", "forest", "sunset", "ocean"]
+
+
 class UserPublic(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -63,6 +66,11 @@ class UserPublic(BaseModel):
     email: str | None
     created_at: datetime
     provider: Literal["kakao", "apple"]
+    # Profile expressiveness (BC-81).
+    cover_image_url: str | None = None
+    theme: ProfileThemeLiteral | None = None
+    featured_book_id: UUID | None = None
+    featured_quote: str | None = None
 
     @classmethod
     def from_user(cls, user: User) -> UserPublic:
@@ -81,6 +89,13 @@ class UpdateProfileRequest(BaseModel):
     nickname: str | None = Field(default=None, min_length=1, max_length=64)
     # An explicit None clears the bio; omitting the field leaves it unchanged.
     bio: str | None = Field(default=None, max_length=200)
+    # Profile expressiveness (BC-81) — same None convention as bio/nickname
+    # above: the service only applies a field when it is not None, so these
+    # can be set but not yet cleared back to NULL via this endpoint.
+    cover_image_url: str | None = Field(default=None, max_length=1024)
+    theme: ProfileThemeLiteral | None = Field(default=None)
+    featured_book_id: UUID | None = Field(default=None)
+    featured_quote: str | None = Field(default=None, max_length=300)
 
 
 class LoginResponse(BaseModel):
