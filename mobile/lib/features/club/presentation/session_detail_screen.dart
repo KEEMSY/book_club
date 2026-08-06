@@ -149,12 +149,16 @@ class _AgendaBody extends StatelessWidget {
         SizedBox(height: spacing.lg),
         Text(
           '논제',
-          style: theme.textTheme.titleMedium
-              ?.copyWith(fontWeight: FontWeight.w700),
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w700,
+          ),
         ),
         SizedBox(height: spacing.sm),
         ...agenda.topics.map(
-          (topic) => _TopicAccordionTile(topic: topic),
+          (topic) => _TopicAccordionTile(
+            key: ValueKey('topic-tile-${topic.id}'),
+            topic: topic,
+          ),
         ),
       ],
     );
@@ -164,18 +168,42 @@ class _AgendaBody extends StatelessWidget {
 /// One agenda topic rendered as an expandable tile.
 ///
 /// Collapsed state shows the reply count so members can gauge activity at a
-/// glance; expanding reveals the latest reply as a preview. The full
-/// threaded reply UI (composer, nested rendering, edit/delete) is BC-51,
-/// which reuses [topicCommentsProvider] rather than adding a new fetch path.
-class _TopicAccordionTile extends ConsumerWidget {
-  const _TopicAccordionTile({required this.topic});
+/// glance. Expanding reveals the full thread inline (BC-51): every root
+/// comment with its at-most-one-level-deep replies, a composer for new top-
+/// level replies or a reply-to-root, and edit/delete actions gated per
+/// comment by [canModerateCommentProvider]. This inline-expansion approach
+/// (rather than a dedicated thread screen) keeps reusing
+/// [topicCommentsProvider] as the single fetch path — same provider BC-49
+/// used for the reply-count/preview.
+class _TopicAccordionTile extends ConsumerStatefulWidget {
+  const _TopicAccordionTile({super.key, required this.topic});
 
   final AgendaTopic topic;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_TopicAccordionTile> createState() =>
+      _TopicAccordionTileState();
+}
+
+class _TopicAccordionTileState extends ConsumerState<_TopicAccordionTile> {
+  final _composerController = TextEditingController();
+  final _editController = TextEditingController();
+  TopicComment? _replyTarget;
+  String? _editingCommentId;
+  bool _isSubmitting = false;
+
+  @override
+  void dispose() {
+    _composerController.dispose();
+    _editController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
+    final topic = widget.topic;
     final commentsAsync = ref.watch(topicCommentsProvider(topic.id));
 
     return Card(
@@ -194,7 +222,15 @@ class _TopicAccordionTile extends ConsumerWidget {
           subtitle: const Text('답글을 불러오지 못했어요'),
         ),
         data: (comments) {
-          final TopicComment? preview = comments.isEmpty ? null : comments.last;
+          final roots =
+              comments.where((c) => c.parentCommentId == null).toList();
+          final repliesByParent = <String, List<TopicComment>>{};
+          for (final comment in comments) {
+            final parentId = comment.parentCommentId;
+            if (parentId == null) continue;
+            (repliesByParent[parentId] ??= []).add(comment);
+          }
+
           return ExpansionTile(
             key: PageStorageKey('topic-${topic.id}'),
             title: Text(_topicTitle(topic)),
@@ -207,29 +243,59 @@ class _TopicAccordionTile extends ConsumerWidget {
             ),
             expandedCrossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (preview == null)
-                Text(
-                  '아직 답글이 없어요',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              if (roots.isEmpty)
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: spacing.sm),
+                  child: Text(
+                    '아직 답글이 없어요',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
                   ),
                 )
               else
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      preview.authorName ?? '익명',
-                      style: theme.textTheme.labelMedium
-                          ?.copyWith(fontWeight: FontWeight.w600),
+                for (final root in roots) ...[
+                  _CommentTile(
+                    comment: root,
+                    canModerate: ref.watch(canModerateCommentProvider(root)),
+                    isEditing: _editingCommentId == root.id,
+                    editController: _editController,
+                    onReply: () => _startReply(root),
+                    onEdit: () => _startEdit(root),
+                    onCancelEdit: _cancelEdit,
+                    onSaveEdit: () => _saveEdit(root),
+                    onDelete: () => _delete(root),
+                  ),
+                  for (final reply in repliesByParent[root.id] ?? const [])
+                    Padding(
+                      padding: EdgeInsets.only(left: spacing.lg),
+                      child: _CommentTile(
+                        comment: reply,
+                        // Replies never get a reply action — the design doc
+                        // caps threads at one level (§2 비목표).
+                        onReply: null,
+                        canModerate: ref.watch(
+                          canModerateCommentProvider(reply),
+                        ),
+                        isEditing: _editingCommentId == reply.id,
+                        editController: _editController,
+                        onEdit: () => _startEdit(reply),
+                        onCancelEdit: _cancelEdit,
+                        onSaveEdit: () => _saveEdit(reply),
+                        onDelete: () => _delete(reply),
+                      ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(preview.body, style: theme.textTheme.bodyMedium),
-                  ],
+                ],
+              SizedBox(height: spacing.sm),
+              if (ref.watch(canReplyToTopicProvider))
+                _ReplyComposer(
+                  topicId: topic.id,
+                  controller: _composerController,
+                  replyTarget: _replyTarget,
+                  isSubmitting: _isSubmitting,
+                  onCancelReply: _cancelReply,
+                  onSubmit: _submitComposer,
                 ),
-              // TODO(BC-51): reply composer + full nested-thread rendering
-              // (all comments, 1-depth replies, edit/delete) replace this
-              // single-preview block once the topic-thread screen exists.
             ],
           );
         },
@@ -237,5 +303,296 @@ class _TopicAccordionTile extends ConsumerWidget {
     );
   }
 
+  void _startReply(TopicComment root) {
+    setState(() {
+      _replyTarget = root;
+      _editingCommentId = null;
+    });
+  }
+
+  void _cancelReply() => setState(() => _replyTarget = null);
+
+  void _startEdit(TopicComment comment) {
+    _editController.text = comment.body;
+    setState(() {
+      _editingCommentId = comment.id;
+      _replyTarget = null;
+    });
+  }
+
+  void _cancelEdit() => setState(() => _editingCommentId = null);
+
+  Future<void> _saveEdit(TopicComment comment) async {
+    final body = _editController.text.trim();
+    if (body.isEmpty) return;
+    setState(() => _isSubmitting = true);
+    try {
+      await ref.read(clubSessionRepositoryProvider).editComment(
+            topicId: widget.topic.id,
+            commentId: comment.id,
+            body: body,
+          );
+      ref.invalidate(topicCommentsProvider(widget.topic.id));
+      if (mounted) setState(() => _editingCommentId = null);
+    } catch (_) {
+      _showError('답글 수정에 실패했어요. 다시 시도해 주세요.');
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
+  }
+
+  Future<void> _delete(TopicComment comment) async {
+    try {
+      await ref
+          .read(clubSessionRepositoryProvider)
+          .deleteComment(topicId: widget.topic.id, commentId: comment.id);
+      ref.invalidate(topicCommentsProvider(widget.topic.id));
+    } catch (_) {
+      _showError('답글 삭제에 실패했어요. 다시 시도해 주세요.');
+    }
+  }
+
+  Future<void> _submitComposer() async {
+    final body = _composerController.text.trim();
+    if (body.isEmpty) return;
+    setState(() => _isSubmitting = true);
+    try {
+      await ref.read(clubSessionRepositoryProvider).addComment(
+            topicId: widget.topic.id,
+            body: body,
+            parentCommentId: _replyTarget?.id,
+          );
+      ref.invalidate(topicCommentsProvider(widget.topic.id));
+      _composerController.clear();
+      if (mounted) setState(() => _replyTarget = null);
+    } catch (_) {
+      _showError('답글 등록에 실패했어요. 다시 시도해 주세요.');
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
+  }
+
+  void _showError(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
   String _topicTitle(AgendaTopic topic) => '${topic.position}. ${topic.prompt}';
+}
+
+/// One comment (root or 1-depth reply) — either its read view (author,
+/// body, "(수정됨)" marker, reply/edit/delete actions) or, while
+/// [isEditing], an inline body-editing field.
+class _CommentTile extends StatelessWidget {
+  const _CommentTile({
+    required this.comment,
+    required this.canModerate,
+    required this.isEditing,
+    required this.editController,
+    required this.onReply,
+    required this.onEdit,
+    required this.onCancelEdit,
+    required this.onSaveEdit,
+    required this.onDelete,
+  });
+
+  final TopicComment comment;
+  final bool canModerate;
+  final bool isEditing;
+  final TextEditingController editController;
+
+  /// `null` for replies — enforces the design doc's 1-depth cap by simply
+  /// not offering a reply action on anything that is itself a reply.
+  final VoidCallback? onReply;
+  final VoidCallback onEdit;
+  final VoidCallback onCancelEdit;
+  final VoidCallback onSaveEdit;
+  final VoidCallback onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+
+    if (isEditing) {
+      return Padding(
+        padding: EdgeInsets.symmetric(vertical: spacing.xs),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              // Distinguishes this field's internal Scrollable from the
+              // ExpansionTile's own `PageStorageKey('topic-...')` — without
+              // it, PageStorage's ancestor-key walk resolves both to the
+              // same identifier and a stored `bool` (expanded state) gets
+              // read back where a scroll-offset `double?` is expected.
+              key: PageStorageKey('reply-edit-${comment.id}'),
+              controller: editController,
+              autofocus: true,
+              minLines: 1,
+              maxLines: 4,
+              decoration: const InputDecoration(isDense: true),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(onPressed: onCancelEdit, child: const Text('취소')),
+                TextButton(onPressed: onSaveEdit, child: const Text('저장')),
+              ],
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: spacing.xs),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                comment.authorName ?? '익명',
+                style: theme.textTheme.labelMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              if (comment.editedAt != null) ...[
+                const SizedBox(width: 4),
+                Text(
+                  '(수정됨)',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                  ),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 2),
+          Text(comment.body, style: theme.textTheme.bodyMedium),
+          Row(
+            children: [
+              if (onReply != null)
+                TextButton(
+                  onPressed: onReply,
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    minimumSize: const Size(48, 32),
+                  ),
+                  child: const Text('답글'),
+                ),
+              if (canModerate) ...[
+                IconButton(
+                  icon: const Icon(Icons.edit_outlined, size: 18),
+                  tooltip: '답글 수정',
+                  onPressed: onEdit,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete_outline_rounded, size: 18),
+                  tooltip: '답글 삭제',
+                  onPressed: onDelete,
+                ),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Composer for a new top-level reply, or a reply-to-[replyTarget] when one
+/// is selected via a root comment's "답글" action.
+class _ReplyComposer extends StatelessWidget {
+  const _ReplyComposer({
+    required this.topicId,
+    required this.controller,
+    required this.replyTarget,
+    required this.isSubmitting,
+    required this.onCancelReply,
+    required this.onSubmit,
+  });
+
+  final String topicId;
+  final TextEditingController controller;
+  final TopicComment? replyTarget;
+  final bool isSubmitting;
+  final VoidCallback onCancelReply;
+  final VoidCallback onSubmit;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+    final target = replyTarget;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (target != null)
+          Padding(
+            padding: EdgeInsets.only(bottom: spacing.xs),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    '${target.authorName ?? "익명"}님에게 답글 작성 중',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: onCancelReply,
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    minimumSize: const Size(48, 32),
+                  ),
+                  child: const Text('취소'),
+                ),
+              ],
+            ),
+          ),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Expanded(
+              child: TextField(
+                // See the matching comment on the edit TextField above —
+                // without a distinguishing PageStorageKey this collides
+                // with the ExpansionTile's own `PageStorageKey('topic-...')`.
+                key: PageStorageKey('reply-composer-$topicId'),
+                controller: controller,
+                minLines: 1,
+                maxLines: 4,
+                decoration: InputDecoration(
+                  isDense: true,
+                  hintText: target != null ? '답글 작성' : '답글을 남겨보세요',
+                  border: const OutlineInputBorder(),
+                ),
+              ),
+            ),
+            SizedBox(width: spacing.sm),
+            IconButton.filled(
+              icon: isSubmitting
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Icon(Icons.send_rounded, size: 18),
+              tooltip: '등록',
+              onPressed: isSubmitting ? null : onSubmit,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
 }

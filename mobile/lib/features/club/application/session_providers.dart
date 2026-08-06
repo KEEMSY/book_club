@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/club_session_repository.dart';
 import '../domain/club_session.dart';
+import '../domain/topic_comment.dart';
 
 /// Binds the session/agenda/discussion read/write seam (BC-42) to its
 /// current implementation.
@@ -28,4 +29,27 @@ final clubSessionRepositoryProvider = Provider<ClubSessionRepository>((ref) {
 /// someone else).
 final canAuthorAgendaProvider = Provider.family<bool, ClubSession>(
   (ref, session) => session.presenterId == fakeCurrentUserId,
+);
+
+/// Whether the current user may post a reply anywhere in a topic's
+/// discussion thread (BC-51 composer gate — design doc §5: club members).
+///
+/// TODO(BC-46): replace with a real `ClubMember` membership check driven by
+/// the club-membership API. Always `true` in the fake — there is no
+/// non-member viewer to model yet in [FakeClubSessionRepository], so there's
+/// no "blocked" UI path this gate can currently exercise.
+final canReplyToTopicProvider = Provider<bool>((ref) => true);
+
+/// Whether the current user may edit/delete [comment] (BC-51 — design doc
+/// §5: own reply OR host).
+///
+/// TODO(BC-46): replace with a real permission check combining
+/// `comment.authorId == currentUserId` OR `ClubMember.role == owner`,
+/// computed server-side. Until then this fake only recognizes authorship —
+/// host-moderation of someone else's reply isn't modeled — which is enough
+/// to exercise both the shown and hidden action paths against
+/// [FakeClubSessionRepository]'s seeded comments (authored by several
+/// different fake users).
+final canModerateCommentProvider = Provider.family<bool, TopicComment>(
+  (ref, comment) => comment.authorId == fakeCurrentUserId,
 );

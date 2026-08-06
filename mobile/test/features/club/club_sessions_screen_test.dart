@@ -128,4 +128,27 @@ class _EmptyClubSessionRepository implements ClubSessionRepository {
     required List<String> orderedTopicIds,
   }) =>
       throw UnimplementedError();
+
+  @override
+  Future<TopicComment> addComment({
+    required String topicId,
+    required String body,
+    String? parentCommentId,
+  }) =>
+      throw UnimplementedError();
+
+  @override
+  Future<TopicComment> editComment({
+    required String topicId,
+    required String commentId,
+    required String body,
+  }) =>
+      throw UnimplementedError();
+
+  @override
+  Future<void> deleteComment({
+    required String topicId,
+    required String commentId,
+  }) =>
+      throw UnimplementedError();
 }
