@@ -192,9 +192,8 @@ class _RailItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool selected = index == selectedIndex;
-    final Color fg = selected
-        ? tint
-        : theme.colorScheme.onSurface.withValues(alpha: 0.6);
+    final Color fg =
+        selected ? tint : theme.colorScheme.onSurface.withValues(alpha: 0.6);
 
     final Widget iconWidget = Badge(
       isLabelVisible: badgeCount > 0,
@@ -220,9 +219,8 @@ class _RailItem extends StatelessWidget {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             decoration: BoxDecoration(
-              color: selected
-                  ? tint.withValues(alpha: 0.12)
-                  : Colors.transparent,
+              color:
+                  selected ? tint.withValues(alpha: 0.12) : Colors.transparent,
               borderRadius: BorderRadius.circular(12),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),

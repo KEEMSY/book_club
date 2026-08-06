@@ -271,9 +271,8 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color fg = selected
-        ? accent
-        : theme.colorScheme.onSurface.withValues(alpha: 0.6);
+    final Color fg =
+        selected ? accent : theme.colorScheme.onSurface.withValues(alpha: 0.6);
 
     return Expanded(
       child: InkWell(
