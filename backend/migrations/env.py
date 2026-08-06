@@ -34,13 +34,32 @@ config.set_main_option("sqlalchemy.url", settings.database_url)
 # Base.metadata before autogenerate diff runs. Adding a new domain means
 # adding its import here (and nothing else).
 from app.core.db import Base  # noqa: E402
+
+# Import EVERY domain that declares SQLAlchemy models so all their tables
+# register against Base.metadata before the autogenerate diff runs. A table
+# that exists in the DB but is missing here would be diffed as a spurious
+# DROP (BC-55) — the prior list only had 7 of the 21 model-owning domains.
+from app.domains.ai_assistant import models as _ai_assistant_models  # noqa: E402, F401
 from app.domains.auth import models as _auth_models  # noqa: E402, F401
 from app.domains.book import models as _book_models  # noqa: E402, F401
 from app.domains.challenge import models as _challenge_models  # noqa: E402, F401
+from app.domains.club import models as _club_models  # noqa: E402, F401
+from app.domains.curation import models as _curation_models  # noqa: E402, F401
+from app.domains.event import models as _event_models  # noqa: E402, F401
+from app.domains.experiment import models as _experiment_models  # noqa: E402, F401
 from app.domains.feed import models as _feed_models  # noqa: E402, F401
+from app.domains.notification import models as _notification_models  # noqa: E402, F401
 from app.domains.reading import models as _reading_models  # noqa: E402, F401
+from app.domains.referral import models as _referral_models  # noqa: E402, F401
+from app.domains.reminder import models as _reminder_models  # noqa: E402, F401
+from app.domains.retention import models as _retention_models  # noqa: E402, F401
 from app.domains.review import models as _review_models  # noqa: E402, F401
+from app.domains.share import models as _share_models  # noqa: E402, F401
 from app.domains.shield import models as _shield_models  # noqa: E402, F401
+from app.domains.social import models as _social_models  # noqa: E402, F401
+from app.domains.subscription import models as _subscription_models  # noqa: E402, F401
+from app.domains.team import models as _team_models  # noqa: E402, F401
+from app.domains.video import models as _video_models  # noqa: E402, F401
 
 target_metadata = Base.metadata
 
