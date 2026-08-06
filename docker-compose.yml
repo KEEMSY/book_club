@@ -66,6 +66,14 @@ services:
 
   db:
     image: postgres:16-alpine
+    # Auto-terminate leaked idle-in-transaction sessions after 5 min (BC-57) so
+    # a stuck connection — e.g. a long-lived handler holding an uncommitted
+    # transaction — cannot hold locks or block dev DB work indefinitely.
+    # Dev-only safety net (compose); production uses a managed Postgres.
+    command:
+      - "postgres"
+      - "-c"
+      - "idle_in_transaction_session_timeout=300000"
     environment:
       POSTGRES_USER: bookclub
       POSTGRES_PASSWORD: bookclub
