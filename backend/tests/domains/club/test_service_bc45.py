@@ -23,6 +23,7 @@ from uuid import UUID, uuid4
 import pytest
 from app.core.exceptions import ConflictError, NotFoundError, PermissionDeniedError
 from app.domains.club.models import AgendaStatus, ClubRole
+from app.domains.club.repository import AgendaWithContext
 from app.domains.club.schemas import (
     AgendaTopicCreate,
     AgendaTopicUpdate,
@@ -41,6 +42,7 @@ class _FakeClub:
     id: UUID = field(default_factory=uuid4)
     owner_id: UUID = field(default_factory=uuid4)
     is_public: bool = False
+    name: str = "테스트 모임"
 
 
 @dataclass
@@ -48,6 +50,7 @@ class _FakeSession:
     id: UUID
     club_id: UUID
     presenter_id: UUID | None = None
+    title: str = "1회차"
 
 
 @dataclass
@@ -130,6 +133,29 @@ class FakeClubRepository:
         rows = [a for a in self._agendas.values() if a.session_id == session_id]
         rows.sort(key=lambda a: a.created_at)
         return rows
+
+    async def list_agendas_by_author(
+        self, user_id: UUID, *, limit: int, offset: int
+    ) -> list[AgendaWithContext]:
+        rows = [a for a in self._agendas.values() if a.author_id == user_id]
+        rows.sort(key=lambda a: a.created_at, reverse=True)
+        page = rows[offset : offset + limit]
+        out: list[AgendaWithContext] = []
+        for agenda in page:
+            session_row = self._sessions[agenda.session_id]
+            club = self._clubs[session_row.club_id]
+            out.append(
+                AgendaWithContext(
+                    agenda=agenda,  # type: ignore[arg-type]
+                    club_id=club.id,
+                    club_name=club.name,
+                    session_title=session_row.title,
+                )
+            )
+        return out
+
+    async def count_agendas_by_author(self, user_id: UUID) -> int:
+        return len([a for a in self._agendas.values() if a.author_id == user_id])
 
     async def update_agenda_body(self, agenda_id: UUID, body: str) -> _FakeAgenda | None:
         agenda = self._agendas.get(agenda_id)
@@ -820,3 +846,73 @@ async def test_reorder_topics_rejects_non_author() -> None:
             user_id=stranger,
             topic_ids=[t1.id],
         )
+
+
+# ---------------------------------------------------------------------------
+# list_my_agendas (BC-80 — GET /clubs/me/agendas)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_list_my_agendas_newest_first_with_club_session_context() -> None:
+    svc, repo = _svc()
+    author = uuid4()
+    club = repo.add_club(owner_id=author)
+    session_row = repo.add_session(club.id)
+    older = await svc.create_agenda(
+        club_id=club.id,
+        session_id=session_row.id,
+        user_id=author,
+        req=SessionAgendaCreate(body="첫 발제문"),
+    )
+    repo._agendas[older.id].created_at = datetime(2026, 1, 1)
+    newer = await svc.create_agenda(
+        club_id=club.id,
+        session_id=session_row.id,
+        user_id=author,
+        req=SessionAgendaCreate(body="둘째 발제문"),
+    )
+    repo._agendas[newer.id].created_at = datetime(2026, 6, 1)
+
+    total, items = await svc.list_my_agendas(user_id=author)
+
+    assert total == 2
+    assert [i.id for i in items] == [newer.id, older.id]
+    assert items[0].club_id == club.id
+    assert items[0].club_name == club.name
+    assert items[0].session_title == session_row.title
+
+
+@pytest.mark.asyncio
+async def test_list_my_agendas_excludes_other_authors() -> None:
+    svc, repo = _svc()
+    author, other = uuid4(), uuid4()
+    club = repo.add_club(owner_id=author)
+    repo.add_member(club.id, other)
+    session_row = repo.add_session(club.id)
+    other_session = repo.add_session(club.id, presenter_id=other)
+    mine = await svc.create_agenda(
+        club_id=club.id,
+        session_id=session_row.id,
+        user_id=author,
+        req=SessionAgendaCreate(body="내 발제문"),
+    )
+    await svc.create_agenda(
+        club_id=club.id,
+        session_id=other_session.id,
+        user_id=other,
+        req=SessionAgendaCreate(body="남의 발제문"),
+    )
+
+    total, items = await svc.list_my_agendas(user_id=author)
+
+    assert total == 1
+    assert [i.id for i in items] == [mine.id]
+
+
+@pytest.mark.asyncio
+async def test_list_my_agendas_empty_when_none() -> None:
+    svc, _repo = _svc()
+    total, items = await svc.list_my_agendas(user_id=uuid4())
+    assert total == 0
+    assert items == []

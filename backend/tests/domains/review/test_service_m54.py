@@ -16,7 +16,7 @@ from uuid import UUID, uuid4
 import pytest
 from app.core.exceptions import ConflictError, NotFoundError, PermissionDeniedError
 from app.domains.review.models import BookReview
-from app.domains.review.ports import ReviewAggregate
+from app.domains.review.ports import MyReviewRow, ReviewAggregate
 from app.domains.review.schemas import CreateReviewRequest
 from app.domains.review.service import REPORT_HIDE_THRESHOLD, ReviewService
 from pydantic import ValidationError
@@ -45,6 +45,8 @@ class FakeReviewRepo:
     """In-memory ReviewRepositoryPort."""
 
     by_id: dict[UUID, BookReview] = field(default_factory=dict)
+    # book_id -> (title, cover_url), used only by list_by_user (BC-80).
+    book_info: dict[UUID, tuple[str | None, str | None]] = field(default_factory=dict)
 
     def seed(self, review: BookReview) -> BookReview:
         self.by_id[review.id] = review
@@ -89,6 +91,22 @@ class FakeReviewRepo:
         rows = [r for r in self.by_id.values() if r.book_id == book_id and r.hidden_at is None]
         rows.sort(key=lambda r: r.created_at, reverse=True)
         return rows[offset : offset + limit]
+
+    async def list_by_user(self, user_id: UUID, *, limit: int, offset: int) -> list[MyReviewRow]:
+        rows = [r for r in self.by_id.values() if r.user_id == user_id and r.hidden_at is None]
+        rows.sort(key=lambda r: r.created_at, reverse=True)
+        page = rows[offset : offset + limit]
+        return [
+            MyReviewRow(
+                review=r,
+                book_title=self.book_info.get(r.book_id, (None, None))[0],
+                book_cover_url=self.book_info.get(r.book_id, (None, None))[1],
+            )
+            for r in page
+        ]
+
+    async def count_by_user(self, user_id: UUID) -> int:
+        return len([r for r in self.by_id.values() if r.user_id == user_id and r.hidden_at is None])
 
     async def get_book_summary(self, book_id: UUID) -> ReviewAggregate:
         rows = [r for r in self.by_id.values() if r.book_id == book_id and r.hidden_at is None]
@@ -380,3 +398,62 @@ async def test_list_book_reviews_excludes_hidden() -> None:
     assert summary.rating_count == 1
     assert summary.average_rating == 4.0
     assert len(reviews) == 1
+
+
+# ---------------------------------------------------------------------------
+# list_my_reviews (BC-80 — GET /me/reviews)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_list_my_reviews_newest_first_with_book_info() -> None:
+    user_id = uuid4()
+    book_a, book_b = uuid4(), uuid4()
+    repo = FakeReviewRepo()
+    repo.book_info[book_a] = ("책 A", "https://example.com/a.jpg")
+    repo.book_info[book_b] = ("책 B", "https://example.com/b.jpg")
+    older = repo.seed(_make_review(user_id=user_id, book_id=book_a, rating=3.0))
+    older.created_at = datetime(2026, 1, 1, tzinfo=UTC)
+    newer = repo.seed(_make_review(user_id=user_id, book_id=book_b, rating=5.0))
+    newer.created_at = datetime(2026, 6, 1, tzinfo=UTC)
+    svc = _make_svc(reviews=repo)
+
+    total, rows = await svc.list_my_reviews(user_id=user_id)
+
+    assert total == 2
+    assert [r.review.id for r in rows] == [newer.id, older.id]
+    assert rows[0].book_title == "책 B"
+    assert rows[0].book_cover_url == "https://example.com/b.jpg"
+
+
+@pytest.mark.asyncio
+async def test_list_my_reviews_excludes_other_users_and_hidden() -> None:
+    user_id, other_id, book_id = uuid4(), uuid4(), uuid4()
+    repo = FakeReviewRepo()
+    repo.seed(_make_review(user_id=other_id, book_id=book_id))
+    repo.seed(_make_review(user_id=user_id, book_id=book_id, hidden_at=datetime.now(tz=UTC)))
+    mine = repo.seed(_make_review(user_id=user_id, book_id=book_id, rating=4.0))
+    svc = _make_svc(reviews=repo)
+
+    total, rows = await svc.list_my_reviews(user_id=user_id)
+
+    assert total == 1
+    assert [r.review.id for r in rows] == [mine.id]
+
+
+@pytest.mark.asyncio
+async def test_list_my_reviews_pagination() -> None:
+    user_id = uuid4()
+    repo = FakeReviewRepo()
+    for i in range(5):
+        r = repo.seed(_make_review(user_id=user_id, book_id=uuid4()))
+        r.created_at = datetime(2026, 1, 1 + i, tzinfo=UTC)
+    svc = _make_svc(reviews=repo)
+
+    total, page1 = await svc.list_my_reviews(user_id=user_id, limit=2, offset=0)
+    _, page2 = await svc.list_my_reviews(user_id=user_id, limit=2, offset=2)
+
+    assert total == 5
+    assert len(page1) == 2
+    assert len(page2) == 2
+    assert {r.review.id for r in page1}.isdisjoint({r.review.id for r in page2})

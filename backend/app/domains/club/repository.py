@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import secrets
+from dataclasses import dataclass
 from datetime import date, datetime
 from typing import Literal
 from uuid import UUID, uuid4
@@ -29,6 +30,17 @@ from app.domains.club.models import (
     TopicComment,
 )
 from app.domains.club.schemas import AttendeeCount, AttendeePublic
+
+
+@dataclass(frozen=True, slots=True)
+class AgendaWithContext:
+    """A :class:`SessionAgenda` plus the club/session names needed to render
+    it outside its own session view (BC-80 — "내 활동 > 내 발제문")."""
+
+    agenda: SessionAgenda
+    club_id: UUID
+    club_name: str
+    session_title: str
 
 
 class ClubRepository:
@@ -783,6 +795,35 @@ class ClubRepository:
         )
         rows = await self._session.execute(stmt)
         return list(rows.scalars().all())
+
+    async def list_agendas_by_author(
+        self, user_id: UUID, *, limit: int, offset: int
+    ) -> list[AgendaWithContext]:
+        """내 활동 > 내 발제문 (BC-80) — newest first, joined to club/session for context."""
+        stmt = (
+            select(SessionAgenda, ReadingClub.id, ReadingClub.name, ClubSession.title)
+            .join(ClubSession, ClubSession.id == SessionAgenda.session_id)
+            .join(ReadingClub, ReadingClub.id == ClubSession.club_id)
+            .where(SessionAgenda.author_id == user_id)
+            .order_by(SessionAgenda.created_at.desc())
+            .limit(limit)
+            .offset(offset)
+        )
+        result = await self._session.execute(stmt)
+        return [
+            AgendaWithContext(
+                agenda=agenda,
+                club_id=club_id,
+                club_name=club_name,
+                session_title=session_title,
+            )
+            for agenda, club_id, club_name, session_title in result.all()
+        ]
+
+    async def count_agendas_by_author(self, user_id: UUID) -> int:
+        stmt = select(func.count()).where(SessionAgenda.author_id == user_id)
+        result = await self._session.execute(stmt)
+        return int(result.scalar_one())
 
     async def update_agenda_body(self, agenda_id: UUID, body: str) -> SessionAgenda | None:
         agenda = await self._session.get(SessionAgenda, agenda_id)

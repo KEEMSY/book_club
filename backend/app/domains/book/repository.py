@@ -201,3 +201,11 @@ class UserBookRepository:
         )
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
+
+    async def count_for_user(self, user_id: UUID, *, status: UserBookStatus | None) -> int:
+        conditions = [UserBook.user_id == user_id]
+        if status is not None:
+            conditions.append(UserBook.status == status)
+        stmt = select(func.count()).where(and_(*conditions))
+        result = await self._session.execute(stmt)
+        return int(result.scalar_one())

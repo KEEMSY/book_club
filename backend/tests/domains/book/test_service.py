@@ -137,6 +137,12 @@ class FakeUserBookRepo:
         )
         return rows[:limit]
 
+    async def count_for_user(self, user_id: UUID, *, status: UserBookStatus | None) -> int:
+        rows = [ub for ub in self.by_id.values() if ub.user_id == user_id]
+        if status is not None:
+            rows = [ub for ub in rows if ub.status == status]
+        return len(rows)
+
 
 class StubSearch:
     def __init__(self, result: BookSearchResult) -> None:
@@ -316,6 +322,39 @@ async def test_list_library_clamps_limit_and_emits_next_cursor() -> None:
     # Limit clamped to 50 — 999 is silently reduced, no error.
     all_rows = await service.list_library(user_id=user_id, status=None, cursor=None, limit=999)
     assert len(all_rows.items) == 5
+
+
+@pytest.mark.asyncio
+async def test_count_library_filters_by_status() -> None:
+    """count_library (BC-80) — used by the community "내 활동" summary."""
+    service, books, _, _ = _build_service()
+    user_id = uuid4()
+    b1 = await books.upsert_by_isbn(
+        isbn13="9788937461234",
+        title="t1",
+        author="a",
+        publisher=None,
+        cover_url=None,
+        description=None,
+        source=BookSource.NAVER,
+    )
+    b2 = await books.upsert_by_isbn(
+        isbn13="9788937465678",
+        title="t2",
+        author="a",
+        publisher=None,
+        cover_url=None,
+        description=None,
+        source=BookSource.NAVER,
+    )
+    await service.add_to_library(user_id=user_id, book_id=b1.id, status=UserBookStatus.READING)
+    await service.add_to_library(user_id=user_id, book_id=b2.id, status=UserBookStatus.WISHLIST)
+
+    reading_count = await service.count_library(user_id=user_id, status=UserBookStatus.READING)
+    total_count = await service.count_library(user_id=user_id, status=None)
+
+    assert reading_count == 1
+    assert total_count == 2
 
 
 @pytest.mark.asyncio

@@ -16,8 +16,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import ConflictError, NotFoundError
 from app.domains.auth.models import User
+from app.domains.book.models import Book
 from app.domains.review.models import BookReview
-from app.domains.review.ports import ReviewAggregate, ReviewRow
+from app.domains.review.ports import MyReviewRow, ReviewAggregate, ReviewRow
 
 
 class BookReviewRepository:
@@ -121,3 +122,31 @@ class BookReviewRepository:
             rating_count=total_count,
             distribution=distribution,
         )
+
+    async def list_by_user(self, user_id: UUID, *, limit: int, offset: int) -> list[MyReviewRow]:
+        """내 리뷰 목록 (BC-80) — newest first, joined to the book for display.
+
+        Cross-domain JOIN of ``Book`` is a same-DB read, not a service-layer
+        call — consistent with the existing ``Book``/``post_highlights`` joins
+        in ``reading/repository.py`` (CLAUDE.md §3.3).
+        """
+        stmt = (
+            select(BookReview, Book.title, Book.cover_url)
+            .join(Book, Book.id == BookReview.book_id)
+            .where(BookReview.user_id == user_id, BookReview.hidden_at.is_(None))
+            .order_by(BookReview.created_at.desc())
+            .limit(limit)
+            .offset(offset)
+        )
+        result = await self._session.execute(stmt)
+        return [
+            MyReviewRow(review=review, book_title=title, book_cover_url=cover_url)
+            for review, title, cover_url in result.all()
+        ]
+
+    async def count_by_user(self, user_id: UUID) -> int:
+        stmt = select(func.count()).where(
+            BookReview.user_id == user_id, BookReview.hidden_at.is_(None)
+        )
+        result = await self._session.execute(stmt)
+        return int(result.scalar_one())

@@ -60,6 +60,7 @@ from app.domains.feed.ports import (
     FeedEventWithReactionsItem,
     HighlightRepositoryPort,
     ImageStoragePort,
+    MyHighlightItem,
     PostFeedItem,
     PostRepositoryPort,
     PresignedUpload,
@@ -118,6 +119,15 @@ class BookHighlightGroup:
     book_title: str | None
     book_cover_url: str | None
     highlights: list[PostHighlight]
+
+
+@dataclass(frozen=True, slots=True)
+class MyHighlightPage:
+    """Flat, newest-first page of the caller's own highlights (BC-80)."""
+
+    items: list[MyHighlightItem]
+    total: int
+    has_more: bool
 
 
 @dataclass(frozen=True, slots=True)
@@ -660,6 +670,22 @@ class FeedService:
             )
         return result
 
+    async def list_my_highlights(
+        self, *, user_id: UUID, limit: int = 20, offset: int = 0
+    ) -> MyHighlightPage:
+        """내 활동 > 내 하이라이트 (BC-80) — flat, newest-first, paginated.
+
+        Distinct from ``list_all_highlights`` (grouped by book, unpaginated —
+        powers the existing "하이라이트 모아보기" screen).
+        """
+        clamped = max(1, min(limit, _HIGHLIGHTS_PAGE_MAX))
+        safe_offset = max(0, offset)
+        total = await self.highlights.count_by_user(user_id)
+        items = await self.highlights.list_recent_for_user(
+            user_id, limit=clamped, offset=safe_offset
+        )
+        return MyHighlightPage(items=items, total=total, has_more=safe_offset + len(items) < total)
+
     # ------------------------------------------------------------------
     # M47 — Social feed: following feed, reactions & comments on events
     # ------------------------------------------------------------------
@@ -886,6 +912,7 @@ __all__ = [
     "FeedPage",
     "FeedService",
     "HighlightPage",
+    "MyHighlightPage",
     "PostCreated",
     "PostFeedItem",
     "PostType",

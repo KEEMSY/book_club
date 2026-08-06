@@ -49,6 +49,7 @@ from app.domains.club.schemas import (
     CreateClubRequest,
     MemberProgressItem,
     MessageListResponse,
+    MyAgendaItem,
     ReadingPlanResponse,
     SessionAgendaCreate,
     SessionAgendaPublic,
@@ -1000,6 +1001,31 @@ class ClubService:
         await self._get_session_in_club(club_id, session_id)
         agenda = await self._get_agenda_with_topics_in_session(session_id, agenda_id)
         return self._to_agenda_public(agenda, agenda.topics)
+
+    async def list_my_agendas(
+        self, *, user_id: UUID, limit: int = 20, offset: int = 0
+    ) -> tuple[int, list[MyAgendaItem]]:
+        """내 활동 > 내 발제문 (BC-80) — clubs/sessions the caller authored an
+        agenda in, newest first."""
+        clamped = max(1, min(limit, 50))
+        safe_offset = max(0, offset)
+        total = await self.repo.count_agendas_by_author(user_id)
+        rows = await self.repo.list_agendas_by_author(user_id, limit=clamped, offset=safe_offset)
+        items = [
+            MyAgendaItem(
+                id=row.agenda.id,
+                club_id=row.club_id,
+                club_name=row.club_name,
+                session_id=row.agenda.session_id,
+                session_title=row.session_title,
+                body=row.agenda.body,
+                status=row.agenda.status,
+                published_at=row.agenda.published_at,
+                created_at=row.agenda.created_at,
+            )
+            for row in rows
+        ]
+        return total, items
 
     # --- topics (BC-45) ---
 

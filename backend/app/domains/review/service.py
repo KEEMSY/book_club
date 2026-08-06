@@ -14,6 +14,7 @@ from uuid import UUID
 from app.core.exceptions import ConflictError, NotFoundError, PermissionDeniedError
 from app.domains.review.models import BookReview
 from app.domains.review.ports import (
+    MyReviewRow,
     ReviewAggregate,
     ReviewFeedEventPort,
     ReviewRepositoryPort,
@@ -109,6 +110,16 @@ class ReviewService:
         summary = await self._reviews.get_book_summary(book_id)
         reviews = await self._reviews.list_by_book(book_id, limit=clamped, offset=safe_offset)
         return summary, reviews
+
+    async def list_my_reviews(
+        self, *, user_id: UUID, limit: int = 20, offset: int = 0
+    ) -> tuple[int, list[MyReviewRow]]:
+        """내 활동 > 내 리뷰 (BC-80) — total count plus a page, newest first."""
+        clamped = max(1, min(limit, _LIST_LIMIT_MAX))
+        safe_offset = max(0, offset)
+        total = await self._reviews.count_by_user(user_id)
+        rows = await self._reviews.list_by_user(user_id, limit=clamped, offset=safe_offset)
+        return total, rows
 
     async def report_review(self, *, reporter_id: UUID, review_id: UUID) -> BookReview:
         """Flag a review. Self-reporting is forbidden; the repo auto-hides

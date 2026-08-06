@@ -235,6 +235,10 @@ class BookService:
                 next_cursor = last.started_at.isoformat()
         return LibraryPage(items=rows, next_cursor=next_cursor)
 
+    async def count_library(self, *, user_id: UUID, status: UserBookStatus | None) -> int:
+        """내 활동 요약(BC-80)의 "읽는 중" 카운트 등에 쓰이는 총 개수 조회."""
+        return await self.user_books.count_for_user(user_id, status=status)
+
     async def get_discover_sections(self) -> list[DiscoverSection]:
         # Sections that drive the pre-search discovery screen.  Queries are
         # independent so we fire them in parallel; a failed section must not

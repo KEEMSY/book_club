@@ -43,7 +43,7 @@ from app.domains.feed.models import (
     Reaction,
     ReactionType,
 )
-from app.domains.feed.ports import ExploreHighlightItem, HighlightWithBookId
+from app.domains.feed.ports import ExploreHighlightItem, HighlightWithBookId, MyHighlightItem
 
 
 class PostRepository:
@@ -446,6 +446,49 @@ class HighlightRepository:
             )
             for row in result.all()
         ]
+
+    async def list_recent_for_user(
+        self, user_id: UUID, *, limit: int, offset: int
+    ) -> list[MyHighlightItem]:
+        """내 활동 > 내 하이라이트 (BC-80) — flat, newest-first, paginated.
+
+        Distinct from ``list_all_for_user`` (grouped by book, unpaginated —
+        powers the existing "하이라이트 모아보기" screen). The ``books`` JOIN
+        is an intentional same-DB cross-domain read per CLAUDE.md §3.3.
+        """
+        from app.domains.book.models import Book, UserBook
+
+        stmt = (
+            select(
+                PostHighlight,
+                UserBook.book_id.label("book_id"),
+                Book.title.label("book_title"),
+                Book.cover_url.label("book_cover_url"),
+            )
+            .join(UserBook, UserBook.id == PostHighlight.user_book_id)
+            .join(Book, Book.id == UserBook.book_id)
+            .where(PostHighlight.user_id == user_id, PostHighlight.deleted_at.is_(None))
+            .order_by(PostHighlight.created_at.desc(), PostHighlight.id.desc())
+            .limit(limit)
+            .offset(offset)
+        )
+        result = await self._session.execute(stmt)
+        return [
+            MyHighlightItem(
+                highlight=row.PostHighlight,
+                book_id=row.book_id,
+                book_title=row.book_title,
+                book_cover_url=row.book_cover_url,
+            )
+            for row in result.all()
+        ]
+
+    async def count_by_user(self, user_id: UUID) -> int:
+        stmt = select(func.count()).where(
+            PostHighlight.user_id == user_id, PostHighlight.deleted_at.is_(None)
+        )
+        result = await self._session.execute(stmt)
+        return int(result.scalar_one())
 
 
 class FeedEventRepository:
