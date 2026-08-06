@@ -11,7 +11,7 @@ import 'adaptive_layout.dart';
 ///   - Extended (desktop ≥ 1024 px): 220 px wide, icon + label in a row
 ///
 /// The four destinations map 1-to-1 onto AppShell branch indices:
-///   0 홈 · 1 탐색 · 2 서재 · 3 커뮤니티
+///   0 홈 · 1 검색 · 2 서재 · 3 커뮤니티
 ///
 /// A section separator is rendered between 서재 (index 2) and 커뮤니티 (index 3)
 /// so the two usage contexts are visually distinct — matching the mobile
@@ -68,21 +68,19 @@ class WebNavigationRail extends StatelessWidget {
             badgeCount: badgeCount,
             onTap: () => onDestinationSelected(0),
           ),
-          // Deferred (BC-23): 탐색/discovery is gated behind its feature flag.
-          // Branch indices stay fixed (0 홈 · 1 탐색 · 2 서재 · 3 커뮤니티) so
-          // hiding an item never renumbers the others.
-          if (FeatureFlags.discovery)
-            _RailItem(
-              index: 1,
-              selectedIndex: selectedIndex,
-              icon: Icons.explore_outlined,
-              selectedIcon: Icons.explore_rounded,
-              label: '탐색',
-              extended: extended,
-              tint: tint,
-              theme: theme,
-              onTap: () => onDestinationSelected(1),
-            ),
+          // BC-79: 검색 is MVP core (book domain) — always shown, independent
+          // of the deferred discovery flag. Branch index 1 hosts SearchScreen.
+          _RailItem(
+            index: 1,
+            selectedIndex: selectedIndex,
+            icon: CupertinoIcons.search,
+            selectedIcon: CupertinoIcons.search,
+            label: '검색',
+            extended: extended,
+            tint: tint,
+            theme: theme,
+            onTap: () => onDestinationSelected(1),
+          ),
           _RailItem(
             index: 2,
             selectedIndex: selectedIndex,
@@ -194,8 +192,9 @@ class _RailItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool selected = index == selectedIndex;
-    final Color fg =
-        selected ? tint : theme.colorScheme.onSurface.withValues(alpha: 0.6);
+    final Color fg = selected
+        ? tint
+        : theme.colorScheme.onSurface.withValues(alpha: 0.6);
 
     final Widget iconWidget = Badge(
       isLabelVisible: badgeCount > 0,
@@ -221,8 +220,9 @@ class _RailItem extends StatelessWidget {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             decoration: BoxDecoration(
-              color:
-                  selected ? tint.withValues(alpha: 0.12) : Colors.transparent,
+              color: selected
+                  ? tint.withValues(alpha: 0.12)
+                  : Colors.transparent,
               borderRadius: BorderRadius.circular(12),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
