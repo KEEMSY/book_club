@@ -51,10 +51,15 @@ worktrees so their working trees never collide.
 - `main` is GitHub-branch-protected: **PR-merge only** (direct `git push origin main`
   is rejected with `GH006`), no force-push/deletion, `enforce_admins`. No worktree
   or session can change main except by merging a green-CI PR.
-- Shared local resources are session-common: run the Flutter web dev server from the
-  **main worktree** (not a per-ticket worktree); do destructive DB work only on a
-  throwaway `book_club_test` DB (never `TRUNCATE`/`UPDATE` the shared dev DB); don't
-  kill another session's server/port.
+- Containers are isolated per worktree: when a worktree needs a backend stack, bring
+  up an **isolated** one with `scripts/worktree-stack.sh <name> <offset>` (compose
+  project `bookclub-<name>` + port offset + own volumes) so its restart/migrate/DB
+  writes never touch another session's stack. Point web at it via
+  `--dart-define=API_BASE_URL=http://localhost:<API_PORT>`.
+- If using the shared `bookclub` stack instead: no destructive ops (`docker restart`,
+  `alembic migrate`, `TRUNCATE`/`UPDATE` on the shared dev DB); destructive DB checks
+  go to a throwaway `book_club_test` DB. Run the shared web dev server from the main
+  worktree. Don't kill another session's server/port.
 
 ## Parallel execution
 
