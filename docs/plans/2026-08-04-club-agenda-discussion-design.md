@@ -1,8 +1,8 @@
 ---
 title: 발제문 기반 구조화 토론 모임
 epic: BC-42
-version: 1.0.0
-status: draft
+version: 1.1.0
+status: delivered
 created: 2026-08-04
 owner: 김성연
 ---
@@ -247,5 +247,20 @@ ai_assistant(M63 클럽 토론 주제 생성) 자산을 Port로 재사용. Pro �
 
 ## Changelog
 
+- **1.1.0** (2026-08-06) — 에픽 배포 완료. 전 티켓 main 머지:
+  - 백엔드: BC-43(스키마·마이그레이션 0051) · BC-44(회차) · BC-45(발제문·논제) ·
+    BC-46(논제 스레드) · BC-47(feed 이벤트 3종 + CHECK/드리프트 가드, 마이그레이션 0052) ·
+    BC-48(알림) · BC-53(AI 논제 추천, ai_assistant↔club 순환 우회)
+  - 모바일: BC-49(회차 목록·상세) · BC-50(발제문 에디터) · BC-51(논제 스레드 UI) ·
+    BC-52(피드 카드·딥링크·알림 라우팅)
+  - 배선: **BC-60**(신설) — 모바일 fake provider → 실 REST(retrofit) 배선, 권한
+    게이트를 실 auth/멤버십 기준으로 전환, 발제문 에디터에 AI 추천 연결.
+  - 마감: BC-54 — 본 Changelog, QA 시트(`2026-08-06-club-agenda-qa-checklist.md`),
+    유료 모임 후속 에픽 백로그 기록.
+  - 구현 중 발견한 에픽 밖 결함은 별도 티켓 분리: BC-55(env.py autogenerate 갭) ·
+    BC-56(reading 테스트 teardown) · BC-57(dev DB 커넥션 누수).
+  - 유료화는 설계대로 **모델 훅 컬럼만**(`reading_clubs.access_type`/`join_price_cents`,
+    `club_sessions.access_tier`/`price_cents`) — 로직·결제 없음. 후속 유료 모임 에픽은
+    `docs/backlog/IDEAS.md` 참조.
 - **1.0.0** (2026-08-04) — 최초 작성. 회차·발제문·논제·스레드 4계층 모델, 권한 규칙,
   feed/notification/ai 통합, 유료화 훅(모임·회차 레벨), BC-43~BC-54 태스크 분해 확정.
