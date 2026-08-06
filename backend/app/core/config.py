@@ -83,6 +83,13 @@ class Settings(BaseSettings):
     # Admin key for privileged management endpoints. Unset → endpoints return 404.
     admin_key: str = Field(default="")
 
+    # Bootstrap allowlist for the first is_admin=True promotion (BC-88). Ops-only:
+    # applied exclusively by `scripts/promote_admin.py --bootstrap`, never by any
+    # HTTP endpoint, so setting this env var alone cannot grant access — a deploy
+    # with DB credentials still has to run the script. Empty by default (no-op).
+    # Env format: JSON array, e.g. INITIAL_ADMIN_EMAILS=["owner@bookclub.kr"].
+    initial_admin_emails: list[str] = Field(default_factory=list)
+
     # Agora RTC credentials for club video calls (M71). Both empty → the
     # StubAgoraTokenAdapter is selected so dev/test work without a real account.
     agora_app_id: str = Field(default="")

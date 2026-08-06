@@ -77,6 +77,7 @@ class UserAdminItem(BaseModel):
     email: str | None
     is_active: bool
     is_admin: bool
+    is_pro: bool
     created_at: datetime
 
 

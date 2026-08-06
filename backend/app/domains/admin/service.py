@@ -11,7 +11,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from uuid import UUID
 
-from app.core.exceptions import NotFoundError
+from app.core.exceptions import ConflictError, NotFoundError
 from app.domains.admin.repository import AdminRepository
 from app.domains.admin.schemas import (
     ConversionFunnelResponse,
@@ -141,8 +141,21 @@ class AdminService:
     ) -> UserAdminItem:
         """Partially update a user's admin flags.
 
-        Raises ``NotFoundError`` when the user does not exist.
+        Raises ``NotFoundError`` when the user does not exist. Raises
+        ``ConflictError`` when the request would revoke ``is_admin`` from the
+        last remaining admin — without this guard the console has no
+        in-app way back and would need the ``promote_admin.py`` CLI (BC-88)
+        to recover.
         """
+        if is_admin is False:
+            target = await self.repo.get_user_by_id(user_id)
+            if target is None:
+                raise NotFoundError("user not found", code="USER_NOT_FOUND")
+            if target.is_admin and await self.repo.count_admins() <= 1:
+                raise ConflictError(
+                    "마지막 관리자 권한은 해제할 수 없습니다.", code="LAST_ADMIN_PROTECTED"
+                )
+
         user: User | None = await self.repo.patch_user(
             user_id, is_active=is_active, is_admin=is_admin
         )
