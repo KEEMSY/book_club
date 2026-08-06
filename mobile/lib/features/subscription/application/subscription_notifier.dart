@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/config/feature_flags.dart';
 import '../domain/subscription_status.dart';
 import 'subscription_providers.dart';
 
@@ -13,6 +14,13 @@ part 'subscription_notifier.g.dart';
 class SubscriptionNotifier extends _$SubscriptionNotifier {
   @override
   Future<SubscriptionStatus> build() async {
+    // Subscription is deferred (BC-41): the `/me/subscription` endpoint is
+    // unmounted server-side (404). Return a free (non-Pro) status without
+    // calling it, so every `isPro` watcher degrades gracefully instead of
+    // surfacing a 404. Re-enabling the feature flag restores the live fetch.
+    if (!FeatureFlags.subscription) {
+      return const SubscriptionStatus();
+    }
     return ref.read(subscriptionRepositoryProvider).getStatus();
   }
 
@@ -36,9 +44,6 @@ class SubscriptionNotifier extends _$SubscriptionNotifier {
           ),
     );
     state = result;
-    return result.maybeWhen(
-      data: (s) => s.isPro,
-      orElse: () => false,
-    );
+    return result.maybeWhen(data: (s) => s.isPro, orElse: () => false);
   }
 }

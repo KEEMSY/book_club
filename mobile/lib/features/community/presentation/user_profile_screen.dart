@@ -743,7 +743,10 @@ class _ActionButton extends ConsumerWidget {
             icon: const Icon(Icons.people_alt_outlined),
             label: const Text('친구 초대'),
           ),
-          if (!isPro) ...[
+          // Subscription deferred (BC-41): hide the Pro upsell when the feature
+          // is off, matching the reminder gating above — otherwise it navigates
+          // to a paywall that redirects home.
+          if (FeatureFlags.subscription && !isPro) ...[
             const SizedBox(height: 8),
             FilledButton.icon(
               onPressed: () => context.push(AppRoutes.paywall),
