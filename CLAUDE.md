@@ -144,6 +144,20 @@ Router  →  Service  →  Repository / External Adapter
 - [ ] 설계 변경이 동반되면 `docs/plans/` 갱신
 - [ ] 백로그에 아이디어가 새로 추가되었다면 `docs/backlog/IDEAS.md` 반영
 
+### 6.4 동시 세션 격리 & main 보호 (강제)
+
+여러 세션이 각자 워크트리에서 병렬로 작업하더라도 **`main` 과 공유 자원에 영향을 주지 않는다.**
+
+- **main 은 GitHub 브랜치 보호로 잠겨 있다** (기술적 강제, 우회 불가):
+  - PR 병합으로만 변경 가능 — `git push origin main` 직접 푸시는 `GH006` 로 거부된다.
+  - force-push·브랜치 삭제 금지, `enforce_admins`(관리자도 예외 없음), linear history.
+  - 따라서 어떤 워크트리/세션도 **green-CI PR 병합** 외의 방법으로 main 을 바꿀 수 없다.
+- **공유 로컬 자원을 오염·점유하지 않는다** (dev DB `:5432`, 포트 `:3100`/`:8000` 은 세션 공용):
+  - 테스트·검증용 DB 조작은 **throwaway DB(`book_club_test`)** 에서만. 공유 dev DB(`bookclub`)에 `TRUNCATE`/`UPDATE` 등 파괴적 쿼리 **금지**.
+  - Flutter 웹 dev 서버는 **main 워크트리에서 실행**한다. 워크트리에서 띄우면 그 워크트리를 `git worktree remove` 할 때 서버가 깨진다.
+  - 다른 세션이 쓰는 포트/서버를 임의로 종료하지 않는다. 필요하면 별도 포트를 쓴다.
+- 워크트리 정리(`git worktree remove`) 전에 그 워크트리에서 띄운 프로세스(dev 서버 등)를 먼저 종료한다.
+
 ## 7. 버저닝 정책
 
 ### 7.1 애플리케이션 버전
@@ -219,5 +233,5 @@ Router  →  Service  →  Repository / External Adapter
 
 ---
 
-**Last updated**: 2026-07-27
-**CLAUDE.md version**: 1.3.0
+**Last updated**: 2026-08-06
+**CLAUDE.md version**: 1.4.0
