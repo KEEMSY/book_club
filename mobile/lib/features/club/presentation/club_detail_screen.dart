@@ -16,6 +16,7 @@ import '../application/club_providers.dart';
 import '../domain/club.dart';
 import 'club_chat_screen.dart';
 import 'club_rooms_screen.dart';
+import 'club_sessions_screen.dart';
 import 'create_event_sheet.dart';
 import 'reading_plan_tab.dart';
 
@@ -41,7 +42,7 @@ class _ClubDetailScreenState extends ConsumerState<ClubDetailScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
   }
 
   @override
@@ -67,8 +68,13 @@ class _ClubDetailScreenState extends ConsumerState<ClubDetailScreen>
         ],
         bottom: TabBar(
           controller: _tabController,
+          isScrollable: true,
+          tabAlignment: TabAlignment.start,
           tabs: const [
             Tab(text: '모임'),
+            // BC-49/BC-42 §10: 회차(발제·비동기 구조화 토론)는 실시간 채팅과
+            // 혼동되지 않도록 별도 탭으로 분리한다.
+            Tab(text: '회차'),
             Tab(text: '독서 계획'),
             Tab(text: '채팅'),
             Tab(text: '채팅방'),
@@ -79,6 +85,7 @@ class _ClubDetailScreenState extends ConsumerState<ClubDetailScreen>
         controller: _tabController,
         children: [
           _ClubEventsTab(club: widget.club),
+          ClubSessionsBody(club: widget.club),
           ReadingPlanTab(club: widget.club),
           ClubChatScreen(club: widget.club),
           ClubRoomsBody(club: widget.club),
