@@ -6,6 +6,9 @@ Routes (thin DTO → service → DTO per CLAUDE.md §3.1):
   DELETE /books/{book_id}/reviews/me           — delete own review
   GET    /books/{book_id}/reviews              — list reviews + rating summary
   POST   /books/{book_id}/reviews/{review_id}/report — report a review
+
+``me_router`` (no path prefix — mirrors ``reading.router.me_router``):
+  GET    /me/reviews                           — caller's own reviews (BC-80)
 """
 
 from __future__ import annotations
@@ -17,17 +20,20 @@ from fastapi import APIRouter, Depends, Query, status
 
 from app.core.deps import get_current_user_id
 from app.domains.review.models import BookReview
-from app.domains.review.ports import ReviewRow
+from app.domains.review.ports import MyReviewRow, ReviewRow
 from app.domains.review.providers import get_review_service
 from app.domains.review.schemas import (
     BookReviewSummary,
     CreateReviewRequest,
+    MyReviewItem,
+    MyReviewListResponse,
     ReviewResponse,
     UpdateReviewRequest,
 )
 from app.domains.review.service import ReviewService
 
 router = APIRouter(prefix="/books/{book_id}/reviews", tags=["review"])
+me_router = APIRouter(tags=["review"])
 
 
 def _to_response(review: BookReview) -> ReviewResponse:
@@ -123,3 +129,29 @@ async def report_review(
 ) -> ReviewResponse:
     review = await service.report_review(reporter_id=UUID(user_id), review_id=review_id)
     return _to_response(review)
+
+
+def _my_row_to_item(row: MyReviewRow) -> MyReviewItem:
+    r = row.review
+    return MyReviewItem(
+        id=r.id,
+        book_id=r.book_id,
+        book_title=row.book_title,
+        book_cover_url=row.book_cover_url,
+        rating=float(r.rating),
+        body=r.body,
+        created_at=r.created_at,
+    )
+
+
+@me_router.get("/me/reviews", response_model=MyReviewListResponse)
+async def list_my_reviews(
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ReviewService, Depends(get_review_service)],
+    limit: Annotated[int, Query(ge=1, le=50)] = 20,
+    offset: Annotated[int, Query(ge=0)] = 0,
+) -> MyReviewListResponse:
+    """내 활동 > 내 리뷰 (BC-80), 최신순 페이지네이션."""
+    total, rows = await service.list_my_reviews(user_id=UUID(user_id), limit=limit, offset=offset)
+    items = [_my_row_to_item(r) for r in rows]
+    return MyReviewListResponse(items=items, total=total, has_more=offset + len(items) < total)

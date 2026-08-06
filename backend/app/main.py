@@ -45,6 +45,7 @@ from app.domains.reading.router import router as reading_router
 from app.domains.referral.router import router as referral_router
 from app.domains.reminder.router import router as reminder_router
 from app.domains.retention.router import router as retention_router
+from app.domains.review.router import me_router as review_me_router
 from app.domains.review.router import router as review_router
 from app.domains.search.router import router as search_router
 from app.domains.share.router import router as share_router
@@ -178,6 +179,7 @@ def create_app() -> FastAPI:
         app.include_router(shield_router)
     if settings.feature_review_enabled:
         app.include_router(review_router)
+        app.include_router(review_me_router)
     if settings.feature_ai_assistant_enabled:
         app.include_router(ai_assistant_router)
     if settings.feature_share_enabled:

@@ -36,6 +36,7 @@ from app.domains.club.schemas import (
     CreateReadingPlanRequest,
     EditMessageRequest,
     MessageListResponse,
+    MyAgendaListResponse,
     PublicClubListResponse,
     ReadingPlanResponse,
     ReorderTopicsRequest,
@@ -97,6 +98,18 @@ async def list_my_clubs(
     clubs = await service.list_my_clubs(UUID(user_id))
     items = [await _to_public(c, service.repo) for c in clubs]
     return ClubListResponse(items=items)
+
+
+@router.get("/me/agendas", response_model=MyAgendaListResponse)
+async def list_my_agendas(
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+    limit: Annotated[int, Query(ge=1, le=50)] = 20,
+    offset: Annotated[int, Query(ge=0)] = 0,
+) -> MyAgendaListResponse:
+    """내 활동 > 내 발제문 (BC-80), 최신순 페이지네이션."""
+    total, items = await service.list_my_agendas(user_id=UUID(user_id), limit=limit, offset=offset)
+    return MyAgendaListResponse(items=items, total=total, has_more=offset + len(items) < total)
 
 
 @router.post("/join", response_model=ClubPublic, status_code=status.HTTP_200_OK)

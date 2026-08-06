@@ -16,6 +16,16 @@ from uuid import UUID
 from app.core.exceptions import NotFoundError
 from app.domains.auth.repository import UserRepository
 from app.domains.community.ports import (
+    ActivityAgendaItem,
+    ActivityAgendaQueryPort,
+    ActivityBookItem,
+    ActivityClubItem,
+    ActivityClubQueryPort,
+    ActivityHighlightItem,
+    ActivityHighlightQueryPort,
+    ActivityLibraryQueryPort,
+    ActivityReviewItem,
+    ActivityReviewQueryPort,
     BadgeSummary,
     GradeStats,
     HighlightSummary,
@@ -32,6 +42,9 @@ from app.domains.feed.service import FeedPage
 _FEED_PAGE_MAX = 50
 _FEED_PAGE_MIN = 1
 _POPULAR_DAYS = 30
+# BC-80 — "내 활동" summary preview size per category (full lists live behind
+# each domain's own paginated "list mine" endpoint; see MyActivitySummary).
+_ACTIVITY_PREVIEW_SIZE = 5
 
 
 def _parse_cursor(cursor: str | None) -> datetime | None:
@@ -58,6 +71,33 @@ class UserProfileView:
     recent_highlights: list[HighlightSummary]
 
 
+@dataclass(frozen=True, slots=True)
+class MyActivityCounts:
+    reviews: int
+    highlights: int
+    agendas: int
+    clubs: int
+    reading_books: int
+
+
+@dataclass(frozen=True, slots=True)
+class MyActivitySummary:
+    """Dashboard-preview payload for GET /community/me/activity (BC-80).
+
+    Each list is capped at ``_ACTIVITY_PREVIEW_SIZE`` — the full, paginated
+    list for a category lives behind its own domain's "list mine" endpoint
+    (``GET /me/reviews``, ``GET /me/highlights/recent``,
+    ``GET /clubs/me/agendas``, ``GET /clubs/me``, ``GET /me/library?status=reading``).
+    """
+
+    counts: MyActivityCounts
+    reviews: list[ActivityReviewItem]
+    highlights: list[ActivityHighlightItem]
+    agendas: list[ActivityAgendaItem]
+    clubs: list[ActivityClubItem]
+    reading_books: list[ActivityBookItem]
+
+
 @dataclass(slots=True)
 class CommunityService:
     community_repo: CommunityRepository
@@ -68,6 +108,11 @@ class CommunityService:
     reading_query: ProfileReadingQueryPort
     challenge_query: ProfileChallengeQueryPort
     highlight_query: ProfileHighlightQueryPort
+    activity_reviews: ActivityReviewQueryPort
+    activity_highlights: ActivityHighlightQueryPort
+    activity_agendas: ActivityAgendaQueryPort
+    activity_clubs: ActivityClubQueryPort
+    activity_library: ActivityLibraryQueryPort
 
     async def get_following_feed(
         self,
@@ -158,6 +203,42 @@ class CommunityService:
             grade_stats=grade_stats,
             badges=badges,
             recent_highlights=highlights,
+        )
+
+    async def get_my_activity(self, *, user_id: UUID) -> MyActivitySummary:
+        """내 활동 요약 (BC-80) — 카테고리별 총 개수 + 최신 미리보기.
+
+        Cross-domain reads happen sequentially, not via ``asyncio.gather`` —
+        mirrors the explicit constraint documented in
+        ``reading/service.py`` (concurrent gather on a single shared
+        AsyncSession causes connection drops).
+        """
+        review_total, review_items = await self.activity_reviews.preview(
+            user_id, _ACTIVITY_PREVIEW_SIZE
+        )
+        highlight_total, highlight_items = await self.activity_highlights.preview(
+            user_id, _ACTIVITY_PREVIEW_SIZE
+        )
+        agenda_total, agenda_items = await self.activity_agendas.preview(
+            user_id, _ACTIVITY_PREVIEW_SIZE
+        )
+        club_total, club_items = await self.activity_clubs.preview(user_id, _ACTIVITY_PREVIEW_SIZE)
+        library_total, library_items = await self.activity_library.preview(
+            user_id, _ACTIVITY_PREVIEW_SIZE
+        )
+        return MyActivitySummary(
+            counts=MyActivityCounts(
+                reviews=review_total,
+                highlights=highlight_total,
+                agendas=agenda_total,
+                clubs=club_total,
+                reading_books=library_total,
+            ),
+            reviews=review_items,
+            highlights=highlight_items,
+            agendas=agenda_items,
+            clubs=club_items,
+            reading_books=library_items,
         )
 
     async def _build_page(

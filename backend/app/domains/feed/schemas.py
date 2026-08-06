@@ -206,6 +206,26 @@ class AllHighlightsResponse(BaseModel):
     groups: list[BookHighlightGroupPublic]
 
 
+class MyHighlightItemPublic(BaseModel):
+    """A single row in the caller's own highlight list (BC-80 — GET /me/highlights)."""
+
+    id: UUID
+    book_id: UUID
+    book_title: str | None = None
+    book_cover_url: str | None = None
+    quote_text: str
+    page_number: int | None
+    created_at: datetime
+
+
+class MyHighlightListResponse(BaseModel):
+    """Flat, newest-first page of the caller's own highlights."""
+
+    items: list[MyHighlightItemPublic]
+    total: int
+    has_more: bool
+
+
 _ALLOWED_EMOJIS: frozenset[str] = frozenset({"❤️", "🔥", "👏", "📚", "💪"})
 
 
@@ -309,6 +329,8 @@ __all__ = [
     "HighlightResponse",
     "HighlightVisibility",
     "HighlightVisibilityResponse",
+    "MyHighlightItemPublic",
+    "MyHighlightListResponse",
     "PostPublic",
     "PresignedUploadResponse",
     "ReactionType",

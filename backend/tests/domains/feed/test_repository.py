@@ -21,10 +21,11 @@ import pytest
 from app.domains.auth.models import AuthProvider
 from app.domains.auth.repository import UserRepository
 from app.domains.book.models import BookSource
-from app.domains.book.repository import BookRepository
+from app.domains.book.repository import BookRepository, UserBookRepository
 from app.domains.feed.models import PostType, ReactionType
 from app.domains.feed.repository import (
     CommentRepository,
+    HighlightRepository,
     PostRepository,
     ReactionRepository,
 )
@@ -55,6 +56,12 @@ async def _create_book(session: AsyncSession, *, isbn13: str) -> UUID:
         source=BookSource.NAVER,
     )
     return book.id
+
+
+async def _create_user_book(session: AsyncSession, *, user_id: UUID, book_id: UUID) -> UUID:
+    ub_repo = UserBookRepository(session)
+    ub = await ub_repo.create(user_id=user_id, book_id=book_id)
+    return ub.id
 
 
 @pytest.mark.asyncio
@@ -335,3 +342,65 @@ async def test_post_get_by_id_hides_soft_deleted(session: AsyncSession) -> None:
     assert await posts.get_by_id(post.id) is None
     # A second soft_delete on a missing/already-gone row is a noop.
     await posts.soft_delete(uuid4(), datetime.now(tz=UTC))
+
+
+@pytest.mark.asyncio
+async def test_highlight_list_recent_for_user_newest_first_with_book_info(
+    session: AsyncSession,
+) -> None:
+    """list_recent_for_user (BC-80) — flat, newest-first, joined to the book."""
+    user_id = await _create_user(session, sub="hl-user")
+    other_id = await _create_user(session, sub="hl-other")
+    book_id = await _create_book(session, isbn13="9788937469001")
+    ub_id = await _create_user_book(session, user_id=user_id, book_id=book_id)
+    other_ub_id = await _create_user_book(session, user_id=other_id, book_id=book_id)
+
+    highlights = HighlightRepository(session)
+    older = await highlights.create(
+        user_id=user_id, user_book_id=ub_id, quote_text="첫 문장", page_number=1, note_text=None
+    )
+    older.created_at = datetime.now(tz=UTC) - timedelta(hours=1)
+    await session.flush()
+    newer = await highlights.create(
+        user_id=user_id, user_book_id=ub_id, quote_text="둘째 문장", page_number=2, note_text=None
+    )
+    await highlights.create(
+        user_id=other_id,
+        user_book_id=other_ub_id,
+        quote_text="남의 문장",
+        page_number=None,
+        note_text=None,
+    )
+
+    rows = await highlights.list_recent_for_user(user_id, limit=10, offset=0)
+
+    assert [r.highlight.id for r in rows] == [newer.id, older.id]
+    assert all(r.book_id == book_id for r in rows)
+    assert rows[0].book_title == "book-001"
+    assert await highlights.count_by_user(user_id) == 2
+    assert await highlights.count_by_user(other_id) == 1
+
+
+@pytest.mark.asyncio
+async def test_highlight_list_recent_for_user_pagination(session: AsyncSession) -> None:
+    user_id = await _create_user(session, sub="hl-page-user")
+    book_id = await _create_book(session, isbn13="9788937469002")
+    ub_id = await _create_user_book(session, user_id=user_id, book_id=book_id)
+    highlights = HighlightRepository(session)
+    for i in range(3):
+        h = await highlights.create(
+            user_id=user_id,
+            user_book_id=ub_id,
+            quote_text=f"문장 {i}",
+            page_number=None,
+            note_text=None,
+        )
+        h.created_at = datetime.now(tz=UTC) - timedelta(hours=3 - i)
+        await session.flush()
+
+    page1 = await highlights.list_recent_for_user(user_id, limit=2, offset=0)
+    page2 = await highlights.list_recent_for_user(user_id, limit=2, offset=2)
+
+    assert len(page1) == 2
+    assert len(page2) == 1
+    assert {r.highlight.id for r in page1}.isdisjoint({r.highlight.id for r in page2})

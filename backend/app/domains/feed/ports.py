@@ -240,6 +240,21 @@ class ExploreHighlightItem:
     reaction_count: int
 
 
+@dataclass(frozen=True, slots=True)
+class MyHighlightItem:
+    """A caller's own highlight enriched with book display info (BC-80).
+
+    ``book_id``/``book_title``/``book_cover_url`` come from the
+    ``user_books`` → ``books`` JOIN, mirroring :class:`ExploreHighlightItem`
+    but without the reaction count (not needed for the "내 활동" list).
+    """
+
+    highlight: PostHighlight
+    book_id: UUID
+    book_title: str | None
+    book_cover_url: str | None
+
+
 class FeedEventRepositoryPort(Protocol):
     """Append-only log of per-user activity events, with M47 read extensions."""
 
@@ -334,3 +349,9 @@ class HighlightRepositoryPort(Protocol):
     async def mark_shared(self, highlight_id: UUID, *, shared_at: datetime) -> None: ...
 
     async def list_public(self, *, limit: int, sort: str) -> list[ExploreHighlightItem]: ...
+
+    async def list_recent_for_user(
+        self, user_id: UUID, *, limit: int, offset: int
+    ) -> list[MyHighlightItem]: ...
+
+    async def count_by_user(self, user_id: UUID) -> int: ...

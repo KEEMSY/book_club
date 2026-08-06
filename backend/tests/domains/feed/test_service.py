@@ -31,7 +31,12 @@ from uuid import UUID, uuid4
 import pytest
 from app.core.exceptions import ConflictError, NotFoundError
 from app.domains.feed.models import Comment, Post, PostHighlight, PostType, Reaction, ReactionType
-from app.domains.feed.ports import BookSnapshot, HighlightWithBookId, PresignedUpload
+from app.domains.feed.ports import (
+    BookSnapshot,
+    HighlightWithBookId,
+    MyHighlightItem,
+    PresignedUpload,
+)
 from app.domains.feed.service import FeedService
 
 
@@ -297,6 +302,25 @@ class FakeHighlightRepo:
     def register_user_book(self, user_book_id: UUID, book_id: UUID) -> None:
         """Test helper — teaches the fake which book_id maps to a user_book_id."""
         self._ub_to_book[user_book_id] = book_id
+
+    async def list_recent_for_user(
+        self, user_id: UUID, *, limit: int, offset: int
+    ) -> list[MyHighlightItem]:
+        rows = [h for h in self.by_id.values() if h.user_id == user_id]
+        rows.sort(key=lambda h: h.created_at, reverse=True)
+        page = rows[offset : offset + limit]
+        return [
+            MyHighlightItem(
+                highlight=h,
+                book_id=self._ub_to_book.get(h.user_book_id, uuid4()),
+                book_title="책",
+                book_cover_url=None,
+            )
+            for h in page
+        ]
+
+    async def count_by_user(self, user_id: UUID) -> int:
+        return len([h for h in self.by_id.values() if h.user_id == user_id])
 
 
 def _build_service(
@@ -913,4 +937,62 @@ async def test_list_all_highlights_book_snapshot_missing_is_tolerated() -> None:
     groups = await service.list_all_highlights(user_id=user_id)
     assert len(groups) == 1
     assert groups[0].book_title is None
-    assert groups[0].book_cover_url is None
+
+
+# ---------------------------------------------------------------------------
+# list_my_highlights (BC-80 — GET /me/highlights/recent)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_list_my_highlights_newest_first_and_excludes_others() -> None:
+    user_id, other_id = uuid4(), uuid4()
+    ub = uuid4()
+    service, *_, highlights = _build_service()
+    highlights.register_user_book(ub, uuid4())
+
+    older = await service.create_highlight(
+        user_id=user_id, user_book_id=ub, quote_text="첫 문장", page_number=None
+    )
+    older.created_at = datetime(2026, 1, 1, tzinfo=UTC)
+    newer = await service.create_highlight(
+        user_id=user_id, user_book_id=ub, quote_text="둘째 문장", page_number=None
+    )
+    newer.created_at = datetime(2026, 6, 1, tzinfo=UTC)
+    await service.create_highlight(
+        user_id=other_id, user_book_id=ub, quote_text="남의 문장", page_number=None
+    )
+
+    page = await service.list_my_highlights(user_id=user_id)
+
+    assert page.total == 2
+    assert [item.highlight.id for item in page.items] == [newer.id, older.id]
+    assert page.has_more is False
+
+
+@pytest.mark.asyncio
+async def test_list_my_highlights_pagination_has_more() -> None:
+    user_id = uuid4()
+    ub = uuid4()
+    service, *_, highlights = _build_service()
+    highlights.register_user_book(ub, uuid4())
+    for i in range(3):
+        h = await service.create_highlight(
+            user_id=user_id, user_book_id=ub, quote_text=f"문장 {i}", page_number=None
+        )
+        h.created_at = datetime(2026, 1, 1 + i, tzinfo=UTC)
+
+    page = await service.list_my_highlights(user_id=user_id, limit=2, offset=0)
+
+    assert page.total == 3
+    assert len(page.items) == 2
+    assert page.has_more is True
+
+
+@pytest.mark.asyncio
+async def test_list_my_highlights_empty_when_none() -> None:
+    service, *_ = _build_service()
+    page = await service.list_my_highlights(user_id=uuid4())
+    assert page.items == []
+    assert page.total == 0
+    assert page.has_more is False

@@ -180,3 +180,36 @@ async def test_list_for_user_status_filter_and_pagination(session: AsyncSession)
         user_id, status=UserBookStatus.COMPLETED, cursor=None, limit=10
     )
     assert [ub.id for ub in only_done] == [created[1].id]
+
+
+@pytest.mark.asyncio
+async def test_count_for_user_filters_by_status(session: AsyncSession) -> None:
+    """count_for_user (BC-80) — used by the community "내 활동" summary."""
+    user_id = await _create_user(session, sub="u-count")
+    book_repo = BookRepository(session)
+    ub_repo = UserBookRepository(session)
+
+    b1 = await book_repo.upsert_by_isbn(
+        isbn13="9788937469991",
+        title="book-1",
+        author="a",
+        publisher=None,
+        cover_url=None,
+        description=None,
+        source=BookSource.NAVER,
+    )
+    b2 = await book_repo.upsert_by_isbn(
+        isbn13="9788937469992",
+        title="book-2",
+        author="a",
+        publisher=None,
+        cover_url=None,
+        description=None,
+        source=BookSource.NAVER,
+    )
+    await ub_repo.create(user_id=user_id, book_id=b1.id, status=UserBookStatus.READING)
+    await ub_repo.create(user_id=user_id, book_id=b2.id, status=UserBookStatus.COMPLETED)
+
+    assert await ub_repo.count_for_user(user_id, status=UserBookStatus.READING) == 1
+    assert await ub_repo.count_for_user(user_id, status=None) == 2
+    assert await ub_repo.count_for_user(uuid4(), status=None) == 0

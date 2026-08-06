@@ -7,6 +7,15 @@ Endpoints:
   GET /community/explore                 — discover feed (sort=latest|popular)
   GET /community/users/{id}/profile      — full user profile with follow counts
   GET /community/users/{id}/posts        — posts authored by a user (cursor-paged)
+  GET /community/me/activity             — "내 활동" summary (BC-80): counts +
+                                            a short preview per category. Each
+                                            category's full paginated list lives
+                                            behind its own domain endpoint:
+                                              - GET /me/reviews (review)
+                                              - GET /me/highlights/recent (feed)
+                                              - GET /clubs/me/agendas (club)
+                                              - GET /clubs/me (club)
+                                              - GET /me/library?status=reading (book)
 """
 
 from __future__ import annotations
@@ -19,9 +28,16 @@ from fastapi import APIRouter, Depends, Query
 from app.core.deps import get_current_user_id
 from app.domains.community.providers import get_community_service
 from app.domains.community.schemas import (
+    ActivityAgendaItemPublic,
+    ActivityBookItemPublic,
+    ActivityClubItemPublic,
+    ActivityCountsPublic,
+    ActivityHighlightItemPublic,
+    ActivityReviewItemPublic,
     BadgeSummaryPublic,
     GradeStatsPublic,
     HighlightSummaryPublic,
+    MyActivityResponse,
     UserProfileResponse,
 )
 from app.domains.community.service import CommunityService
@@ -187,5 +203,78 @@ async def get_user_profile(
                 created_at=h.created_at,
             )
             for h in profile.recent_highlights
+        ],
+    )
+
+
+@router.get("/me/activity", response_model=MyActivityResponse)
+async def get_my_activity(
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[CommunityService, Depends(get_community_service)],
+) -> MyActivityResponse:
+    """내 활동 요약 (BC-80) — 카테고리별 총 개수 + 최신 5개 미리보기.
+
+    각 카테고리의 전체 페이지네이션 목록은 해당 도메인의 전용 엔드포인트를
+    쓴다 (모듈 docstring 참고).
+    """
+    summary = await service.get_my_activity(user_id=UUID(user_id))
+    return MyActivityResponse(
+        counts=ActivityCountsPublic(
+            reviews=summary.counts.reviews,
+            highlights=summary.counts.highlights,
+            agendas=summary.counts.agendas,
+            clubs=summary.counts.clubs,
+            reading_books=summary.counts.reading_books,
+        ),
+        reviews=[
+            ActivityReviewItemPublic(
+                id=r.id,
+                book_id=r.book_id,
+                book_title=r.book_title,
+                book_cover_url=r.book_cover_url,
+                rating=r.rating,
+                body=r.body,
+                created_at=r.created_at,
+            )
+            for r in summary.reviews
+        ],
+        highlights=[
+            ActivityHighlightItemPublic(
+                id=h.id,
+                book_id=h.book_id,
+                book_title=h.book_title,
+                book_cover_url=h.book_cover_url,
+                quote_text=h.quote_text,
+                created_at=h.created_at,
+            )
+            for h in summary.highlights
+        ],
+        agendas=[
+            ActivityAgendaItemPublic(
+                id=a.id,
+                club_id=a.club_id,
+                club_name=a.club_name,
+                session_id=a.session_id,
+                session_title=a.session_title,
+                status=a.status,
+                published_at=a.published_at,
+                created_at=a.created_at,
+            )
+            for a in summary.agendas
+        ],
+        clubs=[
+            ActivityClubItemPublic(id=c.id, name=c.name, created_at=c.created_at)
+            for c in summary.clubs
+        ],
+        reading_books=[
+            ActivityBookItemPublic(
+                user_book_id=b.user_book_id,
+                book_id=b.book_id,
+                title=b.title,
+                cover_url=b.cover_url,
+                current_chapter=b.current_chapter,
+                started_at=b.started_at,
+            )
+            for b in summary.reading_books
         ],
     )

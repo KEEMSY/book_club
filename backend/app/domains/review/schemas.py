@@ -71,3 +71,23 @@ class BookReviewSummary(BaseModel):
     # Keyed by the rating value as a string ("1.0".."5.0") → number of reviews.
     distribution: dict[str, int]
     reviews: list[ReviewResponse]
+
+
+class MyReviewItem(BaseModel):
+    """A single row in the caller's own review list (BC-80 — GET /me/reviews)."""
+
+    id: UUID
+    book_id: UUID
+    book_title: str | None = None
+    book_cover_url: str | None = None
+    rating: float
+    body: str | None
+    created_at: datetime
+
+
+class MyReviewListResponse(BaseModel):
+    """Page of the caller's own reviews, newest first."""
+
+    items: list[MyReviewItem]
+    total: int
+    has_more: bool

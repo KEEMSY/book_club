@@ -43,3 +43,72 @@ class UserProfileResponse(BaseModel):
     grade_stats: GradeStatsPublic | None = None
     badges: list[BadgeSummaryPublic] = Field(default_factory=list)
     recent_highlights: list[HighlightSummaryPublic] = Field(default_factory=list)
+
+
+# --- BC-80: "내 활동" (my activity) summary ---
+
+
+class ActivityCountsPublic(BaseModel):
+    reviews: int
+    highlights: int
+    agendas: int
+    clubs: int
+    reading_books: int
+
+
+class ActivityReviewItemPublic(BaseModel):
+    id: UUID
+    book_id: UUID
+    book_title: str | None = None
+    book_cover_url: str | None = None
+    rating: float
+    body: str | None = None
+    created_at: datetime
+
+
+class ActivityHighlightItemPublic(BaseModel):
+    id: UUID
+    book_id: UUID
+    book_title: str | None = None
+    book_cover_url: str | None = None
+    quote_text: str
+    created_at: datetime
+
+
+class ActivityAgendaItemPublic(BaseModel):
+    id: UUID
+    club_id: UUID
+    club_name: str
+    session_id: UUID
+    session_title: str
+    status: str
+    published_at: datetime | None = None
+    created_at: datetime
+
+
+class ActivityClubItemPublic(BaseModel):
+    id: UUID
+    name: str
+    created_at: datetime
+
+
+class ActivityBookItemPublic(BaseModel):
+    user_book_id: UUID
+    book_id: UUID
+    title: str
+    cover_url: str | None = None
+    current_chapter: int
+    started_at: datetime | None = None
+
+
+class MyActivityResponse(BaseModel):
+    """GET /community/me/activity — counts plus a short newest-first preview
+    per category. Each category's full, paginated list lives behind its own
+    domain endpoint (see the module docstring in ``community/router.py``)."""
+
+    counts: ActivityCountsPublic
+    reviews: list[ActivityReviewItemPublic] = Field(default_factory=list)
+    highlights: list[ActivityHighlightItemPublic] = Field(default_factory=list)
+    agendas: list[ActivityAgendaItemPublic] = Field(default_factory=list)
+    clubs: list[ActivityClubItemPublic] = Field(default_factory=list)
+    reading_books: list[ActivityBookItemPublic] = Field(default_factory=list)

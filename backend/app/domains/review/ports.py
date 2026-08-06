@@ -35,6 +35,19 @@ class ReviewAggregate:
     distribution: dict[str, int] = field(default_factory=dict)
 
 
+@dataclass
+class MyReviewRow:
+    """A caller's own review plus the reviewed book's display info (BC-80).
+
+    Kept distinct from :class:`ReviewRow` (which carries *author* info for a
+    book's review list) — here the book varies per row instead of the author.
+    """
+
+    review: BookReview
+    book_title: str | None
+    book_cover_url: str | None
+
+
 class ReviewRepositoryPort(Protocol):
     """Persistence boundary for :class:`BookReview`."""
 
@@ -58,6 +71,12 @@ class ReviewRepositoryPort(Protocol):
 
     async def get_book_summary(self, book_id: UUID) -> ReviewAggregate: ...
 
+    async def list_by_user(
+        self, user_id: UUID, *, limit: int, offset: int
+    ) -> list[MyReviewRow]: ...
+
+    async def count_by_user(self, user_id: UUID) -> int: ...
+
 
 class UserBookQueryPort(Protocol):
     """Read-only view into the book domain — review gating depends only on
@@ -79,6 +98,7 @@ class ReviewFeedEventPort(Protocol):
 
 
 __all__ = [
+    "MyReviewRow",
     "ReviewAggregate",
     "ReviewFeedEventPort",
     "ReviewRepositoryPort",

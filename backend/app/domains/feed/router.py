@@ -57,6 +57,8 @@ from app.domains.feed.schemas import (
     HighlightResponse,
     HighlightVisibility,
     HighlightVisibilityResponse,
+    MyHighlightItemPublic,
+    MyHighlightListResponse,
     PostPublic,
     PresignedUploadResponse,
     RequestUploadRequest,
@@ -501,6 +503,36 @@ async def list_all_my_highlights(
             )
             for g in groups
         ]
+    )
+
+
+@router.get("/me/highlights/recent", response_model=MyHighlightListResponse)
+async def list_my_recent_highlights(
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[FeedService, Depends(get_feed_service)],
+    limit: Annotated[int, Query(ge=1, le=50)] = 20,
+    offset: Annotated[int, Query(ge=0)] = 0,
+) -> MyHighlightListResponse:
+    """내 활동 > 내 하이라이트 (BC-80) — flat, newest-first, paginated.
+
+    Distinct from ``GET /me/highlights`` (grouped by book, unpaginated).
+    """
+    page = await service.list_my_highlights(user_id=UUID(user_id), limit=limit, offset=offset)
+    return MyHighlightListResponse(
+        items=[
+            MyHighlightItemPublic(
+                id=item.highlight.id,
+                book_id=item.book_id,
+                book_title=item.book_title,
+                book_cover_url=item.book_cover_url,
+                quote_text=item.highlight.quote_text,
+                page_number=item.highlight.page_number,
+                created_at=item.highlight.created_at,
+            )
+            for item in page.items
+        ],
+        total=page.total,
+        has_more=page.has_more,
     )
 
 

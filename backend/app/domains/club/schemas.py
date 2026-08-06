@@ -269,6 +269,28 @@ class SessionAgendaListResponse(BaseModel):
     items: list[SessionAgendaPublic]
 
 
+class MyAgendaItem(BaseModel):
+    """A single row in the caller's own agenda list (BC-80 — GET /clubs/me/agendas)."""
+
+    id: UUID
+    club_id: UUID
+    club_name: str
+    session_id: UUID
+    session_title: str
+    body: str
+    status: str
+    published_at: datetime | None
+    created_at: datetime
+
+
+class MyAgendaListResponse(BaseModel):
+    """Page of the caller's own agendas (as author), newest first."""
+
+    items: list[MyAgendaItem]
+    total: int
+    has_more: bool
+
+
 class AgendaTopicCreate(BaseModel):
     prompt: str = Field(min_length=1, max_length=2000)
 
