@@ -1,4 +1,7 @@
 import 'package:book_club/core/theme/app_theme.dart';
+import 'package:book_club/features/auth/application/auth_notifier.dart';
+import 'package:book_club/features/auth/domain/auth_state.dart';
+import 'package:book_club/features/auth/domain/auth_user.dart';
 import 'package:book_club/features/club/application/session_providers.dart';
 import 'package:book_club/features/club/data/club_session_repository.dart';
 import 'package:book_club/features/club/domain/club_session.dart';
@@ -8,9 +11,32 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+/// Authenticated as [fakeCurrentUserId] ('user-host') so the real BC-60
+/// permission gates (`canAuthorAgendaProvider`, `canModerateCommentProvider`)
+/// resolve against a concrete current user instead of a null (logged-out)
+/// state.
+class _StubAuth extends AuthNotifier {
+  _StubAuth(this._user);
+
+  final AuthUser _user;
+
+  @override
+  AuthState build() => AuthState.authenticated(_user);
+
+  @override
+  Future<void> bootstrap() async {}
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   GoogleFonts.config.allowRuntimeFetching = false;
+
+  final hostUser = AuthUser(
+    id: fakeCurrentUserId,
+    nickname: '유진',
+    provider: AuthProvider.kakao,
+    createdAt: DateTime(2026, 1, 1),
+  );
 
   // Matches FakeClubSessionRepository's seeded "open" session, which carries
   // a published agenda with three topics (the first has two replies).
@@ -44,6 +70,11 @@ void main() {
         clubSessionRepositoryProvider.overrideWithValue(
           FakeClubSessionRepository(),
         ),
+        authNotifierProvider.overrideWith(() => _StubAuth(hostUser)),
+        // Membership gate for the reply composer (BC-51): the fake current
+        // user is treated as a member of the seeded club so threads are
+        // writable without wiring the real myClubs endpoint into the test.
+        canReplyToTopicProvider.overrideWith((ref, clubId) => true),
       ],
       child: MaterialApp(
         theme: AppTheme.light,

@@ -36,6 +36,7 @@ class _AgendaEditorScreenState extends ConsumerState<AgendaEditorScreen> {
   bool _bodyInitialized = false;
   bool _isSavingDraft = false;
   bool _isPublishing = false;
+  bool _isFetchingRecommendations = false;
 
   @override
   void dispose() {
@@ -54,7 +55,8 @@ class _AgendaEditorScreenState extends ConsumerState<AgendaEditorScreen> {
       return _AccessDeniedScaffold(spacing: spacing, theme: theme);
     }
 
-    final agendaAsync = ref.watch(agendaForEditProvider(session.id));
+    final agendaKey = (clubId: session.clubId, sessionId: session.id);
+    final agendaAsync = ref.watch(agendaForEditProvider(agendaKey));
 
     return Scaffold(
       appBar: AppBar(title: const Text('발제문 작성')),
@@ -71,7 +73,7 @@ class _AgendaEditorScreenState extends ConsumerState<AgendaEditorScreen> {
                 SizedBox(height: spacing.md),
                 FilledButton.tonal(
                   onPressed: () =>
-                      ref.invalidate(agendaForEditProvider(session.id)),
+                      ref.invalidate(agendaForEditProvider(agendaKey)),
                   child: const Text('다시 시도'),
                 ),
               ],
@@ -89,22 +91,26 @@ class _AgendaEditorScreenState extends ConsumerState<AgendaEditorScreen> {
             bodyController: _bodyController,
             isSavingDraft: _isSavingDraft,
             isPublishing: _isPublishing,
-            onSaveDraft: _saveDraft,
-            onPublish: _publish,
+            isFetchingRecommendations: _isFetchingRecommendations,
+            onSaveDraft: () => _saveDraft(agenda),
+            onPublish: () => _publish(agenda),
             onAddTopic: () => _addTopic(agenda),
             onRemoveTopic: (topicId) => _removeTopic(agenda, topicId),
             onReorderTopics: (orderedIds) => _reorderTopics(agenda, orderedIds),
+            onAiRecommend: () => _showAiRecommendations(agenda),
           );
         },
       ),
     );
   }
 
-  Future<void> _saveDraft() async {
+  Future<void> _saveDraft(SessionAgenda agenda) async {
     setState(() => _isSavingDraft = true);
     try {
       await ref.read(clubSessionRepositoryProvider).saveAgendaDraft(
+            clubId: widget.session.clubId,
             sessionId: widget.session.id,
+            agendaId: agenda.id,
             body: _bodyController.text.trim(),
           );
       _refresh();
@@ -119,17 +125,23 @@ class _AgendaEditorScreenState extends ConsumerState<AgendaEditorScreen> {
     }
   }
 
-  Future<void> _publish() async {
+  Future<void> _publish(SessionAgenda agenda) async {
     setState(() => _isPublishing = true);
     try {
       final repo = ref.read(clubSessionRepositoryProvider);
       // Publish always carries whatever body is currently on screen, even if
       // the author never explicitly tapped "임시저장" first.
       await repo.saveAgendaDraft(
+        clubId: widget.session.clubId,
         sessionId: widget.session.id,
+        agendaId: agenda.id,
         body: _bodyController.text.trim(),
       );
-      await repo.publishAgenda(widget.session.id);
+      await repo.publishAgenda(
+        clubId: widget.session.clubId,
+        sessionId: widget.session.id,
+        agendaId: agenda.id,
+      );
       _refresh();
       if (mounted) {
         ScaffoldMessenger.of(context)
@@ -143,14 +155,16 @@ class _AgendaEditorScreenState extends ConsumerState<AgendaEditorScreen> {
     }
   }
 
-  Future<void> _addTopic(SessionAgenda agenda) async {
+  Future<void> _addTopic(SessionAgenda agenda, {String? initialPrompt}) async {
     final prompt = await showDialog<String>(
       context: context,
-      builder: (_) => const _TopicPromptDialog(),
+      builder: (_) => _TopicPromptDialog(initialText: initialPrompt),
     );
     if (prompt == null || !mounted) return;
     try {
       await ref.read(clubSessionRepositoryProvider).addAgendaTopic(
+            clubId: widget.session.clubId,
+            sessionId: widget.session.id,
             agendaId: agenda.id,
             prompt: prompt,
           );
@@ -163,6 +177,8 @@ class _AgendaEditorScreenState extends ConsumerState<AgendaEditorScreen> {
   Future<void> _removeTopic(SessionAgenda agenda, String topicId) async {
     try {
       await ref.read(clubSessionRepositoryProvider).removeAgendaTopic(
+            clubId: widget.session.clubId,
+            sessionId: widget.session.id,
             agendaId: agenda.id,
             topicId: topicId,
           );
@@ -178,6 +194,8 @@ class _AgendaEditorScreenState extends ConsumerState<AgendaEditorScreen> {
   ) async {
     try {
       await ref.read(clubSessionRepositoryProvider).reorderAgendaTopics(
+            clubId: widget.session.clubId,
+            sessionId: widget.session.id,
             agendaId: agenda.id,
             orderedTopicIds: orderedTopicIds,
           );
@@ -187,11 +205,46 @@ class _AgendaEditorScreenState extends ConsumerState<AgendaEditorScreen> {
     }
   }
 
+  /// AI 논제 초안 추천 (BC-53/60) — fetches 3~5 candidates from the book +
+  /// session scope, lets the author pick one, and prefills it into the same
+  /// "논제 추가" dialog [_addTopic] already uses. The recommendation itself
+  /// is never persisted — only the confirmed add via [_addTopic] is.
+  Future<void> _showAiRecommendations(SessionAgenda agenda) async {
+    setState(() => _isFetchingRecommendations = true);
+    List<String> candidates;
+    try {
+      candidates =
+          await ref.read(clubSessionRepositoryProvider).recommendTopicDrafts(
+                clubId: widget.session.clubId,
+                sessionId: widget.session.id,
+                agendaId: agenda.id,
+                bookId: widget.session.bookId,
+                scope: widget.session.scope?.trim().isNotEmpty == true
+                    ? widget.session.scope!
+                    : widget.session.title,
+              );
+    } catch (_) {
+      if (mounted) _showError('AI 논제 추천을 불러오지 못했어요. 다시 시도해 주세요.');
+      if (mounted) setState(() => _isFetchingRecommendations = false);
+      return;
+    }
+    if (!mounted) return;
+    setState(() => _isFetchingRecommendations = false);
+    final selected = await showModalBottomSheet<String>(
+      context: context,
+      builder: (_) => _AiTopicSuggestionSheet(candidates: candidates),
+    );
+    if (selected == null || !mounted) return;
+    await _addTopic(agenda, initialPrompt: selected);
+  }
+
   void _refresh() {
-    ref.invalidate(agendaForEditProvider(widget.session.id));
+    final agendaKey =
+        (clubId: widget.session.clubId, sessionId: widget.session.id);
+    ref.invalidate(agendaForEditProvider(agendaKey));
     // Keeps the read-only detail screen (BC-49) in sync for when the author
     // navigates back to it.
-    ref.invalidate(sessionAgendaProvider(widget.session.id));
+    ref.invalidate(sessionAgendaProvider(agendaKey));
   }
 
   void _showError(String message) {
@@ -243,11 +296,13 @@ class _EditorBody extends StatelessWidget {
     required this.bodyController,
     required this.isSavingDraft,
     required this.isPublishing,
+    required this.isFetchingRecommendations,
     required this.onSaveDraft,
     required this.onPublish,
     required this.onAddTopic,
     required this.onRemoveTopic,
     required this.onReorderTopics,
+    required this.onAiRecommend,
   });
 
   final ClubSession session;
@@ -255,11 +310,13 @@ class _EditorBody extends StatelessWidget {
   final TextEditingController bodyController;
   final bool isSavingDraft;
   final bool isPublishing;
+  final bool isFetchingRecommendations;
   final VoidCallback onSaveDraft;
   final VoidCallback onPublish;
   final VoidCallback onAddTopic;
   final void Function(String topicId) onRemoveTopic;
   final void Function(List<String> orderedTopicIds) onReorderTopics;
+  final VoidCallback onAiRecommend;
 
   @override
   Widget build(BuildContext context) {
@@ -300,6 +357,17 @@ class _EditorBody extends StatelessWidget {
                         ?.copyWith(fontWeight: FontWeight.w700),
                   ),
                   const Spacer(),
+                  TextButton.icon(
+                    onPressed: isFetchingRecommendations ? null : onAiRecommend,
+                    icon: isFetchingRecommendations
+                        ? const SizedBox(
+                            width: 14,
+                            height: 14,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.auto_awesome_rounded),
+                    label: const Text('AI 추천'),
+                  ),
                   TextButton.icon(
                     onPressed: onAddTopic,
                     icon: const Icon(Icons.add_rounded),
@@ -432,16 +500,21 @@ class _TopicEditorTile extends StatelessWidget {
 }
 
 /// Modal prompt input for "논제 추가" — pops the trimmed, non-empty prompt
-/// string, or `null` on cancel.
+/// string, or `null` on cancel. [initialText], when given (an AI
+/// recommendation the author picked — BC-53/60), prefills the field so the
+/// author can still edit it before confirming; the recommendation itself is
+/// never saved on its own.
 class _TopicPromptDialog extends StatefulWidget {
-  const _TopicPromptDialog();
+  const _TopicPromptDialog({this.initialText});
+
+  final String? initialText;
 
   @override
   State<_TopicPromptDialog> createState() => _TopicPromptDialogState();
 }
 
 class _TopicPromptDialogState extends State<_TopicPromptDialog> {
-  final _controller = TextEditingController();
+  late final _controller = TextEditingController(text: widget.initialText);
 
   @override
   void dispose() {
@@ -478,5 +551,68 @@ class _TopicPromptDialogState extends State<_TopicPromptDialog> {
     final prompt = _controller.text.trim();
     if (prompt.isEmpty) return;
     Navigator.of(context).pop(prompt);
+  }
+}
+
+/// Bottom sheet listing AI-drafted topic candidates (BC-53/60) — tapping one
+/// pops it back to [_AgendaEditorScreenState._showAiRecommendations], which
+/// hands it to [_TopicPromptDialog] as a prefill, never saving it directly.
+class _AiTopicSuggestionSheet extends StatelessWidget {
+  const _AiTopicSuggestionSheet({required this.candidates});
+
+  final List<String> candidates;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.all(spacing.md),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'AI 논제 추천',
+              style: theme.textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.w700),
+            ),
+            SizedBox(height: spacing.xs),
+            Text(
+              '마음에 드는 문구를 고르면 논제 입력창에 채워져요. 그대로, 혹은 수정해서 추가할 수 있어요.',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
+            ),
+            SizedBox(height: spacing.sm),
+            if (candidates.isEmpty)
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: spacing.md),
+                child: Text(
+                  '추천할 논제를 찾지 못했어요. 다시 시도해 주세요.',
+                  style: theme.textTheme.bodyMedium,
+                ),
+              )
+            else
+              Flexible(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: candidates.length,
+                  itemBuilder: (context, index) {
+                    final candidate = candidates[index];
+                    return ListTile(
+                      leading: const Icon(Icons.auto_awesome_rounded),
+                      title: Text(candidate),
+                      onTap: () => Navigator.of(context).pop(candidate),
+                    );
+                  },
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
   }
 }

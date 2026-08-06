@@ -1,4 +1,7 @@
 import 'package:book_club/core/theme/app_theme.dart';
+import 'package:book_club/features/auth/application/auth_notifier.dart';
+import 'package:book_club/features/auth/domain/auth_state.dart';
+import 'package:book_club/features/auth/domain/auth_user.dart';
 import 'package:book_club/features/club/application/session_providers.dart';
 import 'package:book_club/features/club/data/club_session_repository.dart';
 import 'package:book_club/features/club/domain/club_session.dart';
@@ -8,9 +11,31 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+/// Authenticated as [fakeCurrentUserId] ('user-host') so the real BC-60
+/// permission gate (`canAuthorAgendaProvider` → auth's current user) treats
+/// the fake-seeded presenter as authorable.
+class _StubAuth extends AuthNotifier {
+  _StubAuth(this._user);
+
+  final AuthUser _user;
+
+  @override
+  AuthState build() => AuthState.authenticated(_user);
+
+  @override
+  Future<void> bootstrap() async {}
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   GoogleFonts.config.allowRuntimeFetching = false;
+
+  final hostUser = AuthUser(
+    id: fakeCurrentUserId,
+    nickname: '유진',
+    provider: AuthProvider.kakao,
+    createdAt: DateTime(2026, 1, 1),
+  );
 
   // Matches FakeClubSessionRepository's seeded "open" session/agenda —
   // three topics (topic-1..3), presented by fakeCurrentUserId.
@@ -57,6 +82,7 @@ void main() {
       overrides: <Override>[
         clubSessionRepositoryProvider
             .overrideWithValue(repository ?? FakeClubSessionRepository()),
+        authNotifierProvider.overrideWith(() => _StubAuth(hostUser)),
       ],
       child: MaterialApp(
         theme: AppTheme.light,
@@ -109,7 +135,10 @@ void main() {
     await tester.pumpWidget(buildApp(openSession, repository: repo));
     await tester.pumpAndSettle();
 
-    final originalAgenda = await repo.getAgenda(openSession.id);
+    final originalAgenda = await repo.getAgenda(
+      clubId: openSession.clubId,
+      sessionId: openSession.id,
+    );
     final originalOrder = originalAgenda!.topics.map((t) => t.id).toList();
 
     await tester.drag(
@@ -118,7 +147,10 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    final updatedAgenda = await repo.getAgenda(openSession.id);
+    final updatedAgenda = await repo.getAgenda(
+      clubId: openSession.clubId,
+      sessionId: openSession.id,
+    );
     final updatedOrder = updatedAgenda!.topics.map((t) => t.id).toList();
 
     expect(updatedOrder, isNot(orderedEquals(originalOrder)));

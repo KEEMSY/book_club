@@ -21,6 +21,7 @@ void main() {
       child: MaterialApp(
         theme: AppTheme.light,
         home: SessionLoader(
+          clubId: 'club-1',
           sessionId: sessionId,
           builder: (session) =>
               Scaffold(body: Text('loaded: ${session.id} (${session.title})')),

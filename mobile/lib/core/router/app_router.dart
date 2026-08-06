@@ -501,6 +501,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/clubs/:clubId/sessions/:sessionId',
         parentNavigatorKey: _rootKey,
         builder: (context, state) {
+          final String clubId = state.pathParameters['clubId']!;
           final String sessionId = state.pathParameters['sessionId']!;
           final ClubSession? session = state.extra as ClubSession?;
           final String? focusTopicId = state.uri.queryParameters['topic_id'];
@@ -510,6 +511,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                   focusTopicId: focusTopicId,
                 )
               : SessionLoader(
+                  clubId: clubId,
                   sessionId: sessionId,
                   builder: (loaded) => SessionDetailScreen(
                     session: loaded,
