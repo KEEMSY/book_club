@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../config/dev_login_gate.dart';
 import '../config/feature_flags.dart';
 import '../../features/auth/application/auth_notifier.dart';
 import '../../features/auth/domain/auth_state.dart';
+import '../../features/auth/presentation/dev_login_screen.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../../features/book/presentation/book_detail_screen.dart';
 import '../../features/book/presentation/library_screen.dart';
@@ -68,6 +70,11 @@ class AppRoutes {
 
   // Entry / auth.
   static const login = '/login';
+
+  // BC-86 — hidden dev/tester login shortcuts (staging/dev builds only, see
+  // [DevLoginGate]). Not linked from any UI; reachable only by direct
+  // navigation to this path.
+  static const devLogin = '/dev-login';
 
   // M3 destinations.
   static const home = '/home';
@@ -244,9 +251,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final bool authenticated = auth is Authenticated;
       final bool onLogin = canonical == AppRoutes.login;
       final bool onOnboarding = canonical == AppRoutes.onboarding;
+      final bool onDevLogin = canonical == AppRoutes.devLogin;
 
-      // Authenticated users never need the onboarding/login screens.
-      if (authenticated && (onLogin || onOnboarding)) {
+      // Authenticated users never need the onboarding/login/dev-login screens.
+      if (authenticated && (onLogin || onOnboarding || onDevLogin)) {
         return AppRoutes.home;
       }
 
@@ -267,8 +275,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         }
       }
 
-      // Unauthenticated: decide between onboarding and login.
-      if (!authenticated && !onLogin && !onOnboarding) {
+      // Unauthenticated: decide between onboarding and login. The hidden
+      // dev-login route (BC-86) is treated like login/onboarding here — its
+      // own redirect below is the actual gate enforcement point, so a
+      // disabled [DevLoginGate] still falls through this branch onto login
+      // rather than ever rendering [DevLoginScreen].
+      if (!authenticated && !onLogin && !onOnboarding && !onDevLogin) {
         // Check the onboarding-complete flag synchronously from the cache.
         // The provider is pre-warmed in main.dart so the value is available.
         final bool onboardingDone =
@@ -288,6 +300,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.login,
         builder: (context, state) => const LoginScreen(),
+      ),
+      // BC-86 — hidden dev/tester login shortcuts, moved off the main login
+      // screen so a production build never surfaces a backend-login bypass
+      // next to the real Kakao/Apple CTAs. Reachable only by direct
+      // navigation (no UI links here); [DevLoginGate.isEnabled] is true
+      // automatically in debug builds and otherwise requires an explicit
+      // `--dart-define=SHOW_DEV_LOGIN=true` (e.g. a staging/QA release
+      // build) — a plain production release build redirects straight to
+      // `/login`, matching the top-level redirect's authenticated bounce-home
+      // above (same double-gate pattern as AppRoutes.paywall below).
+      GoRoute(
+        path: AppRoutes.devLogin,
+        redirect: (context, state) =>
+            DevLoginGate.isEnabled() ? null : AppRoutes.login,
+        builder: (context, state) => const DevLoginScreen(),
       ),
       // Book detail is pushed on top of whichever shell branch the user is on
       // (home vs search vs library), so it lives on the root navigator.

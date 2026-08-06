@@ -1,4 +1,5 @@
 import 'package:book_club/app.dart';
+import 'package:book_club/core/router/app_router.dart';
 import 'package:book_club/core/storage/secure_storage.dart';
 import 'package:book_club/features/auth/application/auth_notifier.dart';
 import 'package:book_club/features/auth/application/auth_providers.dart';
@@ -29,6 +30,12 @@ import 'fakes.dart';
 /// back to the authenticated landing; the library remains reachable through
 /// the bottom-nav.
 ///
+/// BC-86: the dev/tester login shortcuts moved off `/login` onto the hidden
+/// `/dev-login` route, so this flow now navigates there explicitly before
+/// tapping [DevLoginButton] — see `dev_login_screen_test.dart` for the
+/// route's own widget coverage and `dev_login_gate_test.dart` for the
+/// dev/staging-only exposure gate.
+///
 /// TODO(phase-1-prerelease): swap DevLoginButton back to KakaoLoginButton once
 /// real social login is restored.
 void main() {
@@ -39,7 +46,7 @@ void main() {
   // AnimationController whose pending timer keeps the widget-test frame
   // scheduler busy, so this full-navigation e2e hangs (not a product bug —
   // the app runs fine). The happy path it exercises is already covered by
-  // auth_notifier_test (login/logout), login_screen_test (dev-login tap →
+  // auth_notifier_test (login/logout), dev_login_screen_test (dev-login tap →
   // loginDev), dashboard_screen_test, and library_screen_test. Re-enable once
   // the badge animation exposes a test-friendly reduce-motion/dispose hook.
   testWidgets('dev-login → /home → /library → logout → /login', skip: true,
@@ -99,6 +106,16 @@ void main() {
     await tester.pumpAndSettle(const Duration(seconds: 1));
 
     // Router gate resolves Unauthenticated → redirects to /login.
+    expect(find.text('골방'), findsOneWidget);
+
+    // BC-86: the dev-login shortcuts no longer live on /login — navigate to
+    // the hidden route explicitly (DevLoginGate.isEnabled() is true here
+    // since flutter test always runs in a debug-like binary).
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(MaterialApp).first),
+    );
+    container.read(appRouterProvider).go(AppRoutes.devLogin);
+    await tester.pumpAndSettle();
     expect(find.byType(DevLoginButton), findsNWidgets(2));
 
     await tester.tap(find.byType(DevLoginButton).first);
@@ -123,17 +140,16 @@ void main() {
     // Trigger logout. The logout affordance relocated to the profile screen
     // (a deferred community surface not on the bottom nav), so drive it through
     // the notifier — the meaningful assertion is that the router reacts to a
-    // logout by redirecting back to /login.
-    final container = ProviderScope.containerOf(
-      tester.element(find.byType(MaterialApp).first),
-    );
+    // logout by redirecting back to /login. Reuse the container from above
+    // rather than re-fetching it (that would shadow the earlier `container`).
     await container.read(authNotifierProvider.notifier).logout();
     // Bounded pumps rather than pumpAndSettle: the login screen's entrance
     // animation can otherwise keep the frame scheduler busy indefinitely.
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));
 
-    // Back to /login.
-    expect(find.byType(DevLoginButton), findsNWidgets(2));
+    // Back to /login — BC-86 moved the dev CTAs off this screen, so assert
+    // on the hero copy instead of DevLoginButton.
+    expect(find.text('골방'), findsOneWidget);
   });
 }
