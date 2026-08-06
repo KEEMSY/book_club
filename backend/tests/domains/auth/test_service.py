@@ -14,7 +14,7 @@ from uuid import UUID, uuid4
 import pytest
 from app.core.exceptions import AuthError, NotFoundError
 from app.core.security import create_access_token, create_refresh_token
-from app.domains.auth.models import AuthProvider, DevicePlatform, DeviceToken, User
+from app.domains.auth.models import AuthProvider, DevicePlatform, DeviceToken, ProfileTheme, User
 from app.domains.auth.ports import AppleUserProfile, KakaoUserProfile
 from app.domains.auth.service import AuthService
 
@@ -74,6 +74,32 @@ class FakeUserRepo:
         if user is not None:
             user.deleted_at = at
 
+    async def update_profile(
+        self,
+        user_id: UUID,
+        nickname: str | None,
+        bio: str | None,
+        *,
+        cover_image_url: str | None = None,
+        theme: ProfileTheme | None = None,
+        featured_book_id: UUID | None = None,
+        featured_quote: str | None = None,
+    ) -> User:
+        user = self.users[user_id]
+        if nickname is not None:
+            user.nickname = nickname
+        if bio is not None:
+            user.bio = bio
+        if cover_image_url is not None:
+            user.cover_image_url = cover_image_url
+        if theme is not None:
+            user.theme = theme
+        if featured_book_id is not None:
+            user.featured_book_id = featured_book_id
+        if featured_quote is not None:
+            user.featured_quote = featured_quote
+        return user
+
 
 class FakeDeviceTokenRepo:
     def __init__(self) -> None:
@@ -122,10 +148,21 @@ class StubApple:
         return self.profile
 
 
+class FakeBookLookup:
+    """Fake ``FeaturedBookLookupPort`` — an in-memory set of known book ids."""
+
+    def __init__(self, known_book_ids: set[UUID] | None = None) -> None:
+        self.known_book_ids = known_book_ids or set()
+
+    async def exists(self, book_id: UUID) -> bool:
+        return book_id in self.known_book_ids
+
+
 def _build_service(
     *,
     kakao_profile: KakaoUserProfile | None = None,
     apple_profile: AppleUserProfile | None = None,
+    known_book_ids: set[UUID] | None = None,
 ) -> tuple[AuthService, FakeUserRepo, FakeDeviceTokenRepo]:
     users = FakeUserRepo()
     tokens = FakeDeviceTokenRepo()
@@ -141,6 +178,7 @@ def _build_service(
         device_tokens=tokens,
         kakao=kakao,
         apple=apple,
+        featured_books=FakeBookLookup(known_book_ids),
     )
     return service, users, tokens
 
@@ -304,3 +342,83 @@ async def test_access_token_created_by_security_module_has_type_claim() -> None:
 
     payload = decode_token(tok)
     assert payload["type"] == "access"
+
+
+# --- BC-81: profile expressiveness (cover, theme, featured book/quote) ---
+
+
+@pytest.mark.asyncio
+async def test_update_profile_sets_new_expressiveness_fields() -> None:
+    service, _users, _ = _build_service()
+    login = await service.login_with_kakao(access_token="kakao-at")
+
+    updated = await service.update_profile(
+        user_id=login.user.id,
+        nickname=None,
+        bio=None,
+        cover_image_url="https://cdn.example.com/cover.jpg",
+        theme=ProfileTheme.SUNSET,
+        featured_quote="가장 어두운 밤도 끝은 있다.",
+    )
+
+    assert updated.cover_image_url == "https://cdn.example.com/cover.jpg"
+    assert updated.theme is ProfileTheme.SUNSET
+    assert updated.featured_quote == "가장 어두운 밤도 끝은 있다."
+    # untouched fields are left as-is, matching the existing bio/nickname convention.
+    assert updated.featured_book_id is None
+
+
+@pytest.mark.asyncio
+async def test_update_profile_accepts_existing_featured_book() -> None:
+    book_id = uuid4()
+    service, _users, _ = _build_service(known_book_ids={book_id})
+    login = await service.login_with_kakao(access_token="kakao-at")
+
+    updated = await service.update_profile(
+        user_id=login.user.id,
+        nickname=None,
+        bio=None,
+        featured_book_id=book_id,
+    )
+
+    assert updated.featured_book_id == book_id
+
+
+@pytest.mark.asyncio
+async def test_update_profile_rejects_unknown_featured_book() -> None:
+    service, users, _ = _build_service(known_book_ids=set())
+    login = await service.login_with_kakao(access_token="kakao-at")
+
+    with pytest.raises(NotFoundError) as exc_info:
+        await service.update_profile(
+            user_id=login.user.id,
+            nickname=None,
+            bio=None,
+            featured_book_id=uuid4(),
+        )
+
+    assert exc_info.value.code == "BOOK_NOT_FOUND"
+    # The rejected update must not have partially applied.
+    assert users.users[login.user.id].featured_book_id is None
+
+
+@pytest.mark.asyncio
+async def test_update_profile_partial_update_leaves_other_fields_unchanged() -> None:
+    service, _users, _ = _build_service()
+    login = await service.login_with_kakao(access_token="kakao-at")
+    await service.update_profile(
+        user_id=login.user.id,
+        nickname=None,
+        bio=None,
+        cover_image_url="https://cdn.example.com/first.jpg",
+    )
+
+    updated = await service.update_profile(
+        user_id=login.user.id,
+        nickname="새닉네임",
+        bio=None,
+    )
+
+    assert updated.nickname == "새닉네임"
+    # cover_image_url was omitted (None) on the second call, so it survives.
+    assert updated.cover_image_url == "https://cdn.example.com/first.jpg"

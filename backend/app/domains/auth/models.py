@@ -9,6 +9,13 @@
 - ``DeviceToken`` stores FCM push tokens (iOS goes through FCM -> APNS, per
   the design doc). ``token`` is globally unique so a token migrating between
   users (reinstall / device swap) still only occupies one row.
+
+Profile expressiveness fields (BC-81, epic BC-77): ``cover_image_url``,
+``theme``, ``featured_book_id``, ``featured_quote`` let a user personalize
+their public profile beyond nickname/bio/avatar. ``featured_book_id`` is a
+plain FK column (no ORM ``relationship``) so this module does not import
+``app.domains.book`` — cross-domain object loading goes through
+``FeaturedBookLookupPort`` in ``ports.py`` instead (CLAUDE.md §3.3).
 """
 
 from __future__ import annotations
@@ -40,6 +47,23 @@ class DevicePlatform(enum.StrEnum):
     AOS = "aos"
 
 
+class ProfileTheme(enum.StrEnum):
+    """Predefined profile color-palette keys (BC-81).
+
+    A closed set rather than a free-form color value — the Flutter client
+    ships the actual ColorScheme per key, so an unknown value would render
+    nothing sensible. Growing the palette is a migration (CHECK constraint
+    update), same as ``UserBookStatus``.
+    """
+
+    CLASSIC = "classic"
+    SEPIA = "sepia"
+    MIDNIGHT = "midnight"
+    FOREST = "forest"
+    SUNSET = "sunset"
+    OCEAN = "ocean"
+
+
 class User(Base):
     """Registered Book Club user (one row per provider identity)."""
 
@@ -65,6 +89,28 @@ class User(Base):
     profile_image_url: Mapped[str | None] = mapped_column(String(1024), nullable=True)
     bio: Mapped[str | None] = mapped_column(String(200), nullable=True)
     referral_code: Mapped[str | None] = mapped_column(String(8), unique=True, nullable=True)
+
+    # Profile expressiveness (BC-81). All nullable — pre-existing accounts
+    # simply have none of these set.
+    cover_image_url: Mapped[str | None] = mapped_column(String(1024), nullable=True)
+    theme: Mapped[ProfileTheme | None] = mapped_column(
+        SAEnum(
+            ProfileTheme,
+            name="profile_theme",
+            values_callable=lambda enum_cls: [member.value for member in enum_cls],
+            native_enum=False,
+            length=16,
+        ),
+        nullable=True,
+    )
+    # No ORM relationship on purpose (see module docstring) — service-layer
+    # existence validation goes through FeaturedBookLookupPort.
+    featured_book_id: Mapped[uuid.UUID | None] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("books.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    featured_quote: Mapped[str | None] = mapped_column(String(300), nullable=True)
 
     # Account status flags.
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="true")

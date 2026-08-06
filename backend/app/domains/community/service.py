@@ -69,6 +69,11 @@ class UserProfileView:
     grade_stats: GradeStats | None
     badges: list[BadgeSummary]
     recent_highlights: list[HighlightSummary]
+    # Profile expressiveness (BC-81).
+    cover_image_url: str | None
+    theme: str | None
+    featured_book_id: UUID | None
+    featured_quote: str | None
 
 
 @dataclass(frozen=True, slots=True)
@@ -203,6 +208,10 @@ class CommunityService:
             grade_stats=grade_stats,
             badges=badges,
             recent_highlights=highlights,
+            cover_image_url=user.cover_image_url,
+            theme=user.theme.value if user.theme is not None else None,
+            featured_book_id=user.featured_book_id,
+            featured_quote=user.featured_quote,
         )
 
     async def get_my_activity(self, *, user_id: UUID) -> MyActivitySummary:

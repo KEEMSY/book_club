@@ -16,7 +16,7 @@ from datetime import datetime
 from typing import Protocol
 from uuid import UUID
 
-from app.domains.auth.models import AuthProvider, DevicePlatform, DeviceToken, User
+from app.domains.auth.models import AuthProvider, DevicePlatform, DeviceToken, ProfileTheme, User
 
 
 @dataclass(frozen=True, slots=True)
@@ -63,6 +63,11 @@ class UserRepositoryPort(Protocol):
         user_id: UUID,
         nickname: str | None,
         bio: str | None,
+        *,
+        cover_image_url: str | None = None,
+        theme: ProfileTheme | None = None,
+        featured_book_id: UUID | None = None,
+        featured_quote: str | None = None,
     ) -> User: ...
 
 
@@ -72,6 +77,19 @@ class DeviceTokenRepositoryPort(Protocol):
     async def get_active_tokens_for_user(self, user_id: UUID) -> list[DeviceToken]: ...
 
     async def touch(self, token: str) -> None: ...
+
+
+class FeaturedBookLookupPort(Protocol):
+    """Cross-domain existence check for ``User.featured_book_id`` (BC-81).
+
+    Auth must not import ``app.domains.book`` (CLAUDE.md §3.3 — Service may
+    call another domain's Service, never its Repository/models directly).
+    This narrow Port is implemented in ``providers.py`` by an adapter that
+    wraps the book domain's own repository, mirroring the
+    ``ActivityLibraryQueryPort``-style adapters in the community domain.
+    """
+
+    async def exists(self, book_id: UUID) -> bool: ...
 
 
 class KakaoOAuthPort(Protocol):

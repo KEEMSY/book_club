@@ -17,7 +17,7 @@ import pytest_asyncio
 from app.core.config import Settings, get_settings
 from app.core.exceptions import AuthError, NotFoundError
 from app.core.security import create_access_token, create_refresh_token
-from app.domains.auth.models import AuthProvider, DevicePlatform, User
+from app.domains.auth.models import AuthProvider, DevicePlatform, ProfileTheme, User
 from app.domains.auth.providers import get_auth_service
 from app.domains.auth.service import LoginResult, RefreshResult
 from app.main import create_app
@@ -39,6 +39,8 @@ class FakeAuthService:
         self.fail_get_me: bool = False
         self.dev_is_new_user: bool = True
         self.user = self._make_user()
+        self.update_profile_calls: list[dict[str, object]] = []
+        self.fail_update_profile_with: Exception | None = None
 
     @staticmethod
     def _make_user() -> User:
@@ -104,6 +106,44 @@ class FakeAuthService:
 
     async def delete_account(self, *, user_id: UUID) -> None:
         self.delete_calls.append(user_id)
+
+    async def update_profile(
+        self,
+        *,
+        user_id: UUID,
+        nickname: str | None,
+        bio: str | None,
+        cover_image_url: str | None = None,
+        theme: ProfileTheme | None = None,
+        featured_book_id: UUID | None = None,
+        featured_quote: str | None = None,
+    ) -> User:
+        self.update_profile_calls.append(
+            {
+                "user_id": user_id,
+                "nickname": nickname,
+                "bio": bio,
+                "cover_image_url": cover_image_url,
+                "theme": theme,
+                "featured_book_id": featured_book_id,
+                "featured_quote": featured_quote,
+            }
+        )
+        if self.fail_update_profile_with is not None:
+            raise self.fail_update_profile_with
+        if nickname is not None:
+            self.user.nickname = nickname
+        if bio is not None:
+            self.user.bio = bio
+        if cover_image_url is not None:
+            self.user.cover_image_url = cover_image_url
+        if theme is not None:
+            self.user.theme = theme
+        if featured_book_id is not None:
+            self.user.featured_book_id = featured_book_id
+        if featured_quote is not None:
+            self.user.featured_quote = featured_quote
+        return self.user
 
 
 @pytest_asyncio.fixture
@@ -240,6 +280,70 @@ async def test_me_returns_user_profile(
     assert body["nickname"] == "책벌레"
     assert body["provider"] == "kakao"
     assert UUID(body["id"]) == fake.user.id
+
+
+@pytest.mark.asyncio
+async def test_update_me_applies_expressiveness_fields(
+    client_and_fake: tuple[AsyncClient, FakeAuthService],
+) -> None:
+    client, fake = client_and_fake
+    token = create_access_token(str(fake.user.id))
+    book_id = uuid4()
+
+    response = await client.patch(
+        "/me",
+        json={
+            "cover_image_url": "https://cdn.example.com/cover.jpg",
+            "theme": "forest",
+            "featured_book_id": str(book_id),
+            "featured_quote": "책은 마음의 양식.",
+        },
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["cover_image_url"] == "https://cdn.example.com/cover.jpg"
+    assert body["theme"] == "forest"
+    assert body["featured_book_id"] == str(book_id)
+    assert body["featured_quote"] == "책은 마음의 양식."
+    # the service received an actual ProfileTheme, not a bare string.
+    assert fake.update_profile_calls[-1]["theme"] is ProfileTheme.FOREST
+
+
+@pytest.mark.asyncio
+async def test_update_me_rejects_invalid_theme_with_422(
+    client_and_fake: tuple[AsyncClient, FakeAuthService],
+) -> None:
+    client, fake = client_and_fake
+    token = create_access_token(str(fake.user.id))
+
+    response = await client.patch(
+        "/me",
+        json={"theme": "not-a-real-theme"},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert response.status_code == 422
+    assert fake.update_profile_calls == []
+
+
+@pytest.mark.asyncio
+async def test_update_me_404_when_featured_book_missing(
+    client_and_fake: tuple[AsyncClient, FakeAuthService],
+) -> None:
+    client, fake = client_and_fake
+    token = create_access_token(str(fake.user.id))
+    fake.fail_update_profile_with = NotFoundError("book not found", code="BOOK_NOT_FOUND")
+
+    response = await client.patch(
+        "/me",
+        json={"featured_book_id": str(uuid4())},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert response.status_code == 404
+    assert response.json()["error"]["code"] == "BOOK_NOT_FOUND"
 
 
 @pytest.mark.asyncio
