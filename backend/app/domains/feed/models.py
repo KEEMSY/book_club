@@ -207,6 +207,10 @@ class FeedEventType(enum.StrEnum):
     BOOK_REVIEWED = "BOOK_REVIEWED"
     CLUB_JOINED = "CLUB_JOINED"
     HIGHLIGHT_SHARED = "highlight_shared"
+    # BC-47 — club session/agenda/discussion integration (design §6.1).
+    SESSION_OPENED = "session_opened"
+    AGENDA_PUBLISHED = "agenda_published"
+    DISCUSSION_COMMENTED = "discussion_commented"
 
 
 class FeedEvent(Base):

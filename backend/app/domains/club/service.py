@@ -74,6 +74,26 @@ class FeedClubPort(Protocol):
 
     async def record_club_joined(self, *, user_id: UUID, club_id: UUID) -> None: ...
 
+    async def record_session_opened(
+        self, *, user_id: UUID, club_id: UUID, session_id: UUID, book_id: UUID
+    ) -> None: ...
+
+    async def record_agenda_published(
+        self, *, user_id: UUID, club_id: UUID, session_id: UUID, agenda_id: UUID
+    ) -> None: ...
+
+    async def record_discussion_commented(
+        self,
+        *,
+        user_id: UUID,
+        club_id: UUID,
+        session_id: UUID,
+        agenda_id: UUID,
+        topic_id: UUID,
+        comment_id: UUID,
+        parent_comment_id: UUID | None,
+    ) -> None: ...
+
 
 @dataclass(slots=True)
 class ClubService:
@@ -760,6 +780,13 @@ class ClubService:
         updated = await self.repo.update_session_status(session_id, status)
         if updated is None:
             raise NotFoundError("session not found", code="SESSION_NOT_FOUND")
+        if status == SessionStatus.OPEN and self.feed_service is not None:
+            await self.feed_service.record_session_opened(
+                user_id=user_id,
+                club_id=club_id,
+                session_id=session_id,
+                book_id=updated.book_id,
+            )
         return self._to_session_public(updated)
 
     async def _assert_host(self, club_id: UUID, user_id: UUID) -> ReadingClub:
@@ -872,6 +899,13 @@ class ClubService:
         updated = await self.repo.publish_agenda(agenda.id, published_at=datetime.now())
         if updated is None:
             raise NotFoundError("agenda not found", code="AGENDA_NOT_FOUND")
+        if self.feed_service is not None:
+            await self.feed_service.record_agenda_published(
+                user_id=user_id,
+                club_id=club_id,
+                session_id=session_id,
+                agenda_id=agenda_id,
+            )
         topics = await self.repo.list_topics_by_agenda(updated.id)
         return self._to_agenda_public(updated, topics)
 
@@ -1067,6 +1101,16 @@ class ClubService:
             parent_comment_id=parent_id,
             body=req.body,
         )
+        if self.feed_service is not None:
+            await self.feed_service.record_discussion_commented(
+                user_id=user_id,
+                club_id=club_id,
+                session_id=session_id,
+                agenda_id=agenda_id,
+                topic_id=topic.id,
+                comment_id=comment.id,
+                parent_comment_id=parent_id,
+            )
         return self._to_comment_public(comment)
 
     async def update_comment(

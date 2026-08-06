@@ -544,6 +544,92 @@ class FeedService:
             metadata={"club_id": str(club_id)},
         )
 
+    # --- BC-47: club session/agenda/discussion integration (design §6.1) ---
+
+    async def record_session_opened(
+        self,
+        *,
+        user_id: UUID,
+        club_id: UUID,
+        session_id: UUID,
+        book_id: UUID,
+    ) -> None:
+        """Record a SESSION_OPENED event when a club session transitions to open.
+
+        ``user_id`` is the host who performed the transition. No-ops when
+        ``feed_events`` is not wired.
+        """
+        if self.feed_events is None:
+            return
+        await self.feed_events.create_event(
+            user_id=user_id,
+            event_type="session_opened",
+            metadata={
+                "club_id": str(club_id),
+                "session_id": str(session_id),
+                "book_id": str(book_id),
+            },
+        )
+
+    async def record_agenda_published(
+        self,
+        *,
+        user_id: UUID,
+        club_id: UUID,
+        session_id: UUID,
+        agenda_id: UUID,
+    ) -> None:
+        """Record an AGENDA_PUBLISHED event when a session agenda is published.
+
+        ``user_id`` is the host/presenter who published the agenda. No-ops
+        when ``feed_events`` is not wired.
+        """
+        if self.feed_events is None:
+            return
+        await self.feed_events.create_event(
+            user_id=user_id,
+            event_type="agenda_published",
+            metadata={
+                "club_id": str(club_id),
+                "session_id": str(session_id),
+                "agenda_id": str(agenda_id),
+            },
+        )
+
+    async def record_discussion_commented(
+        self,
+        *,
+        user_id: UUID,
+        club_id: UUID,
+        session_id: UUID,
+        agenda_id: UUID,
+        topic_id: UUID,
+        comment_id: UUID,
+        parent_comment_id: UUID | None,
+    ) -> None:
+        """Record a DISCUSSION_COMMENTED event when a topic reply is posted.
+
+        ``user_id`` is the commenter. ``parent_comment_id`` is None for a
+        top-level reply and set for a (single-level, design §2 비목표) reply
+        to a reply. No-ops when ``feed_events`` is not wired.
+        """
+        if self.feed_events is None:
+            return
+        await self.feed_events.create_event(
+            user_id=user_id,
+            event_type="discussion_commented",
+            metadata={
+                "club_id": str(club_id),
+                "session_id": str(session_id),
+                "agenda_id": str(agenda_id),
+                "topic_id": str(topic_id),
+                "comment_id": str(comment_id),
+                "parent_comment_id": (
+                    str(parent_comment_id) if parent_comment_id is not None else None
+                ),
+            },
+        )
+
     async def list_all_highlights(self, *, user_id: UUID) -> list[BookHighlightGroup]:
         """Return all user highlights grouped by user_book, enriched with book info.
 
