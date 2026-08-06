@@ -19,6 +19,15 @@ Business rules owned here:
   styles never share a cached card.
 - ``get_audio_intro`` (M67): generates a short spoken reading intro. Free users
   get one per day (logged under ``audio_intro``); Pro is unmetered.
+- ``generate_agenda_topic_drafts`` (BC-53): module-level, not a method — the
+  club domain's session-agenda 논제 추천 reuses this exact book-lookup +
+  Claude-call + usage-log business logic through a narrow adapter that wires
+  only the three ports it needs (``AIAssistantPort``/``BookInfoPort``/
+  ``UsageLogRepositoryPort``), instead of constructing a full
+  ``AIAssistantService`` — that would recurse into ``get_club_service`` via
+  ``ClubCoachPort`` (see ``providers.py``). No Pro gate, no DB write; the
+  presenter only gets a recommendation and still adds picked topics via the
+  existing club ``add_topic`` flow (design §6.3, BC-45).
 """
 
 from __future__ import annotations
@@ -33,6 +42,7 @@ from app.core.exceptions import (
     RateLimitedError,
 )
 from app.domains.ai_assistant.ports import (
+    AgendaTopicDraftsContent,
     AIAssistantPort,
     AudioIntroContent,
     BookInfoPort,
@@ -51,6 +61,7 @@ from app.domains.ai_assistant.ports import (
 FEATURE_PREP = "prep_card"
 FEATURE_REFLECTION = "reflection"
 FEATURE_TOPICS = "club_topics"
+FEATURE_AGENDA_TOPICS = "agenda_topics"
 FEATURE_AUDIO_INTRO = "audio_intro"
 
 PREP_DAILY_LIMIT = 5
@@ -78,6 +89,37 @@ def _today_start() -> datetime:
 def _month_start() -> datetime:
     now = datetime.now(tz=UTC)
     return now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+
+async def generate_agenda_topic_drafts(
+    *,
+    ai: AIAssistantPort,
+    books: BookInfoPort,
+    usage: UsageLogRepositoryPort,
+    user_id: UUID,
+    book_id: UUID,
+    scope: str,
+) -> AgendaTopicDraftsContent:
+    """발제자용 논제 초안 3~5개 추천 (BC-53) — 추천만 반환하며 DB에 저장하지 않는다.
+
+    무료 MVP 범위로 Pro 게이팅을 두지 않는다(design §6.3, 명시적 결정). club
+    도메인의 ``ClubService.recommend_topics``가 발제문 author 권한을 확인한
+    뒤 이 함수를 호출한다 — 실제 논제 추가는 기존 ``add_topic``을 그대로 쓴다.
+    """
+    info = await books.get_book_info(book_id)
+    if info is None:
+        raise NotFoundError("book not found", code="BOOK_NOT_FOUND")
+
+    content = await ai.generate_agenda_topics(
+        book_title=info.title, author=info.author, scope=scope
+    )
+    await usage.record(
+        user_id=user_id,
+        feature=FEATURE_AGENDA_TOPICS,
+        book_id=book_id,
+        tokens_used=content.tokens_used,
+    )
+    return content
 
 
 @dataclass(slots=True)

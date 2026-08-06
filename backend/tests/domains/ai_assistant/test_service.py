@@ -15,6 +15,7 @@ import pytest
 from app.core.exceptions import NotFoundError, PermissionDeniedError, RateLimitedError
 from app.domains.ai_assistant.adapters.stub_claude_adapter import StubClaudeAdapter
 from app.domains.ai_assistant.ports import (
+    AgendaTopicDraftsContent,
     BookInfo,
     PrepCardContent,
     ReflectionContent,
@@ -23,11 +24,13 @@ from app.domains.ai_assistant.ports import (
 from app.domains.ai_assistant.service import (
     AUDIO_INTRO_FREE_DAILY_LIMIT,
     DEFAULT_CARD_STYLE,
+    FEATURE_AGENDA_TOPICS,
     FEATURE_AUDIO_INTRO,
     FEATURE_PREP,
     FEATURE_REFLECTION,
     PREP_DAILY_LIMIT,
     AIAssistantService,
+    generate_agenda_topic_drafts,
 )
 
 
@@ -421,3 +424,83 @@ async def test_audio_intro_missing_book_raises_not_found() -> None:
     service, _ = _make_service(books={})
     with pytest.raises(NotFoundError):
         await service.get_audio_intro(user_id=uuid4(), book_id=uuid4())
+
+
+# ---------------------------------------------------------------------------
+# BC-53 — generate_agenda_topic_drafts (module-level, reused by club domain
+# through a narrow adapter that wires only ai/books/usage — see
+# app/domains/club/providers.py's _AgendaTopicAiAdapter)
+# ---------------------------------------------------------------------------
+
+
+async def test_generate_agenda_topic_drafts_returns_3_to_5_topics() -> None:
+    book_id = uuid4()
+    user_id = uuid4()
+    books = FakeBookInfo({book_id: BookInfo(title="데미안", author="헤세", description=None)})
+    usage = FakeUsageLog()
+    ai = StubClaudeAdapter()
+
+    content = await generate_agenda_topic_drafts(
+        ai=ai, books=books, usage=usage, user_id=user_id, book_id=book_id, scope="1~3장"
+    )
+
+    assert 3 <= len(content.topics) <= 5
+    assert all(isinstance(t, str) and t for t in content.topics)
+
+
+async def test_generate_agenda_topic_drafts_logs_usage_under_agenda_topics_feature() -> None:
+    book_id = uuid4()
+    user_id = uuid4()
+    books = FakeBookInfo({book_id: BookInfo(title="데미안", author="헤세", description=None)})
+    usage = FakeUsageLog()
+
+    await generate_agenda_topic_drafts(
+        ai=StubClaudeAdapter(),
+        books=books,
+        usage=usage,
+        user_id=user_id,
+        book_id=book_id,
+        scope="1~3장",
+    )
+
+    since = datetime(2000, 1, 1, tzinfo=UTC)
+    assert await usage.count_since(user_id=user_id, feature=FEATURE_AGENDA_TOPICS, since=since) == 1
+
+
+async def test_generate_agenda_topic_drafts_missing_book_raises_not_found() -> None:
+    with pytest.raises(NotFoundError):
+        await generate_agenda_topic_drafts(
+            ai=StubClaudeAdapter(),
+            books=FakeBookInfo({}),
+            usage=FakeUsageLog(),
+            user_id=uuid4(),
+            book_id=uuid4(),
+            scope="1~3장",
+        )
+
+
+async def test_generate_agenda_topic_drafts_passes_scope_and_book_to_adapter() -> None:
+    book_id = uuid4()
+    captured: dict[str, object] = {}
+
+    class CapturingStub(StubClaudeAdapter):
+        async def generate_agenda_topics(  # type: ignore[override]
+            self, **kwargs: object
+        ) -> AgendaTopicDraftsContent:
+            captured.update(kwargs)
+            return await super().generate_agenda_topics(**kwargs)  # type: ignore[arg-type]
+
+    books = FakeBookInfo({book_id: BookInfo(title="데미안", author="헤세", description=None)})
+
+    await generate_agenda_topic_drafts(
+        ai=CapturingStub(),
+        books=books,
+        usage=FakeUsageLog(),
+        user_id=uuid4(),
+        book_id=book_id,
+        scope="1~3장, 주인공의 각성",
+    )
+
+    assert captured["book_title"] == "데미안"
+    assert captured["author"] == "헤세"
+    assert captured["scope"] == "1~3장, 주인공의 각성"

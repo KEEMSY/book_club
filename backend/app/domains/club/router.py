@@ -14,6 +14,8 @@ from app.domains.club.schemas import (
     AgendaTopicCreate,
     AgendaTopicListResponse,
     AgendaTopicPublic,
+    AgendaTopicRecommendationRequest,
+    AgendaTopicRecommendationResponse,
     AgendaTopicUpdate,
     AttendeeListResponse,
     ClubEventCreate,
@@ -694,6 +696,33 @@ async def add_topic(
         user_id=UUID(user_id),
         req=body,
     )
+
+
+# --- AI 논제 초안 추천 (BC-53, design §6.3) ---
+#
+# 추천만 반환하고 DB에 저장하지 않는다 — 발제자가 마음에 드는 문구를 골라
+# 위 add_topic으로 직접 추가한다. 무료 MVP 범위라 Pro 게이팅은 없다.
+@router.post(
+    "/{club_id}/sessions/{session_id}/agendas/{agenda_id}/topics/recommendations",
+    response_model=AgendaTopicRecommendationResponse,
+)
+async def recommend_topic_drafts(
+    club_id: UUID,
+    session_id: UUID,
+    agenda_id: UUID,
+    body: AgendaTopicRecommendationRequest,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> AgendaTopicRecommendationResponse:
+    topics = await service.recommend_topic_drafts(
+        club_id=club_id,
+        session_id=session_id,
+        agenda_id=agenda_id,
+        user_id=UUID(user_id),
+        book_id=body.book_id,
+        scope=body.scope,
+    )
+    return AgendaTopicRecommendationResponse(topics=topics)
 
 
 # NOTE: the reorder route must be registered before the {topic_id} PATCH route

@@ -35,7 +35,7 @@ from app.domains.club.repository import ClubRepository
 
 
 @lru_cache(maxsize=1)
-def _get_ai_adapter() -> AIAssistantPort:
+def get_ai_adapter() -> AIAssistantPort:
     """Process-wide AI adapter — the live SDK client is reused across requests."""
     settings = get_settings()
     if settings.anthropic_api_key:
@@ -48,7 +48,7 @@ def get_ai_assistant_service(
 ) -> AIAssistantService:
     book_info = BookInfoAdapter(session)
     return AIAssistantService(
-        ai=_get_ai_adapter(),
+        ai=get_ai_adapter(),
         prep_cache=RedisPrepCache(),
         reflections=AIReflectionRepository(session),
         usage=AIUsageLogRepository(session),
