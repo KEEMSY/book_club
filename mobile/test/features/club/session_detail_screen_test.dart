@@ -38,21 +38,23 @@ void main() {
     createdAt: DateTime(2026, 8, 3),
   );
 
-  Widget buildApp(ClubSession session) {
+  Widget buildApp(ClubSession session, {String? focusTopicId}) {
     return ProviderScope(
       overrides: <Override>[
-        clubSessionRepositoryProvider
-            .overrideWithValue(FakeClubSessionRepository()),
+        clubSessionRepositoryProvider.overrideWithValue(
+          FakeClubSessionRepository(),
+        ),
       ],
       child: MaterialApp(
         theme: AppTheme.light,
-        home: SessionDetailScreen(session: session),
+        home: SessionDetailScreen(session: session, focusTopicId: focusTopicId),
       ),
     );
   }
 
-  testWidgets('renders the agenda body and one collapsed tile per topic',
-      (tester) async {
+  testWidgets('renders the agenda body and one collapsed tile per topic', (
+    tester,
+  ) async {
     await tester.pumpWidget(buildApp(openSession));
     await tester.pumpAndSettle();
 
@@ -72,48 +74,50 @@ void main() {
   });
 
   testWidgets(
-      'expanding a topic accordion tile reveals the full thread, root and '
-      'reply alike (BC-51)', (tester) async {
-    await tester.pumpWidget(buildApp(openSession));
-    await tester.pumpAndSettle();
+    'expanding a topic accordion tile reveals the full thread, root and '
+    'reply alike (BC-51)',
+    (tester) async {
+      await tester.pumpWidget(buildApp(openSession));
+      await tester.pumpAndSettle();
 
-    await tester.tap(
-      find.text('1. 저자가 말하는 "이기적 유전자"는 개체의 이기심과 어떻게 다른가요?'),
-    );
-    await tester.pumpAndSettle();
+      await tester.tap(find.text('1. 저자가 말하는 "이기적 유전자"는 개체의 이기심과 어떻게 다른가요?'));
+      await tester.pumpAndSettle();
 
-    // Both the root comment (민지) and its 1-depth reply (호성) render, not
-    // just the last one — this is the full-thread view BC-51 replaces the
-    // BC-49 single-preview block with.
-    expect(find.text('민지'), findsOneWidget);
-    expect(
-      find.text('이기적 유전자는 개체 수준이 아니라 유전자 수준의 자기복제 경향을 말하는 것 같아요.'),
-      findsOneWidget,
-    );
-    expect(find.text('호성'), findsOneWidget);
-    expect(
-      find.text('맞아요, 그래서 개체의 이타적 행동도 유전자 전달에 유리하면 설명 가능하죠.'),
-      findsOneWidget,
-    );
-  });
+      // Both the root comment (민지) and its 1-depth reply (호성) render, not
+      // just the last one — this is the full-thread view BC-51 replaces the
+      // BC-49 single-preview block with.
+      expect(find.text('민지'), findsOneWidget);
+      expect(
+        find.text('이기적 유전자는 개체 수준이 아니라 유전자 수준의 자기복제 경향을 말하는 것 같아요.'),
+        findsOneWidget,
+      );
+      expect(find.text('호성'), findsOneWidget);
+      expect(
+        find.text('맞아요, 그래서 개체의 이타적 행동도 유전자 전달에 유리하면 설명 가능하죠.'),
+        findsOneWidget,
+      );
+    },
+  );
 
   testWidgets(
-      'a topic with no replies shows the no-replies message and a composer '
-      'when expanded', (tester) async {
-    await tester.pumpWidget(buildApp(openSession));
-    await tester.pumpAndSettle();
+    'a topic with no replies shows the no-replies message and a composer '
+    'when expanded',
+    (tester) async {
+      await tester.pumpWidget(buildApp(openSession));
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.text(
-      '2. 이타적으로 보이는 행동 중 유전자 관점으로 설명되지 않는 사례가 있을까요?',
-    ));
-    await tester.pumpAndSettle();
+      await tester.tap(
+        find.text('2. 이타적으로 보이는 행동 중 유전자 관점으로 설명되지 않는 사례가 있을까요?'),
+      );
+      await tester.pumpAndSettle();
 
-    expect(find.text('아직 답글이 없어요'), findsOneWidget);
-    expect(
-      find.byKey(const PageStorageKey('reply-composer-topic-2')),
-      findsOneWidget,
-    );
-  });
+      expect(find.text('아직 답글이 없어요'), findsOneWidget);
+      expect(
+        find.byKey(const PageStorageKey('reply-composer-topic-2')),
+        findsOneWidget,
+      );
+    },
+  );
 
   testWidgets(
       'posting a new top-level reply adds it to the thread and bumps '
@@ -121,9 +125,7 @@ void main() {
     await tester.pumpWidget(buildApp(openSession));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text(
-      '2. 이타적으로 보이는 행동 중 유전자 관점으로 설명되지 않는 사례가 있을까요?',
-    ));
+    await tester.tap(find.text('2. 이타적으로 보이는 행동 중 유전자 관점으로 설명되지 않는 사례가 있을까요?'));
     await tester.pumpAndSettle();
 
     await tester.enterText(
@@ -153,38 +155,40 @@ void main() {
   });
 
   testWidgets(
-      'replying to a root comment nests the reply and does not itself offer '
-      'a reply action (1-depth cap)', (tester) async {
-    await tester.pumpWidget(buildApp(openSession));
-    await tester.pumpAndSettle();
+    'replying to a root comment nests the reply and does not itself offer '
+    'a reply action (1-depth cap)',
+    (tester) async {
+      await tester.pumpWidget(buildApp(openSession));
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.text(
-      '3. 이 논의가 오늘날 사회 현상을 설명하는 데 얼마나 유효하다고 생각하나요?',
-    ));
-    await tester.pumpAndSettle();
+      await tester.tap(
+        find.text('3. 이 논의가 오늘날 사회 현상을 설명하는 데 얼마나 유효하다고 생각하나요?'),
+      );
+      await tester.pumpAndSettle();
 
-    // topic-3 seeds exactly one root comment (다은), so exactly one "답글"
-    // action exists before replying.
-    expect(find.text('답글'), findsOneWidget);
+      // topic-3 seeds exactly one root comment (다은), so exactly one "답글"
+      // action exists before replying.
+      expect(find.text('답글'), findsOneWidget);
 
-    await tester.ensureVisible(find.text('답글'));
-    await tester.tap(find.text('답글'));
-    await tester.pumpAndSettle();
-    expect(find.textContaining('님에게 답글 작성 중'), findsOneWidget);
+      await tester.ensureVisible(find.text('답글'));
+      await tester.tap(find.text('답글'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('님에게 답글 작성 중'), findsOneWidget);
 
-    await tester.enterText(
-      find.byKey(const PageStorageKey('reply-composer-topic-3')),
-      '동의해요, SNS 사례가 딱 맞네요',
-    );
-    await tester.ensureVisible(find.byTooltip('등록'));
-    await tester.tap(find.byTooltip('등록'));
-    await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byKey(const PageStorageKey('reply-composer-topic-3')),
+        '동의해요, SNS 사례가 딱 맞네요',
+      );
+      await tester.ensureVisible(find.byTooltip('등록'));
+      await tester.tap(find.byTooltip('등록'));
+      await tester.pumpAndSettle();
 
-    expect(find.text('동의해요, SNS 사례가 딱 맞네요'), findsOneWidget);
-    // Still exactly one "답글" action — the newly-added reply is 1-depth and
-    // does not grow its own reply action.
-    expect(find.text('답글'), findsOneWidget);
-  });
+      expect(find.text('동의해요, SNS 사례가 딱 맞네요'), findsOneWidget);
+      // Still exactly one "답글" action — the newly-added reply is 1-depth and
+      // does not grow its own reply action.
+      expect(find.text('답글'), findsOneWidget);
+    },
+  );
 
   testWidgets(
       "another member's replies never show edit/delete actions to the "
@@ -192,9 +196,7 @@ void main() {
     await tester.pumpWidget(buildApp(openSession));
     await tester.pumpAndSettle();
 
-    await tester.tap(
-      find.text('1. 저자가 말하는 "이기적 유전자"는 개체의 이기심과 어떻게 다른가요?'),
-    );
+    await tester.tap(find.text('1. 저자가 말하는 "이기적 유전자"는 개체의 이기심과 어떻게 다른가요?'));
     await tester.pumpAndSettle();
 
     // Both seeded comments here (민지's root, 호성's reply) are authored by
@@ -204,14 +206,13 @@ void main() {
     expect(find.byIcon(Icons.delete_outline_rounded), findsNothing);
   });
 
-  testWidgets('editing own reply updates its body and marks it (수정됨)',
-      (tester) async {
+  testWidgets('editing own reply updates its body and marks it (수정됨)', (
+    tester,
+  ) async {
     await tester.pumpWidget(buildApp(openSession));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text(
-      '2. 이타적으로 보이는 행동 중 유전자 관점으로 설명되지 않는 사례가 있을까요?',
-    ));
+    await tester.tap(find.text('2. 이타적으로 보이는 행동 중 유전자 관점으로 설명되지 않는 사례가 있을까요?'));
     await tester.pumpAndSettle();
 
     await tester.enterText(
@@ -243,9 +244,7 @@ void main() {
     await tester.pumpWidget(buildApp(openSession));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text(
-      '2. 이타적으로 보이는 행동 중 유전자 관점으로 설명되지 않는 사례가 있을까요?',
-    ));
+    await tester.tap(find.text('2. 이타적으로 보이는 행동 중 유전자 관점으로 설명되지 않는 사례가 있을까요?'));
     await tester.pumpAndSettle();
 
     await tester.enterText(
@@ -265,8 +264,9 @@ void main() {
     expect(find.text('아직 답글이 없어요'), findsOneWidget);
   });
 
-  testWidgets('a session with no published agenda shows the empty state',
-      (tester) async {
+  testWidgets('a session with no published agenda shows the empty state', (
+    tester,
+  ) async {
     await tester.pumpWidget(buildApp(draftSession));
     await tester.pumpAndSettle();
 
@@ -285,5 +285,42 @@ void main() {
     await tester.pumpWidget(buildApp(draftSession));
     await tester.pumpAndSettle();
     expect(find.byIcon(Icons.edit_rounded), findsNothing);
+  });
+
+  group('BC-52 topic deep-link focus', () {
+    testWidgets('focusTopicId auto-expands the matching topic tile', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildApp(openSession, focusTopicId: 'topic-2'));
+      await tester.pumpAndSettle();
+
+      // topic-2 is seeded with zero replies — its expanded-only empty-state
+      // message is proof the tile opened without a manual tap.
+      expect(find.text('아직 답글이 없어요'), findsOneWidget);
+      expect(
+        find.byKey(const PageStorageKey('reply-composer-topic-2')),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('other topic tiles stay collapsed when one is focused', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildApp(openSession, focusTopicId: 'topic-2'));
+      await tester.pumpAndSettle();
+
+      // topic-1 seeds two comments (민지/호성) — collapsed means their
+      // bodies aren't in the tree yet.
+      expect(find.text('민지'), findsNothing);
+    });
+
+    testWidgets('no topic is expanded when focusTopicId is null', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildApp(openSession));
+      await tester.pumpAndSettle();
+
+      expect(find.text('아직 답글이 없어요'), findsNothing);
+    });
   });
 }

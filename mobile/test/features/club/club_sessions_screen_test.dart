@@ -87,6 +87,10 @@ class _EmptyClubSessionRepository implements ClubSessionRepository {
       const <ClubSession>[];
 
   @override
+  Future<ClubSession> getSession(String sessionId) =>
+      throw UnimplementedError();
+
+  @override
   Future<SessionAgenda?> getAgenda(String sessionId) async => null;
 
   @override

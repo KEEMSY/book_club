@@ -8,6 +8,40 @@ import '../../domain/feed_event.dart';
 import '../../domain/feed_reaction.dart';
 import '../../application/feed_providers.dart';
 
+/// The three club-session feed event types BC-52 wires a session-detail
+/// deep link for. Mirrors the `FeedEventType` values BC-47 added on the
+/// backend (`app/domains/feed/models.py`).
+const Set<String> clubSessionFeedEventTypes = <String>{
+  'session_opened',
+  'agenda_published',
+  'discussion_commented',
+};
+
+/// Deep-link target for a club-session [event] — id-only, matching the
+/// BC-47 feed-event payload (`{club_id, session_id, book_id}` /
+/// `{club_id, session_id, agenda_id}` /
+/// `{club_id, session_id, agenda_id, topic_id, comment_id,
+/// parent_comment_id?}`). `null` when [event] isn't one of
+/// [clubSessionFeedEventTypes] or is missing the ids the route needs.
+///
+/// Pure and free of `BuildContext`/go_router so it's unit-testable on its
+/// own; callers (e.g. `CommunityHomeScreen`) turn a non-null result into a
+/// `context.push(AppRoutes.sessionDetail(...))` for [FeedEventCard.onTapCard].
+({String clubId, String sessionId, String? topicId})? clubSessionDeepLinkFor(
+  FeedEvent event,
+) {
+  if (!clubSessionFeedEventTypes.contains(event.eventType)) return null;
+  final Map<String, dynamic> meta = event.eventMetadata;
+  final String? clubId = meta['club_id'] as String?;
+  final String? sessionId = meta['session_id'] as String?;
+  if (clubId == null || sessionId == null) return null;
+  return (
+    clubId: clubId,
+    sessionId: sessionId,
+    topicId: meta['topic_id'] as String?,
+  );
+}
+
 /// Card that renders a single [FeedEvent] (activity-event feed entry).
 ///
 /// Layout:
@@ -15,6 +49,10 @@ import '../../application/feed_providers.dart';
 ///   * Activity body — emoji + human-readable summary from [event_metadata]
 ///   * Emoji reaction bar (5 fixed emoji: ❤️ 🔥 👏 📚 💪)
 ///   * Comment count chip → opens [FeedCommentSheet]
+///
+/// When [onTapCard] is given (club-session events — BC-52), the whole card
+/// becomes tappable to deep-link into the session; other event types leave
+/// it `null` and the card stays non-interactive outside its own buttons.
 class FeedEventCard extends ConsumerWidget {
   const FeedEventCard({
     super.key,
@@ -22,11 +60,13 @@ class FeedEventCard extends ConsumerWidget {
     required this.currentUserId,
     required this.onTapComments,
     required this.onReactionToggled,
+    this.onTapCard,
   });
 
   final FeedEvent event;
   final String currentUserId;
   final VoidCallback onTapComments;
+  final VoidCallback? onTapCard;
 
   /// Called after a successful toggle with (emoji, added).
   final void Function(String emoji, bool added) onReactionToggled;
@@ -37,11 +77,12 @@ class FeedEventCard extends ConsumerWidget {
     final spacing = theme.extension<AppSpacing>()!;
     final shadows = theme.extension<AppShadows>()!;
     final radii = theme.extension<AppRadius>()!;
+    final radius = Radius.circular(radii.md);
 
-    return Container(
+    final Widget card = Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerLowest,
-        borderRadius: BorderRadius.all(Radius.circular(radii.md)),
+        borderRadius: BorderRadius.all(radius),
         boxShadow: shadows.elevated,
       ),
       padding: EdgeInsets.fromLTRB(
@@ -80,6 +121,23 @@ class FeedEventCard extends ConsumerWidget {
         ],
       ),
     );
+
+    final VoidCallback? tapCard = onTapCard;
+    if (tapCard == null) return card;
+
+    // Wrapping rather than replacing Container keeps the reaction bar and
+    // comment button's own InkWells on top — Flutter's gesture arena gives
+    // a tap precisely on one of those inner targets to that target, not to
+    // this outer card-level InkWell.
+    return Material(
+      type: MaterialType.transparency,
+      borderRadius: BorderRadius.all(radius),
+      child: InkWell(
+        onTap: tapCard,
+        borderRadius: BorderRadius.all(radius),
+        child: card,
+      ),
+    );
   }
 }
 
@@ -108,10 +166,7 @@ class _EventHeader extends StatelessWidget {
             color: theme.colorScheme.surfaceContainerHigh,
             shape: BoxShape.circle,
           ),
-          child: const Text(
-            '👤',
-            style: TextStyle(fontSize: 16),
-          ),
+          child: const Text('👤', style: TextStyle(fontSize: 16)),
         ),
         const SizedBox(width: 8),
         Expanded(
@@ -120,8 +175,9 @@ class _EventHeader extends StatelessWidget {
             children: <Widget>[
               Text(
                 _eventTypeLabel(event.eventType),
-                style: theme.textTheme.titleSmall
-                    ?.copyWith(fontWeight: FontWeight.w600),
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               Text(
                 _relativeTime(event.createdAt),
@@ -145,6 +201,13 @@ class _EventHeader extends StatelessWidget {
         return '연속 독서';
       case 'CLUB_JOINED':
         return '클럽 참여';
+      // BC-52 — club session/agenda/discussion events (design doc §6.1).
+      case 'session_opened':
+        return '새 회차';
+      case 'agenda_published':
+        return '새 발제문';
+      case 'discussion_commented':
+        return '토론 답글';
       default:
         return '독서 활동';
     }
@@ -188,6 +251,13 @@ class _EventTypePill extends StatelessWidget {
         return ('스트릭', Colors.orange);
       case 'CLUB_JOINED':
         return ('클럽', theme.colorScheme.secondary);
+      // BC-52 — club session/agenda/discussion events (design doc §6.1).
+      case 'session_opened':
+        return ('회차', theme.colorScheme.primary);
+      case 'agenda_published':
+        return ('발제문', theme.colorScheme.tertiary);
+      case 'discussion_commented':
+        return ('토론', theme.colorScheme.secondary);
       default:
         return ('활동', theme.colorScheme.onSurfaceVariant);
     }
@@ -209,8 +279,10 @@ class _EventBody extends StatelessWidget {
     final radii = theme.extension<AppRadius>()!;
     final spacing = theme.extension<AppSpacing>()!;
 
-    final (String emoji, String label, String sub) =
-        _eventSummary(event.eventType, event.eventMetadata);
+    final (String emoji, String label, String sub) = _eventSummary(
+      event.eventType,
+      event.eventMetadata,
+    );
 
     return Container(
       padding: EdgeInsets.symmetric(
@@ -277,6 +349,16 @@ class _EventBody extends StatelessWidget {
       case 'CLUB_JOINED':
         final clubName = (meta['club_name'] as String?) ?? '';
         return ('👋', '북클럽에 참여했어요!', clubName);
+      // BC-52 — club session/agenda/discussion events (design doc §6.1).
+      // The BC-47 payload carries ids only (club_id/session_id/agenda_id/
+      // topic_id) — no denormalized title, so there's no sub-line to show;
+      // tapping the card (onTapCard) is how a member reaches the details.
+      case 'session_opened':
+        return ('🗓️', '새 회차가 열렸어요', '');
+      case 'agenda_published':
+        return ('✍️', '새 발제문이 올라왔어요', '');
+      case 'discussion_commented':
+        return ('💬', '토론에 새 답글이 달렸어요', '');
       default:
         return ('📚', '독서 활동', '');
     }

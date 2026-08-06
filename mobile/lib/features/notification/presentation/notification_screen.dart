@@ -9,6 +9,81 @@ import '../application/notification_notifier.dart';
 import '../application/notification_state.dart';
 import '../data/notification_models.dart';
 
+/// Deep-link target resolved from a notification's `ntype` + `data` payload.
+///
+/// [useGo] is `true` only for the `comment`/`reaction` case, which
+/// intentionally replaces the stack (lands on the community tab) rather
+/// than pushing atop it — every other case pushes.
+typedef NotificationDeepLink = ({String path, bool useGo});
+
+/// Resolves [dto]'s tap destination, or `null` when its `ntype` has none.
+///
+/// Pure — no `BuildContext`/go_router — so it's unit-testable without
+/// pumping the full [NotificationScreen], whose notifier opens a live
+/// WebSocket connection in `build()`.
+NotificationDeepLink? notificationDeepLink(NotificationDto dto) {
+  switch (dto.ntype) {
+    case 'follow_received':
+      final followerId = dto.data['follower_id'];
+      if (followerId != null) {
+        return (path: AppRoutes.userProfile(followerId), useGo: false);
+      }
+    case 'badge_earned':
+      return (path: AppRoutes.badges, useGo: false);
+    case 'grade_up':
+      return (path: AppRoutes.grade, useGo: false);
+    case 'weekly_report':
+      return (path: AppRoutes.weeklyReport, useGo: false);
+    case 'comment' || 'reaction':
+      // TODO(feed): no standalone post-detail route exists yet; the feed
+      // lives inside the community tab, so route there until a
+      // `/feed/post/:id` screen ships. (owner: feed team)
+      return (path: AppRoutes.community, useGo: true);
+    case 'club_chat' || 'chat_mention':
+      // Payload carries only the club id (no room id), so open the
+      // club-level chat, which loads the club by id.
+      final clubId = dto.data['club_id'];
+      if (clubId != null) {
+        return (path: AppRoutes.clubChat(clubId), useGo: false);
+      }
+    case 'challenge_started' ||
+          'challenge_completed' ||
+          'challenge_joined' ||
+          'challenge_reminder':
+      final challengeId = dto.data['challenge_id'];
+      if (challengeId != null) {
+        return (path: AppRoutes.challengeDetail(challengeId), useGo: false);
+      }
+    case 'club_joined' || 'club_invite':
+      final clubId = dto.data['club_id'];
+      if (clubId != null) {
+        return (path: AppRoutes.clubDetail(clubId), useGo: false);
+      }
+    // BC-52 — club session/agenda/discussion events. These ntype strings
+    // are provisional: BC-48 (backend notification integration) hasn't
+    // landed yet, so they're chosen to match the feed event types BC-47
+    // already shipped (`session_opened`/`agenda_published`/
+    // `discussion_commented` in `feed/models.py`'s `FeedEventType`), which
+    // follow the same lowercase-snake convention as the existing
+    // `club_joined`/`club_chat` ntypes above. Confirm/adjust once BC-48
+    // lands with its actual `ntype` values.
+    case 'session_opened' || 'agenda_published' || 'discussion_commented':
+      final clubId = dto.data['club_id'];
+      final sessionId = dto.data['session_id'];
+      if (clubId != null && sessionId != null) {
+        return (
+          path: AppRoutes.sessionDetail(
+            clubId,
+            sessionId,
+            topicId: dto.data['topic_id'],
+          ),
+          useGo: false,
+        );
+      }
+  }
+  return null;
+}
+
 /// Notification bell icon with unread badge — placed in AppBar actions.
 ///
 /// Fetches the unread count once on mount. A full real-time approach
@@ -31,8 +106,9 @@ class _NotificationBellState extends ConsumerState<NotificationBell> {
 
   @override
   Widget build(BuildContext context) {
-    final int count =
-        ref.watch(notificationNotifierProvider.select((s) => s.unreadCount));
+    final int count = ref.watch(
+      notificationNotifierProvider.select((s) => s.unreadCount),
+    );
     return IconButton(
       tooltip: '알림',
       onPressed: () => context.push(AppRoutes.notifications),
@@ -83,45 +159,11 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
   }
 
   VoidCallback? _buildNavigate(BuildContext context, NotificationDto dto) {
-    switch (dto.ntype) {
-      case 'follow_received':
-        final followerId = dto.data['follower_id'];
-        if (followerId != null) {
-          return () => context.push(AppRoutes.userProfile(followerId));
-        }
-      case 'badge_earned':
-        return () => context.push(AppRoutes.badges);
-      case 'grade_up':
-        return () => context.push(AppRoutes.grade);
-      case 'weekly_report':
-        return () => context.push(AppRoutes.weeklyReport);
-      case 'comment' || 'reaction':
-        // TODO(feed): no standalone post-detail route exists yet; the feed
-        // lives inside the community tab, so route there until a
-        // `/feed/post/:id` screen ships. (owner: feed team)
-        return () => context.go(AppRoutes.community);
-      case 'club_chat' || 'chat_mention':
-        // Payload carries only the club id (no room id), so open the
-        // club-level chat, which loads the club by id.
-        final clubId = dto.data['club_id'];
-        if (clubId != null) {
-          return () => context.push(AppRoutes.clubChat(clubId));
-        }
-      case 'challenge_started' ||
-            'challenge_completed' ||
-            'challenge_joined' ||
-            'challenge_reminder':
-        final challengeId = dto.data['challenge_id'];
-        if (challengeId != null) {
-          return () => context.push(AppRoutes.challengeDetail(challengeId));
-        }
-      case 'club_joined' || 'club_invite':
-        final clubId = dto.data['club_id'];
-        if (clubId != null) {
-          return () => context.push(AppRoutes.clubDetail(clubId));
-        }
-    }
-    return null;
+    final target = notificationDeepLink(dto);
+    if (target == null) return null;
+    return target.useGo
+        ? () => context.go(target.path)
+        : () => context.push(target.path);
   }
 
   @override
@@ -142,10 +184,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
               pinned: true,
               title: Row(
                 children: [
-                  Text(
-                    '알림',
-                    style: theme.textTheme.titleLarge,
-                  ),
+                  Text('알림', style: theme.textTheme.titleLarge),
                   if (state.unreadCount > 0) ...[
                     SizedBox(width: spacing.sm),
                     Container(
@@ -188,33 +227,24 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
               )
             else if (state.error != null && state.items.isEmpty)
               SliverFillRemaining(
-                child: _EmptyOrError(
-                  message: state.error!,
-                  isError: true,
-                ),
+                child: _EmptyOrError(message: state.error!, isError: true),
               )
             else if (state.items.isEmpty)
               const SliverFillRemaining(
-                child: _EmptyOrError(
-                  message: '아직 알림이 없어요',
-                  isError: false,
-                ),
+                child: _EmptyOrError(message: '아직 알림이 없어요', isError: false),
               )
             else ...[
               SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final item = state.items[index];
-                    return _NotificationCard(
-                      dto: item,
-                      onTap: () => ref
-                          .read(notificationNotifierProvider.notifier)
-                          .markRead(item.id),
-                      onNavigate: _buildNavigate(context, item),
-                    );
-                  },
-                  childCount: state.items.length,
-                ),
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final item = state.items[index];
+                  return _NotificationCard(
+                    dto: item,
+                    onTap: () => ref
+                        .read(notificationNotifierProvider.notifier)
+                        .markRead(item.id),
+                    onNavigate: _buildNavigate(context, item),
+                  );
+                }, childCount: state.items.length),
               ),
               if (state.isLoading)
                 const SliverToBoxAdapter(
@@ -383,21 +413,19 @@ class _NtypeIcon extends StatelessWidget {
       'challenge_reminder' => ('⏰', const Color(0xFFFFF3E0)),
       // Club activity
       'club_joined' || 'club_invite' => ('📚', const Color(0xFFE8F5E9)),
+      // BC-52 — club session/agenda/discussion events.
+      'session_opened' => ('🗓️', const Color(0xFFE8F5E9)),
+      'agenda_published' => ('✍️', const Color(0xFFFFF3E0)),
+      'discussion_commented' => ('💬', const Color(0xFFE3F2FD)),
       _ => ('🔔', theme.colorScheme.surfaceContainer),
     };
 
     return Container(
       width: 44,
       height: 44,
-      decoration: BoxDecoration(
-        color: bg,
-        shape: BoxShape.circle,
-      ),
+      decoration: BoxDecoration(color: bg, shape: BoxShape.circle),
       alignment: Alignment.center,
-      child: Text(
-        emoji,
-        style: const TextStyle(fontSize: 20),
-      ),
+      child: Text(emoji, style: const TextStyle(fontSize: 20)),
     );
   }
 }
