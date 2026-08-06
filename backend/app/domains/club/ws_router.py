@@ -34,10 +34,10 @@ import logging
 import uuid
 from typing import Any
 
-from fastapi import APIRouter, Depends, Query, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Query, WebSocket, WebSocketDisconnect
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.db import get_session
+from app.core.db import get_sessionmaker
 from app.core.exceptions import AuthError, PermissionDeniedError
 from app.core.security import decode_token
 from app.core.ws_manager import ws_manager
@@ -126,7 +126,6 @@ async def club_chat_stream(
     websocket: WebSocket,
     club_id: uuid.UUID,
     token: str = Query(...),
-    session: AsyncSession = Depends(get_session),
 ) -> None:
     """Real-time chat stream for a reading club.
 
@@ -150,6 +149,12 @@ async def club_chat_stream(
     ws_manager.connect_club(club_id, websocket)
     ws_manager.connect_user(user_id, websocket)
 
+    # Acquire a fresh short-lived session per message rather than holding one
+    # Depends(get_session) session across the idle receive loop — the latter
+    # left an autobegun transaction open for the whole WS lifetime
+    # (idle-in-transaction leak, BC-62).
+    sessionmaker = get_sessionmaker()
+
     heartbeat_task = asyncio.create_task(_heartbeat(websocket))
 
     try:
@@ -166,32 +171,35 @@ async def club_chat_stream(
                 await websocket.send_text(json.dumps({"type": "pong"}))
                 continue
 
-            service = ClubService(ClubRepository(session))
-            try:
-                msg = await service.send_message(
-                    club_id=club_id,
-                    user_id=uuid.UUID(user_id),
-                    content=data.get("content", ""),
-                    media_url=data.get("media_url"),
+            async with sessionmaker() as session:
+                service = ClubService(ClubRepository(session))
+                try:
+                    msg = await service.send_message(
+                        club_id=club_id,
+                        user_id=uuid.UUID(user_id),
+                        content=data.get("content", ""),
+                        media_url=data.get("media_url"),
+                    )
+                except PermissionDeniedError:
+                    await websocket.send_text(
+                        json.dumps({"type": "error", "detail": "not a club member"})
+                    )
+                    continue
+                # Persist the message before fan-out so it survives disconnects.
+                await session.commit()
+
+                outbound: dict[str, Any] = {
+                    "type": "chat.message",
+                    "data": msg.model_dump(mode="json"),
+                }
+
+                await ws_manager.broadcast_club(club_id, outbound)
+
+                # Notify members who are not currently in the chat room so they
+                # can update their unread badge via the personal stream.
+                await _notify_offline_club_members(
+                    club_id, user_id, msg.model_dump(mode="json"), session
                 )
-            except PermissionDeniedError:
-                await websocket.send_text(
-                    json.dumps({"type": "error", "detail": "not a club member"})
-                )
-                continue
-
-            outbound: dict[str, Any] = {
-                "type": "chat.message",
-                "data": msg.model_dump(mode="json"),
-            }
-
-            await ws_manager.broadcast_club(club_id, outbound)
-
-            # Notify members who are not currently in the chat room so they
-            # can update their unread badge via the personal stream.
-            await _notify_offline_club_members(
-                club_id, user_id, msg.model_dump(mode="json"), session
-            )
     except WebSocketDisconnect:
         pass
     except Exception:
@@ -210,7 +218,6 @@ async def room_chat_stream(
     club_id: uuid.UUID,
     room_id: uuid.UUID,
     token: str = Query(...),
-    session: AsyncSession = Depends(get_session),
 ) -> None:
     """Real-time chat stream for a progress-gated club room.
 
@@ -228,47 +235,51 @@ async def room_chat_stream(
         await websocket.close(code=4001, reason=str(exc))
         return
 
-    # Verify progress gate before accepting the connection.
+    # Verify progress gate before accepting the connection. Use a short-lived
+    # session for the checks so no transaction is held past connect (BC-62).
     from sqlalchemy import select
 
     from app.domains.book.models import UserBook
     from app.domains.club.models import ClubMember, ClubRoom, ReadingClub
 
-    # Check club membership.
-    member_stmt = select(ClubMember.club_id).where(
-        ClubMember.club_id == club_id,
-        ClubMember.user_id == uuid.UUID(user_id),
-    )
-    member_result = await session.execute(member_stmt)
-    if member_result.scalar_one_or_none() is None:
-        await websocket.close(code=4003, reason="not a club member")
-        return
+    sessionmaker = get_sessionmaker()
 
-    # Fetch the room.
-    room = await session.get(ClubRoom, room_id)
-    if room is None or room.club_id != club_id:
-        await websocket.close(code=4003, reason="room not found")
-        return
-
-    if room.progress_gate > 0:
-        # Resolve the club's book and compare the caller's chapter against the gate.
-        club = await session.get(ReadingClub, club_id)
-        caller_chapter = 0
-        if club is not None and club.book_id is not None:
-            chapter_stmt = select(UserBook.current_chapter).where(
-                UserBook.user_id == uuid.UUID(user_id),
-                UserBook.book_id == club.book_id,
-            )
-            chapter_result = await session.execute(chapter_stmt)
-            chapter_val: int | None = chapter_result.scalar_one_or_none()
-            caller_chapter = chapter_val if chapter_val is not None else 0
-
-        if caller_chapter < room.progress_gate:
-            await websocket.close(
-                code=4003,
-                reason=f"chapter {caller_chapter} below gate {room.progress_gate}",
-            )
+    async with sessionmaker() as session:
+        # Check club membership.
+        member_stmt = select(ClubMember.club_id).where(
+            ClubMember.club_id == club_id,
+            ClubMember.user_id == uuid.UUID(user_id),
+        )
+        member_result = await session.execute(member_stmt)
+        if member_result.scalar_one_or_none() is None:
+            await websocket.close(code=4003, reason="not a club member")
             return
+
+        # Fetch the room.
+        room = await session.get(ClubRoom, room_id)
+        if room is None or room.club_id != club_id:
+            await websocket.close(code=4003, reason="room not found")
+            return
+
+        if room.progress_gate > 0:
+            # Resolve the club's book and compare the caller's chapter against the gate.
+            club = await session.get(ReadingClub, club_id)
+            caller_chapter = 0
+            if club is not None and club.book_id is not None:
+                chapter_stmt = select(UserBook.current_chapter).where(
+                    UserBook.user_id == uuid.UUID(user_id),
+                    UserBook.book_id == club.book_id,
+                )
+                chapter_result = await session.execute(chapter_stmt)
+                chapter_val: int | None = chapter_result.scalar_one_or_none()
+                caller_chapter = chapter_val if chapter_val is not None else 0
+
+            if caller_chapter < room.progress_gate:
+                await websocket.close(
+                    code=4003,
+                    reason=f"chapter {caller_chapter} below gate {room.progress_gate}",
+                )
+                return
 
     await websocket.accept()
     ws_manager.connect_room(room_id, websocket)
@@ -290,26 +301,28 @@ async def room_chat_stream(
                 await websocket.send_text(json.dumps({"type": "pong"}))
                 continue
 
-            service = ClubService(ClubRepository(session))
-            try:
-                msg = await service.send_message(
-                    club_id=club_id,
-                    user_id=uuid.UUID(user_id),
-                    content=data.get("content", ""),
-                    media_url=data.get("media_url"),
-                )
-            except PermissionDeniedError:
-                await websocket.send_text(
-                    json.dumps({"type": "error", "detail": "not a club member"})
-                )
-                continue
+            async with sessionmaker() as session:
+                service = ClubService(ClubRepository(session))
+                try:
+                    msg = await service.send_message(
+                        club_id=club_id,
+                        user_id=uuid.UUID(user_id),
+                        content=data.get("content", ""),
+                        media_url=data.get("media_url"),
+                    )
+                except PermissionDeniedError:
+                    await websocket.send_text(
+                        json.dumps({"type": "error", "detail": "not a club member"})
+                    )
+                    continue
+                await session.commit()
 
-            outbound: dict[str, Any] = {
-                "type": "chat.message",
-                "data": msg.model_dump(mode="json"),
-            }
+                outbound: dict[str, Any] = {
+                    "type": "chat.message",
+                    "data": msg.model_dump(mode="json"),
+                }
 
-            await ws_manager.broadcast_room(room_id, outbound)
+                await ws_manager.broadcast_room(room_id, outbound)
     except WebSocketDisconnect:
         pass
     except Exception:
