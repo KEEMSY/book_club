@@ -45,6 +45,10 @@ from app.domains.club.schemas import (
     SessionAgendaUpdate,
     SetClubBookRequest,
     SetSessionPresenterRequest,
+    TopicCommentCreate,
+    TopicCommentPublic,
+    TopicCommentThreadListResponse,
+    TopicCommentUpdate,
     UpdateProgressRequest,
     UpdateSessionStatusRequest,
 )
@@ -758,5 +762,102 @@ async def delete_topic(
         session_id=session_id,
         agenda_id=agenda_id,
         topic_id=topic_id,
+        user_id=UUID(user_id),
+    )
+
+
+# --- topic comments (BC-46) ---
+
+
+@router.post(
+    "/{club_id}/sessions/{session_id}/agendas/{agenda_id}/topics/{topic_id}/comments",
+    response_model=TopicCommentPublic,
+    status_code=status.HTTP_201_CREATED,
+)
+async def add_comment(
+    club_id: UUID,
+    session_id: UUID,
+    agenda_id: UUID,
+    topic_id: UUID,
+    body: TopicCommentCreate,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> TopicCommentPublic:
+    return await service.add_comment(
+        club_id=club_id,
+        session_id=session_id,
+        agenda_id=agenda_id,
+        topic_id=topic_id,
+        user_id=UUID(user_id),
+        req=body,
+    )
+
+
+@router.get(
+    "/{club_id}/sessions/{session_id}/agendas/{agenda_id}/topics/{topic_id}/comments",
+    response_model=TopicCommentThreadListResponse,
+)
+async def list_comments(
+    club_id: UUID,
+    session_id: UUID,
+    agenda_id: UUID,
+    topic_id: UUID,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> TopicCommentThreadListResponse:
+    items = await service.list_comments(
+        club_id=club_id,
+        session_id=session_id,
+        agenda_id=agenda_id,
+        topic_id=topic_id,
+        caller_user_id=UUID(user_id),
+    )
+    return TopicCommentThreadListResponse(items=items)
+
+
+@router.patch(
+    "/{club_id}/sessions/{session_id}/agendas/{agenda_id}/topics/{topic_id}/comments/{comment_id}",
+    response_model=TopicCommentPublic,
+)
+async def update_comment(
+    club_id: UUID,
+    session_id: UUID,
+    agenda_id: UUID,
+    topic_id: UUID,
+    comment_id: UUID,
+    body: TopicCommentUpdate,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> TopicCommentPublic:
+    return await service.update_comment(
+        club_id=club_id,
+        session_id=session_id,
+        agenda_id=agenda_id,
+        topic_id=topic_id,
+        comment_id=comment_id,
+        user_id=UUID(user_id),
+        req=body,
+    )
+
+
+@router.delete(
+    "/{club_id}/sessions/{session_id}/agendas/{agenda_id}/topics/{topic_id}/comments/{comment_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def delete_comment(
+    club_id: UUID,
+    session_id: UUID,
+    agenda_id: UUID,
+    topic_id: UUID,
+    comment_id: UUID,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> None:
+    await service.delete_comment(
+        club_id=club_id,
+        session_id=session_id,
+        agenda_id=agenda_id,
+        topic_id=topic_id,
+        comment_id=comment_id,
         user_id=UUID(user_id),
     )

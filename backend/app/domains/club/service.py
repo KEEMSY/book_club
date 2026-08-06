@@ -22,6 +22,7 @@ from app.domains.club.models import (
     ReadingClub,
     SessionAgenda,
     SessionStatus,
+    TopicComment,
 )
 from app.domains.club.repository import ClubRepository
 from app.domains.club.schemas import (
@@ -47,6 +48,10 @@ from app.domains.club.schemas import (
     SessionAgendaCreate,
     SessionAgendaPublic,
     SessionAgendaUpdate,
+    TopicCommentCreate,
+    TopicCommentPublic,
+    TopicCommentThreadPublic,
+    TopicCommentUpdate,
 )
 
 # Fallback page count when the catalog row carries no page total — keeps plan
@@ -1024,4 +1029,177 @@ class ClubService:
             position=topic.position,
             prompt=topic.prompt,
             created_at=topic.created_at,
+        )
+
+    # --- topic comments (BC-46) ---
+
+    async def add_comment(
+        self,
+        *,
+        club_id: UUID,
+        session_id: UUID,
+        agenda_id: UUID,
+        topic_id: UUID,
+        user_id: UUID,
+        req: TopicCommentCreate,
+    ) -> TopicCommentPublic:
+        await self._get_club_or_404(club_id)
+        await self._get_session_in_club(club_id, session_id)
+        agenda = await self._get_agenda_in_session(session_id, agenda_id)
+        topic = await self._get_topic_in_agenda(agenda.id, topic_id)
+        # 답글 작성 = club 멤버 (design §5) — 공개 클럽 열람자라도 작성은 멤버만
+        # 허용해야 하므로 _assert_can_view_club이 아닌 멤버십을 직접 확인한다.
+        await self._assert_club_member(club_id, user_id)
+
+        parent_id = req.parent_comment_id
+        if parent_id is not None:
+            parent = await self._get_comment_in_topic(topic.id, parent_id)
+            if parent.parent_comment_id is not None:
+                # 1단계 대댓글까지만 허용(design §2 비목표) — 부모 자신이 이미
+                # 대댓글이면 그 밑에 또 답글을 다는 2단계 트리를 거부한다.
+                raise ConflictError(
+                    "대댓글에는 답글을 달 수 없습니다", code="MAX_REPLY_DEPTH_EXCEEDED"
+                )
+
+        comment = await self.repo.create_comment(
+            topic_id=topic.id,
+            author_id=user_id,
+            parent_comment_id=parent_id,
+            body=req.body,
+        )
+        return self._to_comment_public(comment)
+
+    async def update_comment(
+        self,
+        *,
+        club_id: UUID,
+        session_id: UUID,
+        agenda_id: UUID,
+        topic_id: UUID,
+        comment_id: UUID,
+        user_id: UUID,
+        req: TopicCommentUpdate,
+    ) -> TopicCommentPublic:
+        club = await self._get_club_or_404(club_id)
+        await self._get_session_in_club(club_id, session_id)
+        agenda = await self._get_agenda_in_session(session_id, agenda_id)
+        topic = await self._get_topic_in_agenda(agenda.id, topic_id)
+        comment = await self._get_comment_in_topic(topic.id, comment_id)
+        self._assert_comment_author_or_host(club, comment, user_id)
+
+        updated = await self.repo.update_comment_body(
+            comment.id, req.body, edited_at=datetime.now()
+        )
+        if updated is None:
+            raise NotFoundError("comment not found", code="COMMENT_NOT_FOUND")
+        return self._to_comment_public(updated)
+
+    async def delete_comment(
+        self,
+        *,
+        club_id: UUID,
+        session_id: UUID,
+        agenda_id: UUID,
+        topic_id: UUID,
+        comment_id: UUID,
+        user_id: UUID,
+    ) -> None:
+        club = await self._get_club_or_404(club_id)
+        await self._get_session_in_club(club_id, session_id)
+        agenda = await self._get_agenda_in_session(session_id, agenda_id)
+        topic = await self._get_topic_in_agenda(agenda.id, topic_id)
+        comment = await self._get_comment_in_topic(topic.id, comment_id)
+        self._assert_comment_author_or_host(club, comment, user_id)
+        # design §4 모델 주석: parent_comment_id는 ON DELETE CASCADE이므로 최상위
+        # 댓글을 지우면 그 아래 대댓글도 DB가 함께 정리한다 — 여기서 자식을 따로
+        # 조회·삭제할 필요는 없다.
+        await self.repo.delete_comment(comment.id)
+
+    async def list_comments(
+        self,
+        *,
+        club_id: UUID,
+        session_id: UUID,
+        agenda_id: UUID,
+        topic_id: UUID,
+        caller_user_id: UUID,
+    ) -> list[TopicCommentThreadPublic]:
+        await self._assert_can_view_club(club_id, caller_user_id)
+        await self._get_session_in_club(club_id, session_id)
+        agenda = await self._get_agenda_in_session(session_id, agenda_id)
+        topic = await self._get_topic_in_agenda(agenda.id, topic_id)
+        comments = await self.repo.list_comments_by_topic(topic.id)
+        return self._build_comment_threads(comments)
+
+    async def _get_club_or_404(self, club_id: UUID) -> ReadingClub:
+        club = await self.repo.get_by_id(club_id)
+        if club is None:
+            raise NotFoundError("club not found", code="CLUB_NOT_FOUND")
+        return club
+
+    async def _assert_club_member(self, club_id: UUID, user_id: UUID) -> None:
+        """답글 작성 권한 = club 멤버 (design §5) — 발제자·호스트 제한 없음."""
+        if not await self.repo.is_member(club_id, user_id):
+            raise PermissionDeniedError("클럽 멤버만 답글을 작성할 수 있습니다", code="NOT_MEMBER")
+
+    async def _get_comment_in_topic(self, topic_id: UUID, comment_id: UUID) -> TopicComment:
+        comment = await self.repo.get_comment(comment_id)
+        if comment is None or comment.topic_id != topic_id:
+            raise NotFoundError("comment not found", code="COMMENT_NOT_FOUND")
+        return comment
+
+    @staticmethod
+    def _assert_comment_author_or_host(
+        club: ReadingClub, comment: TopicComment, user_id: UUID
+    ) -> None:
+        """답글 수정·삭제 권한 = 본인 또는 host (design §5)."""
+        is_author = comment.author_id == user_id
+        is_host = club.owner_id == user_id
+        if not (is_author or is_host):
+            raise PermissionDeniedError(
+                "본인 또는 호스트만 답글을 수정·삭제할 수 있습니다",
+                code="PERMISSION_DENIED",
+            )
+
+    @staticmethod
+    def _build_comment_threads(comments: list[TopicComment]) -> list[TopicCommentThreadPublic]:
+        """Group a topic's flat, oldest-first comments into top-level threads.
+
+        Replies are single-level by construction (design §2 비목표) — every
+        reply's parent is itself a top-level comment — so grouping by
+        parent_comment_id in one pass is sufficient; no recursive tree walk
+        is needed.
+        """
+        replies_by_parent: dict[UUID, list[TopicCommentPublic]] = {}
+        roots: list[TopicComment] = []
+        for comment in comments:
+            if comment.parent_comment_id is None:
+                roots.append(comment)
+            else:
+                replies_by_parent.setdefault(comment.parent_comment_id, []).append(
+                    ClubService._to_comment_public(comment)
+                )
+        return [
+            TopicCommentThreadPublic(
+                id=root.id,
+                topic_id=root.topic_id,
+                author_id=root.author_id,
+                body=root.body,
+                created_at=root.created_at,
+                edited_at=root.edited_at,
+                replies=replies_by_parent.get(root.id, []),
+            )
+            for root in roots
+        ]
+
+    @staticmethod
+    def _to_comment_public(comment: TopicComment) -> TopicCommentPublic:
+        return TopicCommentPublic(
+            id=comment.id,
+            topic_id=comment.topic_id,
+            author_id=comment.author_id,
+            parent_comment_id=comment.parent_comment_id,
+            body=comment.body,
+            created_at=comment.created_at,
+            edited_at=comment.edited_at,
         )

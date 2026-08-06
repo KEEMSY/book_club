@@ -26,6 +26,7 @@ from app.domains.club.models import (
     ReadingClub,
     SessionAgenda,
     SessionStatus,
+    TopicComment,
 )
 from app.domains.club.schemas import AttendeeCount, AttendeePublic
 
@@ -863,3 +864,57 @@ class ClubRepository:
                 topic.position = position
         await self._session.flush()
         return await self.list_topics_by_agenda(agenda_id)
+
+    # --- topic comments (BC-46) ---
+
+    async def create_comment(
+        self,
+        *,
+        topic_id: UUID,
+        author_id: UUID,
+        parent_comment_id: UUID | None,
+        body: str,
+    ) -> TopicComment:
+        comment = TopicComment(
+            id=uuid4(),
+            topic_id=topic_id,
+            author_id=author_id,
+            parent_comment_id=parent_comment_id,
+            body=body,
+            created_at=datetime.now(),
+        )
+        self._session.add(comment)
+        await self._session.flush()
+        return comment
+
+    async def get_comment(self, comment_id: UUID) -> TopicComment | None:
+        return await self._session.get(TopicComment, comment_id)
+
+    async def list_comments_by_topic(self, topic_id: UUID) -> list[TopicComment]:
+        """Return a topic's comments oldest-first — the order the service needs
+
+        to group replies under their parent in a single pass (parents are
+        always created, and thus ordered, before their replies).
+        """
+        stmt = (
+            select(TopicComment)
+            .where(TopicComment.topic_id == topic_id)
+            .order_by(TopicComment.created_at.asc())
+        )
+        rows = await self._session.execute(stmt)
+        return list(rows.scalars().all())
+
+    async def update_comment_body(
+        self, comment_id: UUID, body: str, *, edited_at: datetime
+    ) -> TopicComment | None:
+        comment = await self._session.get(TopicComment, comment_id)
+        if comment is None:
+            return None
+        comment.body = body
+        comment.edited_at = edited_at
+        await self._session.flush()
+        return comment
+
+    async def delete_comment(self, comment_id: UUID) -> None:
+        stmt = delete(TopicComment).where(TopicComment.id == comment_id)
+        await self._session.execute(stmt)
