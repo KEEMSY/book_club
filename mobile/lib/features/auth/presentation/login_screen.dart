@@ -7,7 +7,6 @@ import '../../../core/theme/app_theme.dart';
 import '../application/auth_notifier.dart';
 import '../domain/auth_state.dart';
 import 'widgets/apple_login_button.dart';
-import 'widgets/dev_login_button.dart';
 import 'widgets/kakao_login_button.dart';
 import 'widgets/loading_overlay.dart';
 
@@ -37,11 +36,6 @@ class LoginScreen extends ConsumerWidget {
     // state and shows a single-line apology with the backend's message.
     final String? failureMessage = auth is AuthFailure ? auth.message : null;
 
-    // Dev-mode flag: show DevLoginButton only in debug builds so the button is
-    // compiled out entirely in release. kDebugMode is a compile-time constant,
-    // so tree-shaking removes the branch in --release mode.
-    const bool isDevMode = kDebugMode &&
-        bool.fromEnvironment('SHOW_DEV_LOGIN', defaultValue: true);
     final bool showApple =
         !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
 
@@ -68,17 +62,12 @@ class LoginScreen extends ConsumerWidget {
                     isBusy: isBusy,
                     failureMessage: failureMessage,
                     showApple: showApple,
-                    showDevLogin: isDevMode,
                     onKakao: () => ref
                         .read(authNotifierProvider.notifier)
                         .loginWithKakao(),
                     onApple: () => ref
                         .read(authNotifierProvider.notifier)
                         .loginWithApple(),
-                    onDevLogin: () =>
-                        ref.read(authNotifierProvider.notifier).loginDev(),
-                    onTesterLogin: () =>
-                        ref.read(authNotifierProvider.notifier).loginTester(),
                   ),
                 ],
               ),
@@ -147,22 +136,16 @@ class _BottomCtas extends StatelessWidget {
     required this.isBusy,
     required this.failureMessage,
     required this.showApple,
-    required this.showDevLogin,
     required this.onKakao,
     required this.onApple,
-    required this.onDevLogin,
-    required this.onTesterLogin,
   });
 
   final AppSpacing spacing;
   final bool isBusy;
   final String? failureMessage;
   final bool showApple;
-  final bool showDevLogin;
   final VoidCallback onKakao;
   final VoidCallback onApple;
-  final VoidCallback onDevLogin;
-  final VoidCallback onTesterLogin;
 
   @override
   Widget build(BuildContext context) {
@@ -190,38 +173,6 @@ class _BottomCtas extends StatelessWidget {
           if (showApple) ...<Widget>[
             SizedBox(height: spacing.sm),
             AppleLoginButton(onPressed: onApple, isLoading: isBusy),
-          ],
-          if (kDebugMode && showDevLogin) ...<Widget>[
-            SizedBox(height: spacing.sm),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: DevLoginButton(
-                    onPressed: onDevLogin,
-                    isLoading: isBusy,
-                  ),
-                ),
-                SizedBox(width: spacing.sm),
-                Expanded(
-                  child: DevLoginButton(
-                    onPressed: onTesterLogin,
-                    label: '테스트 데이터 로그인',
-                    isLoading: isBusy,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: spacing.xs),
-            Text(
-              'Dev 환경 전용 · 테스트 데이터 로그인은 샘플 데이터가 자동 생성됩니다',
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color:
-                    theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-                fontSize: 11,
-                height: 1.4,
-              ),
-            ),
           ],
           SizedBox(height: spacing.md),
           Text(
