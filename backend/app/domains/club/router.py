@@ -23,6 +23,9 @@ from app.domains.club.schemas import (
     ClubRoomCreate,
     ClubRoomListResponse,
     ClubRoomPublic,
+    ClubSessionCreate,
+    ClubSessionListResponse,
+    ClubSessionPublic,
     CreateClubRequest,
     CreateReadingPlanRequest,
     EditMessageRequest,
@@ -32,7 +35,9 @@ from app.domains.club.schemas import (
     RsvpRequest,
     SendMessageRequest,
     SetClubBookRequest,
+    SetSessionPresenterRequest,
     UpdateProgressRequest,
+    UpdateSessionStatusRequest,
 )
 from app.domains.club.service import ClubService
 
@@ -476,3 +481,83 @@ async def set_club_book(
         book_id=body.book_id,
     )
     return await _to_public(club, service.repo)
+
+
+# --- sessions (BC-44) ---
+
+
+@router.post(
+    "/{club_id}/sessions",
+    response_model=ClubSessionPublic,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_session(
+    club_id: UUID,
+    body: ClubSessionCreate,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> ClubSessionPublic:
+    return await service.create_session(club_id=club_id, user_id=UUID(user_id), req=body)
+
+
+@router.get("/{club_id}/sessions", response_model=ClubSessionListResponse)
+async def list_sessions(
+    club_id: UUID,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+    book_id: Annotated[UUID | None, Query(description="특정 책의 회차만 조회")] = None,
+) -> ClubSessionListResponse:
+    items = await service.list_sessions(
+        club_id=club_id, caller_user_id=UUID(user_id), book_id=book_id
+    )
+    return ClubSessionListResponse(items=items)
+
+
+@router.get("/{club_id}/sessions/{session_id}", response_model=ClubSessionPublic)
+async def get_session(
+    club_id: UUID,
+    session_id: UUID,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> ClubSessionPublic:
+    return await service.get_session(
+        club_id=club_id, session_id=session_id, caller_user_id=UUID(user_id)
+    )
+
+
+@router.patch(
+    "/{club_id}/sessions/{session_id}/presenter",
+    response_model=ClubSessionPublic,
+)
+async def set_session_presenter(
+    club_id: UUID,
+    session_id: UUID,
+    body: SetSessionPresenterRequest,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> ClubSessionPublic:
+    return await service.set_session_presenter(
+        club_id=club_id,
+        session_id=session_id,
+        user_id=UUID(user_id),
+        presenter_id=body.presenter_id,
+    )
+
+
+@router.patch(
+    "/{club_id}/sessions/{session_id}/status",
+    response_model=ClubSessionPublic,
+)
+async def update_session_status(
+    club_id: UUID,
+    session_id: UUID,
+    body: UpdateSessionStatusRequest,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> ClubSessionPublic:
+    return await service.transition_session_status(
+        club_id=club_id,
+        session_id=session_id,
+        user_id=UUID(user_id),
+        status=body.status,
+    )

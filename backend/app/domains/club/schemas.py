@@ -197,3 +197,39 @@ class MemberProgressItem(BaseModel):
 class ClubProgressResponse(BaseModel):
     plan: ReadingPlanResponse | None
     members: list[MemberProgressItem]
+
+
+# --- sessions (BC-44) ---
+
+
+class ClubSessionCreate(BaseModel):
+    book_id: UUID
+    title: str = Field(min_length=1, max_length=200)
+    scope: str | None = Field(default=None, max_length=2000)
+    presenter_id: UUID | None = None
+    scheduled_at: datetime | None = None
+
+
+class ClubSessionPublic(BaseModel):
+    id: UUID
+    club_id: UUID
+    book_id: UUID
+    title: str
+    scope: str | None
+    presenter_id: UUID | None
+    scheduled_at: datetime | None
+    status: str
+    created_by: UUID
+    created_at: datetime
+
+
+class ClubSessionListResponse(BaseModel):
+    items: list[ClubSessionPublic]
+
+
+class SetSessionPresenterRequest(BaseModel):
+    presenter_id: UUID | None = None
+
+
+class UpdateSessionStatusRequest(BaseModel):
+    status: str = Field(pattern="^(draft|open|closed)$")

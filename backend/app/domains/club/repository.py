@@ -16,10 +16,12 @@ from app.domains.club.models import (
     ClubReadingPlan,
     ClubRole,
     ClubRoom,
+    ClubSession,
     ClubTag,
     EventAttendee,
     MessageRead,
     ReadingClub,
+    SessionStatus,
 )
 from app.domains.club.schemas import AttendeeCount, AttendeePublic
 
@@ -668,3 +670,69 @@ class ClubRepository:
         stmt = select(ClubMember.user_id).where(ClubMember.club_id == club_id)
         rows = await self._session.execute(stmt)
         return list(rows.scalars().all())
+
+    # --- sessions (BC-44) ---
+
+    async def create_session(
+        self,
+        *,
+        club_id: UUID,
+        book_id: UUID,
+        title: str,
+        scope: str | None,
+        presenter_id: UUID | None,
+        scheduled_at: datetime | None,
+        created_by: UUID,
+    ) -> ClubSession:
+        session_row = ClubSession(
+            id=uuid4(),
+            club_id=club_id,
+            book_id=book_id,
+            title=title,
+            scope=scope,
+            presenter_id=presenter_id,
+            scheduled_at=scheduled_at,
+            status=SessionStatus.DRAFT,
+            created_by=created_by,
+            created_at=datetime.now(),
+        )
+        self._session.add(session_row)
+        await self._session.flush()
+        return session_row
+
+    async def get_session(self, session_id: UUID) -> ClubSession | None:
+        return await self._session.get(ClubSession, session_id)
+
+    async def list_sessions(
+        self, club_id: UUID, *, book_id: UUID | None = None
+    ) -> list[ClubSession]:
+        """Return the club's sessions, ordered by book then newest-first.
+
+        Ordering by ``book_id`` first means consecutive rows already share a
+        book, so callers can group by book with a single pass over the list
+        (design §4 — 책별 그룹 목록) without an extra query.
+        """
+        stmt = select(ClubSession).where(ClubSession.club_id == club_id)
+        if book_id is not None:
+            stmt = stmt.where(ClubSession.book_id == book_id)
+        stmt = stmt.order_by(ClubSession.book_id, ClubSession.created_at.desc())
+        rows = await self._session.execute(stmt)
+        return list(rows.scalars().all())
+
+    async def update_session_status(self, session_id: UUID, status: str) -> ClubSession | None:
+        session_row = await self._session.get(ClubSession, session_id)
+        if session_row is None:
+            return None
+        session_row.status = status
+        await self._session.flush()
+        return session_row
+
+    async def update_session_presenter(
+        self, session_id: UUID, presenter_id: UUID | None
+    ) -> ClubSession | None:
+        session_row = await self._session.get(ClubSession, session_id)
+        if session_row is None:
+            return None
+        session_row.presenter_id = presenter_id
+        await self._session.flush()
+        return session_row
