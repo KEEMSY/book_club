@@ -7,7 +7,7 @@ from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
 import pytest
-from app.core.exceptions import NotFoundError
+from app.core.exceptions import ConflictError, NotFoundError
 from app.domains.admin.service import AdminService
 
 # ---------------------------------------------------------------------------
@@ -66,6 +66,14 @@ class FakeAdminRepository:
 
     async def get_user_by_id(self, user_id: UUID) -> _FakeUser | None:
         return self._users.get(user_id)
+
+    async def get_user_by_email(self, email: str) -> _FakeUser | None:
+        return next(
+            (u for u in self._users.values() if (u.email or "").lower() == email.lower()), None
+        )
+
+    async def count_admins(self) -> int:
+        return sum(1 for u in self._users.values() if u.is_admin)
 
     async def patch_user(
         self,
@@ -183,3 +191,55 @@ async def test_patch_user_missing_raises_not_found() -> None:
     svc, _ = _svc()
     with pytest.raises(NotFoundError):
         await svc.patch_user(uuid4(), is_active=False, is_admin=None)
+
+
+@pytest.mark.asyncio
+async def test_patch_user_exposes_is_pro() -> None:
+    svc, repo = _svc()
+    user = _FakeUser(is_pro=True)
+    repo._users[user.id] = user
+
+    item = await svc.get_user(user.id)
+    assert item.is_pro is True
+
+
+# ---------------------------------------------------------------------------
+# patch_user — last-admin protection (BC-88)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_patch_user_blocks_revoking_last_admin() -> None:
+    svc, repo = _svc()
+    only_admin = _FakeUser(is_admin=True)
+    repo._users[only_admin.id] = only_admin
+
+    with pytest.raises(ConflictError) as exc_info:
+        await svc.patch_user(only_admin.id, is_active=None, is_admin=False)
+    assert exc_info.value.code == "LAST_ADMIN_PROTECTED"
+    # The guard must fire before any write — the user stays an admin.
+    assert only_admin.is_admin is True
+
+
+@pytest.mark.asyncio
+async def test_patch_user_allows_revoking_admin_when_others_remain() -> None:
+    svc, repo = _svc()
+    admin_a = _FakeUser(is_admin=True)
+    admin_b = _FakeUser(is_admin=True)
+    repo._users[admin_a.id] = admin_a
+    repo._users[admin_b.id] = admin_b
+
+    patched = await svc.patch_user(admin_a.id, is_active=None, is_admin=False)
+    assert patched.is_admin is False
+
+
+@pytest.mark.asyncio
+async def test_patch_user_allows_deactivating_the_last_admin() -> None:
+    """is_active=False alone must not trip the is_admin guard."""
+    svc, repo = _svc()
+    only_admin = _FakeUser(is_admin=True)
+    repo._users[only_admin.id] = only_admin
+
+    patched = await svc.patch_user(only_admin.id, is_active=False, is_admin=None)
+    assert patched.is_active is False
+    assert patched.is_admin is True

@@ -172,6 +172,33 @@ class AdminRepository:
             return None
         return user
 
+    async def get_user_by_email(self, email: str) -> User | None:
+        """Return a non-deleted user by case-insensitive exact email match.
+
+        Used by the admin-promotion CLI (``scripts/promote_admin.py``, BC-88) —
+        promotion is looked up by email since that is the identifier an
+        operator has on hand, not the internal UUID.
+        """
+        stmt = select(User).where(
+            func.lower(User.email) == email.lower(),
+            User.deleted_at.is_(None),
+        )
+        result = await self._session.execute(stmt)
+        return result.scalar_one_or_none()
+
+    async def count_admins(self) -> int:
+        """Count of non-deleted users with ``is_admin=True``.
+
+        Used to guard against revoking the last remaining admin (BC-88) —
+        once that count hits zero, only direct DB access can recover.
+        """
+        stmt = select(func.count(User.id)).where(
+            User.is_admin.is_(True),
+            User.deleted_at.is_(None),
+        )
+        result = await self._session.execute(stmt)
+        return result.scalar_one() or 0
+
     async def patch_user(
         self,
         user_id: UUID,
