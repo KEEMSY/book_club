@@ -29,6 +29,19 @@ abstract class ClubSessionRepository {
   /// groups these by [ClubSession.bookId] client-side.
   Future<List<ClubSession>> listSessions(String clubId);
 
+  /// Loads a single session by [sessionId] alone.
+  ///
+  /// The deep-link seam BC-52 wires for feed-card taps and push-notification
+  /// routing: both only carry a session id (`{club_id, session_id, ...}` in
+  /// the BC-47 feed-event/notification payload), not the [ClubSession]
+  /// object the detail screen otherwise expects via router `extra`.
+  ///
+  /// TODO(wiring): retrofit — swap for a real
+  /// `GET /clubs/{club_id}/sessions/{session_id}` call once BC-44/45's
+  /// endpoints exist; wire it in `session_providers.dart`'s
+  /// `clubSessionRepositoryProvider` alongside the rest of this interface.
+  Future<ClubSession> getSession(String sessionId);
+
   /// The published agenda for [sessionId], or `null` when the session has no
   /// published agenda yet (draft session, or the presenter hasn't published).
   Future<SessionAgenda?> getAgenda(String sessionId);
@@ -138,7 +151,17 @@ class FakeClubSessionRepository implements ClubSessionRepository {
   static const _agendaForOpenId = 'agenda-1';
   static const _agendaForClosedId = 'agenda-2';
 
-  List<ClubSession> _sessionsFor(String clubId) => [
+  /// Cache of sessions keyed by id, backing [getSession] — the id-only
+  /// lookup BC-52 wires for feed-card taps and push-notification deep
+  /// links. Seeded eagerly with a placeholder clubId so a cold deep link
+  /// resolves even before [listSessions] has run for the caller's real
+  /// clubId; [listSessions] refreshes each entry with the caller's actual
+  /// clubId afterwards.
+  final Map<String, ClubSession> _sessionsById = {
+    for (final session in _sessionsFor('club-1')) session.id: session,
+  };
+
+  static List<ClubSession> _sessionsFor(String clubId) => [
         ClubSession(
           id: sessionOpenId,
           clubId: clubId,
@@ -283,7 +306,20 @@ class FakeClubSessionRepository implements ClubSessionRepository {
 
   @override
   Future<List<ClubSession>> listSessions(String clubId) async {
-    return _sessionsFor(clubId);
+    final sessions = _sessionsFor(clubId);
+    for (final session in sessions) {
+      _sessionsById[session.id] = session;
+    }
+    return sessions;
+  }
+
+  @override
+  Future<ClubSession> getSession(String sessionId) async {
+    final session = _sessionsById[sessionId];
+    if (session == null) {
+      throw ArgumentError('알 수 없는 회차입니다: $sessionId');
+    }
+    return session;
   }
 
   @override

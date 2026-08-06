@@ -139,8 +139,9 @@ class _GlobalEventFeedSectionState
             Tab(text: '전체'),
             Tab(text: '팔로우'),
           ],
-          labelStyle:
-              theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
+          labelStyle: theme.textTheme.labelLarge?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
         ),
         Expanded(
           child: TabBarView(
@@ -322,9 +323,19 @@ class _EventFeedList extends StatelessWidget {
                   );
                 }
                 final FeedEvent event = items[index];
+                final deepLink = clubSessionDeepLinkFor(event);
                 return FeedEventCard(
                   event: event,
                   currentUserId: currentUserId,
+                  onTapCard: deepLink == null
+                      ? null
+                      : () => context.push(
+                            AppRoutes.sessionDetail(
+                              deepLink.clubId,
+                              deepLink.sessionId,
+                              topicId: deepLink.topicId,
+                            ),
+                          ),
                   onTapComments: () => FeedCommentSheet.show(
                     context,
                     eventId: event.id,
@@ -382,10 +393,7 @@ class _FollowingFeedTab extends ConsumerWidget {
     }
 
     if (feedState.posts.isEmpty) {
-      return _EmptyFollowingState(
-        onExploreTap: onExploreTap,
-        spacing: spacing,
-      );
+      return _EmptyFollowingState(onExploreTap: onExploreTap, spacing: spacing);
     }
 
     return RefreshIndicator(
@@ -445,10 +453,7 @@ class _EmptyFollowingState extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             SizedBox(height: spacing.lg),
-            FilledButton(
-              onPressed: onExploreTap,
-              child: const Text('독자 탐색하기'),
-            ),
+            FilledButton(onPressed: onExploreTap, child: const Text('독자 탐색하기')),
           ],
         ),
       ),
@@ -704,10 +709,9 @@ class _SearchResults extends ConsumerWidget {
             child: Text(
               '"$query"에 해당하는 독자가 없어요',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.5),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
             ),
           );
@@ -791,8 +795,10 @@ class _UserSearchTileState extends ConsumerState<_UserSearchTile> {
           ? OutlinedButton(
               onPressed: _toggle,
               style: OutlinedButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
+                ),
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
@@ -801,8 +807,10 @@ class _UserSearchTileState extends ConsumerState<_UserSearchTile> {
           : FilledButton(
               onPressed: _toggle,
               style: FilledButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
+                ),
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),

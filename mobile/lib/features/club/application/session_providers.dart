@@ -17,6 +17,16 @@ final clubSessionRepositoryProvider = Provider<ClubSessionRepository>((ref) {
   return FakeClubSessionRepository();
 });
 
+/// Resolves a single [ClubSession] by id — the deep-link seam BC-52 wires
+/// for feed-card taps and push-notification routing, where only a session
+/// id is known (no [ClubSession] object to pass via router `extra`).
+/// Mirrors `clubByIdProvider` (`club_providers.dart`), the equivalent
+/// id-only loader for the club-level deep link.
+final sessionByIdProvider =
+    FutureProvider.autoDispose.family<ClubSession, String>((ref, sessionId) {
+  return ref.watch(clubSessionRepositoryProvider).getSession(sessionId);
+});
+
 /// Whether the current user may write [session]'s agenda (BC-50 editor
 /// entry gate — design doc §5: authorship = host OR presenter).
 ///

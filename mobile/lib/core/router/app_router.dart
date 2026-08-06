@@ -33,6 +33,7 @@ import '../../features/club/presentation/club_rooms_screen.dart';
 import '../../features/club/presentation/club_sessions_screen.dart';
 import '../../features/club/presentation/public_clubs_screen.dart';
 import '../../features/club/presentation/session_detail_screen.dart';
+import '../../features/club/presentation/session_loader.dart';
 import '../../features/club/presentation/agenda_editor_screen.dart';
 import '../../features/club/domain/club.dart';
 import '../../features/club/domain/club_session.dart';
@@ -134,12 +135,23 @@ class AppRoutes {
   static String clubRoomChat(String clubId, String roomId) =>
       '/clubs/$clubId/rooms/$roomId/chat';
 
-  // BC-49 — session (회차) list and detail. BC-51's topic-thread route seam
-  // is intentionally left unregistered here; it'll nest under sessionDetail
-  // once that screen exists.
+  // BC-49 — session (회차) list and detail.
   static String clubSessions(String clubId) => '/clubs/$clubId/sessions';
-  static String sessionDetail(String clubId, String sessionId) =>
-      '/clubs/$clubId/sessions/$sessionId';
+
+  // BC-52 — [topicId] renders as a `?topic_id=` query param the session
+  // route reads to auto-expand/scroll to that topic (feed-card taps and
+  // push-notification deep links only carry ids, never the full
+  // `ClubSession`/topic objects the list screen passes via `extra`).
+  static String sessionDetail(
+    String clubId,
+    String sessionId, {
+    String? topicId,
+  }) {
+    final base = '/clubs/$clubId/sessions/$sessionId';
+    return topicId != null
+        ? '$base?topic_id=${Uri.encodeQueryComponent(topicId)}'
+        : base;
+  }
 
   // BC-50 — agenda editor, opened from SessionDetailScreen's AppBar action
   // (host/presenter only — gated by canAuthorAgendaProvider both there and
@@ -470,7 +482,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
       // BC-49 — session list; Club passed via extra (same convention as the
-      // room list above — no id-only loader yet, that lands with BC-52).
+      // room list above). Unlike the session-detail route below, this list
+      // route has no id-only fallback — feed cards/notifications deep-link
+      // straight to a session, never to "the session list for this club".
       GoRoute(
         path: '/clubs/:clubId/sessions',
         parentNavigatorKey: _rootKey,
@@ -480,12 +494,28 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
       // BC-49 — session detail; ClubSession passed via extra from the list.
+      // BC-52 — also reachable by id alone (ClubSession absent from extra)
+      // from feed-card taps and push-notification deep links, resolved via
+      // SessionLoader; an optional `?topic_id=` focuses/scrolls to a topic.
       GoRoute(
         path: '/clubs/:clubId/sessions/:sessionId',
         parentNavigatorKey: _rootKey,
         builder: (context, state) {
-          final ClubSession session = state.extra! as ClubSession;
-          return SessionDetailScreen(session: session);
+          final String sessionId = state.pathParameters['sessionId']!;
+          final ClubSession? session = state.extra as ClubSession?;
+          final String? focusTopicId = state.uri.queryParameters['topic_id'];
+          return session != null
+              ? SessionDetailScreen(
+                  session: session,
+                  focusTopicId: focusTopicId,
+                )
+              : SessionLoader(
+                  sessionId: sessionId,
+                  builder: (loaded) => SessionDetailScreen(
+                    session: loaded,
+                    focusTopicId: focusTopicId,
+                  ),
+                );
         },
       ),
       // BC-50 — agenda editor; ClubSession passed via extra from the detail
@@ -746,9 +776,7 @@ class _DeferredFeatureScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: const Center(
-        child: Text('현재 사용할 수 없는 기능입니다.'),
-      ),
+      body: const Center(child: Text('현재 사용할 수 없는 기능입니다.')),
     );
   }
 }

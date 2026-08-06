@@ -14,13 +14,23 @@ import '../domain/topic_comment.dart';
 
 /// Session detail — agenda body + a per-topic discussion accordion.
 ///
-/// [session] is always passed via `extra` from the list screen (same
-/// no-loader convention as `ClubRoomsScreen`'s `Club` — deep-link resolution
-/// by id alone is left to BC-52, which wires notification/feed-card taps).
+/// [session] is passed via `extra` from the list screen (same no-loader
+/// convention as `ClubRoomsScreen`'s `Club`) or resolved by id alone via
+/// [SessionLoader] — the deep-link path BC-52 wires for feed-card taps and
+/// push-notification routing.
+///
+/// [focusTopicId], when set, auto-expands and scrolls to the matching topic
+/// tile (`ValueKey('topic-tile-$focusTopicId')`) once the agenda loads — the
+/// "논제로 스크롤/포커스" part of the same BC-52 deep link.
 class SessionDetailScreen extends ConsumerWidget {
-  const SessionDetailScreen({super.key, required this.session});
+  const SessionDetailScreen({
+    super.key,
+    required this.session,
+    this.focusTopicId,
+  });
 
   final ClubSession session;
+  final String? focusTopicId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -75,7 +85,11 @@ class SessionDetailScreen extends ConsumerWidget {
         ),
         data: (agenda) => agenda == null
             ? _NoAgendaState(spacing: spacing, theme: theme)
-            : _AgendaBody(session: session, agenda: agenda),
+            : _AgendaBody(
+                session: session,
+                agenda: agenda,
+                focusTopicId: focusTopicId,
+              ),
       ),
     );
   }
@@ -114,10 +128,15 @@ class _NoAgendaState extends StatelessWidget {
 }
 
 class _AgendaBody extends StatelessWidget {
-  const _AgendaBody({required this.session, required this.agenda});
+  const _AgendaBody({
+    required this.session,
+    required this.agenda,
+    this.focusTopicId,
+  });
 
   final ClubSession session;
   final SessionAgenda agenda;
+  final String? focusTopicId;
 
   @override
   Widget build(BuildContext context) {
@@ -158,6 +177,7 @@ class _AgendaBody extends StatelessWidget {
           (topic) => _TopicAccordionTile(
             key: ValueKey('topic-tile-${topic.id}'),
             topic: topic,
+            isFocused: topic.id == focusTopicId,
           ),
         ),
       ],
@@ -176,9 +196,18 @@ class _AgendaBody extends StatelessWidget {
 /// [topicCommentsProvider] as the single fetch path — same provider BC-49
 /// used for the reply-count/preview.
 class _TopicAccordionTile extends ConsumerStatefulWidget {
-  const _TopicAccordionTile({super.key, required this.topic});
+  const _TopicAccordionTile({
+    super.key,
+    required this.topic,
+    this.isFocused = false,
+  });
 
   final AgendaTopic topic;
+
+  /// Set when this tile is the target of a BC-52 deep link
+  /// (`SessionDetailScreen.focusTopicId`) — the tile auto-expands and
+  /// scrolls itself into view once instead of waiting for a manual tap.
+  final bool isFocused;
 
   @override
   ConsumerState<_TopicAccordionTile> createState() =>
@@ -191,6 +220,24 @@ class _TopicAccordionTileState extends ConsumerState<_TopicAccordionTile> {
   TopicComment? _replyTarget;
   String? _editingCommentId;
   bool _isSubmitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.isFocused) {
+      // Deferred to the next frame so the ExpansionTile (and the topics
+      // above it) have already laid out — Scrollable.ensureVisible needs a
+      // built RenderObject to compute the scroll offset against.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        Scrollable.ensureVisible(
+          context,
+          alignment: 0.1,
+          duration: const Duration(milliseconds: 300),
+        );
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -233,6 +280,7 @@ class _TopicAccordionTileState extends ConsumerState<_TopicAccordionTile> {
 
           return ExpansionTile(
             key: PageStorageKey('topic-${topic.id}'),
+            initiallyExpanded: widget.isFocused,
             title: Text(_topicTitle(topic)),
             subtitle: Text('답글 ${comments.length}개'),
             childrenPadding: EdgeInsets.fromLTRB(
