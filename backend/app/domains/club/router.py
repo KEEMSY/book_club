@@ -11,6 +11,10 @@ from app.domains.club.models import ClubReadingPlan, ReadingClub
 from app.domains.club.providers import get_club_service
 from app.domains.club.repository import ClubRepository
 from app.domains.club.schemas import (
+    AgendaTopicCreate,
+    AgendaTopicListResponse,
+    AgendaTopicPublic,
+    AgendaTopicUpdate,
     AttendeeListResponse,
     ClubEventCreate,
     ClubEventListResponse,
@@ -32,8 +36,13 @@ from app.domains.club.schemas import (
     MessageListResponse,
     PublicClubListResponse,
     ReadingPlanResponse,
+    ReorderTopicsRequest,
     RsvpRequest,
     SendMessageRequest,
+    SessionAgendaCreate,
+    SessionAgendaListResponse,
+    SessionAgendaPublic,
+    SessionAgendaUpdate,
     SetClubBookRequest,
     SetSessionPresenterRequest,
     UpdateProgressRequest,
@@ -560,4 +569,194 @@ async def update_session_status(
         session_id=session_id,
         user_id=UUID(user_id),
         status=body.status,
+    )
+
+
+# --- agendas (BC-45) ---
+
+
+@router.post(
+    "/{club_id}/sessions/{session_id}/agendas",
+    response_model=SessionAgendaPublic,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_agenda(
+    club_id: UUID,
+    session_id: UUID,
+    body: SessionAgendaCreate,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> SessionAgendaPublic:
+    return await service.create_agenda(
+        club_id=club_id, session_id=session_id, user_id=UUID(user_id), req=body
+    )
+
+
+@router.get(
+    "/{club_id}/sessions/{session_id}/agendas",
+    response_model=SessionAgendaListResponse,
+)
+async def list_agendas(
+    club_id: UUID,
+    session_id: UUID,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> SessionAgendaListResponse:
+    items = await service.list_agendas(
+        club_id=club_id, session_id=session_id, caller_user_id=UUID(user_id)
+    )
+    return SessionAgendaListResponse(items=items)
+
+
+@router.get(
+    "/{club_id}/sessions/{session_id}/agendas/{agenda_id}",
+    response_model=SessionAgendaPublic,
+)
+async def get_agenda(
+    club_id: UUID,
+    session_id: UUID,
+    agenda_id: UUID,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> SessionAgendaPublic:
+    return await service.get_agenda(
+        club_id=club_id,
+        session_id=session_id,
+        agenda_id=agenda_id,
+        caller_user_id=UUID(user_id),
+    )
+
+
+@router.patch(
+    "/{club_id}/sessions/{session_id}/agendas/{agenda_id}",
+    response_model=SessionAgendaPublic,
+)
+async def update_agenda(
+    club_id: UUID,
+    session_id: UUID,
+    agenda_id: UUID,
+    body: SessionAgendaUpdate,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> SessionAgendaPublic:
+    return await service.update_agenda(
+        club_id=club_id,
+        session_id=session_id,
+        agenda_id=agenda_id,
+        user_id=UUID(user_id),
+        req=body,
+    )
+
+
+@router.post(
+    "/{club_id}/sessions/{session_id}/agendas/{agenda_id}/publish",
+    response_model=SessionAgendaPublic,
+)
+async def publish_agenda(
+    club_id: UUID,
+    session_id: UUID,
+    agenda_id: UUID,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> SessionAgendaPublic:
+    return await service.publish_agenda(
+        club_id=club_id,
+        session_id=session_id,
+        agenda_id=agenda_id,
+        user_id=UUID(user_id),
+    )
+
+
+# --- topics (BC-45) ---
+
+
+@router.post(
+    "/{club_id}/sessions/{session_id}/agendas/{agenda_id}/topics",
+    response_model=AgendaTopicPublic,
+    status_code=status.HTTP_201_CREATED,
+)
+async def add_topic(
+    club_id: UUID,
+    session_id: UUID,
+    agenda_id: UUID,
+    body: AgendaTopicCreate,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> AgendaTopicPublic:
+    return await service.add_topic(
+        club_id=club_id,
+        session_id=session_id,
+        agenda_id=agenda_id,
+        user_id=UUID(user_id),
+        req=body,
+    )
+
+
+# NOTE: the reorder route must be registered before the {topic_id} PATCH route
+# below — both are single-segment PATCH paths under .../topics/, and FastAPI
+# matches in registration order. Reversing this would make "reorder" attempt
+# UUID conversion as a topic_id and fail with 422 instead of running reorder.
+@router.patch(
+    "/{club_id}/sessions/{session_id}/agendas/{agenda_id}/topics/reorder",
+    response_model=AgendaTopicListResponse,
+)
+async def reorder_topics(
+    club_id: UUID,
+    session_id: UUID,
+    agenda_id: UUID,
+    body: ReorderTopicsRequest,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> AgendaTopicListResponse:
+    items = await service.reorder_topics(
+        club_id=club_id,
+        session_id=session_id,
+        agenda_id=agenda_id,
+        user_id=UUID(user_id),
+        topic_ids=body.topic_ids,
+    )
+    return AgendaTopicListResponse(items=items)
+
+
+@router.patch(
+    "/{club_id}/sessions/{session_id}/agendas/{agenda_id}/topics/{topic_id}",
+    response_model=AgendaTopicPublic,
+)
+async def update_topic(
+    club_id: UUID,
+    session_id: UUID,
+    agenda_id: UUID,
+    topic_id: UUID,
+    body: AgendaTopicUpdate,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> AgendaTopicPublic:
+    return await service.update_topic(
+        club_id=club_id,
+        session_id=session_id,
+        agenda_id=agenda_id,
+        topic_id=topic_id,
+        user_id=UUID(user_id),
+        req=body,
+    )
+
+
+@router.delete(
+    "/{club_id}/sessions/{session_id}/agendas/{agenda_id}/topics/{topic_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def delete_topic(
+    club_id: UUID,
+    session_id: UUID,
+    agenda_id: UUID,
+    topic_id: UUID,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    service: Annotated[ClubService, Depends(get_club_service)],
+) -> None:
+    await service.delete_topic(
+        club_id=club_id,
+        session_id=session_id,
+        agenda_id=agenda_id,
+        topic_id=topic_id,
+        user_id=UUID(user_id),
     )

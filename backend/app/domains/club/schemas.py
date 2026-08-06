@@ -233,3 +233,53 @@ class SetSessionPresenterRequest(BaseModel):
 
 class UpdateSessionStatusRequest(BaseModel):
     status: str = Field(pattern="^(draft|open|closed)$")
+
+
+# --- agendas & topics (BC-45) ---
+
+
+class SessionAgendaCreate(BaseModel):
+    body: str = Field(min_length=1, max_length=10000)
+
+
+class SessionAgendaUpdate(BaseModel):
+    body: str = Field(min_length=1, max_length=10000)
+
+
+class AgendaTopicPublic(BaseModel):
+    id: UUID
+    agenda_id: UUID
+    position: int
+    prompt: str
+    created_at: datetime
+
+
+class SessionAgendaPublic(BaseModel):
+    id: UUID
+    session_id: UUID
+    author_id: UUID
+    body: str
+    status: str
+    published_at: datetime | None
+    created_at: datetime
+    topics: list[AgendaTopicPublic] = Field(default_factory=list)
+
+
+class SessionAgendaListResponse(BaseModel):
+    items: list[SessionAgendaPublic]
+
+
+class AgendaTopicCreate(BaseModel):
+    prompt: str = Field(min_length=1, max_length=2000)
+
+
+class AgendaTopicUpdate(BaseModel):
+    prompt: str = Field(min_length=1, max_length=2000)
+
+
+class AgendaTopicListResponse(BaseModel):
+    items: list[AgendaTopicPublic]
+
+
+class ReorderTopicsRequest(BaseModel):
+    topic_ids: list[UUID] = Field(min_length=1)

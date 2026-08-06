@@ -418,8 +418,14 @@ class SessionAgenda(Base):
     )
 
     session: Mapped[ClubSession] = relationship("ClubSession", back_populates="agendas")
+    # Ordered by display position so eager-loaded topics need no re-sort in
+    # the service layer (BC-45 — mirrors the club_id/created_at ordering
+    # ClubRepository.list_sessions already relies on for its grouping).
     topics: Mapped[list[AgendaTopic]] = relationship(
-        "AgendaTopic", back_populates="agenda", cascade="all, delete-orphan"
+        "AgendaTopic",
+        back_populates="agenda",
+        cascade="all, delete-orphan",
+        order_by="AgendaTopic.position",
     )
 
 
