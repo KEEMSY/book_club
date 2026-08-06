@@ -52,6 +52,34 @@ created: 2026-08-06
 - [ ] 유료 훅 컬럼(access_type 등)은 UI/동작에 아무 영향 없음(현재 전부 open/included)
 
 ## E2E 실행 기록
-- 자동(CI): 백엔드 pytest+alembic, 모바일 analyze+widget test — **PR #27~#43 전부 green**.
-- 수동/Chrome MCP: 로컬 백엔드+웹 기동 필요. 실행 시 결과·스크린샷을 본 섹션에 첨부.
-  - 상태: ⏳ 로컬 스택 기동 후 수행 예정(참조: 메모리 e2e_verification, `docs/plans/2026-04-26-m6-qa-checklist.md`).
+
+### 자동(CI)
+백엔드 pytest+alembic, 모바일 analyze+widget test — **PR #27~#43 전부 green**.
+
+### 라이브 API E2E (2026-08-06, 실행 중 dev 스택 대상)
+실행 중 백엔드(`localhost:8000`, 소스 마운트 --reload, DB 마이그레이션 0052 적용)에
+`POST /auth/dev-login`으로 발급한 호스트/멤버 토큰으로 실 엔드포인트를 관통 실행.
+**13스텝 전부 실제 정상 동작** 확인:
+
+| 스텝 | 결과 |
+|---|---|
+| 클럽 생성(host) | ✅ 201 |
+| 멤버 가입(invite_code) | ✅ 200 |
+| 회차 생성 | ✅ 201 |
+| 회차 open 전이 | ✅ 200 |
+| 발제문 작성(draft) | ✅ 201 |
+| 논제 2개 추가 | ✅ 201 |
+| 발제문 게시(publish) | ✅ 200 |
+| 멤버 답글 작성 | ✅ 201 |
+| 호스트 대댓글(1단계) | ✅ 201 |
+| AI 논제 추천 | ✅ 200, 후보 4개 |
+| 논제 스레드 조회 | ✅ 200, `{items:[{root, replies:[reply]}]}` — 루트+1단계 중첩 확인 |
+| feed 이벤트 | ✅ `session_opened`·`agenda_published`·`discussion_commented` 3종 발화 |
+
+→ 시나리오 1~5의 **서버 계약·실 DB 동작을 라이브로 검증**. (검증 스크립트: 세션 스크래치패드 `e2e_club.py`)
+
+### 모바일 UI
+회차 목록·상세, 발제문 에디터, 논제 스레드, 피드 카드·딥링크, 알림 라우팅은
+**위젯 테스트(184 passed)** 로 검증. Flutter Web(CanvasKit)은 DOM 기반 Chrome MCP로
+상호작용 자동화가 제한적이라 **라이브 웹 클릭-스루는 미수행** — `docs/backlog/IDEAS.md`의
+"실 UI E2E 자동화" 항목으로 추적.
