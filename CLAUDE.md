@@ -152,11 +152,15 @@ Router  →  Service  →  Repository / External Adapter
   - PR 병합으로만 변경 가능 — `git push origin main` 직접 푸시는 `GH006` 로 거부된다.
   - force-push·브랜치 삭제 금지, `enforce_admins`(관리자도 예외 없음), linear history.
   - 따라서 어떤 워크트리/세션도 **green-CI PR 병합** 외의 방법으로 main 을 바꿀 수 없다.
-- **공유 로컬 자원을 오염·점유하지 않는다** (dev DB `:5432`, 포트 `:3100`/`:8000` 은 세션 공용):
-  - 테스트·검증용 DB 조작은 **throwaway DB(`book_club_test`)** 에서만. 공유 dev DB(`bookclub`)에 `TRUNCATE`/`UPDATE` 등 파괴적 쿼리 **금지**.
-  - Flutter 웹 dev 서버는 **main 워크트리에서 실행**한다. 워크트리에서 띄우면 그 워크트리를 `git worktree remove` 할 때 서버가 깨진다.
-  - 다른 세션이 쓰는 포트/서버를 임의로 종료하지 않는다. 필요하면 별도 포트를 쓴다.
-- 워크트리 정리(`git worktree remove`) 전에 그 워크트리에서 띄운 프로세스(dev 서버 등)를 먼저 종료한다.
+- **컨테이너는 워크트리별 독립 스택으로 격리한다** (동시 세션이 서로의 컨테이너 동작에 간섭하지 않도록):
+  - 워크트리에서 백엔드 스택이 필요하면 **`scripts/worktree-stack.sh <name> <offset>`** 로 격리 스택을 띄운다
+    (compose 프로젝트 `bookclub-<name>` + 포트 오프셋 + 전용 볼륨·네트워크). 예: `scripts/worktree-stack.sh bc59 40 up -d` → api `:8040`, db `:5472`, redis `:6419`.
+    → 그 스택에서의 `restart`/`alembic migrate`/DB 쓰기는 **오직 그 스택에만** 적용되고 공유 `bookclub` 스택·타 세션에 영향 없다.
+  - 웹은 해당 스택 포트로 붙인다: `flutter run -d web-server --dart-define=API_BASE_URL=http://localhost:<API_PORT>`.
+  - 격리 스택을 안 쓰고 **공유 `bookclub` 스택(:8000/:5432)을 쓸 때는 파괴적 조작 금지** — `docker restart`, `alembic migrate`, 공유 dev DB(`bookclub`)에 `TRUNCATE`/`UPDATE` 금지. 파괴적 DB 검증은 throwaway `book_club_test` DB에서만.
+  - 다른 세션이 쓰는 포트/서버를 임의로 종료하지 않는다.
+- Flutter 웹 dev 서버(공유 스택용)는 **main 워크트리에서 실행**한다. 워크트리에서 띄우면 그 워크트리를 `git worktree remove` 할 때 서버가 깨진다.
+- 워크트리 정리(`git worktree remove`) 전에 그 워크트리에서 띄운 프로세스(dev 서버 등)·격리 스택(`scripts/worktree-stack.sh <name> <offset> down`)을 먼저 정리한다.
 
 ## 7. 버저닝 정책
 
@@ -234,4 +238,4 @@ Router  →  Service  →  Repository / External Adapter
 ---
 
 **Last updated**: 2026-08-06
-**CLAUDE.md version**: 1.4.0
+**CLAUDE.md version**: 1.5.0
