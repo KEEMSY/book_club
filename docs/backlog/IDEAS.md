@@ -274,3 +274,9 @@
 ### 2026-06-24 (Phase 16 M73 Flutter Web 진행 중 발견)
 
 - [ ] (mobile) `dart:io` 직접 import 7개 파일 웹 호환 처리 — `flutter build web` 컴파일 차단 블로커. `dart:io`는 웹에서 미지원이라 조건부 import(`dart.library.io` / `dart.library.html`) 또는 `kIsWeb` 분기 + 플랫폼 추상화 필요. 대상: `core/network/dio_provider.dart`, `reading/application/timer_lifecycle.dart`, `reading/application/timer_notifier.dart`, `auth/data/apple_login_adapter.dart`, `auth/application/auth_notifier.dart`, `auth/presentation/login_screen.dart`, `auth/data/kakao_login_adapter.dart` — 맥락: M73 웹 빌드 파이프라인 구축 (2026-06-24)
+
+### 2026-08-06 (BC-42 발제문 모임 에픽 마감 시 발견)
+
+- [ ] (monetization) **유료 모임 후속 에픽** — 모임/회차 단위 유료 입장·결제·정산. BC-42에서 데이터 모델 훅만 심어둠(`reading_clubs.access_type`/`join_price_cents`, `club_sessions.access_tier`/`price_cents`, 현재 전부 미사용). 필요한 것: (1) 가입 게이팅 로직(open/approval/paid), (2) 결제 연동(RevenueCat/PG), (3) 호스트 정산, (4) 유료 모임 발견·환불 정책. 트레바리형 시즌제 참고 — 맥락: BC-42 발제문 모임(유료화는 훅만) (2026-08-06)
+- [ ] (mobile) 모임 회차/발제문/토론 **실 UI E2E 자동화** — BC-49~52는 fake, BC-60에서 실 REST 배선했으나 위젯 테스트는 mock 기준. Chrome MCP 로컬 E2E(회차 생성→발제문 게시→논제 토론)를 CI에 편입할지 검토 — 맥락: BC-54 마감(E2E는 로컬 스택 기동 필요로 수동 확인) (2026-08-06)
+- [ ] (mobile) 피드 알림 `session_opened` ntype는 실제 발화되는 알림이 없음(BC-48은 agenda_published·discussion_commented만 푸시) — BC-52가 추가한 해당 라우팅 case는 dead. 정리하거나 향후 회차 오픈 알림 추가 시 활용 — 맥락: BC-52/BC-60 (2026-08-06)
