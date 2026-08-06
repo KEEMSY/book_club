@@ -10,7 +10,12 @@ from uuid import UUID
 
 import redis.asyncio as aioredis
 
-from app.core.exceptions import ConflictError, NotFoundError, PermissionDeniedError
+from app.core.exceptions import (
+    ConflictError,
+    NotConfiguredError,
+    NotFoundError,
+    PermissionDeniedError,
+)
 from app.core.ws_manager import ws_manager
 from app.domains.club.models import (
     AgendaStatus,
@@ -129,6 +134,23 @@ class NotificationClubPort(Protocol):
     ) -> None: ...
 
 
+class AgendaTopicAiPort(Protocol):
+    """AI 논제 초안 추천 포트 (BC-53).
+
+    ai_assistant 도메인(M63)의 논제 생성 자산을 재사용하기 위한 좁은 계약.
+    ``FeedClubPort``/``NotificationClubPort``와 같은 이유로 여기 정의한다:
+    club service는 이 Protocol에만 의존하고 구체 ``AIAssistantPort``/
+    ``AIAssistantService``는 절대 import하지 않는다(CLAUDE.md §3.2).
+    providers.py의 어댑터가 book 조회·Claude 호출·사용량 로깅까지 위임하고,
+    여기서는 문자열 후보 목록만 돌려받는다 — 추천만 반환하며 DB에는 저장하지
+    않는다(실제 논제 추가는 기존 add_topic 사용).
+    """
+
+    async def generate_topic_drafts(
+        self, *, user_id: UUID, book_id: UUID, scope: str
+    ) -> list[str]: ...
+
+
 @dataclass(slots=True)
 class ClubService:
     repo: ClubRepository
@@ -141,6 +163,11 @@ class ClubService:
     notification_service: NotificationClubPort | None = field(default=None)
     # Optional Redis client for recommendation caching; skipped when absent.
     redis: aioredis.Redis | None = field(default=None)
+    # Optional AI 논제 추천 포트 (BC-53) — 실제 HTTP 요청 경로에서는 providers.py가
+    # 항상 wiring하지만, 다른 cross-domain 포트들과 동일하게 옵션으로 두어 기존
+    # 생성 호출부(단위 테스트 등)를 깨지 않는다. 미설정 상태에서 추천을 요청하면
+    # NotConfiguredError(503)를 던진다.
+    agenda_ai: AgendaTopicAiPort | None = field(default=None)
 
     async def create_club(self, *, user_id: UUID, req: CreateClubRequest) -> ReadingClub:
         return await self.repo.create(
@@ -1046,6 +1073,38 @@ class ClubService:
             raise ConflictError("논제 목록이 일치하지 않습니다", code="INVALID_TOPIC_SET")
         reordered = await self.repo.reorder_topics(agenda.id, topic_ids)
         return [self._to_topic_public(t) for t in reordered]
+
+    # --- AI 논제 초안 추천 (BC-53) ---
+
+    async def recommend_topic_drafts(
+        self,
+        *,
+        club_id: UUID,
+        session_id: UUID,
+        agenda_id: UUID,
+        user_id: UUID,
+        book_id: UUID,
+        scope: str,
+    ) -> list[str]:
+        """발제문 author용 AI 논제 초안 3~5개 추천 (BC-53, design §6.3).
+
+        권한은 논제 추가·수정·삭제와 동일하게 "이 발제문의 author"로 게이팅한다
+        (``_assert_agenda_author`` 재사용) — 세션의 host/presenter 전반이 아니라
+        실제로 이 발제문을 쓴 사람만 추천을 받는다. 추천 결과는 그대로 반환할
+        뿐 DB에 저장하지 않는다: 발제자가 마음에 드는 문구를 골라 기존
+        ``add_topic``으로 직접 추가해야 한다. 무료 MVP 범위라 Pro 게이팅은 두지
+        않는다(design §6.3, 명시적 결정).
+        """
+        await self._get_session_in_club(club_id, session_id)
+        agenda = await self._get_agenda_in_session(session_id, agenda_id)
+        self._assert_agenda_author(agenda, user_id)
+        if self.agenda_ai is None:
+            raise NotConfiguredError(
+                "AI 논제 추천 기능을 사용할 수 없습니다", code="AGENDA_AI_UNAVAILABLE"
+            )
+        return await self.agenda_ai.generate_topic_drafts(
+            user_id=user_id, book_id=book_id, scope=scope
+        )
 
     async def _assert_host_or_presenter(
         self, *, club_id: UUID, session_id: UUID, user_id: UUID

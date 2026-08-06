@@ -9,6 +9,7 @@ references the inputs so it is obviously a stub, never mistaken for real content
 from __future__ import annotations
 
 from app.domains.ai_assistant.ports import (
+    AgendaTopicDraftsContent,
     AudioIntroContent,
     ClubTopicsContent,
     NextBookRecommendation,
@@ -62,6 +63,19 @@ class StubClaudeAdapter:
                 f"{page_start}~{page_end}쪽에서 가장 인상 깊었던 장면은? (샘플)",
                 "등장인물의 선택에 동의하나요? (샘플)",
                 "이번 주 범위의 핵심 메시지는? (샘플)",
+            ],
+            tokens_used=0,
+        )
+
+    async def generate_agenda_topics(
+        self, *, book_title: str, author: str, scope: str
+    ) -> AgendaTopicDraftsContent:
+        return AgendaTopicDraftsContent(
+            topics=[
+                f"《{book_title}》의 '{scope}' 범위에서 가장 논쟁적인 지점은? (샘플)",
+                "이 범위에서 등장인물의 선택에 동의하나요, 반대하나요? (샘플)",
+                f"{author}의 관점에서 이 범위가 전하는 메시지는 무엇일까요? (샘플)",
+                "우리 모임과 비슷한 경험이 있다면 무엇인가요? (샘플)",
             ],
             tokens_used=0,
         )

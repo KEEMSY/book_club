@@ -55,6 +55,22 @@ class ClubTopicsContent:
 
 
 @dataclass(frozen=True, slots=True)
+class AgendaTopicDraftsContent:
+    """3~5 draft 논제 candidates for a session agenda's free-text scope (BC-53).
+
+    Distinct from ``ClubTopicsContent`` (M63): that one is keyed on a numeric
+    page range and returns exactly 3 topics that get posted straight to club
+    chat; this one is keyed on the presenter's free-text scope description and
+    returns a variable 3~5 count that the caller only *recommends* — nothing is
+    persisted here, the presenter still adds picked/edited topics via the
+    existing ``add_topic`` flow (club domain, BC-45).
+    """
+
+    topics: list[str]
+    tokens_used: int = 0
+
+
+@dataclass(frozen=True, slots=True)
 class AudioIntroContent:
     """A ~200-character spoken reading intro script, played in-app via TTS."""
 
@@ -101,6 +117,10 @@ class AIAssistantPort(Protocol):
     async def generate_club_topics(
         self, *, book_title: str, page_start: int, page_end: int
     ) -> ClubTopicsContent: ...
+
+    async def generate_agenda_topics(
+        self, *, book_title: str, author: str, scope: str
+    ) -> AgendaTopicDraftsContent: ...
 
     async def generate_audio_intro(
         self, *, book_title: str, author: str, description: str | None

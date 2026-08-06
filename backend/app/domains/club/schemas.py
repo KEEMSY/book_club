@@ -281,6 +281,19 @@ class AgendaTopicListResponse(BaseModel):
     items: list[AgendaTopicPublic]
 
 
+class AgendaTopicRecommendationRequest(BaseModel):
+    """AI 논제 초안 추천 요청 (BC-53) — 책 + 이번 회차 범위(자유 텍스트)."""
+
+    book_id: UUID
+    scope: str = Field(min_length=1, max_length=2000)
+
+
+class AgendaTopicRecommendationResponse(BaseModel):
+    """추천된 논제 초안 3~5개 — DB에 저장되지 않는다. 실제 추가는 add_topic 사용."""
+
+    topics: list[str]
+
+
 class ReorderTopicsRequest(BaseModel):
     topic_ids: list[UUID] = Field(min_length=1)
 

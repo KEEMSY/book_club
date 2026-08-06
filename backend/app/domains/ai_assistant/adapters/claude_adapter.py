@@ -29,6 +29,7 @@ from tenacity import (
 
 from app.core.exceptions import ExternalServiceError
 from app.domains.ai_assistant.ports import (
+    AgendaTopicDraftsContent,
     AudioIntroContent,
     ClubTopicsContent,
     NextBookRecommendation,
@@ -76,6 +77,12 @@ _REFLECTION_SYSTEM = (
 _TOPICS_SYSTEM = (
     "당신은 독서 모임을 이끄는 진행자입니다. 이번 주 읽기 범위를 바탕으로 모임 구성원이 "
     "활발히 대화할 수 있는 토론 주제를 제안합니다. 모든 답변은 한국어로 작성합니다."
+)
+_AGENDA_TOPICS_SYSTEM = (
+    "당신은 독서 모임 발제자를 돕는 진행자입니다. 발제자가 정한 이번 회차의 범위를 "
+    "바탕으로, 모임 구성원이 활발히 토론할 수 있는 논제 초안을 제안합니다. 각 논제는 "
+    "찬반이 갈리거나 해석의 여지가 있는 개방형 질문으로 작성하세요. 모든 답변은 "
+    "한국어로 작성합니다."
 )
 _AUDIO_INTRO_SYSTEM = (
     "당신은 오디오 독서 코치입니다. 독자가 이어폰으로 들으며 책에 몰입할 수 있도록, "
@@ -141,6 +148,21 @@ _TOPICS_SCHEMA: dict[str, Any] = {
             "type": "array",
             "items": {"type": "string"},
             "description": "이번 주 읽기 범위 토론 주제 정확히 3개",
+        },
+    },
+    "required": ["topics"],
+    "additionalProperties": False,
+}
+
+_AGENDA_TOPICS_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "topics": {
+            "type": "array",
+            "items": {"type": "string"},
+            "minItems": 3,
+            "maxItems": 5,
+            "description": "발제 범위를 바탕으로 한 논제 초안, 3~5개",
         },
     },
     "required": ["topics"],
@@ -266,6 +288,21 @@ class ClaudeAdapter:
             system=_TOPICS_SYSTEM, prompt=prompt, schema=_TOPICS_SCHEMA
         )
         return ClubTopicsContent(
+            topics=[str(t) for t in data["topics"]],
+            tokens_used=tokens,
+        )
+
+    async def generate_agenda_topics(
+        self, *, book_title: str, author: str, scope: str
+    ) -> AgendaTopicDraftsContent:
+        prompt = (
+            f"책 제목: {book_title}\n저자: {author}\n이번 회차 발제 범위: {scope}\n\n"
+            "이 범위를 바탕으로 독서 모임 논제 초안 3~5개를 만들어 주세요."
+        )
+        data, tokens = await self._generate(
+            system=_AGENDA_TOPICS_SYSTEM, prompt=prompt, schema=_AGENDA_TOPICS_SCHEMA
+        )
+        return AgendaTopicDraftsContent(
             topics=[str(t) for t in data["topics"]],
             tokens_used=tokens,
         )
