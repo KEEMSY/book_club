@@ -237,6 +237,110 @@ class NotificationService:
                 {"badge_id": str(event.badge_id)},
             )
 
+    # --- BC-48: club session/agenda/discussion integration (design §6.2) ---
+    #
+    # Unlike the event-bus handlers above (on_reaction_added etc.), these are
+    # called synchronously by ClubService through the NotificationClubPort
+    # Protocol (club/service.py) — ClubService has already computed the
+    # deduplicated, self-excluded recipient list, so these methods only fan
+    # the push out per recipient. A per-recipient failure (bad token, DB
+    # hiccup) is logged and skipped so one bad recipient cannot block the
+    # rest of the club's notifications, and never propagates back to
+    # ClubService — a push failure must not roll back the agenda/comment
+    # write that already succeeded.
+
+    async def notify_agenda_published(
+        self,
+        *,
+        actor_id: UUID,
+        club_id: UUID,
+        session_id: UUID,
+        agenda_id: UUID,
+        recipient_ids: list[UUID],
+    ) -> None:
+        """Push '새 발제문이 올라왔어요' to every recipient (design §6.2).
+
+        ``actor_id`` (the publisher) is not pushed to — ClubService already
+        excludes it from ``recipient_ids``.
+        """
+        title = "새 발제문이 올라왔어요"
+        body = "모임에 새로운 발제문이 게시됐어요. 지금 확인해보세요."
+        data = {
+            "type": NotificationType.AGENDA_PUBLISHED.value,
+            "club_id": str(club_id),
+            "session_id": str(session_id),
+            "agenda_id": str(agenda_id),
+        }
+        await self._fan_out_club_push(
+            recipient_ids,
+            ntype=NotificationType.AGENDA_PUBLISHED,
+            title=title,
+            body=body,
+            data=data,
+        )
+
+    async def notify_topic_comment_added(
+        self,
+        *,
+        actor_id: UUID,
+        club_id: UUID,
+        session_id: UUID,
+        agenda_id: UUID,
+        topic_id: UUID,
+        comment_id: UUID,
+        recipient_ids: list[UUID],
+    ) -> None:
+        """Push '논제에 답글이 달렸어요' to the agenda author and/or parent-comment
+        author (design §6.2). ``actor_id`` (the commenter) is not pushed to —
+        ClubService already excludes it from ``recipient_ids``.
+        """
+        title = "논제에 답글이 달렸어요"
+        body = "회원님의 발제문/답글에 새 답글이 달렸습니다."
+        data = {
+            "type": NotificationType.DISCUSSION_COMMENTED.value,
+            "club_id": str(club_id),
+            "session_id": str(session_id),
+            "agenda_id": str(agenda_id),
+            "topic_id": str(topic_id),
+            "comment_id": str(comment_id),
+        }
+        await self._fan_out_club_push(
+            recipient_ids,
+            ntype=NotificationType.DISCUSSION_COMMENTED,
+            title=title,
+            body=body,
+            data=data,
+        )
+
+    async def _fan_out_club_push(
+        self,
+        recipient_ids: list[UUID],
+        *,
+        ntype: NotificationType,
+        title: str,
+        body: str,
+        data: dict[str, str],
+    ) -> None:
+        for uid in recipient_ids:
+            try:
+                async with self.sessionmaker() as session:
+                    notif = await self._save_notification(
+                        session,
+                        user_id=uid,
+                        ntype=ntype,
+                        title=title,
+                        body=body,
+                        data=data,
+                    )
+                    tokens = await self.device_tokens.get_active_tokens(uid)
+                    await session.commit()
+                if tokens:
+                    await self.push.send_to_tokens(tokens, notif.title, notif.body, data)
+            except Exception:
+                logger.exception(
+                    "club_notification_fan_out_failed user_id=%s ntype=%s", uid, ntype.value
+                )
+
     async def on_grade_up(self, event: object) -> None:
         """Push a grade-up notification when the user crosses a grade or tier boundary.
 

@@ -233,6 +233,26 @@ class _TestableNotificationService(NotificationService):
                 tokens, notif.title, notif.body, {"badge_id": str(event.badge_id)}
             )
 
+    async def _fan_out_club_push(
+        self,
+        recipient_ids: list[UUID],
+        *,
+        ntype: NotificationType,
+        title: str,
+        body: str,
+        data: dict[str, str],
+    ) -> None:
+        """In-memory override of the BC-48 fan-out helper — bypasses the real
+        sessionmaker (see _make_notification) while preserving the per-recipient
+        loop + push-call semantics the production code implements."""
+        for uid in recipient_ids:
+            notif = self._make_notification(
+                user_id=uid, ntype=ntype, title=title, body=body, data=data
+            )
+            tokens = await self.device_tokens.get_active_tokens(uid)
+            if tokens:
+                await self.push.send_to_tokens(tokens, notif.title, notif.body, data)
+
     async def on_grade_up(self, event: object) -> None:
         from app.domains.notification.service import _GRADE_NAMES, _TIER_ROMAN
         from app.domains.reading.events import UserGradeRecomputed as _UGR
@@ -537,3 +557,102 @@ async def test_on_badge_earned_no_push_when_no_tokens() -> None:
 
     assert len(svc._notifications) == 1
     assert len(push.calls) == 0
+
+
+# ---------------------------------------------------------------------------
+# BC-48: notify_agenda_published / notify_topic_comment_added
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_notify_agenda_published_fans_out_to_all_recipients() -> None:
+    push = FakePushAdapter()
+    member_a, member_b = uuid4(), uuid4()
+    club_id, session_id, agenda_id, actor_id = uuid4(), uuid4(), uuid4(), uuid4()
+
+    svc = _TestableNotificationService(push, {member_a: ["tok-a"], member_b: ["tok-b"]})
+
+    await svc.notify_agenda_published(
+        actor_id=actor_id,
+        club_id=club_id,
+        session_id=session_id,
+        agenda_id=agenda_id,
+        recipient_ids=[member_a, member_b],
+    )
+
+    assert len(svc._notifications) == 2
+    recipient_ids = {n.user_id for n in svc._notifications}
+    assert recipient_ids == {member_a, member_b}
+    assert all(n.ntype == NotificationType.AGENDA_PUBLISHED.value for n in svc._notifications)
+    assert len(push.calls) == 2
+    assert push.calls[0]["data"]["agenda_id"] == str(agenda_id)
+
+
+@pytest.mark.asyncio
+async def test_notify_agenda_published_empty_recipients_is_noop() -> None:
+    push = FakePushAdapter()
+    svc = _TestableNotificationService(push, {})
+
+    await svc.notify_agenda_published(
+        actor_id=uuid4(),
+        club_id=uuid4(),
+        session_id=uuid4(),
+        agenda_id=uuid4(),
+        recipient_ids=[],
+    )
+
+    assert svc._notifications == []
+    assert push.calls == []
+
+
+@pytest.mark.asyncio
+async def test_notify_agenda_published_skips_push_when_recipient_has_no_tokens() -> None:
+    """No device tokens: the in-app notification is still created, but no push fires."""
+    push = FakePushAdapter()
+    member = uuid4()
+    svc = _TestableNotificationService(push, {})
+
+    await svc.notify_agenda_published(
+        actor_id=uuid4(),
+        club_id=uuid4(),
+        session_id=uuid4(),
+        agenda_id=uuid4(),
+        recipient_ids=[member],
+    )
+
+    assert len(svc._notifications) == 1
+    assert push.calls == []
+
+
+@pytest.mark.asyncio
+async def test_notify_topic_comment_added_fans_out_to_agenda_and_parent_author() -> None:
+    push = FakePushAdapter()
+    agenda_author, parent_author = uuid4(), uuid4()
+    club_id, session_id, agenda_id, topic_id, comment_id = (
+        uuid4(),
+        uuid4(),
+        uuid4(),
+        uuid4(),
+        uuid4(),
+    )
+
+    svc = _TestableNotificationService(
+        push, {agenda_author: ["tok-agenda"], parent_author: ["tok-parent"]}
+    )
+
+    await svc.notify_topic_comment_added(
+        actor_id=uuid4(),
+        club_id=club_id,
+        session_id=session_id,
+        agenda_id=agenda_id,
+        topic_id=topic_id,
+        comment_id=comment_id,
+        recipient_ids=[agenda_author, parent_author],
+    )
+
+    assert len(svc._notifications) == 2
+    recipient_ids = {n.user_id for n in svc._notifications}
+    assert recipient_ids == {agenda_author, parent_author}
+    assert all(n.ntype == NotificationType.DISCUSSION_COMMENTED.value for n in svc._notifications)
+    assert len(push.calls) == 2
+    assert push.calls[0]["data"]["comment_id"] == str(comment_id)

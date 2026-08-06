@@ -13,9 +13,13 @@ from app.domains.club.service import ClubService
 
 def get_club_service(session: Annotated[AsyncSession, Depends(get_session)]) -> ClubService:
     from app.domains.feed.providers import get_feed_service
+    from app.domains.notification.providers import get_notification_service
 
     return ClubService(
         repo=ClubRepository(session),
         feed_service=get_feed_service(session),
+        # Process-wide — notification pushes use their own sessions, independent
+        # of the request-scoped `session` above (BC-48, mirrors feed_service).
+        notification_service=get_notification_service(),
         redis=get_redis(),
     )

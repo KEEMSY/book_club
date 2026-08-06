@@ -43,6 +43,11 @@ class NotificationType(enum.StrEnum):
     BADGE_EARNED = "badge_earned"
     STREAK_WARNING = "streak_warning"
     SUBSCRIPTION_REMINDER = "subscription_reminder"
+    # BC-48: club session/agenda/discussion notifications (design §6.2). Values
+    # match the feed domain's event_type strings for the same actions (BC-47)
+    # so mobile routing (BC-52) can share one discriminator across feed/push.
+    AGENDA_PUBLISHED = "agenda_published"
+    DISCUSSION_COMMENTED = "discussion_commented"
 
 
 class Notification(Base):

@@ -95,12 +95,50 @@ class FeedClubPort(Protocol):
     ) -> None: ...
 
 
+class NotificationClubPort(Protocol):
+    """Minimal cross-domain interface consumed by ClubService (BC-48, design §6.2).
+
+    Mirrors ``FeedClubPort`` above — defined here rather than importing
+    NotificationService so the club service depends only on this narrow
+    contract per CLAUDE.md §3.2. ClubService computes the deduplicated,
+    self-excluded recipient list (member roster / agenda author / parent
+    comment author) before calling either method; the port implementation is
+    only responsible for delivering the push.
+    """
+
+    async def notify_agenda_published(
+        self,
+        *,
+        actor_id: UUID,
+        club_id: UUID,
+        session_id: UUID,
+        agenda_id: UUID,
+        recipient_ids: list[UUID],
+    ) -> None: ...
+
+    async def notify_topic_comment_added(
+        self,
+        *,
+        actor_id: UUID,
+        club_id: UUID,
+        session_id: UUID,
+        agenda_id: UUID,
+        topic_id: UUID,
+        comment_id: UUID,
+        recipient_ids: list[UUID],
+    ) -> None: ...
+
+
 @dataclass(slots=True)
 class ClubService:
     repo: ClubRepository
     # Optional — existing callers that do not wire the feed service continue to
     # work; CLUB_JOINED events are silently skipped when absent.
     feed_service: FeedClubPort | None = field(default=None)
+    # Optional — existing callers that do not wire the notification service
+    # continue to work; agenda/discussion pushes are silently skipped when
+    # absent (BC-48, mirrors feed_service above).
+    notification_service: NotificationClubPort | None = field(default=None)
     # Optional Redis client for recommendation caching; skipped when absent.
     redis: aioredis.Redis | None = field(default=None)
 
@@ -906,6 +944,17 @@ class ClubService:
                 session_id=session_id,
                 agenda_id=agenda_id,
             )
+        if self.notification_service is not None:
+            member_ids = await self.repo.get_member_ids(club_id)
+            recipient_ids = [uid for uid in member_ids if uid != user_id]
+            if recipient_ids:
+                await self.notification_service.notify_agenda_published(
+                    actor_id=user_id,
+                    club_id=club_id,
+                    session_id=session_id,
+                    agenda_id=agenda_id,
+                    recipient_ids=recipient_ids,
+                )
         topics = await self.repo.list_topics_by_agenda(updated.id)
         return self._to_agenda_public(updated, topics)
 
@@ -1086,6 +1135,7 @@ class ClubService:
         await self._assert_club_member(club_id, user_id)
 
         parent_id = req.parent_comment_id
+        parent_author_id: UUID | None = None
         if parent_id is not None:
             parent = await self._get_comment_in_topic(topic.id, parent_id)
             if parent.parent_comment_id is not None:
@@ -1094,6 +1144,7 @@ class ClubService:
                 raise ConflictError(
                     "대댓글에는 답글을 달 수 없습니다", code="MAX_REPLY_DEPTH_EXCEEDED"
                 )
+            parent_author_id = parent.author_id
 
         comment = await self.repo.create_comment(
             topic_id=topic.id,
@@ -1111,6 +1162,24 @@ class ClubService:
                 comment_id=comment.id,
                 parent_comment_id=parent_id,
             )
+        if self.notification_service is not None:
+            # 발제문 author + (대댓글이면) 부모 댓글 author, 본인 제외·중복 제거
+            # (design §6.2). agenda/parent는 위에서 이미 조회했으므로 추가 쿼리 없음.
+            recipient_ids = {
+                uid
+                for uid in (agenda.author_id, parent_author_id)
+                if uid is not None and uid != user_id
+            }
+            if recipient_ids:
+                await self.notification_service.notify_topic_comment_added(
+                    actor_id=user_id,
+                    club_id=club_id,
+                    session_id=session_id,
+                    agenda_id=agenda_id,
+                    topic_id=topic.id,
+                    comment_id=comment.id,
+                    recipient_ids=list(recipient_ids),
+                )
         return self._to_comment_public(comment)
 
     async def update_comment(
