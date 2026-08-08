@@ -62,6 +62,8 @@ class SocialRepository {
   Future<void> unblock(String targetUserId) =>
       _call(() => _api.unblock(targetUserId));
 
+  Future<UserSummaryPage> getMyBlocks() => _call(() => _api.getMyBlocks());
+
   Future<void> reportUser(String userId, {required String reason}) =>
       _call(() => _api.reportUser(userId, {'reason': reason}));
 

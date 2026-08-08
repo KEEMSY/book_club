@@ -20,6 +20,7 @@ part 'social_api.g.dart';
 ///   * `GET    /social/users/{userId}/following`
 ///   * `POST   /social/block/{targetUserId}`
 ///   * `DELETE /social/block/{targetUserId}`
+///   * `GET    /social/blocks`
 ///   * `POST   /social/reports/users/{userId}`
 @RestApi()
 abstract class SocialApi {
@@ -48,6 +49,10 @@ abstract class SocialApi {
 
   @DELETE('/social/block/{targetUserId}')
   Future<void> unblock(@Path('targetUserId') String targetUserId);
+
+  /// Users the current account has blocked (BC-82 settings-hub entry).
+  @GET('/social/blocks')
+  Future<UserSummaryPage> getMyBlocks();
 
   @POST('/social/reports/users/{userId}')
   Future<void> reportUser(

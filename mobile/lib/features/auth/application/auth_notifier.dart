@@ -13,8 +13,8 @@ import 'auth_providers.dart';
 
 part 'auth_notifier.g.dart';
 
-/// Holds the [AuthState] sealed union and orchestrates the three public
-/// flows (kakao login · apple login · logout · account delete).
+/// Holds the [AuthState] sealed union and orchestrates the public auth flows
+/// (kakao login · apple login · logout · account delete).
 ///
 /// State transitions are kept unidirectional — only [_setState] writes to
 /// the underlying `state` so any future debug/logging hook can be attached
@@ -92,6 +92,17 @@ class AuthNotifier extends _$AuthNotifier {
     await _fcmTokenRefreshSub?.cancel();
     _fcmTokenRefreshSub = null;
     await _repository.logout();
+    _setState(const AuthState.unauthenticated());
+  }
+
+  /// Permanently deletes the signed-in user's account (BC-82 account
+  /// management). The backend soft-deletes and the local session is cleared
+  /// the same way [logout] clears it — there is no "undo" surfaced in the UI,
+  /// so the caller must confirm with the user before calling this.
+  Future<void> deleteAccount() async {
+    await _fcmTokenRefreshSub?.cancel();
+    _fcmTokenRefreshSub = null;
+    await _repository.deleteAccount();
     _setState(const AuthState.unauthenticated());
   }
 

@@ -7,6 +7,7 @@ import '../config/feature_flags.dart';
 import '../../features/admin/presentation/admin_console_screen.dart';
 import '../../features/auth/application/auth_notifier.dart';
 import '../../features/auth/domain/auth_state.dart';
+import '../../features/auth/presentation/account_screen.dart';
 import '../../features/auth/presentation/dev_login_screen.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../../features/book/presentation/book_detail_screen.dart';
@@ -28,6 +29,7 @@ import '../../features/community/presentation/my_reviews_screen.dart';
 import '../../features/community/presentation/profile_edit_screen.dart';
 import '../../features/community/presentation/user_profile_screen.dart';
 import '../../features/social/domain/user_summary.dart';
+import '../../features/social/presentation/blocked_users_screen.dart';
 import '../../features/feed/presentation/highlight_explore_screen.dart';
 import '../../features/feed/presentation/post_compose_screen.dart';
 import '../../features/club/presentation/club_chat_screen.dart';
@@ -53,6 +55,7 @@ import '../../features/onboarding/application/onboarding_provider.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/onboarding/presentation/privacy_policy_screen.dart';
 import '../../features/search/presentation/unified_search_screen.dart';
+import '../../features/settings/presentation/settings_screen.dart';
 import '../../features/subscription/presentation/paywall_screen.dart';
 import '../../features/subscription/presentation/team_admin_screen.dart';
 import '../../features/reading/application/recap_notifier.dart';
@@ -201,6 +204,12 @@ class AppRoutes {
   // M57 — in-app legal documents (App Store submission requirement).
   static const settingsPrivacy = '/settings/privacy';
   static const settingsTerms = '/settings/terms';
+
+  // BC-82 — settings hub: single entry point replacing the own-profile
+  // overflow menu, plus new entries reusing existing feature screens.
+  static const settings = '/settings';
+  static const account = '/settings/account';
+  static const blockedUsers = '/settings/blocked';
 
   // Highlight discovery — community-wide highlight explore feed.
   static const highlightExplore = '/highlights/explore';
@@ -696,6 +705,25 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           title: '이용약관',
           assetPath: 'assets/legal/terms.md',
         ),
+      ),
+      // BC-82 — settings hub, pushed above the shell from the own-profile
+      // AppBar action.
+      GoRoute(
+        path: AppRoutes.settings,
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) => const SettingsScreen(),
+      ),
+      // BC-82 — social-domain account status + delete-account entry.
+      GoRoute(
+        path: AppRoutes.account,
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) => const AccountScreen(),
+      ),
+      // BC-82 — blocked-users list, backed by `GET /social/blocks`.
+      GoRoute(
+        path: AppRoutes.blockedUsers,
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) => const BlockedUsersScreen(),
       ),
       // M31 — deeplink entry point: bookclub.app/invite/{code}
       // Applies the referral code and then redirects to home. The apply call

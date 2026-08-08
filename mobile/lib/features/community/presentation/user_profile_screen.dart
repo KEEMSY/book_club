@@ -5,14 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/config/feature_flags.dart';
-import '../../../core/providers/locale_provider.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../l10n/app_localizations.dart';
 import '../../../core/theme/grade_theme.dart';
 import '../../../core/theme/profile_theme_palette.dart';
-import '../../auth/application/auth_notifier.dart';
-import '../../auth/domain/auth_state.dart';
 import '../../book/application/book_providers.dart';
 import '../../book/presentation/widgets/book_cover.dart';
 import '../../feed/presentation/comments_sheet.dart';
@@ -73,119 +69,20 @@ class _ProfileContent extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
-    // BC-87: admin console entry is shown only on the owner's own profile and
-    // only when the authenticated user is an admin. The route + every backing
-    // endpoint re-checks is_admin server-side.
-    final auth = ref.watch(authNotifierProvider);
-    final bool isAdmin =
-        profile.isMe && auth is Authenticated && auth.user.isAdmin;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(profile.nickname),
+        // BC-82: the own-profile overflow menu (언어·개인정보처리방침·이용약관·
+        // 관리자·로그아웃) collapsed into a single settings-hub entry point —
+        // see SettingsScreen for where each item now lives (관리자 stays
+        // is_admin-gated inside the hub itself).
         actions: profile.isMe
             ? <Widget>[
-                PopupMenuButton<_OwnProfileAction>(
-                  icon: const Icon(Icons.more_vert_rounded),
-                  onSelected: (action) async {
-                    if (action == _OwnProfileAction.language) {
-                      await _showLanguagePicker(context, ref);
-                      return;
-                    }
-                    if (action == _OwnProfileAction.privacy) {
-                      context.push(AppRoutes.settingsPrivacy);
-                      return;
-                    }
-                    if (action == _OwnProfileAction.terms) {
-                      context.push(AppRoutes.settingsTerms);
-                      return;
-                    }
-                    if (action == _OwnProfileAction.admin) {
-                      context.push(AppRoutes.admin);
-                      return;
-                    }
-                    if (action == _OwnProfileAction.logout) {
-                      final bool? confirmed = await showDialog<bool>(
-                        context: context,
-                        builder: (ctx) => AlertDialog(
-                          title: const Text('로그아웃'),
-                          content: const Text('정말 로그아웃할까요?'),
-                          actions: <Widget>[
-                            TextButton(
-                              onPressed: () => Navigator.of(ctx).pop(false),
-                              child: const Text('취소'),
-                            ),
-                            TextButton(
-                              onPressed: () => Navigator.of(ctx).pop(true),
-                              child: Text(
-                                '로그아웃',
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.error,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                      if (confirmed == true && context.mounted) {
-                        await ref.read(authNotifierProvider.notifier).logout();
-                      }
-                    }
-                  },
-                  itemBuilder: (_) => <PopupMenuEntry<_OwnProfileAction>>[
-                    PopupMenuItem<_OwnProfileAction>(
-                      value: _OwnProfileAction.language,
-                      child: Row(
-                        children: <Widget>[
-                          const Icon(Icons.language_outlined),
-                          const SizedBox(width: 12),
-                          Text(AppLocalizations.of(context).settingsLanguage),
-                        ],
-                      ),
-                    ),
-                    const PopupMenuItem<_OwnProfileAction>(
-                      value: _OwnProfileAction.privacy,
-                      child: Row(
-                        children: <Widget>[
-                          Icon(Icons.privacy_tip_outlined),
-                          SizedBox(width: 12),
-                          Text('개인정보처리방침'),
-                        ],
-                      ),
-                    ),
-                    const PopupMenuItem<_OwnProfileAction>(
-                      value: _OwnProfileAction.terms,
-                      child: Row(
-                        children: <Widget>[
-                          Icon(Icons.description_outlined),
-                          SizedBox(width: 12),
-                          Text('이용약관'),
-                        ],
-                      ),
-                    ),
-                    if (isAdmin)
-                      const PopupMenuItem<_OwnProfileAction>(
-                        value: _OwnProfileAction.admin,
-                        child: Row(
-                          children: <Widget>[
-                            Icon(Icons.admin_panel_settings_outlined),
-                            SizedBox(width: 12),
-                            Text('관리자'),
-                          ],
-                        ),
-                      ),
-                    const PopupMenuDivider(),
-                    const PopupMenuItem<_OwnProfileAction>(
-                      value: _OwnProfileAction.logout,
-                      child: Row(
-                        children: <Widget>[
-                          Icon(Icons.logout_outlined),
-                          SizedBox(width: 12),
-                          Text('로그아웃'),
-                        ],
-                      ),
-                    ),
-                  ],
+                IconButton(
+                  icon: const Icon(Icons.settings_outlined),
+                  tooltip: '설정',
+                  onPressed: () => context.push(AppRoutes.settings),
                 ),
               ]
             : <Widget>[_ThreeDotMenu(profile: profile)],
@@ -1233,40 +1130,3 @@ class _UserPostsSliverState extends ConsumerState<_UserPostsSliver> {
     );
   }
 }
-
-enum _OwnProfileAction { language, privacy, terms, admin, logout }
-
-/// Lets the signed-in user switch the app language (M72 · i18n). Presented as a
-/// [SimpleDialog] from the own-profile overflow menu; the choice is persisted by
-/// [LocalePod] so it survives cold restarts.
-Future<void> _showLanguagePicker(BuildContext context, WidgetRef ref) async {
-  final Locale current = ref.read(localePodProvider);
-  final Locale? picked = await showDialog<Locale>(
-    context: context,
-    builder: (ctx) => SimpleDialog(
-      title: Text(AppLocalizations.of(ctx).settingsLanguage),
-      children: <Widget>[
-        for (final ({Locale locale, String label}) option in _languageOptions)
-          ListTile(
-            title: Text(option.label),
-            trailing: option.locale.languageCode == current.languageCode
-                ? const Icon(Icons.check_rounded)
-                : null,
-            onTap: () => Navigator.of(ctx).pop(option.locale),
-          ),
-      ],
-    ),
-  );
-  if (picked != null) {
-    await ref.read(localePodProvider.notifier).setLocale(picked);
-  }
-}
-
-/// Endonyms (each language named in itself) so the list is legible regardless
-/// of the currently active locale.
-const List<({Locale locale, String label})> _languageOptions =
-    <({Locale locale, String label})>[
-  (locale: Locale('ko'), label: '한국어'),
-  (locale: Locale('en'), label: 'English'),
-  (locale: Locale('ja'), label: '日本語'),
-];
