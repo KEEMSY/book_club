@@ -139,6 +139,14 @@ class AuthRepository {
 
   Future<void> logout() => _storage.clearTokens();
 
+  /// Soft-deletes the current user (BC-82 account-management entry) and
+  /// clears the local session the same way [logout] does — a deleted user
+  /// has no valid session left to keep around.
+  Future<void> deleteAccount() async {
+    await _call(() => _api.deleteMe());
+    await _storage.clearTokens();
+  }
+
   /// Seeds realistic test data for the current dev-login user.
   ///
   /// Idempotent — calling it again clears the previous seed and re-creates it.

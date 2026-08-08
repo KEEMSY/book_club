@@ -6,10 +6,10 @@ part of 'auth_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$authNotifierHash() => r'a42a38b78ef9514db63920331a1bc8584db13f10';
+String _$authNotifierHash() => r'8ecfd0af8092d3723f8fcc33e69a14b74cc96ccf';
 
-/// Holds the [AuthState] sealed union and orchestrates the three public
-/// flows (kakao login · apple login · logout · account delete).
+/// Holds the [AuthState] sealed union and orchestrates the public auth flows
+/// (kakao login · apple login · logout · account delete).
 ///
 /// State transitions are kept unidirectional — only [_setState] writes to
 /// the underlying `state` so any future debug/logging hook can be attached
