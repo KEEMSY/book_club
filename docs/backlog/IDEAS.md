@@ -284,3 +284,9 @@
 ### 2026-08-08 (BC-82 설정 허브 구현 중 발견)
 
 - [ ] (notification) 알림 수신 설정(유형별 on/off 토글) 화면·백엔드 부재 — 현재 `/notifications`(백엔드 `app/domains/notification/router.py`)는 인박스 조회·읽음처리·주간 리포트만 제공, 환경설정(preferences) 엔드포인트가 없음. 설정 허브의 "알림" 항목은 임시로 알림 인박스(`AppRoutes.notifications`)로 연결 — 맥락: BC-82 설정 허브 (2026-08-08)
+
+### 2026-08-08 (BC-77 프로필 개선 에픽 마감 시 발견)
+
+- [ ] (community/profile) **'내 활동' 요약 집계기가 community 도메인 종속** — BC-80의 `GET /community/me/activity`가 community 도메인 하위라 `FeatureFlags.community=false`(현재)면 프로필 '내 활동' 요약 섹션이 미노출. 개별 목록(리뷰/하이라이트/발제문/읽는중)은 community 밖이라 정상. 활동 집계기를 community 밖(예: me/auth 또는 별도 activity 표면)으로 이설할지 검토 — 맥락: BC-83 내 활동 탭 / BC-77 마감 (2026-08-08)
+- [ ] (profile) 프로필 표현력 4필드(cover_image_url·theme·featured_book_id·featured_quote)를 **NULL로 되돌릴 수 없음** — PATCH /me가 None을 "미변경"으로 처리(기존 bio와 동일 한계). "제거" 지원하려면 명시적 클리어 시맨틱(sentinel/전용 필드) 필요 — 맥락: BC-81/BC-84 (2026-08-08)
+- [ ] (profile) 표현력 편집의 "대표 책 선택"이 **서재 내 책만** 대상(전체 카탈로그 검색 아님) — 카탈로그 검색 선택 UX 검토 — 맥락: BC-84 (2026-08-08)
