@@ -87,4 +87,11 @@ abstract class ClubApi {
 
   @POST('/clubs/{clubId}/join-public')
   Future<dynamic> joinPublicClub(@Path('clubId') String clubId);
+
+  /// 내 활동 > 내 발제문 (BC-80/83), 최신순 페이지네이션.
+  @GET('/clubs/me/agendas')
+  Future<dynamic> listMyAgendas({
+    @Query('limit') int limit = 20,
+    @Query('offset') int offset = 0,
+  });
 }

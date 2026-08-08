@@ -952,6 +952,803 @@ class __$BookReviewSummaryDtoCopyWithImpl<$Res>
 }
 
 /// @nodoc
+mixin _$MyReviewItemDto {
+  String get id;
+  String get bookId;
+  String? get bookTitle;
+  String? get bookCoverUrl;
+  double get rating;
+  String? get body;
+  DateTime get createdAt;
+
+  /// Create a copy of MyReviewItemDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $MyReviewItemDtoCopyWith<MyReviewItemDto> get copyWith =>
+      _$MyReviewItemDtoCopyWithImpl<MyReviewItemDto>(
+          this as MyReviewItemDto, _$identity);
+
+  /// Serializes this MyReviewItemDto to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is MyReviewItemDto &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.bookId, bookId) || other.bookId == bookId) &&
+            (identical(other.bookTitle, bookTitle) ||
+                other.bookTitle == bookTitle) &&
+            (identical(other.bookCoverUrl, bookCoverUrl) ||
+                other.bookCoverUrl == bookCoverUrl) &&
+            (identical(other.rating, rating) || other.rating == rating) &&
+            (identical(other.body, body) || other.body == body) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, bookId, bookTitle,
+      bookCoverUrl, rating, body, createdAt);
+
+  @override
+  String toString() {
+    return 'MyReviewItemDto(id: $id, bookId: $bookId, bookTitle: $bookTitle, bookCoverUrl: $bookCoverUrl, rating: $rating, body: $body, createdAt: $createdAt)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $MyReviewItemDtoCopyWith<$Res> {
+  factory $MyReviewItemDtoCopyWith(
+          MyReviewItemDto value, $Res Function(MyReviewItemDto) _then) =
+      _$MyReviewItemDtoCopyWithImpl;
+  @useResult
+  $Res call(
+      {String id,
+      String bookId,
+      String? bookTitle,
+      String? bookCoverUrl,
+      double rating,
+      String? body,
+      DateTime createdAt});
+}
+
+/// @nodoc
+class _$MyReviewItemDtoCopyWithImpl<$Res>
+    implements $MyReviewItemDtoCopyWith<$Res> {
+  _$MyReviewItemDtoCopyWithImpl(this._self, this._then);
+
+  final MyReviewItemDto _self;
+  final $Res Function(MyReviewItemDto) _then;
+
+  /// Create a copy of MyReviewItemDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? bookId = null,
+    Object? bookTitle = freezed,
+    Object? bookCoverUrl = freezed,
+    Object? rating = null,
+    Object? body = freezed,
+    Object? createdAt = null,
+  }) {
+    return _then(_self.copyWith(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookId: null == bookId
+          ? _self.bookId
+          : bookId // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookTitle: freezed == bookTitle
+          ? _self.bookTitle
+          : bookTitle // ignore: cast_nullable_to_non_nullable
+              as String?,
+      bookCoverUrl: freezed == bookCoverUrl
+          ? _self.bookCoverUrl
+          : bookCoverUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      rating: null == rating
+          ? _self.rating
+          : rating // ignore: cast_nullable_to_non_nullable
+              as double,
+      body: freezed == body
+          ? _self.body
+          : body // ignore: cast_nullable_to_non_nullable
+              as String?,
+      createdAt: null == createdAt
+          ? _self.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [MyReviewItemDto].
+extension MyReviewItemDtoPatterns on MyReviewItemDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_MyReviewItemDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _MyReviewItemDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_MyReviewItemDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _MyReviewItemDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_MyReviewItemDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _MyReviewItemDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String bookId,
+            String? bookTitle,
+            String? bookCoverUrl,
+            double rating,
+            String? body,
+            DateTime createdAt)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _MyReviewItemDto() when $default != null:
+        return $default(_that.id, _that.bookId, _that.bookTitle,
+            _that.bookCoverUrl, _that.rating, _that.body, _that.createdAt);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String bookId,
+            String? bookTitle,
+            String? bookCoverUrl,
+            double rating,
+            String? body,
+            DateTime createdAt)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _MyReviewItemDto():
+        return $default(_that.id, _that.bookId, _that.bookTitle,
+            _that.bookCoverUrl, _that.rating, _that.body, _that.createdAt);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String id,
+            String bookId,
+            String? bookTitle,
+            String? bookCoverUrl,
+            double rating,
+            String? body,
+            DateTime createdAt)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _MyReviewItemDto() when $default != null:
+        return $default(_that.id, _that.bookId, _that.bookTitle,
+            _that.bookCoverUrl, _that.rating, _that.body, _that.createdAt);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _MyReviewItemDto implements MyReviewItemDto {
+  const _MyReviewItemDto(
+      {required this.id,
+      required this.bookId,
+      this.bookTitle,
+      this.bookCoverUrl,
+      required this.rating,
+      this.body,
+      required this.createdAt});
+  factory _MyReviewItemDto.fromJson(Map<String, dynamic> json) =>
+      _$MyReviewItemDtoFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final String bookId;
+  @override
+  final String? bookTitle;
+  @override
+  final String? bookCoverUrl;
+  @override
+  final double rating;
+  @override
+  final String? body;
+  @override
+  final DateTime createdAt;
+
+  /// Create a copy of MyReviewItemDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$MyReviewItemDtoCopyWith<_MyReviewItemDto> get copyWith =>
+      __$MyReviewItemDtoCopyWithImpl<_MyReviewItemDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$MyReviewItemDtoToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _MyReviewItemDto &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.bookId, bookId) || other.bookId == bookId) &&
+            (identical(other.bookTitle, bookTitle) ||
+                other.bookTitle == bookTitle) &&
+            (identical(other.bookCoverUrl, bookCoverUrl) ||
+                other.bookCoverUrl == bookCoverUrl) &&
+            (identical(other.rating, rating) || other.rating == rating) &&
+            (identical(other.body, body) || other.body == body) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, bookId, bookTitle,
+      bookCoverUrl, rating, body, createdAt);
+
+  @override
+  String toString() {
+    return 'MyReviewItemDto(id: $id, bookId: $bookId, bookTitle: $bookTitle, bookCoverUrl: $bookCoverUrl, rating: $rating, body: $body, createdAt: $createdAt)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$MyReviewItemDtoCopyWith<$Res>
+    implements $MyReviewItemDtoCopyWith<$Res> {
+  factory _$MyReviewItemDtoCopyWith(
+          _MyReviewItemDto value, $Res Function(_MyReviewItemDto) _then) =
+      __$MyReviewItemDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      String bookId,
+      String? bookTitle,
+      String? bookCoverUrl,
+      double rating,
+      String? body,
+      DateTime createdAt});
+}
+
+/// @nodoc
+class __$MyReviewItemDtoCopyWithImpl<$Res>
+    implements _$MyReviewItemDtoCopyWith<$Res> {
+  __$MyReviewItemDtoCopyWithImpl(this._self, this._then);
+
+  final _MyReviewItemDto _self;
+  final $Res Function(_MyReviewItemDto) _then;
+
+  /// Create a copy of MyReviewItemDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? bookId = null,
+    Object? bookTitle = freezed,
+    Object? bookCoverUrl = freezed,
+    Object? rating = null,
+    Object? body = freezed,
+    Object? createdAt = null,
+  }) {
+    return _then(_MyReviewItemDto(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookId: null == bookId
+          ? _self.bookId
+          : bookId // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookTitle: freezed == bookTitle
+          ? _self.bookTitle
+          : bookTitle // ignore: cast_nullable_to_non_nullable
+              as String?,
+      bookCoverUrl: freezed == bookCoverUrl
+          ? _self.bookCoverUrl
+          : bookCoverUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      rating: null == rating
+          ? _self.rating
+          : rating // ignore: cast_nullable_to_non_nullable
+              as double,
+      body: freezed == body
+          ? _self.body
+          : body // ignore: cast_nullable_to_non_nullable
+              as String?,
+      createdAt: null == createdAt
+          ? _self.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$MyReviewListResponseDto {
+  List<MyReviewItemDto> get items;
+  int get total;
+  bool get hasMore;
+
+  /// Create a copy of MyReviewListResponseDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $MyReviewListResponseDtoCopyWith<MyReviewListResponseDto> get copyWith =>
+      _$MyReviewListResponseDtoCopyWithImpl<MyReviewListResponseDto>(
+          this as MyReviewListResponseDto, _$identity);
+
+  /// Serializes this MyReviewListResponseDto to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is MyReviewListResponseDto &&
+            const DeepCollectionEquality().equals(other.items, items) &&
+            (identical(other.total, total) || other.total == total) &&
+            (identical(other.hasMore, hasMore) || other.hasMore == hasMore));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, const DeepCollectionEquality().hash(items), total, hasMore);
+
+  @override
+  String toString() {
+    return 'MyReviewListResponseDto(items: $items, total: $total, hasMore: $hasMore)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $MyReviewListResponseDtoCopyWith<$Res> {
+  factory $MyReviewListResponseDtoCopyWith(MyReviewListResponseDto value,
+          $Res Function(MyReviewListResponseDto) _then) =
+      _$MyReviewListResponseDtoCopyWithImpl;
+  @useResult
+  $Res call({List<MyReviewItemDto> items, int total, bool hasMore});
+}
+
+/// @nodoc
+class _$MyReviewListResponseDtoCopyWithImpl<$Res>
+    implements $MyReviewListResponseDtoCopyWith<$Res> {
+  _$MyReviewListResponseDtoCopyWithImpl(this._self, this._then);
+
+  final MyReviewListResponseDto _self;
+  final $Res Function(MyReviewListResponseDto) _then;
+
+  /// Create a copy of MyReviewListResponseDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? items = null,
+    Object? total = null,
+    Object? hasMore = null,
+  }) {
+    return _then(_self.copyWith(
+      items: null == items
+          ? _self.items
+          : items // ignore: cast_nullable_to_non_nullable
+              as List<MyReviewItemDto>,
+      total: null == total
+          ? _self.total
+          : total // ignore: cast_nullable_to_non_nullable
+              as int,
+      hasMore: null == hasMore
+          ? _self.hasMore
+          : hasMore // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [MyReviewListResponseDto].
+extension MyReviewListResponseDtoPatterns on MyReviewListResponseDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_MyReviewListResponseDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _MyReviewListResponseDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_MyReviewListResponseDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _MyReviewListResponseDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_MyReviewListResponseDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _MyReviewListResponseDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(List<MyReviewItemDto> items, int total, bool hasMore)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _MyReviewListResponseDto() when $default != null:
+        return $default(_that.items, _that.total, _that.hasMore);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(List<MyReviewItemDto> items, int total, bool hasMore)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _MyReviewListResponseDto():
+        return $default(_that.items, _that.total, _that.hasMore);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(List<MyReviewItemDto> items, int total, bool hasMore)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _MyReviewListResponseDto() when $default != null:
+        return $default(_that.items, _that.total, _that.hasMore);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _MyReviewListResponseDto implements MyReviewListResponseDto {
+  const _MyReviewListResponseDto(
+      {final List<MyReviewItemDto> items = const <MyReviewItemDto>[],
+      this.total = 0,
+      this.hasMore = false})
+      : _items = items;
+  factory _MyReviewListResponseDto.fromJson(Map<String, dynamic> json) =>
+      _$MyReviewListResponseDtoFromJson(json);
+
+  final List<MyReviewItemDto> _items;
+  @override
+  @JsonKey()
+  List<MyReviewItemDto> get items {
+    if (_items is EqualUnmodifiableListView) return _items;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_items);
+  }
+
+  @override
+  @JsonKey()
+  final int total;
+  @override
+  @JsonKey()
+  final bool hasMore;
+
+  /// Create a copy of MyReviewListResponseDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$MyReviewListResponseDtoCopyWith<_MyReviewListResponseDto> get copyWith =>
+      __$MyReviewListResponseDtoCopyWithImpl<_MyReviewListResponseDto>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$MyReviewListResponseDtoToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _MyReviewListResponseDto &&
+            const DeepCollectionEquality().equals(other._items, _items) &&
+            (identical(other.total, total) || other.total == total) &&
+            (identical(other.hasMore, hasMore) || other.hasMore == hasMore));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, const DeepCollectionEquality().hash(_items), total, hasMore);
+
+  @override
+  String toString() {
+    return 'MyReviewListResponseDto(items: $items, total: $total, hasMore: $hasMore)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$MyReviewListResponseDtoCopyWith<$Res>
+    implements $MyReviewListResponseDtoCopyWith<$Res> {
+  factory _$MyReviewListResponseDtoCopyWith(_MyReviewListResponseDto value,
+          $Res Function(_MyReviewListResponseDto) _then) =
+      __$MyReviewListResponseDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call({List<MyReviewItemDto> items, int total, bool hasMore});
+}
+
+/// @nodoc
+class __$MyReviewListResponseDtoCopyWithImpl<$Res>
+    implements _$MyReviewListResponseDtoCopyWith<$Res> {
+  __$MyReviewListResponseDtoCopyWithImpl(this._self, this._then);
+
+  final _MyReviewListResponseDto _self;
+  final $Res Function(_MyReviewListResponseDto) _then;
+
+  /// Create a copy of MyReviewListResponseDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? items = null,
+    Object? total = null,
+    Object? hasMore = null,
+  }) {
+    return _then(_MyReviewListResponseDto(
+      items: null == items
+          ? _self._items
+          : items // ignore: cast_nullable_to_non_nullable
+              as List<MyReviewItemDto>,
+      total: null == total
+          ? _self.total
+          : total // ignore: cast_nullable_to_non_nullable
+              as int,
+      hasMore: null == hasMore
+          ? _self.hasMore
+          : hasMore // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ));
+  }
+}
+
+/// @nodoc
 mixin _$CreateReviewRequest {
   double get rating;
   String? get body;

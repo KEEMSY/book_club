@@ -10,6 +10,7 @@ import '../../reading/application/reading_providers.dart';
 import '../../social/domain/user_summary.dart';
 import '../data/community_api.dart';
 import '../data/community_repository.dart';
+import '../domain/my_activity.dart';
 
 part 'community_providers.g.dart';
 
@@ -57,6 +58,19 @@ final userProfileProvider =
     badges: const <BadgeSummary>[],
     recentHighlights: const <HighlightSummary>[],
   );
+});
+
+/// "내 활동" summary (BC-83) — counts + a 5-item preview per category, shown
+/// on the caller's own profile. Only meaningful for `isMe` profiles (the
+/// endpoint is always scoped to the authenticated user), so the profile
+/// screen only watches this when rendering its own profile.
+///
+/// Gated behind [FeatureFlags.community] like the rest of this file's
+/// providers: `/community/*` is unmounted when community is deferred, and
+/// the profile screen hides the section entirely in that case rather than
+/// surfacing a 404.
+final myActivityProvider = FutureProvider.autoDispose<MyActivitySummary>((ref) {
+  return ref.watch(communityRepositoryProvider).getMyActivity();
 });
 
 // ---------------------------------------------------------------------------

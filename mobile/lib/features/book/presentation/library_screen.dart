@@ -43,9 +43,15 @@ import 'widgets/status_segment.dart';
 /// 잠시 멈춤 / 포기 상태는 "전체" 탭에서만 노출된다. 롱프레스 액션 시트로
 /// 어떤 상태로도 변경 가능하다.
 class LibraryScreen extends ConsumerStatefulWidget {
-  const LibraryScreen({super.key, this.highlightUserBookId});
+  const LibraryScreen({super.key, this.highlightUserBookId, this.initialTab});
 
   final String? highlightUserBookId;
+
+  /// Tab index to open on (0=전체, 1=읽는 중, 2=완독, 3=읽고 싶어요, 4=하이라이트).
+  /// Defaults to 0 (전체). BC-83's "내 활동 > 읽는 중 더보기" deep-links here
+  /// with `1` via `AppRoutes.library(initialTab: 1)` instead of duplicating
+  /// the reading-status list UI.
+  final int? initialTab;
 
   @override
   ConsumerState<LibraryScreen> createState() => _LibraryScreenState();
@@ -71,14 +77,15 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
   @override
   void initState() {
     super.initState();
-    _tab = TabController(length: 5, vsync: this);
+    final int initial = (widget.initialTab ?? 0).clamp(0, 4);
+    _tab = TabController(length: 5, vsync: this, initialIndex: initial);
     _tab.addListener(_onTabChange);
     _scrolls = List.generate(4, (i) {
       final ctrl = ScrollController();
       ctrl.addListener(() => _onScroll(i));
       return ctrl;
     });
-    WidgetsBinding.instance.addPostFrameCallback((_) => _loadTab(0));
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadTab(initial));
   }
 
   @override

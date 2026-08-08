@@ -16,6 +16,20 @@ class ClubRepository {
         .toList();
   }
 
+  /// 내 활동 > 내 발제문 (BC-80/83), 최신순 페이지네이션.
+  Future<MyAgendaPage> listMyAgendas({int limit = 20, int offset = 0}) async {
+    final data = await _api.listMyAgendas(limit: limit, offset: offset);
+    final map = data as Map<String, dynamic>;
+    final items = (map['items'] as List? ?? [])
+        .map((e) => MyAgendaItem.fromJson(e as Map<String, dynamic>))
+        .toList();
+    return MyAgendaPage(
+      items: items,
+      total: map['total'] as int? ?? items.length,
+      hasMore: map['has_more'] as bool? ?? false,
+    );
+  }
+
   Future<Club> createClub({
     required String name,
     String? description,
