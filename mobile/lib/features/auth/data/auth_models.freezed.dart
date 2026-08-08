@@ -1591,7 +1591,11 @@ mixin _$AuthUserDto {
   String get provider;
   DateTime get createdAt;
   String? get profileImageUrl;
-  String? get email;
+  String?
+      get email; // BC-87: not yet sent by `UserPublic` (backend BC-81, parallel work) —
+// defaults to false so today's `/me` payload still parses cleanly. Once
+// BC-81 adds `is_admin`, `field_rename: snake` picks it up automatically.
+  bool get isAdmin;
 
   /// Create a copy of AuthUserDto
   /// with the given fields replaced by the non-null parameter values.
@@ -1617,17 +1621,18 @@ mixin _$AuthUserDto {
                 other.createdAt == createdAt) &&
             (identical(other.profileImageUrl, profileImageUrl) ||
                 other.profileImageUrl == profileImageUrl) &&
-            (identical(other.email, email) || other.email == email));
+            (identical(other.email, email) || other.email == email) &&
+            (identical(other.isAdmin, isAdmin) || other.isAdmin == isAdmin));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, id, nickname, provider, createdAt, profileImageUrl, email);
+  int get hashCode => Object.hash(runtimeType, id, nickname, provider,
+      createdAt, profileImageUrl, email, isAdmin);
 
   @override
   String toString() {
-    return 'AuthUserDto(id: $id, nickname: $nickname, provider: $provider, createdAt: $createdAt, profileImageUrl: $profileImageUrl, email: $email)';
+    return 'AuthUserDto(id: $id, nickname: $nickname, provider: $provider, createdAt: $createdAt, profileImageUrl: $profileImageUrl, email: $email, isAdmin: $isAdmin)';
   }
 }
 
@@ -1643,7 +1648,8 @@ abstract mixin class $AuthUserDtoCopyWith<$Res> {
       String provider,
       DateTime createdAt,
       String? profileImageUrl,
-      String? email});
+      String? email,
+      bool isAdmin});
 }
 
 /// @nodoc
@@ -1664,6 +1670,7 @@ class _$AuthUserDtoCopyWithImpl<$Res> implements $AuthUserDtoCopyWith<$Res> {
     Object? createdAt = null,
     Object? profileImageUrl = freezed,
     Object? email = freezed,
+    Object? isAdmin = null,
   }) {
     return _then(_self.copyWith(
       id: null == id
@@ -1690,6 +1697,10 @@ class _$AuthUserDtoCopyWithImpl<$Res> implements $AuthUserDtoCopyWith<$Res> {
           ? _self.email
           : email // ignore: cast_nullable_to_non_nullable
               as String?,
+      isAdmin: null == isAdmin
+          ? _self.isAdmin
+          : isAdmin // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -1787,8 +1798,14 @@ extension AuthUserDtoPatterns on AuthUserDto {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String id, String nickname, String provider,
-            DateTime createdAt, String? profileImageUrl, String? email)?
+    TResult Function(
+            String id,
+            String nickname,
+            String provider,
+            DateTime createdAt,
+            String? profileImageUrl,
+            String? email,
+            bool isAdmin)?
         $default, {
     required TResult orElse(),
   }) {
@@ -1796,7 +1813,7 @@ extension AuthUserDtoPatterns on AuthUserDto {
     switch (_that) {
       case _AuthUserDto() when $default != null:
         return $default(_that.id, _that.nickname, _that.provider,
-            _that.createdAt, _that.profileImageUrl, _that.email);
+            _that.createdAt, _that.profileImageUrl, _that.email, _that.isAdmin);
       case _:
         return orElse();
     }
@@ -1817,15 +1834,21 @@ extension AuthUserDtoPatterns on AuthUserDto {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String id, String nickname, String provider,
-            DateTime createdAt, String? profileImageUrl, String? email)
+    TResult Function(
+            String id,
+            String nickname,
+            String provider,
+            DateTime createdAt,
+            String? profileImageUrl,
+            String? email,
+            bool isAdmin)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _AuthUserDto():
         return $default(_that.id, _that.nickname, _that.provider,
-            _that.createdAt, _that.profileImageUrl, _that.email);
+            _that.createdAt, _that.profileImageUrl, _that.email, _that.isAdmin);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -1845,15 +1868,21 @@ extension AuthUserDtoPatterns on AuthUserDto {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String id, String nickname, String provider,
-            DateTime createdAt, String? profileImageUrl, String? email)?
+    TResult? Function(
+            String id,
+            String nickname,
+            String provider,
+            DateTime createdAt,
+            String? profileImageUrl,
+            String? email,
+            bool isAdmin)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _AuthUserDto() when $default != null:
         return $default(_that.id, _that.nickname, _that.provider,
-            _that.createdAt, _that.profileImageUrl, _that.email);
+            _that.createdAt, _that.profileImageUrl, _that.email, _that.isAdmin);
       case _:
         return null;
     }
@@ -1869,7 +1898,8 @@ class _AuthUserDto extends AuthUserDto {
       required this.provider,
       required this.createdAt,
       this.profileImageUrl,
-      this.email})
+      this.email,
+      this.isAdmin = false})
       : super._();
   factory _AuthUserDto.fromJson(Map<String, dynamic> json) =>
       _$AuthUserDtoFromJson(json);
@@ -1886,6 +1916,12 @@ class _AuthUserDto extends AuthUserDto {
   final String? profileImageUrl;
   @override
   final String? email;
+// BC-87: not yet sent by `UserPublic` (backend BC-81, parallel work) —
+// defaults to false so today's `/me` payload still parses cleanly. Once
+// BC-81 adds `is_admin`, `field_rename: snake` picks it up automatically.
+  @override
+  @JsonKey()
+  final bool isAdmin;
 
   /// Create a copy of AuthUserDto
   /// with the given fields replaced by the non-null parameter values.
@@ -1916,17 +1952,18 @@ class _AuthUserDto extends AuthUserDto {
                 other.createdAt == createdAt) &&
             (identical(other.profileImageUrl, profileImageUrl) ||
                 other.profileImageUrl == profileImageUrl) &&
-            (identical(other.email, email) || other.email == email));
+            (identical(other.email, email) || other.email == email) &&
+            (identical(other.isAdmin, isAdmin) || other.isAdmin == isAdmin));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, id, nickname, provider, createdAt, profileImageUrl, email);
+  int get hashCode => Object.hash(runtimeType, id, nickname, provider,
+      createdAt, profileImageUrl, email, isAdmin);
 
   @override
   String toString() {
-    return 'AuthUserDto(id: $id, nickname: $nickname, provider: $provider, createdAt: $createdAt, profileImageUrl: $profileImageUrl, email: $email)';
+    return 'AuthUserDto(id: $id, nickname: $nickname, provider: $provider, createdAt: $createdAt, profileImageUrl: $profileImageUrl, email: $email, isAdmin: $isAdmin)';
   }
 }
 
@@ -1944,7 +1981,8 @@ abstract mixin class _$AuthUserDtoCopyWith<$Res>
       String provider,
       DateTime createdAt,
       String? profileImageUrl,
-      String? email});
+      String? email,
+      bool isAdmin});
 }
 
 /// @nodoc
@@ -1965,6 +2003,7 @@ class __$AuthUserDtoCopyWithImpl<$Res> implements _$AuthUserDtoCopyWith<$Res> {
     Object? createdAt = null,
     Object? profileImageUrl = freezed,
     Object? email = freezed,
+    Object? isAdmin = null,
   }) {
     return _then(_AuthUserDto(
       id: null == id
@@ -1991,6 +2030,10 @@ class __$AuthUserDtoCopyWithImpl<$Res> implements _$AuthUserDtoCopyWith<$Res> {
           ? _self.email
           : email // ignore: cast_nullable_to_non_nullable
               as String?,
+      isAdmin: null == isAdmin
+          ? _self.isAdmin
+          : isAdmin // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }

@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'auth_user.dart';
+part of 'admin_user.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -13,87 +13,83 @@ part of 'auth_user.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
-mixin _$AuthUser {
+mixin _$AdminUser {
   String get id;
   String get nickname;
-  AuthProvider get provider;
-  DateTime get createdAt;
-  String? get profileImageUrl;
-  String?
-      get email; // BC-87: gates the admin console entry point / route. Defaults to false
-// so call sites that predate this field (tests, other builders) still
-// compile without passing it explicitly.
+  String? get email;
+  bool get isActive;
   bool get isAdmin;
+  bool get isPro;
+  DateTime get createdAt;
 
-  /// Create a copy of AuthUser
+  /// Create a copy of AdminUser
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  $AuthUserCopyWith<AuthUser> get copyWith =>
-      _$AuthUserCopyWithImpl<AuthUser>(this as AuthUser, _$identity);
+  $AdminUserCopyWith<AdminUser> get copyWith =>
+      _$AdminUserCopyWithImpl<AdminUser>(this as AdminUser, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is AuthUser &&
+            other is AdminUser &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.nickname, nickname) ||
                 other.nickname == nickname) &&
-            (identical(other.provider, provider) ||
-                other.provider == provider) &&
-            (identical(other.createdAt, createdAt) ||
-                other.createdAt == createdAt) &&
-            (identical(other.profileImageUrl, profileImageUrl) ||
-                other.profileImageUrl == profileImageUrl) &&
             (identical(other.email, email) || other.email == email) &&
-            (identical(other.isAdmin, isAdmin) || other.isAdmin == isAdmin));
+            (identical(other.isActive, isActive) ||
+                other.isActive == isActive) &&
+            (identical(other.isAdmin, isAdmin) || other.isAdmin == isAdmin) &&
+            (identical(other.isPro, isPro) || other.isPro == isPro) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, id, nickname, provider,
-      createdAt, profileImageUrl, email, isAdmin);
+  int get hashCode => Object.hash(
+      runtimeType, id, nickname, email, isActive, isAdmin, isPro, createdAt);
 
   @override
   String toString() {
-    return 'AuthUser(id: $id, nickname: $nickname, provider: $provider, createdAt: $createdAt, profileImageUrl: $profileImageUrl, email: $email, isAdmin: $isAdmin)';
+    return 'AdminUser(id: $id, nickname: $nickname, email: $email, isActive: $isActive, isAdmin: $isAdmin, isPro: $isPro, createdAt: $createdAt)';
   }
 }
 
 /// @nodoc
-abstract mixin class $AuthUserCopyWith<$Res> {
-  factory $AuthUserCopyWith(AuthUser value, $Res Function(AuthUser) _then) =
-      _$AuthUserCopyWithImpl;
+abstract mixin class $AdminUserCopyWith<$Res> {
+  factory $AdminUserCopyWith(AdminUser value, $Res Function(AdminUser) _then) =
+      _$AdminUserCopyWithImpl;
   @useResult
   $Res call(
       {String id,
       String nickname,
-      AuthProvider provider,
-      DateTime createdAt,
-      String? profileImageUrl,
       String? email,
-      bool isAdmin});
+      bool isActive,
+      bool isAdmin,
+      bool isPro,
+      DateTime createdAt});
 }
 
 /// @nodoc
-class _$AuthUserCopyWithImpl<$Res> implements $AuthUserCopyWith<$Res> {
-  _$AuthUserCopyWithImpl(this._self, this._then);
+class _$AdminUserCopyWithImpl<$Res> implements $AdminUserCopyWith<$Res> {
+  _$AdminUserCopyWithImpl(this._self, this._then);
 
-  final AuthUser _self;
-  final $Res Function(AuthUser) _then;
+  final AdminUser _self;
+  final $Res Function(AdminUser) _then;
 
-  /// Create a copy of AuthUser
+  /// Create a copy of AdminUser
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
     Object? id = null,
     Object? nickname = null,
-    Object? provider = null,
-    Object? createdAt = null,
-    Object? profileImageUrl = freezed,
     Object? email = freezed,
+    Object? isActive = null,
     Object? isAdmin = null,
+    Object? isPro = null,
+    Object? createdAt = null,
   }) {
     return _then(_self.copyWith(
       id: null == id
@@ -104,32 +100,32 @@ class _$AuthUserCopyWithImpl<$Res> implements $AuthUserCopyWith<$Res> {
           ? _self.nickname
           : nickname // ignore: cast_nullable_to_non_nullable
               as String,
-      provider: null == provider
-          ? _self.provider
-          : provider // ignore: cast_nullable_to_non_nullable
-              as AuthProvider,
-      createdAt: null == createdAt
-          ? _self.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      profileImageUrl: freezed == profileImageUrl
-          ? _self.profileImageUrl
-          : profileImageUrl // ignore: cast_nullable_to_non_nullable
-              as String?,
       email: freezed == email
           ? _self.email
           : email // ignore: cast_nullable_to_non_nullable
               as String?,
+      isActive: null == isActive
+          ? _self.isActive
+          : isActive // ignore: cast_nullable_to_non_nullable
+              as bool,
       isAdmin: null == isAdmin
           ? _self.isAdmin
           : isAdmin // ignore: cast_nullable_to_non_nullable
               as bool,
+      isPro: null == isPro
+          ? _self.isPro
+          : isPro // ignore: cast_nullable_to_non_nullable
+              as bool,
+      createdAt: null == createdAt
+          ? _self.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
     ));
   }
 }
 
-/// Adds pattern-matching-related methods to [AuthUser].
-extension AuthUserPatterns on AuthUser {
+/// Adds pattern-matching-related methods to [AdminUser].
+extension AdminUserPatterns on AdminUser {
   /// A variant of `map` that fallback to returning `orElse`.
   ///
   /// It is equivalent to doing:
@@ -144,12 +140,12 @@ extension AuthUserPatterns on AuthUser {
 
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>(
-    TResult Function(_AuthUser value)? $default, {
+    TResult Function(_AdminUser value)? $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
-      case _AuthUser() when $default != null:
+      case _AdminUser() when $default != null:
         return $default(_that);
       case _:
         return orElse();
@@ -171,11 +167,11 @@ extension AuthUserPatterns on AuthUser {
 
   @optionalTypeArgs
   TResult map<TResult extends Object?>(
-    TResult Function(_AuthUser value) $default,
+    TResult Function(_AdminUser value) $default,
   ) {
     final _that = this;
     switch (_that) {
-      case _AuthUser():
+      case _AdminUser():
         return $default(_that);
       case _:
         throw StateError('Unexpected subclass');
@@ -196,11 +192,11 @@ extension AuthUserPatterns on AuthUser {
 
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>(
-    TResult? Function(_AuthUser value)? $default,
+    TResult? Function(_AdminUser value)? $default,
   ) {
     final _that = this;
     switch (_that) {
-      case _AuthUser() when $default != null:
+      case _AdminUser() when $default != null:
         return $default(_that);
       case _:
         return null;
@@ -221,22 +217,16 @@ extension AuthUserPatterns on AuthUser {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(
-            String id,
-            String nickname,
-            AuthProvider provider,
-            DateTime createdAt,
-            String? profileImageUrl,
-            String? email,
-            bool isAdmin)?
+    TResult Function(String id, String nickname, String? email, bool isActive,
+            bool isAdmin, bool isPro, DateTime createdAt)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
-      case _AuthUser() when $default != null:
-        return $default(_that.id, _that.nickname, _that.provider,
-            _that.createdAt, _that.profileImageUrl, _that.email, _that.isAdmin);
+      case _AdminUser() when $default != null:
+        return $default(_that.id, _that.nickname, _that.email, _that.isActive,
+            _that.isAdmin, _that.isPro, _that.createdAt);
       case _:
         return orElse();
     }
@@ -257,21 +247,15 @@ extension AuthUserPatterns on AuthUser {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(
-            String id,
-            String nickname,
-            AuthProvider provider,
-            DateTime createdAt,
-            String? profileImageUrl,
-            String? email,
-            bool isAdmin)
+    TResult Function(String id, String nickname, String? email, bool isActive,
+            bool isAdmin, bool isPro, DateTime createdAt)
         $default,
   ) {
     final _that = this;
     switch (_that) {
-      case _AuthUser():
-        return $default(_that.id, _that.nickname, _that.provider,
-            _that.createdAt, _that.profileImageUrl, _that.email, _that.isAdmin);
+      case _AdminUser():
+        return $default(_that.id, _that.nickname, _that.email, _that.isActive,
+            _that.isAdmin, _that.isPro, _that.createdAt);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -291,21 +275,15 @@ extension AuthUserPatterns on AuthUser {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(
-            String id,
-            String nickname,
-            AuthProvider provider,
-            DateTime createdAt,
-            String? profileImageUrl,
-            String? email,
-            bool isAdmin)?
+    TResult? Function(String id, String nickname, String? email, bool isActive,
+            bool isAdmin, bool isPro, DateTime createdAt)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
-      case _AuthUser() when $default != null:
-        return $default(_that.id, _that.nickname, _that.provider,
-            _that.createdAt, _that.profileImageUrl, _that.email, _that.isAdmin);
+      case _AdminUser() when $default != null:
+        return $default(_that.id, _that.nickname, _that.email, _that.isActive,
+            _that.isAdmin, _that.isPro, _that.createdAt);
       case _:
         return null;
     }
@@ -314,109 +292,105 @@ extension AuthUserPatterns on AuthUser {
 
 /// @nodoc
 
-class _AuthUser implements AuthUser {
-  const _AuthUser(
+class _AdminUser implements AdminUser {
+  const _AdminUser(
       {required this.id,
       required this.nickname,
-      required this.provider,
-      required this.createdAt,
-      this.profileImageUrl,
       this.email,
-      this.isAdmin = false});
+      required this.isActive,
+      required this.isAdmin,
+      required this.isPro,
+      required this.createdAt});
 
   @override
   final String id;
   @override
   final String nickname;
   @override
-  final AuthProvider provider;
+  final String? email;
+  @override
+  final bool isActive;
+  @override
+  final bool isAdmin;
+  @override
+  final bool isPro;
   @override
   final DateTime createdAt;
-  @override
-  final String? profileImageUrl;
-  @override
-  final String? email;
-// BC-87: gates the admin console entry point / route. Defaults to false
-// so call sites that predate this field (tests, other builders) still
-// compile without passing it explicitly.
-  @override
-  @JsonKey()
-  final bool isAdmin;
 
-  /// Create a copy of AuthUser
+  /// Create a copy of AdminUser
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  _$AuthUserCopyWith<_AuthUser> get copyWith =>
-      __$AuthUserCopyWithImpl<_AuthUser>(this, _$identity);
+  _$AdminUserCopyWith<_AdminUser> get copyWith =>
+      __$AdminUserCopyWithImpl<_AdminUser>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _AuthUser &&
+            other is _AdminUser &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.nickname, nickname) ||
                 other.nickname == nickname) &&
-            (identical(other.provider, provider) ||
-                other.provider == provider) &&
-            (identical(other.createdAt, createdAt) ||
-                other.createdAt == createdAt) &&
-            (identical(other.profileImageUrl, profileImageUrl) ||
-                other.profileImageUrl == profileImageUrl) &&
             (identical(other.email, email) || other.email == email) &&
-            (identical(other.isAdmin, isAdmin) || other.isAdmin == isAdmin));
+            (identical(other.isActive, isActive) ||
+                other.isActive == isActive) &&
+            (identical(other.isAdmin, isAdmin) || other.isAdmin == isAdmin) &&
+            (identical(other.isPro, isPro) || other.isPro == isPro) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, id, nickname, provider,
-      createdAt, profileImageUrl, email, isAdmin);
+  int get hashCode => Object.hash(
+      runtimeType, id, nickname, email, isActive, isAdmin, isPro, createdAt);
 
   @override
   String toString() {
-    return 'AuthUser(id: $id, nickname: $nickname, provider: $provider, createdAt: $createdAt, profileImageUrl: $profileImageUrl, email: $email, isAdmin: $isAdmin)';
+    return 'AdminUser(id: $id, nickname: $nickname, email: $email, isActive: $isActive, isAdmin: $isAdmin, isPro: $isPro, createdAt: $createdAt)';
   }
 }
 
 /// @nodoc
-abstract mixin class _$AuthUserCopyWith<$Res>
-    implements $AuthUserCopyWith<$Res> {
-  factory _$AuthUserCopyWith(_AuthUser value, $Res Function(_AuthUser) _then) =
-      __$AuthUserCopyWithImpl;
+abstract mixin class _$AdminUserCopyWith<$Res>
+    implements $AdminUserCopyWith<$Res> {
+  factory _$AdminUserCopyWith(
+          _AdminUser value, $Res Function(_AdminUser) _then) =
+      __$AdminUserCopyWithImpl;
   @override
   @useResult
   $Res call(
       {String id,
       String nickname,
-      AuthProvider provider,
-      DateTime createdAt,
-      String? profileImageUrl,
       String? email,
-      bool isAdmin});
+      bool isActive,
+      bool isAdmin,
+      bool isPro,
+      DateTime createdAt});
 }
 
 /// @nodoc
-class __$AuthUserCopyWithImpl<$Res> implements _$AuthUserCopyWith<$Res> {
-  __$AuthUserCopyWithImpl(this._self, this._then);
+class __$AdminUserCopyWithImpl<$Res> implements _$AdminUserCopyWith<$Res> {
+  __$AdminUserCopyWithImpl(this._self, this._then);
 
-  final _AuthUser _self;
-  final $Res Function(_AuthUser) _then;
+  final _AdminUser _self;
+  final $Res Function(_AdminUser) _then;
 
-  /// Create a copy of AuthUser
+  /// Create a copy of AdminUser
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $Res call({
     Object? id = null,
     Object? nickname = null,
-    Object? provider = null,
-    Object? createdAt = null,
-    Object? profileImageUrl = freezed,
     Object? email = freezed,
+    Object? isActive = null,
     Object? isAdmin = null,
+    Object? isPro = null,
+    Object? createdAt = null,
   }) {
-    return _then(_AuthUser(
+    return _then(_AdminUser(
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -425,26 +399,26 @@ class __$AuthUserCopyWithImpl<$Res> implements _$AuthUserCopyWith<$Res> {
           ? _self.nickname
           : nickname // ignore: cast_nullable_to_non_nullable
               as String,
-      provider: null == provider
-          ? _self.provider
-          : provider // ignore: cast_nullable_to_non_nullable
-              as AuthProvider,
-      createdAt: null == createdAt
-          ? _self.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      profileImageUrl: freezed == profileImageUrl
-          ? _self.profileImageUrl
-          : profileImageUrl // ignore: cast_nullable_to_non_nullable
-              as String?,
       email: freezed == email
           ? _self.email
           : email // ignore: cast_nullable_to_non_nullable
               as String?,
+      isActive: null == isActive
+          ? _self.isActive
+          : isActive // ignore: cast_nullable_to_non_nullable
+              as bool,
       isAdmin: null == isAdmin
           ? _self.isAdmin
           : isAdmin // ignore: cast_nullable_to_non_nullable
               as bool,
+      isPro: null == isPro
+          ? _self.isPro
+          : isPro // ignore: cast_nullable_to_non_nullable
+              as bool,
+      createdAt: null == createdAt
+          ? _self.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
     ));
   }
 }

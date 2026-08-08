@@ -71,6 +71,7 @@ _AuthUserDto _$AuthUserDtoFromJson(Map<String, dynamic> json) => _AuthUserDto(
       createdAt: DateTime.parse(json['created_at'] as String),
       profileImageUrl: json['profile_image_url'] as String?,
       email: json['email'] as String?,
+      isAdmin: json['is_admin'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$AuthUserDtoToJson(_AuthUserDto instance) =>
@@ -81,6 +82,7 @@ Map<String, dynamic> _$AuthUserDtoToJson(_AuthUserDto instance) =>
       'created_at': instance.createdAt.toIso8601String(),
       'profile_image_url': instance.profileImageUrl,
       'email': instance.email,
+      'is_admin': instance.isAdmin,
     };
 
 _LoginResponse _$LoginResponseFromJson(Map<String, dynamic> json) =>

@@ -11,6 +11,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../core/theme/grade_theme.dart';
 import '../../auth/application/auth_notifier.dart';
+import '../../auth/domain/auth_state.dart';
 import '../../feed/presentation/comments_sheet.dart';
 import '../../subscription/application/subscription_notifier.dart';
 import '../../subscription/presentation/pro_badge.dart';
@@ -68,6 +69,12 @@ class _ProfileContent extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
+    // BC-87: admin console entry is shown only on the owner's own profile and
+    // only when the authenticated user is an admin. The route + every backing
+    // endpoint re-checks is_admin server-side.
+    final auth = ref.watch(authNotifierProvider);
+    final bool isAdmin =
+        profile.isMe && auth is Authenticated && auth.user.isAdmin;
 
     return Scaffold(
       appBar: AppBar(
@@ -87,6 +94,10 @@ class _ProfileContent extends ConsumerWidget {
                     }
                     if (action == _OwnProfileAction.terms) {
                       context.push(AppRoutes.settingsTerms);
+                      return;
+                    }
+                    if (action == _OwnProfileAction.admin) {
+                      context.push(AppRoutes.admin);
                       return;
                     }
                     if (action == _OwnProfileAction.logout) {
@@ -148,6 +159,17 @@ class _ProfileContent extends ConsumerWidget {
                         ],
                       ),
                     ),
+                    if (isAdmin)
+                      const PopupMenuItem<_OwnProfileAction>(
+                        value: _OwnProfileAction.admin,
+                        child: Row(
+                          children: <Widget>[
+                            Icon(Icons.admin_panel_settings_outlined),
+                            SizedBox(width: 12),
+                            Text('관리자'),
+                          ],
+                        ),
+                      ),
                     const PopupMenuDivider(),
                     const PopupMenuItem<_OwnProfileAction>(
                       value: _OwnProfileAction.logout,
@@ -994,7 +1016,7 @@ class _UserPostsSliverState extends ConsumerState<_UserPostsSliver> {
   }
 }
 
-enum _OwnProfileAction { language, privacy, terms, logout }
+enum _OwnProfileAction { language, privacy, terms, admin, logout }
 
 /// Lets the signed-in user switch the app language (M72 · i18n). Presented as a
 /// [SimpleDialog] from the own-profile overflow menu; the choice is persisted by
