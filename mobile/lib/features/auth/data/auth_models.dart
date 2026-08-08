@@ -93,6 +93,14 @@ abstract class AuthUserDto with _$AuthUserDto {
     // defaults to false so today's `/me` payload still parses cleanly. Once
     // BC-81 adds `is_admin`, `field_rename: snake` picks it up automatically.
     @Default(false) bool isAdmin,
+    // Profile expressiveness (backend BC-81, mobile UI BC-84) — mirrors
+    // `UserPublic.cover_image_url` / `.theme` / `.featured_book_id` /
+    // `.featured_quote`. Raw wire values; see `AuthUser` for why `theme`
+    // stays a `String?` here instead of the `ProfileTheme` enum.
+    String? coverImageUrl,
+    String? theme,
+    String? featuredBookId,
+    String? featuredQuote,
   }) = _AuthUserDto;
 
   factory AuthUserDto.fromJson(Map<String, dynamic> json) =>
@@ -107,6 +115,10 @@ abstract class AuthUserDto with _$AuthUserDto {
       profileImageUrl: profileImageUrl,
       email: email,
       isAdmin: isAdmin,
+      coverImageUrl: coverImageUrl,
+      theme: theme,
+      featuredBookId: featuredBookId,
+      featuredQuote: featuredQuote,
     );
   }
 }

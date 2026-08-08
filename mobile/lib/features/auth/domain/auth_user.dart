@@ -53,5 +53,15 @@ abstract class AuthUser with _$AuthUser {
     // so call sites that predate this field (tests, other builders) still
     // compile without passing it explicitly.
     @Default(false) bool isAdmin,
+    // Profile expressiveness (backend BC-81, mobile UI BC-84). Raw wire
+    // values — see the matching comment on `UserProfile`
+    // (features/social/domain/user_summary.dart) for why `theme` isn't the
+    // `ProfileTheme` enum here. Populated from `/me` (`UserPublic`) and used
+    // to build the own-profile header when `FeatureFlags.community` is off
+    // (community_providers.dart's degrade branch).
+    String? coverImageUrl,
+    String? theme,
+    String? featuredBookId,
+    String? featuredQuote,
   }) = _AuthUser;
 }

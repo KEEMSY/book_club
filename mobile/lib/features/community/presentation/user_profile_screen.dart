@@ -10,8 +10,11 @@ import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../core/theme/grade_theme.dart';
+import '../../../core/theme/profile_theme_palette.dart';
 import '../../auth/application/auth_notifier.dart';
 import '../../auth/domain/auth_state.dart';
+import '../../book/application/book_providers.dart';
+import '../../book/presentation/widgets/book_cover.dart';
 import '../../feed/presentation/comments_sheet.dart';
 import '../../subscription/application/subscription_notifier.dart';
 import '../../subscription/presentation/pro_badge.dart';
@@ -301,9 +304,19 @@ class _ProfileHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final spacing = theme.extension<AppSpacing>()!;
+    // BC-84: `theme` defaults to 클래식 when the profile never set one, so
+    // the cover banner always has a sensible gradient fallback.
+    final profileTheme = ProfileTheme.fromWire(profile.theme);
+    final String? featuredBookId = profile.featuredBookId;
+    final String? featuredQuote = profile.featuredQuote;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        _ProfileCoverBanner(
+          coverImageUrl: profile.coverImageUrl,
+          profileTheme: profileTheme,
+        ),
+        SizedBox(height: spacing.md),
         _ProfileAvatar(
           profileImageUrl: profile.profileImageUrl,
           nickname: profile.nickname,
@@ -334,7 +347,192 @@ class _ProfileHeader extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
         ],
+        if (featuredBookId != null && featuredBookId.isNotEmpty)
+          SizedBox(
+            width: double.infinity,
+            child: _FeaturedBookCard(bookId: featuredBookId),
+          ),
+        if (featuredQuote != null && featuredQuote.isNotEmpty)
+          SizedBox(
+            width: double.infinity,
+            child: _FeaturedQuoteCard(quote: featuredQuote),
+          ),
       ],
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Cover banner — theme gradient fallback, or the user's cover image (BC-84)
+// ---------------------------------------------------------------------------
+
+class _ProfileCoverBanner extends StatelessWidget {
+  const _ProfileCoverBanner({
+    required this.coverImageUrl,
+    required this.profileTheme,
+  });
+
+  final String? coverImageUrl;
+  final ProfileTheme profileTheme;
+
+  @override
+  Widget build(BuildContext context) {
+    final String? url = coverImageUrl;
+    final Widget fallback = DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: ProfileThemePalette.gradientOf(profileTheme),
+        ),
+      ),
+    );
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: SizedBox(
+        height: 120,
+        width: double.infinity,
+        child: (url != null && url.isNotEmpty)
+            ? CachedNetworkImage(
+                imageUrl: url,
+                fit: BoxFit.cover,
+                width: double.infinity,
+                height: double.infinity,
+                placeholder: (_, __) => fallback,
+                errorWidget: (_, __, ___) => fallback,
+              )
+            : fallback,
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Featured book — resolves `featuredBookId` to title/cover (BC-84)
+// ---------------------------------------------------------------------------
+
+class _FeaturedBookCard extends ConsumerWidget {
+  const _FeaturedBookCard({required this.bookId});
+
+  final String bookId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+    final async = ref.watch(featuredBookProvider(bookId));
+    return async.when(
+      loading: () => const Padding(
+        padding: EdgeInsets.symmetric(vertical: 12),
+        child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+      ),
+      // Fails quiet: a stale/removed featured book shouldn't block the rest
+      // of the profile from rendering (same rationale as MyActivitySection).
+      error: (_, __) => const SizedBox.shrink(),
+      data: (book) => Padding(
+        padding: EdgeInsets.only(top: spacing.sm),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () => context.push(AppRoutes.bookDetail(book.id)),
+          child: Container(
+            padding: EdgeInsets.all(spacing.sm),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerLow,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                BookCover(
+                  coverUrl: book.coverUrl,
+                  width: 40,
+                  height: 60,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                SizedBox(width: spacing.sm),
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '대표 책',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                      Text(
+                        book.title,
+                        style: theme.textTheme.bodyMedium,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        book.author,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurface.withValues(
+                            alpha: 0.6,
+                          ),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Featured quote (BC-84)
+// ---------------------------------------------------------------------------
+
+class _FeaturedQuoteCard extends StatelessWidget {
+  const _FeaturedQuoteCard({required this.quote});
+
+  final String quote;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final spacing = theme.extension<AppSpacing>()!;
+    return Padding(
+      padding: EdgeInsets.only(top: spacing.sm),
+      child: Container(
+        padding: EdgeInsets.all(spacing.md),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              CupertinoIcons.quote_bubble,
+              size: 16,
+              color: theme.colorScheme.primary,
+            ),
+            SizedBox(width: spacing.sm),
+            Expanded(
+              child: Text(
+                quote,
+                style: theme.textTheme.bodySmall,
+                maxLines: 4,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

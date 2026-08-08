@@ -72,6 +72,10 @@ _AuthUserDto _$AuthUserDtoFromJson(Map<String, dynamic> json) => _AuthUserDto(
       profileImageUrl: json['profile_image_url'] as String?,
       email: json['email'] as String?,
       isAdmin: json['is_admin'] as bool? ?? false,
+      coverImageUrl: json['cover_image_url'] as String?,
+      theme: json['theme'] as String?,
+      featuredBookId: json['featured_book_id'] as String?,
+      featuredQuote: json['featured_quote'] as String?,
     );
 
 Map<String, dynamic> _$AuthUserDtoToJson(_AuthUserDto instance) =>
@@ -83,6 +87,10 @@ Map<String, dynamic> _$AuthUserDtoToJson(_AuthUserDto instance) =>
       'profile_image_url': instance.profileImageUrl,
       'email': instance.email,
       'is_admin': instance.isAdmin,
+      'cover_image_url': instance.coverImageUrl,
+      'theme': instance.theme,
+      'featured_book_id': instance.featuredBookId,
+      'featured_quote': instance.featuredQuote,
     };
 
 _LoginResponse _$LoginResponseFromJson(Map<String, dynamic> json) =>
