@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../config/dev_login_gate.dart';
 import '../config/feature_flags.dart';
+import '../../features/admin/presentation/admin_console_screen.dart';
 import '../../features/auth/application/auth_notifier.dart';
 import '../../features/auth/domain/auth_state.dart';
 import '../../features/auth/presentation/dev_login_screen.dart';
@@ -207,6 +208,11 @@ class AppRoutes {
 
   // M70 — B2B team-plan admin console.
   static String teamAdmin(String teamId) => '/teams/$teamId';
+
+  // BC-87 — is_admin-only console (usage/paywall/revenue metrics + user
+  // management). Entry point lives on the own-profile overflow menu, shown
+  // only when the authenticated user's `AuthUser.isAdmin` is true.
+  static const admin = '/admin';
 }
 
 /// Adapter that bridges a Riverpod [ValueNotifier]-free state stream into a
@@ -271,6 +277,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           AppRoutes.paywall,
         };
         if (deferredRoutes.contains(canonical)) {
+          return AppRoutes.home;
+        }
+
+        // BC-87 — admin console gate: only `is_admin` sessions may reach
+        // `/admin`. Every backing endpoint independently re-checks
+        // `is_admin` server-side (BC-88); this just avoids rendering the
+        // console shell (and firing its metrics/user-list requests) for a
+        // session that would get 403s on every call.
+        // Inside `if (authenticated)`, `auth` is promoted to Authenticated.
+        if (canonical == AppRoutes.admin && !auth.user.isAdmin) {
           return AppRoutes.home;
         }
       }
@@ -473,6 +489,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           final String teamId = state.pathParameters['id']!;
           return TeamAdminScreen(teamId: teamId);
         },
+      ),
+      // BC-87 — is_admin-only console. Gated in the top-level redirect above
+      // (non-admin sessions never reach this builder); every backend
+      // endpoint it calls independently re-checks is_admin (BC-88 403).
+      GoRoute(
+        path: AppRoutes.admin,
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) => const AdminConsoleScreen(),
       ),
       // M29 — chapter-gated room list; Club object passed via extra.
       GoRoute(

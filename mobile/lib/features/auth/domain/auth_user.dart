@@ -49,5 +49,9 @@ abstract class AuthUser with _$AuthUser {
     required DateTime createdAt,
     String? profileImageUrl,
     String? email,
+    // BC-87: gates the admin console entry point / route. Defaults to false
+    // so call sites that predate this field (tests, other builders) still
+    // compile without passing it explicitly.
+    @Default(false) bool isAdmin,
   }) = _AuthUser;
 }

@@ -89,6 +89,10 @@ abstract class AuthUserDto with _$AuthUserDto {
     required DateTime createdAt,
     String? profileImageUrl,
     String? email,
+    // BC-87: not yet sent by `UserPublic` (backend BC-81, parallel work) —
+    // defaults to false so today's `/me` payload still parses cleanly. Once
+    // BC-81 adds `is_admin`, `field_rename: snake` picks it up automatically.
+    @Default(false) bool isAdmin,
   }) = _AuthUserDto;
 
   factory AuthUserDto.fromJson(Map<String, dynamic> json) =>
@@ -102,6 +106,7 @@ abstract class AuthUserDto with _$AuthUserDto {
       createdAt: createdAt,
       profileImageUrl: profileImageUrl,
       email: email,
+      isAdmin: isAdmin,
     );
   }
 }
