@@ -23,7 +23,17 @@ mixin _$AuthUser {
       get email; // BC-87: gates the admin console entry point / route. Defaults to false
 // so call sites that predate this field (tests, other builders) still
 // compile without passing it explicitly.
-  bool get isAdmin;
+  bool
+      get isAdmin; // Profile expressiveness (backend BC-81, mobile UI BC-84). Raw wire
+// values — see the matching comment on `UserProfile`
+// (features/social/domain/user_summary.dart) for why `theme` isn't the
+// `ProfileTheme` enum here. Populated from `/me` (`UserPublic`) and used
+// to build the own-profile header when `FeatureFlags.community` is off
+// (community_providers.dart's degrade branch).
+  String? get coverImageUrl;
+  String? get theme;
+  String? get featuredBookId;
+  String? get featuredQuote;
 
   /// Create a copy of AuthUser
   /// with the given fields replaced by the non-null parameter values.
@@ -47,16 +57,34 @@ mixin _$AuthUser {
             (identical(other.profileImageUrl, profileImageUrl) ||
                 other.profileImageUrl == profileImageUrl) &&
             (identical(other.email, email) || other.email == email) &&
-            (identical(other.isAdmin, isAdmin) || other.isAdmin == isAdmin));
+            (identical(other.isAdmin, isAdmin) || other.isAdmin == isAdmin) &&
+            (identical(other.coverImageUrl, coverImageUrl) ||
+                other.coverImageUrl == coverImageUrl) &&
+            (identical(other.theme, theme) || other.theme == theme) &&
+            (identical(other.featuredBookId, featuredBookId) ||
+                other.featuredBookId == featuredBookId) &&
+            (identical(other.featuredQuote, featuredQuote) ||
+                other.featuredQuote == featuredQuote));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, id, nickname, provider,
-      createdAt, profileImageUrl, email, isAdmin);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      nickname,
+      provider,
+      createdAt,
+      profileImageUrl,
+      email,
+      isAdmin,
+      coverImageUrl,
+      theme,
+      featuredBookId,
+      featuredQuote);
 
   @override
   String toString() {
-    return 'AuthUser(id: $id, nickname: $nickname, provider: $provider, createdAt: $createdAt, profileImageUrl: $profileImageUrl, email: $email, isAdmin: $isAdmin)';
+    return 'AuthUser(id: $id, nickname: $nickname, provider: $provider, createdAt: $createdAt, profileImageUrl: $profileImageUrl, email: $email, isAdmin: $isAdmin, coverImageUrl: $coverImageUrl, theme: $theme, featuredBookId: $featuredBookId, featuredQuote: $featuredQuote)';
   }
 }
 
@@ -72,7 +100,11 @@ abstract mixin class $AuthUserCopyWith<$Res> {
       DateTime createdAt,
       String? profileImageUrl,
       String? email,
-      bool isAdmin});
+      bool isAdmin,
+      String? coverImageUrl,
+      String? theme,
+      String? featuredBookId,
+      String? featuredQuote});
 }
 
 /// @nodoc
@@ -94,6 +126,10 @@ class _$AuthUserCopyWithImpl<$Res> implements $AuthUserCopyWith<$Res> {
     Object? profileImageUrl = freezed,
     Object? email = freezed,
     Object? isAdmin = null,
+    Object? coverImageUrl = freezed,
+    Object? theme = freezed,
+    Object? featuredBookId = freezed,
+    Object? featuredQuote = freezed,
   }) {
     return _then(_self.copyWith(
       id: null == id
@@ -124,6 +160,22 @@ class _$AuthUserCopyWithImpl<$Res> implements $AuthUserCopyWith<$Res> {
           ? _self.isAdmin
           : isAdmin // ignore: cast_nullable_to_non_nullable
               as bool,
+      coverImageUrl: freezed == coverImageUrl
+          ? _self.coverImageUrl
+          : coverImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      theme: freezed == theme
+          ? _self.theme
+          : theme // ignore: cast_nullable_to_non_nullable
+              as String?,
+      featuredBookId: freezed == featuredBookId
+          ? _self.featuredBookId
+          : featuredBookId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      featuredQuote: freezed == featuredQuote
+          ? _self.featuredQuote
+          : featuredQuote // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -228,15 +280,29 @@ extension AuthUserPatterns on AuthUser {
             DateTime createdAt,
             String? profileImageUrl,
             String? email,
-            bool isAdmin)?
+            bool isAdmin,
+            String? coverImageUrl,
+            String? theme,
+            String? featuredBookId,
+            String? featuredQuote)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _AuthUser() when $default != null:
-        return $default(_that.id, _that.nickname, _that.provider,
-            _that.createdAt, _that.profileImageUrl, _that.email, _that.isAdmin);
+        return $default(
+            _that.id,
+            _that.nickname,
+            _that.provider,
+            _that.createdAt,
+            _that.profileImageUrl,
+            _that.email,
+            _that.isAdmin,
+            _that.coverImageUrl,
+            _that.theme,
+            _that.featuredBookId,
+            _that.featuredQuote);
       case _:
         return orElse();
     }
@@ -264,14 +330,28 @@ extension AuthUserPatterns on AuthUser {
             DateTime createdAt,
             String? profileImageUrl,
             String? email,
-            bool isAdmin)
+            bool isAdmin,
+            String? coverImageUrl,
+            String? theme,
+            String? featuredBookId,
+            String? featuredQuote)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _AuthUser():
-        return $default(_that.id, _that.nickname, _that.provider,
-            _that.createdAt, _that.profileImageUrl, _that.email, _that.isAdmin);
+        return $default(
+            _that.id,
+            _that.nickname,
+            _that.provider,
+            _that.createdAt,
+            _that.profileImageUrl,
+            _that.email,
+            _that.isAdmin,
+            _that.coverImageUrl,
+            _that.theme,
+            _that.featuredBookId,
+            _that.featuredQuote);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -298,14 +378,28 @@ extension AuthUserPatterns on AuthUser {
             DateTime createdAt,
             String? profileImageUrl,
             String? email,
-            bool isAdmin)?
+            bool isAdmin,
+            String? coverImageUrl,
+            String? theme,
+            String? featuredBookId,
+            String? featuredQuote)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _AuthUser() when $default != null:
-        return $default(_that.id, _that.nickname, _that.provider,
-            _that.createdAt, _that.profileImageUrl, _that.email, _that.isAdmin);
+        return $default(
+            _that.id,
+            _that.nickname,
+            _that.provider,
+            _that.createdAt,
+            _that.profileImageUrl,
+            _that.email,
+            _that.isAdmin,
+            _that.coverImageUrl,
+            _that.theme,
+            _that.featuredBookId,
+            _that.featuredQuote);
       case _:
         return null;
     }
@@ -322,7 +416,11 @@ class _AuthUser implements AuthUser {
       required this.createdAt,
       this.profileImageUrl,
       this.email,
-      this.isAdmin = false});
+      this.isAdmin = false,
+      this.coverImageUrl,
+      this.theme,
+      this.featuredBookId,
+      this.featuredQuote});
 
   @override
   final String id;
@@ -342,6 +440,20 @@ class _AuthUser implements AuthUser {
   @override
   @JsonKey()
   final bool isAdmin;
+// Profile expressiveness (backend BC-81, mobile UI BC-84). Raw wire
+// values — see the matching comment on `UserProfile`
+// (features/social/domain/user_summary.dart) for why `theme` isn't the
+// `ProfileTheme` enum here. Populated from `/me` (`UserPublic`) and used
+// to build the own-profile header when `FeatureFlags.community` is off
+// (community_providers.dart's degrade branch).
+  @override
+  final String? coverImageUrl;
+  @override
+  final String? theme;
+  @override
+  final String? featuredBookId;
+  @override
+  final String? featuredQuote;
 
   /// Create a copy of AuthUser
   /// with the given fields replaced by the non-null parameter values.
@@ -366,16 +478,34 @@ class _AuthUser implements AuthUser {
             (identical(other.profileImageUrl, profileImageUrl) ||
                 other.profileImageUrl == profileImageUrl) &&
             (identical(other.email, email) || other.email == email) &&
-            (identical(other.isAdmin, isAdmin) || other.isAdmin == isAdmin));
+            (identical(other.isAdmin, isAdmin) || other.isAdmin == isAdmin) &&
+            (identical(other.coverImageUrl, coverImageUrl) ||
+                other.coverImageUrl == coverImageUrl) &&
+            (identical(other.theme, theme) || other.theme == theme) &&
+            (identical(other.featuredBookId, featuredBookId) ||
+                other.featuredBookId == featuredBookId) &&
+            (identical(other.featuredQuote, featuredQuote) ||
+                other.featuredQuote == featuredQuote));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, id, nickname, provider,
-      createdAt, profileImageUrl, email, isAdmin);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      nickname,
+      provider,
+      createdAt,
+      profileImageUrl,
+      email,
+      isAdmin,
+      coverImageUrl,
+      theme,
+      featuredBookId,
+      featuredQuote);
 
   @override
   String toString() {
-    return 'AuthUser(id: $id, nickname: $nickname, provider: $provider, createdAt: $createdAt, profileImageUrl: $profileImageUrl, email: $email, isAdmin: $isAdmin)';
+    return 'AuthUser(id: $id, nickname: $nickname, provider: $provider, createdAt: $createdAt, profileImageUrl: $profileImageUrl, email: $email, isAdmin: $isAdmin, coverImageUrl: $coverImageUrl, theme: $theme, featuredBookId: $featuredBookId, featuredQuote: $featuredQuote)';
   }
 }
 
@@ -393,7 +523,11 @@ abstract mixin class _$AuthUserCopyWith<$Res>
       DateTime createdAt,
       String? profileImageUrl,
       String? email,
-      bool isAdmin});
+      bool isAdmin,
+      String? coverImageUrl,
+      String? theme,
+      String? featuredBookId,
+      String? featuredQuote});
 }
 
 /// @nodoc
@@ -415,6 +549,10 @@ class __$AuthUserCopyWithImpl<$Res> implements _$AuthUserCopyWith<$Res> {
     Object? profileImageUrl = freezed,
     Object? email = freezed,
     Object? isAdmin = null,
+    Object? coverImageUrl = freezed,
+    Object? theme = freezed,
+    Object? featuredBookId = freezed,
+    Object? featuredQuote = freezed,
   }) {
     return _then(_AuthUser(
       id: null == id
@@ -445,6 +583,22 @@ class __$AuthUserCopyWithImpl<$Res> implements _$AuthUserCopyWith<$Res> {
           ? _self.isAdmin
           : isAdmin // ignore: cast_nullable_to_non_nullable
               as bool,
+      coverImageUrl: freezed == coverImageUrl
+          ? _self.coverImageUrl
+          : coverImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      theme: freezed == theme
+          ? _self.theme
+          : theme // ignore: cast_nullable_to_non_nullable
+              as String?,
+      featuredBookId: freezed == featuredBookId
+          ? _self.featuredBookId
+          : featuredBookId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      featuredQuote: freezed == featuredQuote
+          ? _self.featuredQuote
+          : featuredQuote // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }

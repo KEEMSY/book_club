@@ -57,6 +57,12 @@ final userProfileProvider =
     ),
     badges: const <BadgeSummary>[],
     recentHighlights: const <HighlightSummary>[],
+    // BC-84: `/me` (UserPublic) already carries these, so the own-profile
+    // header still renders expressiveness while community is deferred.
+    coverImageUrl: user.coverImageUrl,
+    theme: user.theme,
+    featuredBookId: user.featuredBookId,
+    featuredQuote: user.featuredQuote,
   );
 });
 

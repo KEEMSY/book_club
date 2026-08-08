@@ -149,11 +149,27 @@ class AuthRepository {
   /// Updates the authenticated user's profile fields.
   ///
   /// Null values are omitted from the request body so the backend applies
-  /// a partial update — only the supplied fields are changed.
-  Future<void> updateProfile({String? nickname, String? bio}) => _call(
+  /// a partial update — only the supplied fields are changed. Note the
+  /// backend's `UpdateProfileRequest` only *applies* a field when it is not
+  /// `None` (see `backend/app/domains/auth/repository.py`), so the four
+  /// BC-81 expressiveness fields cannot be cleared back to null through this
+  /// call — omitting/passing null just leaves the current value untouched.
+  Future<void> updateProfile({
+    String? nickname,
+    String? bio,
+    String? coverImageUrl,
+    String? theme,
+    String? featuredBookId,
+    String? featuredQuote,
+  }) =>
+      _call(
         () => _api.updateProfile({
           if (nickname != null) 'nickname': nickname,
           if (bio != null) 'bio': bio,
+          if (coverImageUrl != null) 'cover_image_url': coverImageUrl,
+          if (theme != null) 'theme': theme,
+          if (featuredBookId != null) 'featured_book_id': featuredBookId,
+          if (featuredQuote != null) 'featured_quote': featuredQuote,
         }),
       );
 

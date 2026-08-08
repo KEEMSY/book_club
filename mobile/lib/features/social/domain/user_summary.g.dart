@@ -108,6 +108,10 @@ _UserProfile _$UserProfileFromJson(Map<String, dynamic> json) => _UserProfile(
               ?.map((e) => HighlightSummary.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
+      coverImageUrl: json['cover_image_url'] as String?,
+      theme: json['theme'] as String?,
+      featuredBookId: json['featured_book_id'] as String?,
+      featuredQuote: json['featured_quote'] as String?,
     );
 
 Map<String, dynamic> _$UserProfileToJson(_UserProfile instance) =>
@@ -124,4 +128,8 @@ Map<String, dynamic> _$UserProfileToJson(_UserProfile instance) =>
       'badges': instance.badges.map((e) => e.toJson()).toList(),
       'recent_highlights':
           instance.recentHighlights.map((e) => e.toJson()).toList(),
+      'cover_image_url': instance.coverImageUrl,
+      'theme': instance.theme,
+      'featured_book_id': instance.featuredBookId,
+      'featured_quote': instance.featuredQuote,
     };

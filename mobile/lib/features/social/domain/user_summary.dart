@@ -95,6 +95,16 @@ abstract class UserProfile with _$UserProfile {
     GradeStats? gradeStats,
     @Default([]) List<BadgeSummary> badges,
     @Default([]) List<HighlightSummary> recentHighlights,
+    // Profile expressiveness (backend BC-81, mobile UI BC-84). Kept as raw
+    // wire values here (not the `ProfileTheme` enum) so this DTO's
+    // json_serializable codegen stays trivial — [ProfileTheme.fromWire]
+    // converts `theme` at the presentation layer. [featuredBookId] is a bare
+    // id; the profile header fetches title/cover via the existing
+    // `GET /books/{id}` (see `featuredBookProvider`).
+    String? coverImageUrl,
+    String? theme,
+    String? featuredBookId,
+    String? featuredQuote,
   }) = _UserProfile;
 
   factory UserProfile.fromJson(Map<String, dynamic> json) =>

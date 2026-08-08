@@ -1883,7 +1883,17 @@ mixin _$UserProfile {
   bool get isMe;
   GradeStats? get gradeStats;
   List<BadgeSummary> get badges;
-  List<HighlightSummary> get recentHighlights;
+  List<HighlightSummary>
+      get recentHighlights; // Profile expressiveness (backend BC-81, mobile UI BC-84). Kept as raw
+// wire values here (not the `ProfileTheme` enum) so this DTO's
+// json_serializable codegen stays trivial — [ProfileTheme.fromWire]
+// converts `theme` at the presentation layer. [featuredBookId] is a bare
+// id; the profile header fetches title/cover via the existing
+// `GET /books/{id}` (see `featuredBookProvider`).
+  String? get coverImageUrl;
+  String? get theme;
+  String? get featuredBookId;
+  String? get featuredQuote;
 
   /// Create a copy of UserProfile
   /// with the given fields replaced by the non-null parameter values.
@@ -1917,7 +1927,14 @@ mixin _$UserProfile {
                 other.gradeStats == gradeStats) &&
             const DeepCollectionEquality().equals(other.badges, badges) &&
             const DeepCollectionEquality()
-                .equals(other.recentHighlights, recentHighlights));
+                .equals(other.recentHighlights, recentHighlights) &&
+            (identical(other.coverImageUrl, coverImageUrl) ||
+                other.coverImageUrl == coverImageUrl) &&
+            (identical(other.theme, theme) || other.theme == theme) &&
+            (identical(other.featuredBookId, featuredBookId) ||
+                other.featuredBookId == featuredBookId) &&
+            (identical(other.featuredQuote, featuredQuote) ||
+                other.featuredQuote == featuredQuote));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1934,11 +1951,15 @@ mixin _$UserProfile {
       isMe,
       gradeStats,
       const DeepCollectionEquality().hash(badges),
-      const DeepCollectionEquality().hash(recentHighlights));
+      const DeepCollectionEquality().hash(recentHighlights),
+      coverImageUrl,
+      theme,
+      featuredBookId,
+      featuredQuote);
 
   @override
   String toString() {
-    return 'UserProfile(id: $id, nickname: $nickname, profileImageUrl: $profileImageUrl, bio: $bio, followerCount: $followerCount, followingCount: $followingCount, isFollowing: $isFollowing, isMe: $isMe, gradeStats: $gradeStats, badges: $badges, recentHighlights: $recentHighlights)';
+    return 'UserProfile(id: $id, nickname: $nickname, profileImageUrl: $profileImageUrl, bio: $bio, followerCount: $followerCount, followingCount: $followingCount, isFollowing: $isFollowing, isMe: $isMe, gradeStats: $gradeStats, badges: $badges, recentHighlights: $recentHighlights, coverImageUrl: $coverImageUrl, theme: $theme, featuredBookId: $featuredBookId, featuredQuote: $featuredQuote)';
   }
 }
 
@@ -1959,7 +1980,11 @@ abstract mixin class $UserProfileCopyWith<$Res> {
       bool isMe,
       GradeStats? gradeStats,
       List<BadgeSummary> badges,
-      List<HighlightSummary> recentHighlights});
+      List<HighlightSummary> recentHighlights,
+      String? coverImageUrl,
+      String? theme,
+      String? featuredBookId,
+      String? featuredQuote});
 
   $GradeStatsCopyWith<$Res>? get gradeStats;
 }
@@ -1987,6 +2012,10 @@ class _$UserProfileCopyWithImpl<$Res> implements $UserProfileCopyWith<$Res> {
     Object? gradeStats = freezed,
     Object? badges = null,
     Object? recentHighlights = null,
+    Object? coverImageUrl = freezed,
+    Object? theme = freezed,
+    Object? featuredBookId = freezed,
+    Object? featuredQuote = freezed,
   }) {
     return _then(_self.copyWith(
       id: null == id
@@ -2033,6 +2062,22 @@ class _$UserProfileCopyWithImpl<$Res> implements $UserProfileCopyWith<$Res> {
           ? _self.recentHighlights
           : recentHighlights // ignore: cast_nullable_to_non_nullable
               as List<HighlightSummary>,
+      coverImageUrl: freezed == coverImageUrl
+          ? _self.coverImageUrl
+          : coverImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      theme: freezed == theme
+          ? _self.theme
+          : theme // ignore: cast_nullable_to_non_nullable
+              as String?,
+      featuredBookId: freezed == featuredBookId
+          ? _self.featuredBookId
+          : featuredBookId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      featuredQuote: freezed == featuredQuote
+          ? _self.featuredQuote
+          : featuredQuote // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 
@@ -2155,7 +2200,11 @@ extension UserProfilePatterns on UserProfile {
             bool isMe,
             GradeStats? gradeStats,
             List<BadgeSummary> badges,
-            List<HighlightSummary> recentHighlights)?
+            List<HighlightSummary> recentHighlights,
+            String? coverImageUrl,
+            String? theme,
+            String? featuredBookId,
+            String? featuredQuote)?
         $default, {
     required TResult orElse(),
   }) {
@@ -2173,7 +2222,11 @@ extension UserProfilePatterns on UserProfile {
             _that.isMe,
             _that.gradeStats,
             _that.badges,
-            _that.recentHighlights);
+            _that.recentHighlights,
+            _that.coverImageUrl,
+            _that.theme,
+            _that.featuredBookId,
+            _that.featuredQuote);
       case _:
         return orElse();
     }
@@ -2205,7 +2258,11 @@ extension UserProfilePatterns on UserProfile {
             bool isMe,
             GradeStats? gradeStats,
             List<BadgeSummary> badges,
-            List<HighlightSummary> recentHighlights)
+            List<HighlightSummary> recentHighlights,
+            String? coverImageUrl,
+            String? theme,
+            String? featuredBookId,
+            String? featuredQuote)
         $default,
   ) {
     final _that = this;
@@ -2222,7 +2279,11 @@ extension UserProfilePatterns on UserProfile {
             _that.isMe,
             _that.gradeStats,
             _that.badges,
-            _that.recentHighlights);
+            _that.recentHighlights,
+            _that.coverImageUrl,
+            _that.theme,
+            _that.featuredBookId,
+            _that.featuredQuote);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -2253,7 +2314,11 @@ extension UserProfilePatterns on UserProfile {
             bool isMe,
             GradeStats? gradeStats,
             List<BadgeSummary> badges,
-            List<HighlightSummary> recentHighlights)?
+            List<HighlightSummary> recentHighlights,
+            String? coverImageUrl,
+            String? theme,
+            String? featuredBookId,
+            String? featuredQuote)?
         $default,
   ) {
     final _that = this;
@@ -2270,7 +2335,11 @@ extension UserProfilePatterns on UserProfile {
             _that.isMe,
             _that.gradeStats,
             _that.badges,
-            _that.recentHighlights);
+            _that.recentHighlights,
+            _that.coverImageUrl,
+            _that.theme,
+            _that.featuredBookId,
+            _that.featuredQuote);
       case _:
         return null;
     }
@@ -2291,7 +2360,11 @@ class _UserProfile implements UserProfile {
       required this.isMe,
       this.gradeStats,
       final List<BadgeSummary> badges = const [],
-      final List<HighlightSummary> recentHighlights = const []})
+      final List<HighlightSummary> recentHighlights = const [],
+      this.coverImageUrl,
+      this.theme,
+      this.featuredBookId,
+      this.featuredQuote})
       : _badges = badges,
         _recentHighlights = recentHighlights;
   factory _UserProfile.fromJson(Map<String, dynamic> json) =>
@@ -2334,6 +2407,21 @@ class _UserProfile implements UserProfile {
     return EqualUnmodifiableListView(_recentHighlights);
   }
 
+// Profile expressiveness (backend BC-81, mobile UI BC-84). Kept as raw
+// wire values here (not the `ProfileTheme` enum) so this DTO's
+// json_serializable codegen stays trivial — [ProfileTheme.fromWire]
+// converts `theme` at the presentation layer. [featuredBookId] is a bare
+// id; the profile header fetches title/cover via the existing
+// `GET /books/{id}` (see `featuredBookProvider`).
+  @override
+  final String? coverImageUrl;
+  @override
+  final String? theme;
+  @override
+  final String? featuredBookId;
+  @override
+  final String? featuredQuote;
+
   /// Create a copy of UserProfile
   /// with the given fields replaced by the non-null parameter values.
   @override
@@ -2371,7 +2459,14 @@ class _UserProfile implements UserProfile {
                 other.gradeStats == gradeStats) &&
             const DeepCollectionEquality().equals(other._badges, _badges) &&
             const DeepCollectionEquality()
-                .equals(other._recentHighlights, _recentHighlights));
+                .equals(other._recentHighlights, _recentHighlights) &&
+            (identical(other.coverImageUrl, coverImageUrl) ||
+                other.coverImageUrl == coverImageUrl) &&
+            (identical(other.theme, theme) || other.theme == theme) &&
+            (identical(other.featuredBookId, featuredBookId) ||
+                other.featuredBookId == featuredBookId) &&
+            (identical(other.featuredQuote, featuredQuote) ||
+                other.featuredQuote == featuredQuote));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2388,11 +2483,15 @@ class _UserProfile implements UserProfile {
       isMe,
       gradeStats,
       const DeepCollectionEquality().hash(_badges),
-      const DeepCollectionEquality().hash(_recentHighlights));
+      const DeepCollectionEquality().hash(_recentHighlights),
+      coverImageUrl,
+      theme,
+      featuredBookId,
+      featuredQuote);
 
   @override
   String toString() {
-    return 'UserProfile(id: $id, nickname: $nickname, profileImageUrl: $profileImageUrl, bio: $bio, followerCount: $followerCount, followingCount: $followingCount, isFollowing: $isFollowing, isMe: $isMe, gradeStats: $gradeStats, badges: $badges, recentHighlights: $recentHighlights)';
+    return 'UserProfile(id: $id, nickname: $nickname, profileImageUrl: $profileImageUrl, bio: $bio, followerCount: $followerCount, followingCount: $followingCount, isFollowing: $isFollowing, isMe: $isMe, gradeStats: $gradeStats, badges: $badges, recentHighlights: $recentHighlights, coverImageUrl: $coverImageUrl, theme: $theme, featuredBookId: $featuredBookId, featuredQuote: $featuredQuote)';
   }
 }
 
@@ -2415,7 +2514,11 @@ abstract mixin class _$UserProfileCopyWith<$Res>
       bool isMe,
       GradeStats? gradeStats,
       List<BadgeSummary> badges,
-      List<HighlightSummary> recentHighlights});
+      List<HighlightSummary> recentHighlights,
+      String? coverImageUrl,
+      String? theme,
+      String? featuredBookId,
+      String? featuredQuote});
 
   @override
   $GradeStatsCopyWith<$Res>? get gradeStats;
@@ -2444,6 +2547,10 @@ class __$UserProfileCopyWithImpl<$Res> implements _$UserProfileCopyWith<$Res> {
     Object? gradeStats = freezed,
     Object? badges = null,
     Object? recentHighlights = null,
+    Object? coverImageUrl = freezed,
+    Object? theme = freezed,
+    Object? featuredBookId = freezed,
+    Object? featuredQuote = freezed,
   }) {
     return _then(_UserProfile(
       id: null == id
@@ -2490,6 +2597,22 @@ class __$UserProfileCopyWithImpl<$Res> implements _$UserProfileCopyWith<$Res> {
           ? _self._recentHighlights
           : recentHighlights // ignore: cast_nullable_to_non_nullable
               as List<HighlightSummary>,
+      coverImageUrl: freezed == coverImageUrl
+          ? _self.coverImageUrl
+          : coverImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      theme: freezed == theme
+          ? _self.theme
+          : theme // ignore: cast_nullable_to_non_nullable
+              as String?,
+      featuredBookId: freezed == featuredBookId
+          ? _self.featuredBookId
+          : featuredBookId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      featuredQuote: freezed == featuredQuote
+          ? _self.featuredQuote
+          : featuredQuote // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 

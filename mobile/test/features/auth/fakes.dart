@@ -155,8 +155,18 @@ class FakeAuthApi implements AuthApi {
     deleteMeCalls++;
   }
 
+  /// Bodies passed to [updateProfile], in call order — lets tests assert on
+  /// exactly which fields were sent (e.g. the BC-84 expressiveness fields use
+  /// snake_case keys built manually in `AuthRepository.updateProfile`).
+  final List<Map<String, dynamic>> updateProfileCalls =
+      <Map<String, dynamic>>[];
+  Object? updateProfileError;
+
   @override
-  Future<void> updateProfile(Map<String, dynamic> body) async {}
+  Future<void> updateProfile(Map<String, dynamic> body) async {
+    updateProfileCalls.add(body);
+    if (updateProfileError != null) throw updateProfileError!;
+  }
 
   @override
   Future<void> seedTesterData() async {
@@ -170,6 +180,10 @@ AuthUserDto buildUserDto({
   String nickname = '희재',
   String provider = 'kakao',
   String? email,
+  String? coverImageUrl,
+  String? theme,
+  String? featuredBookId,
+  String? featuredQuote,
 }) {
   return AuthUserDto(
     id: id,
@@ -178,6 +192,10 @@ AuthUserDto buildUserDto({
     createdAt: DateTime.utc(2026, 4, 20, 12),
     profileImageUrl: null,
     email: email,
+    coverImageUrl: coverImageUrl,
+    theme: theme,
+    featuredBookId: featuredBookId,
+    featuredQuote: featuredQuote,
   );
 }
 
@@ -185,12 +203,20 @@ AuthUser buildUser({
   String id = '00000000-0000-0000-0000-000000000001',
   String nickname = '희재',
   AuthProvider provider = AuthProvider.kakao,
+  String? coverImageUrl,
+  String? theme,
+  String? featuredBookId,
+  String? featuredQuote,
 }) {
   return AuthUser(
     id: id,
     nickname: nickname,
     provider: provider,
     createdAt: DateTime.utc(2026, 4, 20, 12),
+    coverImageUrl: coverImageUrl,
+    theme: theme,
+    featuredBookId: featuredBookId,
+    featuredQuote: featuredQuote,
   );
 }
 

@@ -4,6 +4,7 @@ import '../../../core/network/dio_provider.dart';
 import '../data/book_api.dart';
 import '../data/book_models.dart' show DiscoverResponseDto;
 import '../data/book_repository.dart';
+import '../domain/book.dart';
 import '../domain/book_status.dart';
 
 part 'book_providers.g.dart';
@@ -36,4 +37,14 @@ class LibraryPendingTab extends _$LibraryPendingTab {
 Future<DiscoverResponseDto> discoverBooks(DiscoverBooksRef ref) {
   ref.keepAlive();
   return ref.read(bookRepositoryProvider).getDiscover();
+}
+
+/// Fetches a single book by id — used by the profile header (BC-84) to
+/// resolve a user's `featuredBookId` into title/cover for display.
+/// `featuredBookId` is a bare id on `UserProfile`/`AuthUser`; this stays a
+/// plain family provider (not baked into the profile fetch) so the profile
+/// endpoint doesn't have to join book data server-side.
+@riverpod
+Future<Book> featuredBook(FeaturedBookRef ref, String bookId) {
+  return ref.watch(bookRepositoryProvider).getById(bookId);
 }
