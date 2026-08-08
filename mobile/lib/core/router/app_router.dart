@@ -21,6 +21,10 @@ import '../../features/community/presentation/community_home_screen.dart';
 import '../../features/community/presentation/follower_list_screen.dart';
 import '../../features/community/presentation/following_list_screen.dart';
 import '../../features/community/presentation/leaderboard_screen.dart';
+import '../../features/community/presentation/my_agendas_screen.dart';
+import '../../features/community/presentation/my_clubs_screen.dart';
+import '../../features/community/presentation/my_recent_highlights_screen.dart';
+import '../../features/community/presentation/my_reviews_screen.dart';
 import '../../features/community/presentation/profile_edit_screen.dart';
 import '../../features/community/presentation/user_profile_screen.dart';
 import '../../features/social/domain/user_summary.dart';
@@ -90,6 +94,12 @@ class AppRoutes {
   // M2 destinations (still reachable through the shell).
   static const search = '/search';
   static const library = '/library';
+
+  /// Deep-links into a specific [LibraryScreen] tab (see
+  /// [LibraryScreen.initialTab] for the index mapping). BC-83's "내 활동 >
+  /// 읽는 중 더보기" uses `libraryTab(1)` instead of duplicating the
+  /// reading-status list UI.
+  static String libraryTab(int tabIndex) => '/library?tab=$tabIndex';
   static String bookDetail(String id) => '/books/$id';
 
   // M5 destinations.
@@ -109,6 +119,13 @@ class AppRoutes {
 
   // M27 destination — weekly social leaderboard.
   static const leaderboard = '/community/leaderboard';
+
+  // BC-83 — "내 활동" 더보기 목록 화면 (own profile only; each category's full
+  // page lives behind its own domain endpoint, see `MyActivitySection`).
+  static const myActivityReviews = '/me/activity/reviews';
+  static const myActivityHighlights = '/me/activity/highlights';
+  static const myActivityAgendas = '/me/activity/agendas';
+  static const myActivityClubs = '/me/activity/clubs';
 
   // Profile edit — own profile only.
   static const profileEdit = '/profile/edit';
@@ -737,6 +754,29 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return FollowingListScreen(userId: id);
         },
       ),
+      // BC-83 — "내 활동" 더보기 목록 화면. Pushed above the shell like the
+      // profile/follow routes above; every backing endpoint is scoped to the
+      // authenticated caller regardless of which profile they navigated from.
+      GoRoute(
+        path: AppRoutes.myActivityReviews,
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) => const MyReviewsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.myActivityHighlights,
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) => const MyRecentHighlightsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.myActivityAgendas,
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) => const MyAgendasScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.myActivityClubs,
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) => const MyClubsScreen(),
+      ),
       // Four-tab StatefulShellRoute — 홈 · 검색 · 서재 · 커뮤니티.
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
@@ -771,7 +811,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 builder: (context, state) {
                   final String? highlight =
                       state.uri.queryParameters['highlight'];
-                  return LibraryScreen(highlightUserBookId: highlight);
+                  final String? tab = state.uri.queryParameters['tab'];
+                  return LibraryScreen(
+                    highlightUserBookId: highlight,
+                    initialTab: tab != null ? int.tryParse(tab) : null,
+                  );
                 },
               ),
             ],

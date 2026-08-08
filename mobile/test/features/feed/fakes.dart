@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:book_club/features/feed/data/feed_models.dart';
 import 'package:book_club/features/feed/data/feed_repository.dart';
 import 'package:book_club/features/feed/data/image_uploader.dart';
 import 'package:book_club/features/feed/domain/book_highlight_group.dart';
@@ -192,6 +193,23 @@ class FakeFeedRepository implements FeedRepository {
   @override
   Future<List<BookHighlightGroup>> listAllHighlights() async {
     return const <BookHighlightGroup>[];
+  }
+
+  // -- listMyRecentHighlights (BC-83) --
+  MyHighlightListResponseDto myRecentHighlightsResult =
+      const MyHighlightListResponseDto();
+  Object? myRecentHighlightsError;
+  final List<({int limit, int offset})> listMyRecentHighlightsCalls =
+      <({int limit, int offset})>[];
+
+  @override
+  Future<MyHighlightListResponseDto> listMyRecentHighlights({
+    int limit = 20,
+    int offset = 0,
+  }) async {
+    listMyRecentHighlightsCalls.add((limit: limit, offset: offset));
+    if (myRecentHighlightsError != null) throw myRecentHighlightsError!;
+    return myRecentHighlightsResult;
   }
 
   @override

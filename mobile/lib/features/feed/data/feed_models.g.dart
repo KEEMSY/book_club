@@ -203,6 +203,48 @@ Map<String, dynamic> _$HighlightDtoToJson(_HighlightDto instance) =>
       'created_at': instance.createdAt.toIso8601String(),
     };
 
+_MyHighlightItemDto _$MyHighlightItemDtoFromJson(Map<String, dynamic> json) =>
+    _MyHighlightItemDto(
+      id: json['id'] as String,
+      bookId: json['book_id'] as String,
+      bookTitle: json['book_title'] as String?,
+      bookCoverUrl: json['book_cover_url'] as String?,
+      quoteText: json['quote_text'] as String,
+      pageNumber: (json['page_number'] as num?)?.toInt(),
+      createdAt: DateTime.parse(json['created_at'] as String),
+    );
+
+Map<String, dynamic> _$MyHighlightItemDtoToJson(_MyHighlightItemDto instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'book_id': instance.bookId,
+      'book_title': instance.bookTitle,
+      'book_cover_url': instance.bookCoverUrl,
+      'quote_text': instance.quoteText,
+      'page_number': instance.pageNumber,
+      'created_at': instance.createdAt.toIso8601String(),
+    };
+
+_MyHighlightListResponseDto _$MyHighlightListResponseDtoFromJson(
+        Map<String, dynamic> json) =>
+    _MyHighlightListResponseDto(
+      items: (json['items'] as List<dynamic>?)
+              ?.map(
+                  (e) => MyHighlightItemDto.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const <MyHighlightItemDto>[],
+      total: (json['total'] as num?)?.toInt() ?? 0,
+      hasMore: json['has_more'] as bool? ?? false,
+    );
+
+Map<String, dynamic> _$MyHighlightListResponseDtoToJson(
+        _MyHighlightListResponseDto instance) =>
+    <String, dynamic>{
+      'items': instance.items.map((e) => e.toJson()).toList(),
+      'total': instance.total,
+      'has_more': instance.hasMore,
+    };
+
 _HighlightPageDto _$HighlightPageDtoFromJson(Map<String, dynamic> json) =>
     _HighlightPageDto(
       items: (json['items'] as List<dynamic>)

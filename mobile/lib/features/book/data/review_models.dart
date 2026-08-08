@@ -46,6 +46,40 @@ abstract class BookReviewSummaryDto with _$BookReviewSummaryDto {
       _$BookReviewSummaryDtoFromJson(json);
 }
 
+/// A single row in the caller's own review list (BC-80/83 —
+/// `GET /me/reviews`). Distinct from [ReviewDto]: it carries the book's
+/// title/cover directly (the "내 활동" list spans many books, so denormalizing
+/// avoids an N+1 fetch) and omits fields only relevant on a single book's
+/// review thread (`userId`, `reportCount`, `updatedAt`).
+@freezed
+abstract class MyReviewItemDto with _$MyReviewItemDto {
+  const factory MyReviewItemDto({
+    required String id,
+    required String bookId,
+    String? bookTitle,
+    String? bookCoverUrl,
+    required double rating,
+    String? body,
+    required DateTime createdAt,
+  }) = _MyReviewItemDto;
+
+  factory MyReviewItemDto.fromJson(Map<String, dynamic> json) =>
+      _$MyReviewItemDtoFromJson(json);
+}
+
+/// Page of the caller's own reviews, newest first (`GET /me/reviews`).
+@freezed
+abstract class MyReviewListResponseDto with _$MyReviewListResponseDto {
+  const factory MyReviewListResponseDto({
+    @Default(<MyReviewItemDto>[]) List<MyReviewItemDto> items,
+    @Default(0) int total,
+    @Default(false) bool hasMore,
+  }) = _MyReviewListResponseDto;
+
+  factory MyReviewListResponseDto.fromJson(Map<String, dynamic> json) =>
+      _$MyReviewListResponseDtoFromJson(json);
+}
+
 /// Request body for `POST /books/{id}/reviews`.
 @freezed
 abstract class CreateReviewRequest with _$CreateReviewRequest {

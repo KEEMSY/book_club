@@ -91,3 +91,58 @@ class ClubEvent {
         myRsvp: json['my_rsvp'] as String?,
       );
 }
+
+/// A single row in the caller's own agenda list (BC-80/83 —
+/// `GET /clubs/me/agendas`) — mirrors the backend's `MyAgendaItem` schema.
+/// Carries [clubName]/[sessionTitle] denormalized so the "내 활동" list and
+/// its "더보기" screen can render + deep-link without extra lookups.
+class MyAgendaItem {
+  const MyAgendaItem({
+    required this.id,
+    required this.clubId,
+    required this.clubName,
+    required this.sessionId,
+    required this.sessionTitle,
+    required this.body,
+    required this.status,
+    this.publishedAt,
+    required this.createdAt,
+  });
+
+  final String id;
+  final String clubId;
+  final String clubName;
+  final String sessionId;
+  final String sessionTitle;
+  final String body;
+  final String status;
+  final DateTime? publishedAt;
+  final DateTime createdAt;
+
+  factory MyAgendaItem.fromJson(Map<String, dynamic> json) => MyAgendaItem(
+        id: json['id'] as String,
+        clubId: json['club_id'] as String,
+        clubName: json['club_name'] as String,
+        sessionId: json['session_id'] as String,
+        sessionTitle: json['session_title'] as String,
+        body: json['body'] as String,
+        status: json['status'] as String,
+        publishedAt: json['published_at'] != null
+            ? DateTime.parse(json['published_at'] as String)
+            : null,
+        createdAt: DateTime.parse(json['created_at'] as String),
+      );
+}
+
+/// Page of the caller's own agendas, newest first (`GET /clubs/me/agendas`).
+class MyAgendaPage {
+  const MyAgendaPage({
+    required this.items,
+    required this.total,
+    required this.hasMore,
+  });
+
+  final List<MyAgendaItem> items;
+  final int total;
+  final bool hasMore;
+}

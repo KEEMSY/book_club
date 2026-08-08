@@ -258,6 +258,40 @@ abstract class HighlightDto with _$HighlightDto {
       );
 }
 
+/// A single row in the caller's own highlight list (BC-80/83 —
+/// `GET /me/highlights/recent`). Distinct from [HighlightDto]: flat and
+/// newest-first across every book, and carries the book's title/cover
+/// directly since the "내 활동" list spans many books.
+@freezed
+abstract class MyHighlightItemDto with _$MyHighlightItemDto {
+  const factory MyHighlightItemDto({
+    required String id,
+    required String bookId,
+    String? bookTitle,
+    String? bookCoverUrl,
+    required String quoteText,
+    int? pageNumber,
+    required DateTime createdAt,
+  }) = _MyHighlightItemDto;
+
+  factory MyHighlightItemDto.fromJson(Map<String, dynamic> json) =>
+      _$MyHighlightItemDtoFromJson(json);
+}
+
+/// Page of the caller's own highlights, newest first
+/// (`GET /me/highlights/recent`).
+@freezed
+abstract class MyHighlightListResponseDto with _$MyHighlightListResponseDto {
+  const factory MyHighlightListResponseDto({
+    @Default(<MyHighlightItemDto>[]) List<MyHighlightItemDto> items,
+    @Default(0) int total,
+    @Default(false) bool hasMore,
+  }) = _MyHighlightListResponseDto;
+
+  factory MyHighlightListResponseDto.fromJson(Map<String, dynamic> json) =>
+      _$MyHighlightListResponseDtoFromJson(json);
+}
+
 /// Paginated list response for highlights.
 @freezed
 abstract class HighlightPageDto with _$HighlightPageDto {

@@ -217,6 +217,16 @@ class FeedRepository {
     }
   }
 
+  /// 내 활동 > 내 하이라이트 (BC-80/83), 최신순 페이지네이션.
+  Future<MyHighlightListResponseDto> listMyRecentHighlights({
+    int limit = 20,
+    int offset = 0,
+  }) {
+    return _call(
+      () => _api.listMyRecentHighlights(limit: limit, offset: offset),
+    );
+  }
+
   // ── M47 global event feed ──────────────────────────────────────────────────
 
   Future<FeedEventPage> getGlobalFeed({String? cursor, int limit = 20}) async {

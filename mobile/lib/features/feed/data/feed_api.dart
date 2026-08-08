@@ -24,6 +24,8 @@ part 'feed_api.g.dart';
 ///   * `POST /me/library/{user_book_id}/highlights`
 ///   * `GET  /me/library/{user_book_id}/highlights?cursor=&limit=`
 ///   * `DELETE /me/library/{user_book_id}/highlights/{highlight_id}`
+///   * `GET  /me/highlights/recent?limit=&offset=` — caller's own highlights,
+///     flat + paginated (BC-80/83; distinct from `/me/highlights` above)
 ///
 /// Endpoints (M47 — global event feed):
 ///   * `GET    /feed`
@@ -107,6 +109,13 @@ abstract class FeedApi {
 
   @GET('/me/highlights')
   Future<AllHighlightsResponseDto> listAllHighlights();
+
+  /// 내 활동 > 내 하이라이트 (BC-80/83), 최신순 페이지네이션.
+  @GET('/me/highlights/recent')
+  Future<MyHighlightListResponseDto> listMyRecentHighlights({
+    @Query('limit') int limit = 20,
+    @Query('offset') int offset = 0,
+  });
 
   // ── M47 global event feed ──────────────────────────────────────────────────
 

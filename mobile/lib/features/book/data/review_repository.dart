@@ -44,6 +44,14 @@ class ReviewRepository {
   Future<void> report(String bookId, String reviewId) =>
       _call(() => _api.reportReview(bookId, reviewId));
 
+  /// 내 활동 > 내 리뷰 (BC-80/83), 최신순 페이지네이션.
+  Future<MyReviewListResponseDto> listMyReviews({
+    int limit = 20,
+    int offset = 0,
+  }) {
+    return _call(() => _api.listMyReviews(limit: limit, offset: offset));
+  }
+
   Future<T> _call<T>(Future<T> Function() fn) async {
     try {
       return await fn();

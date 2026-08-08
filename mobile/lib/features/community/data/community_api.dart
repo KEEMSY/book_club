@@ -4,6 +4,7 @@ import 'package:retrofit/retrofit.dart';
 import '../../feed/data/feed_models.dart';
 import '../../social/domain/user_summary.dart';
 import '../domain/leaderboard_entry.dart';
+import '../domain/my_activity.dart';
 
 part 'community_api.g.dart';
 
@@ -14,6 +15,7 @@ part 'community_api.g.dart';
 ///   * `GET /community/explore?sort=&cursor=&limit=`     → discover feed
 ///   * `GET /community/users/{userId}/profile`           → full user profile
 ///   * `GET /community/users/{userId}/posts?cursor=&limit=` → user's posts
+///   * `GET /community/me/activity`                      → "내 활동" summary (BC-80/83)
 @RestApi()
 abstract class CommunityApi {
   factory CommunityApi(Dio dio, {String baseUrl}) = _CommunityApi;
@@ -46,4 +48,12 @@ abstract class CommunityApi {
   /// 7 days among the authenticated user's followees (plus the user themselves).
   @GET('/social/leaderboard/weekly')
   Future<List<LeaderboardEntry>> getWeeklyLeaderboard();
+
+  /// "내 활동" summary (BC-80) — counts + a 5-item preview per category.
+  /// Backs the BC-83 profile section; each category's full list lives behind
+  /// its own domain endpoint: review's `listMyReviews`, feed's
+  /// `listMyRecentHighlights`, club's `listMyAgendas`/`myClubsProvider`, and
+  /// book's `listLibrary(status: 'reading')`.
+  @GET('/community/me/activity')
+  Future<MyActivitySummary> getMyActivity();
 }

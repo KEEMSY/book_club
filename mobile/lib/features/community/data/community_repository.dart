@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import '../../feed/domain/post.dart';
 import '../../social/domain/user_summary.dart';
 import '../domain/leaderboard_entry.dart';
+import '../domain/my_activity.dart';
 import 'community_api.dart';
 
 /// Typed domain failure surfaced by [CommunityRepository].
@@ -79,6 +80,10 @@ class CommunityRepository {
 
   Future<List<LeaderboardEntry>> getWeeklyLeaderboard() =>
       _call(() => _api.getWeeklyLeaderboard());
+
+  /// "내 활동" summary (BC-80/83).
+  Future<MyActivitySummary> getMyActivity() =>
+      _call(() => _api.getMyActivity());
 
   Future<T> _call<T>(Future<T> Function() fn) async {
     try {

@@ -57,6 +57,47 @@ Map<String, dynamic> _$BookReviewSummaryDtoToJson(
       'reviews': instance.reviews.map((e) => e.toJson()).toList(),
     };
 
+_MyReviewItemDto _$MyReviewItemDtoFromJson(Map<String, dynamic> json) =>
+    _MyReviewItemDto(
+      id: json['id'] as String,
+      bookId: json['book_id'] as String,
+      bookTitle: json['book_title'] as String?,
+      bookCoverUrl: json['book_cover_url'] as String?,
+      rating: (json['rating'] as num).toDouble(),
+      body: json['body'] as String?,
+      createdAt: DateTime.parse(json['created_at'] as String),
+    );
+
+Map<String, dynamic> _$MyReviewItemDtoToJson(_MyReviewItemDto instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'book_id': instance.bookId,
+      'book_title': instance.bookTitle,
+      'book_cover_url': instance.bookCoverUrl,
+      'rating': instance.rating,
+      'body': instance.body,
+      'created_at': instance.createdAt.toIso8601String(),
+    };
+
+_MyReviewListResponseDto _$MyReviewListResponseDtoFromJson(
+        Map<String, dynamic> json) =>
+    _MyReviewListResponseDto(
+      items: (json['items'] as List<dynamic>?)
+              ?.map((e) => MyReviewItemDto.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const <MyReviewItemDto>[],
+      total: (json['total'] as num?)?.toInt() ?? 0,
+      hasMore: json['has_more'] as bool? ?? false,
+    );
+
+Map<String, dynamic> _$MyReviewListResponseDtoToJson(
+        _MyReviewListResponseDto instance) =>
+    <String, dynamic>{
+      'items': instance.items.map((e) => e.toJson()).toList(),
+      'total': instance.total,
+      'has_more': instance.hasMore,
+    };
+
 _CreateReviewRequest _$CreateReviewRequestFromJson(Map<String, dynamic> json) =>
     _CreateReviewRequest(
       rating: (json['rating'] as num).toDouble(),

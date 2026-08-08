@@ -4526,6 +4526,827 @@ class __$HighlightDtoCopyWithImpl<$Res>
 }
 
 /// @nodoc
+mixin _$MyHighlightItemDto {
+  String get id;
+  String get bookId;
+  String? get bookTitle;
+  String? get bookCoverUrl;
+  String get quoteText;
+  int? get pageNumber;
+  DateTime get createdAt;
+
+  /// Create a copy of MyHighlightItemDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $MyHighlightItemDtoCopyWith<MyHighlightItemDto> get copyWith =>
+      _$MyHighlightItemDtoCopyWithImpl<MyHighlightItemDto>(
+          this as MyHighlightItemDto, _$identity);
+
+  /// Serializes this MyHighlightItemDto to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is MyHighlightItemDto &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.bookId, bookId) || other.bookId == bookId) &&
+            (identical(other.bookTitle, bookTitle) ||
+                other.bookTitle == bookTitle) &&
+            (identical(other.bookCoverUrl, bookCoverUrl) ||
+                other.bookCoverUrl == bookCoverUrl) &&
+            (identical(other.quoteText, quoteText) ||
+                other.quoteText == quoteText) &&
+            (identical(other.pageNumber, pageNumber) ||
+                other.pageNumber == pageNumber) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, bookId, bookTitle,
+      bookCoverUrl, quoteText, pageNumber, createdAt);
+
+  @override
+  String toString() {
+    return 'MyHighlightItemDto(id: $id, bookId: $bookId, bookTitle: $bookTitle, bookCoverUrl: $bookCoverUrl, quoteText: $quoteText, pageNumber: $pageNumber, createdAt: $createdAt)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $MyHighlightItemDtoCopyWith<$Res> {
+  factory $MyHighlightItemDtoCopyWith(
+          MyHighlightItemDto value, $Res Function(MyHighlightItemDto) _then) =
+      _$MyHighlightItemDtoCopyWithImpl;
+  @useResult
+  $Res call(
+      {String id,
+      String bookId,
+      String? bookTitle,
+      String? bookCoverUrl,
+      String quoteText,
+      int? pageNumber,
+      DateTime createdAt});
+}
+
+/// @nodoc
+class _$MyHighlightItemDtoCopyWithImpl<$Res>
+    implements $MyHighlightItemDtoCopyWith<$Res> {
+  _$MyHighlightItemDtoCopyWithImpl(this._self, this._then);
+
+  final MyHighlightItemDto _self;
+  final $Res Function(MyHighlightItemDto) _then;
+
+  /// Create a copy of MyHighlightItemDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? bookId = null,
+    Object? bookTitle = freezed,
+    Object? bookCoverUrl = freezed,
+    Object? quoteText = null,
+    Object? pageNumber = freezed,
+    Object? createdAt = null,
+  }) {
+    return _then(_self.copyWith(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookId: null == bookId
+          ? _self.bookId
+          : bookId // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookTitle: freezed == bookTitle
+          ? _self.bookTitle
+          : bookTitle // ignore: cast_nullable_to_non_nullable
+              as String?,
+      bookCoverUrl: freezed == bookCoverUrl
+          ? _self.bookCoverUrl
+          : bookCoverUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      quoteText: null == quoteText
+          ? _self.quoteText
+          : quoteText // ignore: cast_nullable_to_non_nullable
+              as String,
+      pageNumber: freezed == pageNumber
+          ? _self.pageNumber
+          : pageNumber // ignore: cast_nullable_to_non_nullable
+              as int?,
+      createdAt: null == createdAt
+          ? _self.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [MyHighlightItemDto].
+extension MyHighlightItemDtoPatterns on MyHighlightItemDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_MyHighlightItemDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _MyHighlightItemDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_MyHighlightItemDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _MyHighlightItemDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_MyHighlightItemDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _MyHighlightItemDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String bookId,
+            String? bookTitle,
+            String? bookCoverUrl,
+            String quoteText,
+            int? pageNumber,
+            DateTime createdAt)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _MyHighlightItemDto() when $default != null:
+        return $default(
+            _that.id,
+            _that.bookId,
+            _that.bookTitle,
+            _that.bookCoverUrl,
+            _that.quoteText,
+            _that.pageNumber,
+            _that.createdAt);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String bookId,
+            String? bookTitle,
+            String? bookCoverUrl,
+            String quoteText,
+            int? pageNumber,
+            DateTime createdAt)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _MyHighlightItemDto():
+        return $default(
+            _that.id,
+            _that.bookId,
+            _that.bookTitle,
+            _that.bookCoverUrl,
+            _that.quoteText,
+            _that.pageNumber,
+            _that.createdAt);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String id,
+            String bookId,
+            String? bookTitle,
+            String? bookCoverUrl,
+            String quoteText,
+            int? pageNumber,
+            DateTime createdAt)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _MyHighlightItemDto() when $default != null:
+        return $default(
+            _that.id,
+            _that.bookId,
+            _that.bookTitle,
+            _that.bookCoverUrl,
+            _that.quoteText,
+            _that.pageNumber,
+            _that.createdAt);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _MyHighlightItemDto implements MyHighlightItemDto {
+  const _MyHighlightItemDto(
+      {required this.id,
+      required this.bookId,
+      this.bookTitle,
+      this.bookCoverUrl,
+      required this.quoteText,
+      this.pageNumber,
+      required this.createdAt});
+  factory _MyHighlightItemDto.fromJson(Map<String, dynamic> json) =>
+      _$MyHighlightItemDtoFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final String bookId;
+  @override
+  final String? bookTitle;
+  @override
+  final String? bookCoverUrl;
+  @override
+  final String quoteText;
+  @override
+  final int? pageNumber;
+  @override
+  final DateTime createdAt;
+
+  /// Create a copy of MyHighlightItemDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$MyHighlightItemDtoCopyWith<_MyHighlightItemDto> get copyWith =>
+      __$MyHighlightItemDtoCopyWithImpl<_MyHighlightItemDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$MyHighlightItemDtoToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _MyHighlightItemDto &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.bookId, bookId) || other.bookId == bookId) &&
+            (identical(other.bookTitle, bookTitle) ||
+                other.bookTitle == bookTitle) &&
+            (identical(other.bookCoverUrl, bookCoverUrl) ||
+                other.bookCoverUrl == bookCoverUrl) &&
+            (identical(other.quoteText, quoteText) ||
+                other.quoteText == quoteText) &&
+            (identical(other.pageNumber, pageNumber) ||
+                other.pageNumber == pageNumber) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, bookId, bookTitle,
+      bookCoverUrl, quoteText, pageNumber, createdAt);
+
+  @override
+  String toString() {
+    return 'MyHighlightItemDto(id: $id, bookId: $bookId, bookTitle: $bookTitle, bookCoverUrl: $bookCoverUrl, quoteText: $quoteText, pageNumber: $pageNumber, createdAt: $createdAt)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$MyHighlightItemDtoCopyWith<$Res>
+    implements $MyHighlightItemDtoCopyWith<$Res> {
+  factory _$MyHighlightItemDtoCopyWith(
+          _MyHighlightItemDto value, $Res Function(_MyHighlightItemDto) _then) =
+      __$MyHighlightItemDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      String bookId,
+      String? bookTitle,
+      String? bookCoverUrl,
+      String quoteText,
+      int? pageNumber,
+      DateTime createdAt});
+}
+
+/// @nodoc
+class __$MyHighlightItemDtoCopyWithImpl<$Res>
+    implements _$MyHighlightItemDtoCopyWith<$Res> {
+  __$MyHighlightItemDtoCopyWithImpl(this._self, this._then);
+
+  final _MyHighlightItemDto _self;
+  final $Res Function(_MyHighlightItemDto) _then;
+
+  /// Create a copy of MyHighlightItemDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? bookId = null,
+    Object? bookTitle = freezed,
+    Object? bookCoverUrl = freezed,
+    Object? quoteText = null,
+    Object? pageNumber = freezed,
+    Object? createdAt = null,
+  }) {
+    return _then(_MyHighlightItemDto(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookId: null == bookId
+          ? _self.bookId
+          : bookId // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookTitle: freezed == bookTitle
+          ? _self.bookTitle
+          : bookTitle // ignore: cast_nullable_to_non_nullable
+              as String?,
+      bookCoverUrl: freezed == bookCoverUrl
+          ? _self.bookCoverUrl
+          : bookCoverUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      quoteText: null == quoteText
+          ? _self.quoteText
+          : quoteText // ignore: cast_nullable_to_non_nullable
+              as String,
+      pageNumber: freezed == pageNumber
+          ? _self.pageNumber
+          : pageNumber // ignore: cast_nullable_to_non_nullable
+              as int?,
+      createdAt: null == createdAt
+          ? _self.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$MyHighlightListResponseDto {
+  List<MyHighlightItemDto> get items;
+  int get total;
+  bool get hasMore;
+
+  /// Create a copy of MyHighlightListResponseDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $MyHighlightListResponseDtoCopyWith<MyHighlightListResponseDto>
+      get copyWith =>
+          _$MyHighlightListResponseDtoCopyWithImpl<MyHighlightListResponseDto>(
+              this as MyHighlightListResponseDto, _$identity);
+
+  /// Serializes this MyHighlightListResponseDto to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is MyHighlightListResponseDto &&
+            const DeepCollectionEquality().equals(other.items, items) &&
+            (identical(other.total, total) || other.total == total) &&
+            (identical(other.hasMore, hasMore) || other.hasMore == hasMore));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, const DeepCollectionEquality().hash(items), total, hasMore);
+
+  @override
+  String toString() {
+    return 'MyHighlightListResponseDto(items: $items, total: $total, hasMore: $hasMore)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $MyHighlightListResponseDtoCopyWith<$Res> {
+  factory $MyHighlightListResponseDtoCopyWith(MyHighlightListResponseDto value,
+          $Res Function(MyHighlightListResponseDto) _then) =
+      _$MyHighlightListResponseDtoCopyWithImpl;
+  @useResult
+  $Res call({List<MyHighlightItemDto> items, int total, bool hasMore});
+}
+
+/// @nodoc
+class _$MyHighlightListResponseDtoCopyWithImpl<$Res>
+    implements $MyHighlightListResponseDtoCopyWith<$Res> {
+  _$MyHighlightListResponseDtoCopyWithImpl(this._self, this._then);
+
+  final MyHighlightListResponseDto _self;
+  final $Res Function(MyHighlightListResponseDto) _then;
+
+  /// Create a copy of MyHighlightListResponseDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? items = null,
+    Object? total = null,
+    Object? hasMore = null,
+  }) {
+    return _then(_self.copyWith(
+      items: null == items
+          ? _self.items
+          : items // ignore: cast_nullable_to_non_nullable
+              as List<MyHighlightItemDto>,
+      total: null == total
+          ? _self.total
+          : total // ignore: cast_nullable_to_non_nullable
+              as int,
+      hasMore: null == hasMore
+          ? _self.hasMore
+          : hasMore // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [MyHighlightListResponseDto].
+extension MyHighlightListResponseDtoPatterns on MyHighlightListResponseDto {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_MyHighlightListResponseDto value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _MyHighlightListResponseDto() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_MyHighlightListResponseDto value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _MyHighlightListResponseDto():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_MyHighlightListResponseDto value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _MyHighlightListResponseDto() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(List<MyHighlightItemDto> items, int total, bool hasMore)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _MyHighlightListResponseDto() when $default != null:
+        return $default(_that.items, _that.total, _that.hasMore);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(List<MyHighlightItemDto> items, int total, bool hasMore)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _MyHighlightListResponseDto():
+        return $default(_that.items, _that.total, _that.hasMore);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(List<MyHighlightItemDto> items, int total, bool hasMore)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _MyHighlightListResponseDto() when $default != null:
+        return $default(_that.items, _that.total, _that.hasMore);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _MyHighlightListResponseDto implements MyHighlightListResponseDto {
+  const _MyHighlightListResponseDto(
+      {final List<MyHighlightItemDto> items = const <MyHighlightItemDto>[],
+      this.total = 0,
+      this.hasMore = false})
+      : _items = items;
+  factory _MyHighlightListResponseDto.fromJson(Map<String, dynamic> json) =>
+      _$MyHighlightListResponseDtoFromJson(json);
+
+  final List<MyHighlightItemDto> _items;
+  @override
+  @JsonKey()
+  List<MyHighlightItemDto> get items {
+    if (_items is EqualUnmodifiableListView) return _items;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_items);
+  }
+
+  @override
+  @JsonKey()
+  final int total;
+  @override
+  @JsonKey()
+  final bool hasMore;
+
+  /// Create a copy of MyHighlightListResponseDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$MyHighlightListResponseDtoCopyWith<_MyHighlightListResponseDto>
+      get copyWith => __$MyHighlightListResponseDtoCopyWithImpl<
+          _MyHighlightListResponseDto>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$MyHighlightListResponseDtoToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _MyHighlightListResponseDto &&
+            const DeepCollectionEquality().equals(other._items, _items) &&
+            (identical(other.total, total) || other.total == total) &&
+            (identical(other.hasMore, hasMore) || other.hasMore == hasMore));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, const DeepCollectionEquality().hash(_items), total, hasMore);
+
+  @override
+  String toString() {
+    return 'MyHighlightListResponseDto(items: $items, total: $total, hasMore: $hasMore)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$MyHighlightListResponseDtoCopyWith<$Res>
+    implements $MyHighlightListResponseDtoCopyWith<$Res> {
+  factory _$MyHighlightListResponseDtoCopyWith(
+          _MyHighlightListResponseDto value,
+          $Res Function(_MyHighlightListResponseDto) _then) =
+      __$MyHighlightListResponseDtoCopyWithImpl;
+  @override
+  @useResult
+  $Res call({List<MyHighlightItemDto> items, int total, bool hasMore});
+}
+
+/// @nodoc
+class __$MyHighlightListResponseDtoCopyWithImpl<$Res>
+    implements _$MyHighlightListResponseDtoCopyWith<$Res> {
+  __$MyHighlightListResponseDtoCopyWithImpl(this._self, this._then);
+
+  final _MyHighlightListResponseDto _self;
+  final $Res Function(_MyHighlightListResponseDto) _then;
+
+  /// Create a copy of MyHighlightListResponseDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? items = null,
+    Object? total = null,
+    Object? hasMore = null,
+  }) {
+    return _then(_MyHighlightListResponseDto(
+      items: null == items
+          ? _self._items
+          : items // ignore: cast_nullable_to_non_nullable
+              as List<MyHighlightItemDto>,
+      total: null == total
+          ? _self.total
+          : total // ignore: cast_nullable_to_non_nullable
+              as int,
+      hasMore: null == hasMore
+          ? _self.hasMore
+          : hasMore // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ));
+  }
+}
+
+/// @nodoc
 mixin _$HighlightPageDto {
   List<HighlightDto> get items;
   String? get nextCursor;

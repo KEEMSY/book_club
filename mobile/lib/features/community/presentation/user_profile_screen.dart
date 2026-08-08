@@ -21,6 +21,7 @@ import '../../social/application/social_providers.dart';
 import '../../social/data/social_repository.dart';
 import '../../social/domain/user_summary.dart';
 import '../application/community_providers.dart';
+import 'widgets/my_activity_section.dart';
 
 /// Full-page user profile screen.
 ///
@@ -232,6 +233,25 @@ class _ProfileContent extends ConsumerWidget {
                 ),
               ),
             ),
+          // BC-83 — "내 활동" dashboard, own profile only. The backing
+          // endpoint (`/community/me/activity`) is always scoped to the
+          // authenticated caller, so it's meaningless (and would 403/mismatch)
+          // on someone else's profile. Gated behind FeatureFlags.community
+          // like the rest of this screen's community-only sections (BC-40).
+          if (profile.isMe && FeatureFlags.community) ...[
+            SliverToBoxAdapter(
+              child: Divider(
+                height: 1,
+                color: theme.colorScheme.outlineVariant,
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.only(top: spacing.md),
+                child: const MyActivitySection(),
+              ),
+            ),
+          ],
           SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsets.symmetric(

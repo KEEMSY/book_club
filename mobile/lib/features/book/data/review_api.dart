@@ -12,6 +12,7 @@ part 'review_api.g.dart';
 ///   * `DELETE /books/{id}/reviews/me`         — delete my review
 ///   * `GET    /books/{id}/reviews`            — aggregate summary + page
 ///   * `POST   /books/{id}/reviews/{rid}/report` — report a review
+///   * `GET    /me/reviews`                    — caller's own reviews (BC-80/83)
 ///
 /// Bearer attachment is handled globally by the auth interceptor. Request
 /// bodies stay as `Map<String, dynamic>`; freezed DTOs are converted to JSON
@@ -47,4 +48,11 @@ abstract class ReviewApi {
     @Path('book_id') String bookId,
     @Path('review_id') String reviewId,
   );
+
+  /// 내 활동 > 내 리뷰 (BC-80/83), 최신순 페이지네이션.
+  @GET('/me/reviews')
+  Future<MyReviewListResponseDto> listMyReviews({
+    @Query('limit') int limit = 20,
+    @Query('offset') int offset = 0,
+  });
 }
