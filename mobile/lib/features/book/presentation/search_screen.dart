@@ -80,7 +80,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   .queryChanged(value),
             ),
           ),
-          Expanded(child: _Body(state: state, scroll: _scrollController)),
+          Expanded(
+            child: _Body(state: state, scroll: _scrollController),
+          ),
         ],
       ),
     );
@@ -312,7 +314,10 @@ class _DiscoverSection extends StatelessWidget {
           child: Text(section.title, style: theme.textTheme.titleMedium),
         ),
         SizedBox(
-          height: 196,
+          // BC-89: BookCover(width:100)는 2:3 비율이라 높이 150px. 그 아래
+          // 제목 2줄 + 저자 1줄이 붙어 기존 196px에선 bottom overflow가 났다.
+          // 커버 150 + 텍스트/간격 여유를 포함해 넉넉히 잡는다.
+          height: 220,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.symmetric(horizontal: spacing.md),
@@ -429,28 +434,13 @@ class _SkeletonCard extends StatelessWidget {
                 ),
                 SizedBox(height: spacing.xs),
                 // Title line 2 (shorter)
-                _ShimmerBox(
-                  width: 160,
-                  height: 14,
-                  radius: 4,
-                  color: base,
-                ),
+                _ShimmerBox(width: 160, height: 14, radius: 4, color: base),
                 SizedBox(height: spacing.sm),
                 // Author
-                _ShimmerBox(
-                  width: 100,
-                  height: 12,
-                  radius: 4,
-                  color: base,
-                ),
+                _ShimmerBox(width: 100, height: 12, radius: 4, color: base),
                 SizedBox(height: spacing.xs / 2),
                 // Publisher
-                _ShimmerBox(
-                  width: 72,
-                  height: 11,
-                  radius: 4,
-                  color: base,
-                ),
+                _ShimmerBox(width: 72, height: 11, radius: 4, color: base),
               ],
             ),
           ),
