@@ -81,7 +81,8 @@ class CommunityRepository {
   Future<List<LeaderboardEntry>> getWeeklyLeaderboard() =>
       _call(() => _api.getWeeklyLeaderboard());
 
-  /// "내 활동" summary (BC-80/83).
+  /// "내 활동" summary (BC-80/83). Backed by `GET /me/activity`, relocated
+  /// out of the community feature gate by BC-90.
   Future<MyActivitySummary> getMyActivity() =>
       _call(() => _api.getMyActivity());
 

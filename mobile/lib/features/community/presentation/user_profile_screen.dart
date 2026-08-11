@@ -134,11 +134,15 @@ class _ProfileContent extends ConsumerWidget {
               ),
             ),
           // BC-83 — "내 활동" dashboard, own profile only. The backing
-          // endpoint (`/community/me/activity`) is always scoped to the
-          // authenticated caller, so it's meaningless (and would 403/mismatch)
-          // on someone else's profile. Gated behind FeatureFlags.community
-          // like the rest of this screen's community-only sections (BC-40).
-          if (profile.isMe && FeatureFlags.community) ...[
+          // endpoint (`/me/activity`, relocated out of the community feature
+          // gate by BC-90) is always scoped to the authenticated caller, so
+          // it's meaningless (and would 403/mismatch) on someone else's
+          // profile — hence the `isMe` check. Unlike this screen's other
+          // sections below, it does NOT depend on FeatureFlags.community:
+          // its five categories (리뷰·하이라이트·발제문·모임·읽는 중) are all
+          // owned by non-community domains, so the summary stays visible
+          // even while community is deferred (BC-40).
+          if (profile.isMe) ...[
             SliverToBoxAdapter(
               child: Divider(
                 height: 1,

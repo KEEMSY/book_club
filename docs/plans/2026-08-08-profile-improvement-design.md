@@ -1,7 +1,7 @@
 ---
 title: 프로필 개선 — 계정·설정 허브 · 내 활동 통합 · 표현력
 epic: BC-77
-version: 1.0.0
+version: 1.0.1
 status: delivered
 created: 2026-08-08
 owner: 김성연
@@ -53,8 +53,10 @@ owner: 김성연
 | A6 마감 | BC-85 | (본 PR) |
 
 ## 4. 알려진 제약 / 후속 (docs/backlog/IDEAS.md)
-- **'내 활동' 요약이 community 도메인 종속** → `FeatureFlags.community=false`면 요약
-  섹션 미노출(개별 목록은 정상). 집계기 이설 검토.
+- ~~'내 활동' 요약이 community 도메인 종속~~ → BC-90으로 해소. 백엔드 집계기를
+  `GET /community/me/activity` → `GET /me/activity`(community 게이팅 밖,
+  항상 마운트)로 이설, 모바일 `MyActivitySection`도 `FeatureFlags.community`
+  무관 노출로 정리.
 - 표현력 4필드 **NULL 클리어 불가**(PATCH None=미변경, 기존 bio 한계와 동일).
 - 표현력 "대표 책 선택"이 서재 내 책만 대상(카탈로그 검색 아님).
 - 알림 수신 설정(preferences) 백엔드 부재 — 별도 티켓 필요.
@@ -62,3 +64,5 @@ owner: 김성연
 ## Changelog
 - **1.0.0** (2026-08-08) — 에픽 배포 완료. A1~A6(BC-80~85) 전부 main 머지.
   계정·설정 허브 + 내 활동 통합 + 표현력. 제약·후속은 §4 참조.
+- **1.0.1** (2026-08-11) — BC-90: "내 활동" 집계기를 community 도메인 게이팅
+  밖으로 이설(`GET /me/activity`). §4의 관련 제약 항목 해소로 갱신.

@@ -15,7 +15,10 @@ part 'community_api.g.dart';
 ///   * `GET /community/explore?sort=&cursor=&limit=`     → discover feed
 ///   * `GET /community/users/{userId}/profile`           → full user profile
 ///   * `GET /community/users/{userId}/posts?cursor=&limit=` → user's posts
-///   * `GET /community/me/activity`                      → "내 활동" summary (BC-80/83)
+///
+/// `GET /me/activity` → "내 활동" summary (BC-80/83) is also bound here even
+/// though it carries no `/community` prefix — it was relocated out of the
+/// community feature gate by BC-90 (see `CommunityApi.getMyActivity`).
 @RestApi()
 abstract class CommunityApi {
   factory CommunityApi(Dio dio, {String baseUrl}) = _CommunityApi;
@@ -54,6 +57,10 @@ abstract class CommunityApi {
   /// its own domain endpoint: review's `listMyReviews`, feed's
   /// `listMyRecentHighlights`, club's `listMyAgendas`/`myClubsProvider`, and
   /// book's `listLibrary(status: 'reading')`.
-  @GET('/community/me/activity')
+  ///
+  /// No `/community` prefix — BC-90 relocated this off the community feature
+  /// gate (it was `GET /community/me/activity`) so the summary stays visible
+  /// while `FeatureFlags.community` is false.
+  @GET('/me/activity')
   Future<MyActivitySummary> getMyActivity();
 }

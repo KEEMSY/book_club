@@ -3,6 +3,7 @@ import 'package:book_club/features/auth/application/auth_notifier.dart';
 import 'package:book_club/features/auth/domain/auth_state.dart';
 import 'package:book_club/features/auth/domain/auth_user.dart';
 import 'package:book_club/features/book/application/book_providers.dart';
+import 'package:book_club/features/community/application/community_providers.dart';
 import 'package:book_club/features/community/presentation/user_profile_screen.dart';
 import 'package:book_club/features/reading/application/reading_providers.dart';
 import 'package:flutter/material.dart';
@@ -75,38 +76,43 @@ void main() {
         authNotifierProvider.overrideWith(() => _StubAuth(user)),
         readingRepositoryProvider.overrideWithValue(readingRepo),
         bookRepositoryProvider.overrideWithValue(bookRepo),
+        // BC-90: MyActivitySection now renders regardless of
+        // FeatureFlags.community — fail its provider locally instead of
+        // letting a real, un-mocked dio call reach the network. The section
+        // isn't under test here (it fails quiet on error).
+        myActivityProvider.overrideWith(
+          (ref) async => throw Exception('not exercised by this test'),
+        ),
       ],
       child: MaterialApp.router(theme: AppTheme.light, routerConfig: router),
     );
   }
 
-  testWidgets(
-    'own profile shows a single settings action and no popup menu',
-    (tester) async {
-      await tester.pumpWidget(buildApp());
-      await _settle(tester);
+  testWidgets('own profile shows a single settings action and no popup menu', (
+    tester,
+  ) async {
+    await tester.pumpWidget(buildApp());
+    await _settle(tester);
 
-      expect(find.byIcon(Icons.settings_outlined), findsOneWidget);
-      // PopupMenuButton is generic (`PopupMenuButton<_OwnProfileAction>`
-      // before this change); match on the runtime `is` check rather than a
-      // concrete type argument so this still catches any popup menu variant.
-      expect(
-        find.byWidgetPredicate((widget) => widget is PopupMenuButton),
-        findsNothing,
-      );
-    },
-  );
+    expect(find.byIcon(Icons.settings_outlined), findsOneWidget);
+    // PopupMenuButton is generic (`PopupMenuButton<_OwnProfileAction>`
+    // before this change); match on the runtime `is` check rather than a
+    // concrete type argument so this still catches any popup menu variant.
+    expect(
+      find.byWidgetPredicate((widget) => widget is PopupMenuButton),
+      findsNothing,
+    );
+  });
 
-  testWidgets(
-    'tapping the settings action pushes the settings hub',
-    (tester) async {
-      await tester.pumpWidget(buildApp());
-      await _settle(tester);
+  testWidgets('tapping the settings action pushes the settings hub', (
+    tester,
+  ) async {
+    await tester.pumpWidget(buildApp());
+    await _settle(tester);
 
-      await tester.tap(find.byIcon(Icons.settings_outlined));
-      await _settle(tester);
+    await tester.tap(find.byIcon(Icons.settings_outlined));
+    await _settle(tester);
 
-      expect(find.text('SETTINGS_SCREEN'), findsOneWidget);
-    },
-  );
+    expect(find.text('SETTINGS_SCREEN'), findsOneWidget);
+  });
 }

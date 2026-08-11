@@ -189,7 +189,7 @@ class _CommunityApi implements CommunityApi {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/community/me/activity',
+            '/me/activity',
             queryParameters: queryParameters,
             data: _data,
           )

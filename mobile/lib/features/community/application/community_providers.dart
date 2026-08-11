@@ -71,10 +71,11 @@ final userProfileProvider =
 /// endpoint is always scoped to the authenticated user), so the profile
 /// screen only watches this when rendering its own profile.
 ///
-/// Gated behind [FeatureFlags.community] like the rest of this file's
-/// providers: `/community/*` is unmounted when community is deferred, and
-/// the profile screen hides the section entirely in that case rather than
-/// surfacing a 404.
+/// Unlike the rest of this file's providers, this is NOT gated behind
+/// [FeatureFlags.community]: BC-90 relocated the backing endpoint to
+/// `GET /me/activity`, mounted unconditionally regardless of
+/// `feature_community_enabled`, so the summary stays visible while
+/// community is deferred (BC-40).
 final myActivityProvider = FutureProvider.autoDispose<MyActivitySummary>((ref) {
   return ref.watch(communityRepositoryProvider).getMyActivity();
 });
