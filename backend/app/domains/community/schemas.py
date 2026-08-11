@@ -108,9 +108,10 @@ class ActivityBookItemPublic(BaseModel):
 
 
 class MyActivityResponse(BaseModel):
-    """GET /community/me/activity — counts plus a short newest-first preview
-    per category. Each category's full, paginated list lives behind its own
-    domain endpoint (see the module docstring in ``community/router.py``)."""
+    """GET /me/activity (relocated from /community/me/activity by BC-90) —
+    counts plus a short newest-first preview per category. Each category's
+    full, paginated list lives behind its own domain endpoint (see the
+    module docstring in ``community/router.py``)."""
 
     counts: ActivityCountsPublic
     reviews: list[ActivityReviewItemPublic] = Field(default_factory=list)

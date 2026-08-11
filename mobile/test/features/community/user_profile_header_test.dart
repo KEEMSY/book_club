@@ -5,6 +5,7 @@ import 'package:book_club/features/auth/domain/auth_user.dart';
 import 'package:book_club/features/book/application/book_providers.dart';
 import 'package:book_club/features/book/data/book_repository.dart'
     show BookRepositoryException;
+import 'package:book_club/features/community/application/community_providers.dart';
 import 'package:book_club/features/community/presentation/user_profile_screen.dart';
 import 'package:book_club/features/reading/application/reading_providers.dart';
 import 'package:flutter/material.dart';
@@ -69,6 +70,14 @@ void main() {
         authNotifierProvider.overrideWith(() => _StubAuth(user)),
         readingRepositoryProvider.overrideWithValue(readingRepo),
         bookRepositoryProvider.overrideWithValue(bookRepo),
+        // BC-90: MyActivitySection now renders regardless of
+        // FeatureFlags.community (it's own-profile-only, not community-only),
+        // so the profile screen watches myActivityProvider here too. Fail it
+        // locally rather than let a real, un-mocked dio call reach the network
+        // — the section renders nothing on error and isn't under test here.
+        myActivityProvider.overrideWith(
+          (ref) async => throw Exception('not exercised by this test'),
+        ),
       ],
       child: MaterialApp(
         theme: AppTheme.light,

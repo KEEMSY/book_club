@@ -28,6 +28,7 @@ from app.domains.challenge.providers import get_challenge_service_singleton
 from app.domains.challenge.router import router as challenge_router
 from app.domains.club.router import router as club_router
 from app.domains.club.ws_router import router as club_ws_router
+from app.domains.community.router import me_router as community_me_router
 from app.domains.community.router import router as community_router
 from app.domains.curation.router import router as curation_router
 from app.domains.discovery.providers import run_cf_retrain
@@ -146,6 +147,9 @@ def create_app() -> FastAPI:
     # Infra / admin routers are always mounted (not user-facing features).
     app.include_router(admin_router)
     app.include_router(admin_dashboard_router)
+    # "내 활동" summary is core surface, not gated behind feature_community_enabled
+    # (BC-90) — see app/domains/community/router.py module docstring.
+    app.include_router(community_me_router)
     # Non-MVP domains are gated by feature flags (BC-1 scope cleanup). Disabling
     # a flag leaves the domain code intact but stops mounting its router.
     if settings.feature_social_enabled:

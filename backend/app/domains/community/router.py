@@ -7,8 +7,14 @@ Endpoints:
   GET /community/explore                 — discover feed (sort=latest|popular)
   GET /community/users/{id}/profile      — full user profile with follow counts
   GET /community/users/{id}/posts        — posts authored by a user (cursor-paged)
-  GET /community/me/activity             — "내 활동" summary (BC-80): counts +
-                                            a short preview per category. Each
+
+``me_router`` below carries no ``/community`` prefix and is mounted
+unconditionally in ``app.main`` — a user's own activity roll-up is core
+surface, not gated behind ``feature_community_enabled`` (BC-90; relocated
+from ``GET /community/me/activity``, originally added in BC-80):
+
+  GET /me/activity                       — "내 활동" summary: counts + a short
+                                            preview per category. Each
                                             category's full paginated list lives
                                             behind its own domain endpoint:
                                               - GET /me/reviews (review)
@@ -16,6 +22,12 @@ Endpoints:
                                               - GET /clubs/me/agendas (club)
                                               - GET /clubs/me (club)
                                               - GET /me/library?status=reading (book)
+
+Its orchestration still lives entirely in
+``CommunityService.get_my_activity``, which reaches the owning domains only
+through their ``Activity*QueryPort`` protocols (CLAUDE.md §3.3) — moving the
+transport layer out from behind the feature gate doesn't change that
+boundary.
 """
 
 from __future__ import annotations
@@ -53,6 +65,9 @@ from app.domains.feed.providers import get_feed_book_query, get_feed_user_query
 from app.domains.feed.schemas import AuthorPublic, FeedResponse, PostPublic
 
 router = APIRouter(prefix="/community", tags=["community"])
+# No prefix — mounted unconditionally in app.main regardless of
+# feature_community_enabled (BC-90). See module docstring.
+me_router = APIRouter(tags=["community"])
 
 
 def _author_from_view(view: AuthorView | None, fallback_id: UUID) -> AuthorPublic:
@@ -211,7 +226,7 @@ async def get_user_profile(
     )
 
 
-@router.get("/me/activity", response_model=MyActivityResponse)
+@me_router.get("/me/activity", response_model=MyActivityResponse)
 async def get_my_activity(
     user_id: Annotated[str, Depends(get_current_user_id)],
     service: Annotated[CommunityService, Depends(get_community_service)],

@@ -87,7 +87,9 @@ class MyActivityCounts:
 
 @dataclass(frozen=True, slots=True)
 class MyActivitySummary:
-    """Dashboard-preview payload for GET /community/me/activity (BC-80).
+    """Dashboard-preview payload for GET /me/activity (BC-80; relocated from
+    /community/me/activity by BC-90 so it stays visible with
+    feature_community_enabled=False).
 
     Each list is capped at ``_ACTIVITY_PREVIEW_SIZE`` — the full, paginated
     list for a category lives behind its own domain's "list mine" endpoint
