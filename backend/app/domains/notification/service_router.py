@@ -12,8 +12,18 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from uuid import UUID
 
-from app.domains.notification.models import Notification, WeeklyReport
-from app.domains.notification.repository import NotificationRepository, WeeklyReportRepository
+from app.domains.notification.models import (
+    TOGGLEABLE_NOTIFICATION_TYPES,
+    Notification,
+    WeeklyReport,
+)
+from app.domains.notification.repository import (
+    NotificationPreferenceRepository,
+    NotificationRepository,
+    WeeklyReportRepository,
+)
+
+_TOGGLEABLE_KEYS = frozenset(t.value for t in TOGGLEABLE_NOTIFICATION_TYPES)
 
 
 @dataclass(slots=True)
@@ -22,6 +32,7 @@ class NotificationRouterService:
 
     notifications: NotificationRepository
     weekly_reports: WeeklyReportRepository
+    preferences: NotificationPreferenceRepository
 
     async def list_notifications(
         self,
@@ -69,3 +80,29 @@ class NotificationRouterService:
         )
         result = await self.weekly_reports._session.execute(stmt)
         return result.scalar_one_or_none()
+
+    async def get_notification_preferences(self, user_id: UUID) -> dict[str, bool]:
+        """Return every toggleable type's on/off state, defaulting unset ones to on."""
+        overrides = await self.preferences.get_overrides(user_id)
+        return _merge_with_defaults(overrides)
+
+    async def update_notification_preferences(
+        self, user_id: UUID, updates: dict[str, bool]
+    ) -> dict[str, bool]:
+        """Partially update the reader's preferences and return the merged state.
+
+        Unknown keys (typos, a required type, a not-yet-toggleable future type)
+        are silently dropped rather than rejected — this keeps the endpoint
+        forward-compatible with older/newer mobile clients (mirrors the
+        lenient cursor parsing in ``router.py``).
+        """
+        filtered = {k: v for k, v in updates.items() if k in _TOGGLEABLE_KEYS}
+        stored = await self.preferences.get_overrides(user_id)
+        merged_overrides = {**stored, **filtered}
+        saved = await self.preferences.upsert_overrides(user_id, merged_overrides)
+        return _merge_with_defaults(saved)
+
+
+def _merge_with_defaults(overrides: dict[str, bool]) -> dict[str, bool]:
+    """Every toggleable type, defaulting to on unless explicitly overridden."""
+    return {t.value: overrides.get(t.value, True) for t in TOGGLEABLE_NOTIFICATION_TYPES}

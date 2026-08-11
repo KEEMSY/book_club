@@ -14,10 +14,13 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Query, status
 
 from app.core.deps import get_current_user_id
+from app.domains.notification.models import REQUIRED_NOTIFICATION_TYPES
 from app.domains.notification.providers import get_notification_router_service
 from app.domains.notification.schemas import (
     NotificationListOut,
     NotificationOut,
+    NotificationPreferencesOut,
+    NotificationPreferencesUpdateIn,
     WeeklyReportOut,
 )
 from app.domains.notification.service_router import NotificationRouterService
@@ -73,6 +76,31 @@ async def unread_count(
 ) -> dict[str, int]:
     count = await svc.unread_count(UUID(user_id))
     return {"count": count}
+
+
+@router.get("/me/notification-preferences", response_model=NotificationPreferencesOut)
+async def get_notification_preferences(
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    svc: Annotated[NotificationRouterService, Depends(get_notification_router_service)],
+) -> NotificationPreferencesOut:
+    preferences = await svc.get_notification_preferences(UUID(user_id))
+    return NotificationPreferencesOut(
+        preferences=preferences,
+        required_types=[t.value for t in REQUIRED_NOTIFICATION_TYPES],
+    )
+
+
+@router.patch("/me/notification-preferences", response_model=NotificationPreferencesOut)
+async def update_notification_preferences(
+    body: NotificationPreferencesUpdateIn,
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    svc: Annotated[NotificationRouterService, Depends(get_notification_router_service)],
+) -> NotificationPreferencesOut:
+    preferences = await svc.update_notification_preferences(UUID(user_id), body.preferences)
+    return NotificationPreferencesOut(
+        preferences=preferences,
+        required_types=[t.value for t in REQUIRED_NOTIFICATION_TYPES],
+    )
 
 
 @router.get("/reports/weekly", response_model=WeeklyReportOut | None)

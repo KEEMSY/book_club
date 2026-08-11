@@ -19,7 +19,7 @@ from sqlalchemy import func, select, update
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domains.notification.models import Notification, WeeklyReport
+from app.domains.notification.models import Notification, NotificationPreference, WeeklyReport
 
 
 class NotificationRepository:
@@ -98,6 +98,42 @@ class NotificationRepository:
         result = await self._session.execute(stmt)
         count = result.scalar_one()
         return int(count or 0)
+
+
+class NotificationPreferenceRepository:
+    """Persistence adapter for :class:`NotificationPreference`."""
+
+    def __init__(self, session: AsyncSession) -> None:
+        self._session = session
+
+    async def get_overrides(self, user_id: UUID) -> dict[str, bool]:
+        """Return the stored override map, or ``{}`` when the user never set one."""
+        stmt = select(NotificationPreference.overrides).where(
+            NotificationPreference.user_id == user_id
+        )
+        result = await self._session.execute(stmt)
+        row = result.scalar_one_or_none()
+        return dict(row) if row is not None else {}
+
+    async def upsert_overrides(self, user_id: UUID, overrides: dict[str, bool]) -> dict[str, bool]:
+        """Replace the stored override map wholesale and return it.
+
+        Callers pass the fully-merged map (existing overrides + this update) —
+        this repository does not merge, per CLAUDE.md §3.1 (no business rules
+        in the repository layer).
+        """
+        stmt = (
+            pg_insert(NotificationPreference)
+            .values(user_id=user_id, overrides=overrides, updated_at=func.now())
+            .on_conflict_do_update(
+                index_elements=[NotificationPreference.user_id],
+                set_={"overrides": overrides, "updated_at": func.now()},
+            )
+            .returning(NotificationPreference.overrides)
+        )
+        result = await self._session.execute(stmt)
+        await self._session.flush()
+        return dict(result.scalar_one())
 
 
 class WeeklyReportRepository:

@@ -50,6 +50,19 @@ class NotificationType(enum.StrEnum):
     DISCUSSION_COMMENTED = "discussion_commented"
 
 
+# BC-91: notification types the reader cannot turn off. SUBSCRIPTION_REMINDER
+# carries trial-expiry/billing information — silencing it could cost the user
+# money (surprise trial-to-paid conversion), so it always sends regardless of
+# NotificationPreference. Every other type is toggleable.
+REQUIRED_NOTIFICATION_TYPES: frozenset[NotificationType] = frozenset(
+    {NotificationType.SUBSCRIPTION_REMINDER}
+)
+
+TOGGLEABLE_NOTIFICATION_TYPES: tuple[NotificationType, ...] = tuple(
+    t for t in NotificationType if t not in REQUIRED_NOTIFICATION_TYPES
+)
+
+
 class Notification(Base):
     """In-app notification inbox row."""
 
@@ -106,5 +119,29 @@ class WeeklyReport(Base):
     longest_session_sec: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     push_sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+
+
+class NotificationPreference(Base):
+    """One row per user storing per-type inbox/push opt-outs (BC-91).
+
+    ``overrides`` is a sparse JSON map of ``NotificationType`` value -> bool.
+    A missing key means "on" (the default) — this keeps adding a new
+    ``NotificationType`` safe: existing rows need no backfill and silently
+    default every reader to enabled for it. Only keys in
+    ``TOGGLEABLE_NOTIFICATION_TYPES`` are meaningful; required types are never
+    looked up here (see ``NotificationService._is_type_enabled``).
+    """
+
+    __tablename__ = "notification_preferences"
+
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    overrides: Mapped[dict[str, bool]] = mapped_column(JSONB, nullable=False, server_default="{}")
+    updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
