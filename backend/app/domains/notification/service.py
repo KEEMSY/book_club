@@ -19,7 +19,11 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from app.domains.notification.models import Notification, NotificationType
+from app.domains.notification.models import (
+    REQUIRED_NOTIFICATION_TYPES,
+    Notification,
+    NotificationType,
+)
 from app.domains.notification.ports import (
     ActiveUserQueryPort,
     CouponIssuePort,
@@ -30,7 +34,11 @@ from app.domains.notification.ports import (
     SessionQueryPort,
     TrialExpiryQueryPort,
 )
-from app.domains.notification.repository import NotificationRepository, WeeklyReportRepository
+from app.domains.notification.repository import (
+    NotificationPreferenceRepository,
+    NotificationRepository,
+    WeeklyReportRepository,
+)
 from app.domains.reading.events import UserGradeRecomputed
 
 logger = logging.getLogger(__name__)
@@ -78,6 +86,21 @@ class NotificationService:
     lapsed_trial: LapsedTrialQueryPort | None = None
     coupon_issuer: CouponIssuePort | None = None
 
+    @staticmethod
+    async def _is_type_enabled(
+        session: AsyncSession, user_id: UUID, ntype: NotificationType
+    ) -> bool:
+        """True unless the reader explicitly turned *ntype* off (BC-91).
+
+        Required types (billing/trial) never touch the preferences table —
+        they always send. For toggleable types, a missing override means on
+        (the default), matching ``NotificationRouterService._merge_with_defaults``.
+        """
+        if ntype in REQUIRED_NOTIFICATION_TYPES:
+            return True
+        overrides = await NotificationPreferenceRepository(session).get_overrides(user_id)
+        return overrides.get(ntype.value, True)
+
     async def on_reaction_added(self, event: object) -> None:
         """Create an in-app notification and push when a reaction is added.
 
@@ -92,6 +115,10 @@ class NotificationService:
             return
 
         async with self.sessionmaker() as session:
+            if not await self._is_type_enabled(
+                session, event.post_author_id, NotificationType.REACTION
+            ):
+                return
             notif = await self._save_notification(
                 session,
                 user_id=event.post_author_id,
@@ -144,6 +171,8 @@ class NotificationService:
             return
 
         async with self.sessionmaker() as session:
+            if not await self._is_type_enabled(session, uid, NotificationType.COMMENT):
+                return
             notif = await self._save_notification(
                 session,
                 user_id=uid,
@@ -171,7 +200,11 @@ class NotificationService:
 
         Also pushes a real-time event to the followee's personal WebSocket
         stream so the Flutter app can update its follower count badge without
-        polling when the user is online.
+        polling when the user is online. FOLLOW_RECEIVED is toggleable
+        (BC-91): when off, both the inbox row and the WS badge nudge are
+        skipped — a reader who muted follow notifications should not get the
+        WS event either, since it exists only to surface this notification
+        live.
         """
         from app.core.ws_manager import ws_manager
         from app.domains.social.events import FollowReceived
@@ -180,6 +213,10 @@ class NotificationService:
             return
 
         async with self.sessionmaker() as session:
+            if not await self._is_type_enabled(
+                session, event.followee_id, NotificationType.FOLLOW_RECEIVED
+            ):
+                return
             notif = await self._save_notification(
                 session,
                 user_id=event.followee_id,
@@ -218,6 +255,10 @@ class NotificationService:
             return
 
         async with self.sessionmaker() as session:
+            if not await self._is_type_enabled(
+                session, event.user_id, NotificationType.BADGE_EARNED
+            ):
+                return
             notif = await self._save_notification(
                 session,
                 user_id=event.user_id,
@@ -324,6 +365,8 @@ class NotificationService:
         for uid in recipient_ids:
             try:
                 async with self.sessionmaker() as session:
+                    if not await self._is_type_enabled(session, uid, ntype):
+                        continue
                     notif = await self._save_notification(
                         session,
                         user_id=uid,
@@ -356,6 +399,8 @@ class NotificationService:
         label = f"{grade_name} {tier_roman}".strip()
 
         async with self.sessionmaker() as session:
+            if not await self._is_type_enabled(session, event.user_id, NotificationType.GRADE_UP):
+                return
             notif = await self._save_notification(
                 session,
                 user_id=event.user_id,
@@ -414,6 +459,10 @@ class NotificationService:
         longest = await self.session_query.get_longest_in_range(user_id, week_start, week_end)
 
         async with self.sessionmaker() as session:
+            # The WeeklyReport row is aggregated reading stats, not a
+            # notification — it is always persisted regardless of the
+            # reader's WEEKLY_REPORT preference (BC-91). Only the inbox row +
+            # push below are gated.
             report_repo = WeeklyReportRepository(session)
             report = await report_repo.upsert(
                 user_id=user_id,
@@ -423,20 +472,24 @@ class NotificationService:
                 best_day=best_day,
                 longest_session_sec=longest,
             )
-            minutes = total_seconds // 60
-            notif = await self._save_notification(
-                session,
-                user_id=user_id,
-                ntype=NotificationType.WEEKLY_REPORT,
-                title="이번 주 독서 리포트가 도착했어요",
-                body=f"지난 한 주 동안 총 {minutes}분 독서했어요.",
-                data={"week_start": str(week_start)},
-            )
-            tokens = await self.device_tokens.get_active_tokens(user_id)
-            await report_repo.mark_push_sent(report.id, datetime.now(tz=UTC))
+
+            notif: Notification | None = None
+            tokens: list[str] = []
+            if await self._is_type_enabled(session, user_id, NotificationType.WEEKLY_REPORT):
+                minutes = total_seconds // 60
+                notif = await self._save_notification(
+                    session,
+                    user_id=user_id,
+                    ntype=NotificationType.WEEKLY_REPORT,
+                    title="이번 주 독서 리포트가 도착했어요",
+                    body=f"지난 한 주 동안 총 {minutes}분 독서했어요.",
+                    data={"week_start": str(week_start)},
+                )
+                tokens = await self.device_tokens.get_active_tokens(user_id)
+                await report_repo.mark_push_sent(report.id, datetime.now(tz=UTC))
             await session.commit()
 
-        if tokens:
+        if tokens and notif is not None:
             await self.push.send_to_tokens(
                 tokens,
                 notif.title,
@@ -469,6 +522,8 @@ class NotificationService:
         title, body = copy.get(push_type, ("Book Club", ""))
 
         async with self.sessionmaker() as session:
+            if not await self._is_type_enabled(session, user_id, NotificationType.STREAK_WARNING):
+                return
             await self._save_notification(
                 session,
                 user_id=user_id,
@@ -505,6 +560,8 @@ class NotificationService:
         title = "스트릭이 끊길 위험이에요! 🔥"
         body = f"{streak_days}일 연속 독서 중이에요. 오늘 독서를 기록해 보세요."
         async with self.sessionmaker() as session:
+            if not await self._is_type_enabled(session, user_id, NotificationType.STREAK_WARNING):
+                return
             await self._save_notification(
                 session,
                 user_id=user_id,
@@ -533,6 +590,9 @@ class NotificationService:
         Persists an in-app notification and pushes to the user's active device
         tokens. Named ``schedule_*`` because ``send_expiry_reminders`` calls it
         once per user whose trial enters the final 24h window.
+
+        Not gated by ``_is_type_enabled`` (BC-91): SUBSCRIPTION_REMINDER is in
+        ``REQUIRED_NOTIFICATION_TYPES`` — trial/billing notices always send.
         """
         title = "내일 Pro 혜택이 종료돼요"
         body = "지금 구독하면 30% 할인 — 체험 중 누린 Pro 기능을 계속 이어가세요."
@@ -606,7 +666,12 @@ class NotificationService:
         logger.info("reengagement_coupon_batch finished users=%d", len(users))
 
     async def send_rejoin_push(self, *, user_id: UUID, coupon_code: str) -> None:
-        """Push a re-engagement discount coupon to a lapsed user (M70)."""
+        """Push a re-engagement discount coupon to a lapsed user (M70).
+
+        Shares ``NotificationType.SUBSCRIPTION_REMINDER`` with the D-1 trial
+        reminder, so it inherits the same required (non-toggleable) status —
+        not gated by ``_is_type_enabled`` (BC-91).
+        """
         title = "다시 만나요! 20% 할인 쿠폰이 도착했어요 🎁"
         body = f"쿠폰 {coupon_code} 으로 Pro를 20% 할인가에 다시 시작해 보세요. (30일 이내)"
         async with self.sessionmaker() as session:

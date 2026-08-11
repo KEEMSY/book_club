@@ -14,7 +14,11 @@ from uuid import UUID, uuid4
 import pytest
 from app.domains.challenge.events import BadgeEarned
 from app.domains.feed.events import CommentAdded, ReactionAdded
-from app.domains.notification.models import Notification, NotificationType
+from app.domains.notification.models import (
+    REQUIRED_NOTIFICATION_TYPES,
+    Notification,
+    NotificationType,
+)
 from app.domains.notification.service import NotificationService
 from app.domains.reading.events import UserGradeRecomputed
 from app.domains.social.events import FollowReceived
@@ -107,6 +111,7 @@ class _TestableNotificationService(NotificationService):
         self,
         push: FakePushAdapter,
         tokens_by_user: dict[UUID, list[str]],
+        disabled: set[tuple[UUID, str]] | None = None,
     ) -> None:
         super().__init__(
             sessionmaker=_FakeSessionMaker(),  # type: ignore[arg-type]
@@ -118,6 +123,15 @@ class _TestableNotificationService(NotificationService):
         )
         self._notifications: list[Notification] = []
         self._tokens_by_user = tokens_by_user
+        # BC-91: (user_id, NotificationType.value) pairs the fake reader has
+        # turned off — mirrors the real NotificationPreference override map
+        # without touching a DB, per CLAUDE.md §5.
+        self._disabled = disabled or set()
+
+    def _pref_enabled(self, user_id: UUID, ntype: NotificationType) -> bool:
+        if ntype in REQUIRED_NOTIFICATION_TYPES:
+            return True
+        return (user_id, ntype.value) not in self._disabled
 
     def _make_notification(
         self,
@@ -146,6 +160,8 @@ class _TestableNotificationService(NotificationService):
         if not isinstance(event, _ReactionAdded):
             return
         if event.reactor_id == event.post_author_id:
+            return
+        if not self._pref_enabled(event.post_author_id, NotificationType.REACTION):
             return
 
         notif = self._make_notification(
@@ -246,6 +262,8 @@ class _TestableNotificationService(NotificationService):
         sessionmaker (see _make_notification) while preserving the per-recipient
         loop + push-call semantics the production code implements."""
         for uid in recipient_ids:
+            if not self._pref_enabled(uid, ntype):
+                continue
             notif = self._make_notification(
                 user_id=uid, ntype=ntype, title=title, body=body, data=data
             )
@@ -656,3 +674,108 @@ async def test_notify_topic_comment_added_fans_out_to_agenda_and_parent_author()
     assert all(n.ntype == NotificationType.DISCUSSION_COMMENTED.value for n in svc._notifications)
     assert len(push.calls) == 2
     assert push.calls[0]["data"]["comment_id"] == str(comment_id)
+
+
+# ---------------------------------------------------------------------------
+# BC-91: notification preferences gate inbox + push delivery
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_on_reaction_added_skips_when_preference_disabled() -> None:
+    """REACTION off for the recipient: no in-app row, no push."""
+    push = FakePushAdapter()
+    post_author = uuid4()
+    reactor = uuid4()
+
+    svc = _TestableNotificationService(
+        push,
+        {post_author: ["tok-abc"]},
+        disabled={(post_author, NotificationType.REACTION.value)},
+    )
+
+    event = ReactionAdded(
+        post_id=uuid4(),
+        reactor_id=reactor,
+        post_author_id=post_author,
+        reaction_type="heart",
+    )
+    await svc.on_reaction_added(event)
+
+    assert svc._notifications == []
+    assert push.calls == []
+
+
+@pytest.mark.asyncio
+async def test_on_reaction_added_sends_when_preference_unset() -> None:
+    """Unset preference defaults to on — mirrors the real service's default."""
+    push = FakePushAdapter()
+    post_author = uuid4()
+    reactor = uuid4()
+
+    # No `disabled` set at all: every type defaults to enabled.
+    svc = _TestableNotificationService(push, {post_author: ["tok-abc"]})
+
+    event = ReactionAdded(
+        post_id=uuid4(),
+        reactor_id=reactor,
+        post_author_id=post_author,
+        reaction_type="heart",
+    )
+    await svc.on_reaction_added(event)
+
+    assert len(svc._notifications) == 1
+    assert len(push.calls) == 1
+
+
+@pytest.mark.asyncio
+async def test_notify_agenda_published_respects_per_recipient_preference() -> None:
+    """Fan-out applies each recipient's own preference — one off, one on."""
+    push = FakePushAdapter()
+    member_off, member_on = uuid4(), uuid4()
+    club_id, session_id, agenda_id, actor_id = uuid4(), uuid4(), uuid4(), uuid4()
+
+    svc = _TestableNotificationService(
+        push,
+        {member_off: ["tok-off"], member_on: ["tok-on"]},
+        disabled={(member_off, NotificationType.AGENDA_PUBLISHED.value)},
+    )
+
+    await svc.notify_agenda_published(
+        actor_id=actor_id,
+        club_id=club_id,
+        session_id=session_id,
+        agenda_id=agenda_id,
+        recipient_ids=[member_off, member_on],
+    )
+
+    assert len(svc._notifications) == 1
+    assert svc._notifications[0].user_id == member_on
+    assert len(push.calls) == 1
+    assert push.calls[0]["tokens"] == ["tok-on"]
+
+
+@pytest.mark.asyncio
+async def test_is_type_enabled_required_type_bypasses_preference_lookup() -> None:
+    """SUBSCRIPTION_REMINDER never touches the preferences table — always on.
+
+    Exercises the *real* (non-faked) ``NotificationService._is_type_enabled``.
+    Passing ``None`` for the session is safe here: the required-type branch
+    returns before the session is ever used, so this stays DB-free.
+    """
+    real_svc = NotificationService(
+        sessionmaker=lambda: None,  # type: ignore[arg-type,return-value]
+        push=FakePushAdapter(),
+        device_tokens=FakeDeviceTokenAdapter({}),
+        daily_stats=FakeDailyStatAdapter({}),
+        session_query=FakeSessionQueryAdapter({}),
+        active_users=FakeActiveUserAdapter([]),
+    )
+
+    enabled = await real_svc._is_type_enabled(
+        None,  # type: ignore[arg-type]
+        uuid4(),
+        NotificationType.SUBSCRIPTION_REMINDER,
+    )
+
+    assert enabled is True

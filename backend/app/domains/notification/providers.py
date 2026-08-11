@@ -24,7 +24,11 @@ from app.domains.auth.models import DeviceToken, User
 from app.domains.notification.adapters.fcm_push_adapter import FcmPushAdapter
 from app.domains.notification.adapters.null_push_adapter import NullPushAdapter
 from app.domains.notification.ports import PushPort
-from app.domains.notification.repository import NotificationRepository, WeeklyReportRepository
+from app.domains.notification.repository import (
+    NotificationPreferenceRepository,
+    NotificationRepository,
+    WeeklyReportRepository,
+)
 from app.domains.notification.service import NotificationService
 from app.domains.notification.service_router import NotificationRouterService
 from app.domains.reading.models import DailyReadingStat, ReadingSession, ReadingSessionSource
@@ -258,6 +262,7 @@ def get_notification_router_service(
     return NotificationRouterService(
         notifications=NotificationRepository(session),
         weekly_reports=WeeklyReportRepository(session),
+        preferences=NotificationPreferenceRepository(session),
     )
 
 
