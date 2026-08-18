@@ -1104,6 +1104,358 @@ class __$UnreadCountResponseCopyWithImpl<$Res>
 }
 
 /// @nodoc
+mixin _$NotificationPreferencesResponse {
+  Map<String, bool> get preferences;
+  List<String> get requiredTypes;
+
+  /// Create a copy of NotificationPreferencesResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $NotificationPreferencesResponseCopyWith<NotificationPreferencesResponse>
+      get copyWith => _$NotificationPreferencesResponseCopyWithImpl<
+              NotificationPreferencesResponse>(
+          this as NotificationPreferencesResponse, _$identity);
+
+  /// Serializes this NotificationPreferencesResponse to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is NotificationPreferencesResponse &&
+            const DeepCollectionEquality()
+                .equals(other.preferences, preferences) &&
+            const DeepCollectionEquality()
+                .equals(other.requiredTypes, requiredTypes));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(preferences),
+      const DeepCollectionEquality().hash(requiredTypes));
+
+  @override
+  String toString() {
+    return 'NotificationPreferencesResponse(preferences: $preferences, requiredTypes: $requiredTypes)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $NotificationPreferencesResponseCopyWith<$Res> {
+  factory $NotificationPreferencesResponseCopyWith(
+          NotificationPreferencesResponse value,
+          $Res Function(NotificationPreferencesResponse) _then) =
+      _$NotificationPreferencesResponseCopyWithImpl;
+  @useResult
+  $Res call({Map<String, bool> preferences, List<String> requiredTypes});
+}
+
+/// @nodoc
+class _$NotificationPreferencesResponseCopyWithImpl<$Res>
+    implements $NotificationPreferencesResponseCopyWith<$Res> {
+  _$NotificationPreferencesResponseCopyWithImpl(this._self, this._then);
+
+  final NotificationPreferencesResponse _self;
+  final $Res Function(NotificationPreferencesResponse) _then;
+
+  /// Create a copy of NotificationPreferencesResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? preferences = null,
+    Object? requiredTypes = null,
+  }) {
+    return _then(_self.copyWith(
+      preferences: null == preferences
+          ? _self.preferences
+          : preferences // ignore: cast_nullable_to_non_nullable
+              as Map<String, bool>,
+      requiredTypes: null == requiredTypes
+          ? _self.requiredTypes
+          : requiredTypes // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [NotificationPreferencesResponse].
+extension NotificationPreferencesResponsePatterns
+    on NotificationPreferencesResponse {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_NotificationPreferencesResponse value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _NotificationPreferencesResponse() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_NotificationPreferencesResponse value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _NotificationPreferencesResponse():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_NotificationPreferencesResponse value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _NotificationPreferencesResponse() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(Map<String, bool> preferences, List<String> requiredTypes)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _NotificationPreferencesResponse() when $default != null:
+        return $default(_that.preferences, _that.requiredTypes);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(Map<String, bool> preferences, List<String> requiredTypes)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _NotificationPreferencesResponse():
+        return $default(_that.preferences, _that.requiredTypes);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            Map<String, bool> preferences, List<String> requiredTypes)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _NotificationPreferencesResponse() when $default != null:
+        return $default(_that.preferences, _that.requiredTypes);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _NotificationPreferencesResponse
+    implements NotificationPreferencesResponse {
+  const _NotificationPreferencesResponse(
+      {required final Map<String, bool> preferences,
+      required final List<String> requiredTypes})
+      : _preferences = preferences,
+        _requiredTypes = requiredTypes;
+  factory _NotificationPreferencesResponse.fromJson(
+          Map<String, dynamic> json) =>
+      _$NotificationPreferencesResponseFromJson(json);
+
+  final Map<String, bool> _preferences;
+  @override
+  Map<String, bool> get preferences {
+    if (_preferences is EqualUnmodifiableMapView) return _preferences;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_preferences);
+  }
+
+  final List<String> _requiredTypes;
+  @override
+  List<String> get requiredTypes {
+    if (_requiredTypes is EqualUnmodifiableListView) return _requiredTypes;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_requiredTypes);
+  }
+
+  /// Create a copy of NotificationPreferencesResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$NotificationPreferencesResponseCopyWith<_NotificationPreferencesResponse>
+      get copyWith => __$NotificationPreferencesResponseCopyWithImpl<
+          _NotificationPreferencesResponse>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$NotificationPreferencesResponseToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _NotificationPreferencesResponse &&
+            const DeepCollectionEquality()
+                .equals(other._preferences, _preferences) &&
+            const DeepCollectionEquality()
+                .equals(other._requiredTypes, _requiredTypes));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(_preferences),
+      const DeepCollectionEquality().hash(_requiredTypes));
+
+  @override
+  String toString() {
+    return 'NotificationPreferencesResponse(preferences: $preferences, requiredTypes: $requiredTypes)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$NotificationPreferencesResponseCopyWith<$Res>
+    implements $NotificationPreferencesResponseCopyWith<$Res> {
+  factory _$NotificationPreferencesResponseCopyWith(
+          _NotificationPreferencesResponse value,
+          $Res Function(_NotificationPreferencesResponse) _then) =
+      __$NotificationPreferencesResponseCopyWithImpl;
+  @override
+  @useResult
+  $Res call({Map<String, bool> preferences, List<String> requiredTypes});
+}
+
+/// @nodoc
+class __$NotificationPreferencesResponseCopyWithImpl<$Res>
+    implements _$NotificationPreferencesResponseCopyWith<$Res> {
+  __$NotificationPreferencesResponseCopyWithImpl(this._self, this._then);
+
+  final _NotificationPreferencesResponse _self;
+  final $Res Function(_NotificationPreferencesResponse) _then;
+
+  /// Create a copy of NotificationPreferencesResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? preferences = null,
+    Object? requiredTypes = null,
+  }) {
+    return _then(_NotificationPreferencesResponse(
+      preferences: null == preferences
+          ? _self._preferences
+          : preferences // ignore: cast_nullable_to_non_nullable
+              as Map<String, bool>,
+      requiredTypes: null == requiredTypes
+          ? _self._requiredTypes
+          : requiredTypes // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+    ));
+  }
+}
+
+/// @nodoc
 mixin _$WeeklyReportResponse {
   String get id;
   String get weekStart;

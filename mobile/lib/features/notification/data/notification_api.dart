@@ -11,10 +11,12 @@ part 'notification_api.g.dart';
 /// token — no additional header config needed here.
 ///
 /// Endpoints:
-///   * `GET  /notifications?cursor=&limit=`
-///   * `POST /notifications/{id}/read`
-///   * `GET  /notifications/unread-count`
-///   * `GET  /reports/weekly?week=`
+///   * `GET   /notifications?cursor=&limit=`
+///   * `POST  /notifications/{id}/read`
+///   * `GET   /notifications/unread-count`
+///   * `GET   /reports/weekly?week=`
+///   * `GET   /me/notification-preferences`
+///   * `PATCH /me/notification-preferences`
 @RestApi()
 abstract class NotificationApi {
   factory NotificationApi(Dio dio, {String baseUrl}) = _NotificationApi;
@@ -40,5 +42,16 @@ abstract class NotificationApi {
   @GET('/reports/weekly')
   Future<WeeklyReportResponse> getWeeklyReport(
     @Query('week') String weekDate,
+  );
+
+  /// BC-92: per-type notification opt-in/out toggles.
+  @GET('/me/notification-preferences')
+  Future<NotificationPreferencesResponse> getNotificationPreferences();
+
+  /// Partial update — [body] is `{"preferences": {type: bool, ...}}`; only
+  /// the included keys change server-side.
+  @PATCH('/me/notification-preferences')
+  Future<NotificationPreferencesResponse> updateNotificationPreferences(
+    @Body() Map<String, dynamic> body,
   );
 }

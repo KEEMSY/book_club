@@ -53,6 +53,11 @@ Widget _buildApp({required AuthUser user}) {
         builder: (_, __) => const Scaffold(body: Text('NOTIFICATIONS_SCREEN')),
       ),
       GoRoute(
+        path: '/settings/notifications',
+        builder: (_, __) =>
+            const Scaffold(body: Text('NOTIFICATION_PREFERENCES_SCREEN')),
+      ),
+      GoRoute(
         path: '/settings/blocked',
         builder: (_, __) => const Scaffold(body: Text('BLOCKED_USERS_SCREEN')),
       ),
@@ -99,6 +104,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('알림'), findsOneWidget);
+    expect(find.text('알림 설정'), findsOneWidget);
     expect(find.text('차단 목록'), findsOneWidget);
     expect(find.text('계정 관리'), findsOneWidget);
     expect(find.text('개인정보처리방침'), findsOneWidget);
@@ -134,6 +140,18 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('NOTIFICATIONS_SCREEN'), findsOneWidget);
+  });
+
+  testWidgets('tapping 알림 설정 pushes the notification preferences screen', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_buildApp(user: _user()));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('알림 설정'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('NOTIFICATION_PREFERENCES_SCREEN'), findsOneWidget);
   });
 
   testWidgets('tapping 차단 목록 pushes the blocked-users screen', (

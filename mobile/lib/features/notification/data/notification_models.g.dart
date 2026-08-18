@@ -62,6 +62,22 @@ Map<String, dynamic> _$UnreadCountResponseToJson(
       'unread_count': instance.unreadCount,
     };
 
+_NotificationPreferencesResponse _$NotificationPreferencesResponseFromJson(
+        Map<String, dynamic> json) =>
+    _NotificationPreferencesResponse(
+      preferences: Map<String, bool>.from(json['preferences'] as Map),
+      requiredTypes: (json['required_types'] as List<dynamic>)
+          .map((e) => e as String)
+          .toList(),
+    );
+
+Map<String, dynamic> _$NotificationPreferencesResponseToJson(
+        _NotificationPreferencesResponse instance) =>
+    <String, dynamic>{
+      'preferences': instance.preferences,
+      'required_types': instance.requiredTypes,
+    };
+
 _WeeklyReportResponse _$WeeklyReportResponseFromJson(
         Map<String, dynamic> json) =>
     _WeeklyReportResponse(

@@ -16,7 +16,7 @@ import '../../auth/domain/auth_state.dart';
 /// Groups every account-level surface behind one screen: profile overflow
 /// menu items that used to live directly on [UserProfileScreen] (언어,
 /// 개인정보처리방침, 이용약관, 관리자, 로그아웃) plus new entries that reuse
-/// existing feature screens (구독·결제 관리, 알림, 차단 목록, 계정 관리).
+/// existing feature screens (구독·결제 관리, 알림, 알림 설정, 차단 목록, 계정 관리).
 /// Every entry re-uses an existing route/screen — nothing here owns
 /// business logic of its own.
 class SettingsScreen extends ConsumerWidget {
@@ -39,6 +39,14 @@ class SettingsScreen extends ConsumerWidget {
             title: const Text('알림'),
             trailing: const Icon(Icons.chevron_right_rounded),
             onTap: () => context.push(AppRoutes.notifications),
+          ),
+          // BC-92 — per-type notification opt-in/out toggles, distinct from
+          // the inbox entry above.
+          ListTile(
+            leading: const Icon(Icons.tune_outlined),
+            title: const Text('알림 설정'),
+            trailing: const Icon(Icons.chevron_right_rounded),
+            onTap: () => context.push(AppRoutes.notificationPreferences),
           ),
           // Subscription deferred (BC-41): hide the entry when the feature
           // flag is off, matching the paywall CTA gating already used on
