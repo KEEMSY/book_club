@@ -48,6 +48,13 @@ dependencies:
   kakao_flutter_sdk_user: ^1.9.7
   sign_in_with_apple: ^6.1.4
 
+  # SHA256 for the Apple Sign In nonce flow (BC-93): we hash a random raw
+  # nonce before handing it to the native SDK so the identity_token's nonce
+  # claim can be checked server-side against a replay. Was already a
+  # transitive dependency (via dio) — declared explicitly per Dart norms
+  # since we now import it directly.
+  crypto: ^3.0.3
+
   # i18n / formatting. Pinned to ^0.20.2 because flutter_localizations (Flutter
   # 3.41 SDK) hard-pins intl to 0.20.2 — an older constraint fails resolution.
   intl: ^0.20.2

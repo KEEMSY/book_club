@@ -203,7 +203,10 @@ void main() {
         ),
       );
       final social = FakeSocialLoginPort(
-        appleResult: const SocialLoginResult(identityToken: 'apple-id-jwt'),
+        appleResult: const SocialLoginResult(
+          identityToken: 'apple-id-jwt',
+          rawNonce: 'apple-raw-nonce',
+        ),
       );
       final c = ProviderContainer(overrides: [
         authRepositoryProvider.overrideWithValue(
@@ -217,6 +220,32 @@ void main() {
 
       expect(c.read(authNotifierProvider), isA<Authenticated>());
       expect(social.appleCalls, 1);
+      // BC-93: the raw nonce generated before the Sign In with Apple sheet
+      // must be forwarded to the backend so it can re-hash and compare
+      // against identity_token's `nonce` claim.
+      expect(api.loginAppleBodies.single['nonce'], 'apple-raw-nonce');
+    });
+
+    test(
+        'loginWithApple fails closed when the SDK result carries no nonce '
+        '(BC-93 — nonce is required for replay protection)', () async {
+      final api = FakeAuthApi();
+      final social = FakeSocialLoginPort(
+        appleResult: const SocialLoginResult(identityToken: 'apple-id-jwt'),
+      );
+      final c = ProviderContainer(overrides: [
+        authRepositoryProvider.overrideWithValue(
+          buildRepository(api: api, social: social),
+        ),
+      ]);
+      addTearDown(c.dispose);
+      final notifier = c.read(authNotifierProvider.notifier);
+
+      await notifier.loginWithApple();
+
+      final failure = c.read(authNotifierProvider) as AuthFailure;
+      expect(failure.code, 'APPLE_EMPTY_TOKEN');
+      expect(api.loginAppleCalls, 0);
     });
 
     test('logout clears tokens and emits Unauthenticated', () async {

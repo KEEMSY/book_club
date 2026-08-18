@@ -11,6 +11,7 @@ primes the client's internal cache, matching real behaviour.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import time
@@ -26,6 +27,15 @@ from app.domains.auth.adapters.apple_oauth_adapter import (
 )
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
+
+_RAW_NONCE = "test-raw-nonce-0123456789"
+
+
+def _nonce_hash(raw_nonce: str = _RAW_NONCE) -> str:
+    return hashlib.sha256(raw_nonce.encode("utf-8")).hexdigest()
+
+
+_DEFAULT_NONCE_CLAIM = _nonce_hash()
 
 _APPLE_CLIENT_ID = "kr.mission-driven.bookclub"
 _APPLE_ISSUER = "https://appleid.apple.com"
@@ -66,6 +76,7 @@ def _encode_apple_token(
     aud: str = _APPLE_CLIENT_ID,
     iss: str = _APPLE_ISSUER,
     exp_offset: int = 600,
+    nonce_claim: str | None = _DEFAULT_NONCE_CLAIM,
 ) -> str:
     now = int(time.time())
     payload: dict[str, Any] = {
@@ -77,6 +88,8 @@ def _encode_apple_token(
     }
     if email is not None:
         payload["email"] = email
+    if nonce_claim is not None:
+        payload["nonce"] = nonce_claim
     return jwt.encode(
         payload,
         factory.private_pem(),
@@ -149,7 +162,7 @@ async def test_apple_happy_path(
     patch_jwks(apple_factory.jwks())
     token = _encode_apple_token(apple_factory)
 
-    profile = await fresh_apple_adapter.verify_identity_token(token)
+    profile = await fresh_apple_adapter.verify_identity_token(token, nonce=_RAW_NONCE)
 
     assert profile.sub == "001234.abc.def"
     assert profile.email == "apple-user@privaterelay.appleid.com"
@@ -165,7 +178,7 @@ async def test_apple_expired_token_raises(
     token = _encode_apple_token(apple_factory, exp_offset=-10)
 
     with pytest.raises(AppleAuthError) as exc_info:
-        await fresh_apple_adapter.verify_identity_token(token)
+        await fresh_apple_adapter.verify_identity_token(token, nonce=_RAW_NONCE)
 
     assert exc_info.value.code == "APPLE_TOKEN_EXPIRED"
 
@@ -180,7 +193,7 @@ async def test_apple_wrong_audience_raises(
     token = _encode_apple_token(apple_factory, aud="com.example.other")
 
     with pytest.raises(AppleAuthError) as exc_info:
-        await fresh_apple_adapter.verify_identity_token(token)
+        await fresh_apple_adapter.verify_identity_token(token, nonce=_RAW_NONCE)
 
     assert exc_info.value.code == "APPLE_BAD_AUDIENCE"
 
@@ -195,7 +208,7 @@ async def test_apple_wrong_issuer_raises(
     token = _encode_apple_token(apple_factory, iss="https://evil.example.com")
 
     with pytest.raises(AppleAuthError) as exc_info:
-        await fresh_apple_adapter.verify_identity_token(token)
+        await fresh_apple_adapter.verify_identity_token(token, nonce=_RAW_NONCE)
 
     assert exc_info.value.code == "APPLE_BAD_ISSUER"
 
@@ -212,7 +225,7 @@ async def test_apple_unknown_kid_raises(
     token = _encode_apple_token(apple_factory)
 
     with pytest.raises(AppleAuthError) as exc_info:
-        await fresh_apple_adapter.verify_identity_token(token)
+        await fresh_apple_adapter.verify_identity_token(token, nonce=_RAW_NONCE)
 
     assert exc_info.value.code in {"APPLE_KID_UNKNOWN", "APPLE_JWKS_UNAVAILABLE"}
 
@@ -229,9 +242,43 @@ async def test_apple_jwks_cache_reused_within_ttl(
     first = _encode_apple_token(apple_factory, sub="sub-1")
     second = _encode_apple_token(apple_factory, sub="sub-2")
 
-    profile_one = await fresh_apple_adapter.verify_identity_token(first)
-    profile_two = await fresh_apple_adapter.verify_identity_token(second)
+    profile_one = await fresh_apple_adapter.verify_identity_token(first, nonce=_RAW_NONCE)
+    profile_two = await fresh_apple_adapter.verify_identity_token(second, nonce=_RAW_NONCE)
 
     assert profile_one.sub == "sub-1"
     assert profile_two.sub == "sub-2"
     assert counter.call_count == 1
+
+
+@pytest.mark.asyncio
+async def test_apple_nonce_mismatch_raises(
+    apple_factory: _RSAFactory,
+    fresh_apple_adapter: AppleOAuthAdapter,
+    patch_jwks: Any,
+) -> None:
+    # Token was minted for a different (or no) nonce than the one the caller
+    # is presenting — must be rejected as a possible replay.
+    patch_jwks(apple_factory.jwks())
+    token = _encode_apple_token(apple_factory)
+
+    with pytest.raises(AppleAuthError) as exc_info:
+        await fresh_apple_adapter.verify_identity_token(token, nonce="a-different-raw-nonce")
+
+    assert exc_info.value.code == "APPLE_NONCE_MISMATCH"
+
+
+@pytest.mark.asyncio
+async def test_apple_missing_nonce_claim_raises(
+    apple_factory: _RSAFactory,
+    fresh_apple_adapter: AppleOAuthAdapter,
+    patch_jwks: Any,
+) -> None:
+    # Token has no nonce claim at all (e.g. Apple SDK invoked without one) —
+    # must not be treated as a match against any caller-supplied nonce.
+    patch_jwks(apple_factory.jwks())
+    token = _encode_apple_token(apple_factory, nonce_claim=None)
+
+    with pytest.raises(AppleAuthError) as exc_info:
+        await fresh_apple_adapter.verify_identity_token(token, nonce=_RAW_NONCE)
+
+    assert exc_info.value.code == "APPLE_NONCE_MISMATCH"

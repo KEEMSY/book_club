@@ -28,9 +28,16 @@ class KakaoLoginRequest(BaseModel):
 
 class AppleLoginRequest(BaseModel):
     identity_token: str = Field(..., min_length=1)
+    # Raw (unhashed) nonce the client generated before invoking Sign In with
+    # Apple — it hashed this value (SHA256) and handed the hash to Apple's
+    # SDK, so identity_token's `nonce` claim only ever carries the hash. The
+    # adapter re-hashes this field and compares (BC-93); mismatch means the
+    # token wasn't minted for this login attempt.
+    nonce: str = Field(..., min_length=16, max_length=255)
     # authorization_code is accepted for forward compatibility: a future
     # server-side refresh implementation will exchange it for Apple's
-    # long-lived refresh token. M1 ignores it.
+    # long-lived refresh token (also needed to revoke on account deletion,
+    # see AuthService.delete_account TODO). M1 ignores it.
     authorization_code: str | None = None
 
 

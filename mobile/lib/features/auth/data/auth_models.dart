@@ -24,10 +24,14 @@ abstract class KakaoLoginRequest with _$KakaoLoginRequest {
 
 /// Request to POST /auth/apple. [authorizationCode] is forward-compat for a
 /// future server-side Apple refresh exchange — M1 backend ignores it.
+/// [nonce] is the raw (unhashed) value generated before the Sign In with
+/// Apple sheet was shown — the backend re-hashes it and checks it against
+/// identityToken's `nonce` claim to reject replayed tokens (BC-93).
 @freezed
 abstract class AppleLoginRequest with _$AppleLoginRequest {
   const factory AppleLoginRequest({
     required String identityToken,
+    required String nonce,
     String? authorizationCode,
   }) = _AppleLoginRequest;
 
