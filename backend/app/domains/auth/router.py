@@ -60,7 +60,7 @@ async def login_with_apple(
     body: AppleLoginRequest,
     service: Annotated[AuthService, Depends(get_auth_service)],
 ) -> LoginResponse:
-    result = await service.login_with_apple(identity_token=body.identity_token)
+    result = await service.login_with_apple(identity_token=body.identity_token, nonce=body.nonce)
     return _login_response(
         result.access_token, result.refresh_token, result.user, result.is_new_user
     )

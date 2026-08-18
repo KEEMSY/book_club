@@ -6,6 +6,7 @@ class SocialLoginResult {
     this.accessToken,
     this.identityToken,
     this.authorizationCode,
+    this.rawNonce,
   });
 
   /// Kakao: OAuth access_token.
@@ -19,6 +20,13 @@ class SocialLoginResult {
   /// at M1). Kakao: null — the Kakao SDK on Korean apps never surfaces the
   /// auth code to the client.
   final String? authorizationCode;
+
+  /// Apple: the raw (unhashed) nonce generated before invoking the native
+  /// Sign In with Apple sheet. Its SHA256 hash was handed to the SDK as the
+  /// request nonce, so it only ever shows up hashed inside [identityToken]'s
+  /// `nonce` claim (BC-93). The backend re-hashes this value and compares.
+  /// Kakao: null.
+  final String? rawNonce;
 }
 
 /// Thrown when the user cancels the platform login sheet. Handled distinctly

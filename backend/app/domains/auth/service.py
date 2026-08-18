@@ -131,8 +131,8 @@ class AuthService:
         await self.users.update_last_login(user.id, now)
         return self._issue_tokens(user, is_new_user=is_new_user)
 
-    async def login_with_apple(self, *, identity_token: str) -> LoginResult:
-        profile = await self.apple.verify_identity_token(identity_token)
+    async def login_with_apple(self, *, identity_token: str, nonce: str) -> LoginResult:
+        profile = await self.apple.verify_identity_token(identity_token, nonce=nonce)
         existing = await self.users.get_by_provider_sub(AuthProvider.APPLE, profile.sub)
         is_new_user = existing is None
         if existing is None:
@@ -245,6 +245,17 @@ class AuthService:
 
     async def delete_account(self, *, user_id: UUID) -> None:
         now = datetime.now(tz=UTC)
+        # TODO(BC-93 follow-up, owner: auth domain): Apple requires revoking
+        # the user's Sign in with Apple grant on account deletion (App Store
+        # Review Guideline 5.1.1(v)). That needs a stored Apple refresh_token
+        # per user (obtained by exchanging `authorization_code` at first
+        # login — currently accepted but discarded, see AppleLoginRequest)
+        # plus an ES256 client_secret JWT (apple_team_id/apple_key_id/
+        # apple_private_key, none of which are configured yet) to call
+        # POST https://appleid.apple.com/auth/revoke. Left unimplemented here
+        # because it needs new Apple Developer secrets the user must
+        # provision; tracked as a new ticket candidate rather than silently
+        # skipped.
         await self.users.soft_delete(user_id, now)
         # device_tokens cascade via the FK when a hard purge runs; until then
         # they stay but no longer map to an active login flow (get_me -> 404).

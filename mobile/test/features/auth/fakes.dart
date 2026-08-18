@@ -118,9 +118,14 @@ class FakeAuthApi implements AuthApi {
     return loginKakaoResponse!;
   }
 
+  /// Bodies passed to [loginApple], in call order — lets tests assert the
+  /// BC-93 nonce field is forwarded to the backend alongside identityToken.
+  final List<Map<String, dynamic>> loginAppleBodies = <Map<String, dynamic>>[];
+
   @override
   Future<LoginResponse> loginApple(Map<String, dynamic> body) async {
     loginAppleCalls++;
+    loginAppleBodies.add(body);
     if (loginAppleError != null) throw loginAppleError!;
     return loginAppleResponse!;
   }
@@ -247,7 +252,10 @@ AuthRepository buildRepository({
     socialLogin: social ??
         FakeSocialLoginPort(
           kakaoResult: const SocialLoginResult(accessToken: 'k-at'),
-          appleResult: const SocialLoginResult(identityToken: 'a-id'),
+          appleResult: const SocialLoginResult(
+            identityToken: 'a-id',
+            rawNonce: 'a-nonce',
+          ),
         ),
   );
 }

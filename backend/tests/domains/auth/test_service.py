@@ -142,9 +142,11 @@ class StubApple:
     def __init__(self, profile: AppleUserProfile) -> None:
         self.profile = profile
         self.calls: list[str] = []
+        self.nonces: list[str] = []
 
-    async def verify_identity_token(self, identity_token: str) -> AppleUserProfile:
+    async def verify_identity_token(self, identity_token: str, *, nonce: str) -> AppleUserProfile:
         self.calls.append(identity_token)
+        self.nonces.append(nonce)
         return self.profile
 
 
@@ -223,7 +225,7 @@ async def test_kakao_returning_user_marks_is_new_user_false() -> None:
 async def test_apple_new_user_without_email_uses_fallback_nickname() -> None:
     service, _users, _ = _build_service(apple_profile=AppleUserProfile(sub="a-2", email=None))
 
-    result = await service.login_with_apple(identity_token="t")
+    result = await service.login_with_apple(identity_token="t", nonce="raw-nonce-value")
 
     assert result.is_new_user is True
     assert result.user.provider is AuthProvider.APPLE

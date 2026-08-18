@@ -105,4 +105,12 @@ class KakaoOAuthPort(Protocol):
 
 
 class AppleOAuthPort(Protocol):
-    async def verify_identity_token(self, identity_token: str) -> AppleUserProfile: ...
+    async def verify_identity_token(self, identity_token: str, *, nonce: str) -> AppleUserProfile:
+        """Verify the token's signature/claims AND that its ``nonce`` claim
+        matches ``sha256(nonce)``. ``nonce`` is the raw, unhashed value the
+        client generated before Sign In with Apple — the client hashes it
+        before handing it to Apple's SDK, so the identity_token only ever
+        carries the hashed form. Mismatch means the token was not minted for
+        this login attempt (replay).
+        """
+        ...

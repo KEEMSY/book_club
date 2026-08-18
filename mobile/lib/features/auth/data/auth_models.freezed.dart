@@ -318,6 +318,7 @@ class __$KakaoLoginRequestCopyWithImpl<$Res>
 /// @nodoc
 mixin _$AppleLoginRequest {
   String get identityToken;
+  String get nonce;
   String? get authorizationCode;
 
   /// Create a copy of AppleLoginRequest
@@ -338,6 +339,7 @@ mixin _$AppleLoginRequest {
             other is AppleLoginRequest &&
             (identical(other.identityToken, identityToken) ||
                 other.identityToken == identityToken) &&
+            (identical(other.nonce, nonce) || other.nonce == nonce) &&
             (identical(other.authorizationCode, authorizationCode) ||
                 other.authorizationCode == authorizationCode));
   }
@@ -345,11 +347,11 @@ mixin _$AppleLoginRequest {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, identityToken, authorizationCode);
+      Object.hash(runtimeType, identityToken, nonce, authorizationCode);
 
   @override
   String toString() {
-    return 'AppleLoginRequest(identityToken: $identityToken, authorizationCode: $authorizationCode)';
+    return 'AppleLoginRequest(identityToken: $identityToken, nonce: $nonce, authorizationCode: $authorizationCode)';
   }
 }
 
@@ -359,7 +361,7 @@ abstract mixin class $AppleLoginRequestCopyWith<$Res> {
           AppleLoginRequest value, $Res Function(AppleLoginRequest) _then) =
       _$AppleLoginRequestCopyWithImpl;
   @useResult
-  $Res call({String identityToken, String? authorizationCode});
+  $Res call({String identityToken, String nonce, String? authorizationCode});
 }
 
 /// @nodoc
@@ -376,12 +378,17 @@ class _$AppleLoginRequestCopyWithImpl<$Res>
   @override
   $Res call({
     Object? identityToken = null,
+    Object? nonce = null,
     Object? authorizationCode = freezed,
   }) {
     return _then(_self.copyWith(
       identityToken: null == identityToken
           ? _self.identityToken
           : identityToken // ignore: cast_nullable_to_non_nullable
+              as String,
+      nonce: null == nonce
+          ? _self.nonce
+          : nonce // ignore: cast_nullable_to_non_nullable
               as String,
       authorizationCode: freezed == authorizationCode
           ? _self.authorizationCode
@@ -484,14 +491,16 @@ extension AppleLoginRequestPatterns on AppleLoginRequest {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String identityToken, String? authorizationCode)?
+    TResult Function(
+            String identityToken, String nonce, String? authorizationCode)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _AppleLoginRequest() when $default != null:
-        return $default(_that.identityToken, _that.authorizationCode);
+        return $default(
+            _that.identityToken, _that.nonce, _that.authorizationCode);
       case _:
         return orElse();
     }
@@ -512,12 +521,15 @@ extension AppleLoginRequestPatterns on AppleLoginRequest {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String identityToken, String? authorizationCode) $default,
+    TResult Function(
+            String identityToken, String nonce, String? authorizationCode)
+        $default,
   ) {
     final _that = this;
     switch (_that) {
       case _AppleLoginRequest():
-        return $default(_that.identityToken, _that.authorizationCode);
+        return $default(
+            _that.identityToken, _that.nonce, _that.authorizationCode);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -537,13 +549,15 @@ extension AppleLoginRequestPatterns on AppleLoginRequest {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String identityToken, String? authorizationCode)?
+    TResult? Function(
+            String identityToken, String nonce, String? authorizationCode)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _AppleLoginRequest() when $default != null:
-        return $default(_that.identityToken, _that.authorizationCode);
+        return $default(
+            _that.identityToken, _that.nonce, _that.authorizationCode);
       case _:
         return null;
     }
@@ -554,12 +568,16 @@ extension AppleLoginRequestPatterns on AppleLoginRequest {
 @JsonSerializable()
 class _AppleLoginRequest implements AppleLoginRequest {
   const _AppleLoginRequest(
-      {required this.identityToken, this.authorizationCode});
+      {required this.identityToken,
+      required this.nonce,
+      this.authorizationCode});
   factory _AppleLoginRequest.fromJson(Map<String, dynamic> json) =>
       _$AppleLoginRequestFromJson(json);
 
   @override
   final String identityToken;
+  @override
+  final String nonce;
   @override
   final String? authorizationCode;
 
@@ -585,6 +603,7 @@ class _AppleLoginRequest implements AppleLoginRequest {
             other is _AppleLoginRequest &&
             (identical(other.identityToken, identityToken) ||
                 other.identityToken == identityToken) &&
+            (identical(other.nonce, nonce) || other.nonce == nonce) &&
             (identical(other.authorizationCode, authorizationCode) ||
                 other.authorizationCode == authorizationCode));
   }
@@ -592,11 +611,11 @@ class _AppleLoginRequest implements AppleLoginRequest {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, identityToken, authorizationCode);
+      Object.hash(runtimeType, identityToken, nonce, authorizationCode);
 
   @override
   String toString() {
-    return 'AppleLoginRequest(identityToken: $identityToken, authorizationCode: $authorizationCode)';
+    return 'AppleLoginRequest(identityToken: $identityToken, nonce: $nonce, authorizationCode: $authorizationCode)';
   }
 }
 
@@ -608,7 +627,7 @@ abstract mixin class _$AppleLoginRequestCopyWith<$Res>
       __$AppleLoginRequestCopyWithImpl;
   @override
   @useResult
-  $Res call({String identityToken, String? authorizationCode});
+  $Res call({String identityToken, String nonce, String? authorizationCode});
 }
 
 /// @nodoc
@@ -625,12 +644,17 @@ class __$AppleLoginRequestCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? identityToken = null,
+    Object? nonce = null,
     Object? authorizationCode = freezed,
   }) {
     return _then(_AppleLoginRequest(
       identityToken: null == identityToken
           ? _self.identityToken
           : identityToken // ignore: cast_nullable_to_non_nullable
+              as String,
+      nonce: null == nonce
+          ? _self.nonce
+          : nonce // ignore: cast_nullable_to_non_nullable
               as String,
       authorizationCode: freezed == authorizationCode
           ? _self.authorizationCode

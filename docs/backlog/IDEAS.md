@@ -290,3 +290,7 @@
 - [x] (community/profile) **'내 활동' 요약 집계기가 community 도메인 종속** — BC-80의 `GET /community/me/activity`가 community 도메인 하위라 `FeatureFlags.community=false`(현재)면 프로필 '내 활동' 요약 섹션이 미노출. 개별 목록(리뷰/하이라이트/발제문/읽는중)은 community 밖이라 정상. 활동 집계기를 community 밖(예: me/auth 또는 별도 activity 표면)으로 이설할지 검토 — 맥락: BC-83 내 활동 탭 / BC-77 마감 (2026-08-08) — BC-90로 이설 완료: `GET /me/activity`(community 게이팅 밖, 항상 마운트) (PR #58)
 - [ ] (profile) 프로필 표현력 4필드(cover_image_url·theme·featured_book_id·featured_quote)를 **NULL로 되돌릴 수 없음** — PATCH /me가 None을 "미변경"으로 처리(기존 bio와 동일 한계). "제거" 지원하려면 명시적 클리어 시맨틱(sentinel/전용 필드) 필요 — 맥락: BC-81/BC-84 (2026-08-08)
 - [ ] (profile) 표현력 편집의 "대표 책 선택"이 **서재 내 책만** 대상(전체 카탈로그 검색 아님) — 카탈로그 검색 선택 UX 검토 — 맥락: BC-84 (2026-08-08)
+
+### 2026-08-18 (BC-93 Apple 로그인 검증·완성 중 발견)
+
+- [ ] (auth) **계정 탈퇴 시 Apple Sign in with Apple 토큰 revoke 미구현** — App Store Review Guideline 5.1.1(v)는 앱 내 탈퇴 시 소셜 로그인 grant도 함께 해제하도록 요구. 구현하려면 (1) 첫 로그인 시 `authorization_code`(현재 수신만 하고 폐기)를 Apple 토큰 엔드포인트와 교환해 refresh_token을 암호화 저장, (2) ES256 client_secret JWT 발급용 `apple_team_id`/`apple_key_id`/`apple_private_key`(.p8) 신규 시크릿 확보, (3) 탈퇴 플로우에서 `POST https://appleid.apple.com/auth/revoke` 호출. Apple Developer 계정에서 Key 발급이 선행되어야 하므로 별도 티켓으로 분리 — 맥락: BC-93 Apple 로그인 프로덕션 검증 (2026-08-18)

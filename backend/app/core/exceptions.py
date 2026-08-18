@@ -91,7 +91,7 @@ class KakaoAuthError(AuthError):
 
 
 class AppleAuthError(AuthError):
-    """Apple identity_token verification failed — signature / aud / iss / exp."""
+    """Apple identity_token verification failed — signature / aud / iss / exp / nonce."""
 
     code = "APPLE_AUTH_FAILED"
 

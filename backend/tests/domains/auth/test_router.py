@@ -30,6 +30,7 @@ class FakeAuthService:
     def __init__(self) -> None:
         self.kakao_calls: list[str] = []
         self.apple_calls: list[str] = []
+        self.apple_nonce_calls: list[str] = []
         self.dev_calls: list[tuple[str, str | None]] = []
         self.refresh_calls: list[str] = []
         self.device_token_calls: list[tuple[UUID, str, DevicePlatform]] = []
@@ -65,8 +66,9 @@ class FakeAuthService:
             is_new_user=True,
         )
 
-    async def login_with_apple(self, *, identity_token: str) -> LoginResult:
+    async def login_with_apple(self, *, identity_token: str, nonce: str) -> LoginResult:
         self.apple_calls.append(identity_token)
+        self.apple_nonce_calls.append(nonce)
         return LoginResult(
             access_token=create_access_token(str(self.user.id)),
             refresh_token=create_refresh_token(str(self.user.id)),
@@ -196,12 +198,43 @@ async def test_apple_login_accepts_optional_authorization_code(
     client, fake = client_and_fake
     response = await client.post(
         "/auth/apple",
-        json={"identity_token": "id.tok.sig", "authorization_code": "ignored"},
+        json={
+            "identity_token": "id.tok.sig",
+            "nonce": "raw-nonce-value-1234",
+            "authorization_code": "ignored",
+        },
     )
     assert response.status_code == 200
     body = response.json()
     assert body["is_new_user"] is False
     assert fake.apple_calls == ["id.tok.sig"]
+    assert fake.apple_nonce_calls == ["raw-nonce-value-1234"]
+
+
+@pytest.mark.asyncio
+async def test_apple_login_rejects_missing_nonce(
+    client_and_fake: tuple[AsyncClient, FakeAuthService],
+) -> None:
+    client, fake = client_and_fake
+    response = await client.post(
+        "/auth/apple",
+        json={"identity_token": "id.tok.sig"},
+    )
+    assert response.status_code == 422
+    assert fake.apple_calls == []
+
+
+@pytest.mark.asyncio
+async def test_apple_login_rejects_too_short_nonce(
+    client_and_fake: tuple[AsyncClient, FakeAuthService],
+) -> None:
+    client, fake = client_and_fake
+    response = await client.post(
+        "/auth/apple",
+        json={"identity_token": "id.tok.sig", "nonce": "short"},
+    )
+    assert response.status_code == 422
+    assert fake.apple_calls == []
 
 
 @pytest.mark.asyncio

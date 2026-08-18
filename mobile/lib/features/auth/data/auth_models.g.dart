@@ -19,12 +19,14 @@ Map<String, dynamic> _$KakaoLoginRequestToJson(_KakaoLoginRequest instance) =>
 _AppleLoginRequest _$AppleLoginRequestFromJson(Map<String, dynamic> json) =>
     _AppleLoginRequest(
       identityToken: json['identity_token'] as String,
+      nonce: json['nonce'] as String,
       authorizationCode: json['authorization_code'] as String?,
     );
 
 Map<String, dynamic> _$AppleLoginRequestToJson(_AppleLoginRequest instance) =>
     <String, dynamic>{
       'identity_token': instance.identityToken,
+      'nonce': instance.nonce,
       'authorization_code': instance.authorizationCode,
     };
 

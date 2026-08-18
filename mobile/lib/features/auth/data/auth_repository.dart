@@ -97,10 +97,21 @@ class AuthRepository {
         message: 'Apple 로그인에 실패했습니다. 다시 시도해주세요.',
       );
     }
+    // rawNonce is always set by AppleLoginAdapter.signIn() alongside
+    // identityToken — this branch guards the SocialLoginPort contract, not a
+    // real runtime path (BC-93 nonce replay check requires it server-side).
+    final String? rawNonce = social.rawNonce;
+    if (rawNonce == null || rawNonce.isEmpty) {
+      throw const AuthRepositoryException(
+        code: 'APPLE_EMPTY_TOKEN',
+        message: 'Apple 로그인에 실패했습니다. 다시 시도해주세요.',
+      );
+    }
     final LoginResponse resp = await _call(
       () => _api.loginApple(
         AppleLoginRequest(
           identityToken: identityToken,
+          nonce: rawNonce,
           authorizationCode: social.authorizationCode,
         ).toJson(),
       ),

@@ -8,13 +8,23 @@ keys regularly but not per-request.
 Thread/async safety:
 - The cache is guarded by an asyncio lock so two concurrent logins don't
   trigger two JWKS fetches at once.
-- On verification failure of any kind (signature, aud, iss, exp, unknown kid)
-  we raise :class:`AppleAuthError` with a specific ``code`` for observability.
+- On verification failure of any kind (signature, aud, iss, exp, unknown kid,
+  nonce mismatch) we raise :class:`AppleAuthError` with a specific ``code``
+  for observability.
+
+Nonce (BC-93): the mobile client generates a random raw nonce, SHA256-hashes
+it, and hands the *hash* to Apple's native SDK as the request nonce. Apple
+echoes that same hash back in the identity_token's ``nonce`` claim. The raw
+nonce travels alongside identity_token to ``POST /auth/apple`` (over TLS), so
+verification here is: ``sha256(raw_nonce) == payload["nonce"]``. This blocks
+a captured identity_token from being replayed against a different login
+attempt, since each attempt mints its own nonce.
 """
 
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import time
 from typing import Any
 
@@ -64,7 +74,7 @@ class AppleOAuthAdapter:
     def __init__(self, jwks_cache: _JWKSCache | None = None) -> None:
         self._cache = jwks_cache or _jwks_cache
 
-    async def verify_identity_token(self, identity_token: str) -> AppleUserProfile:
+    async def verify_identity_token(self, identity_token: str, *, nonce: str) -> AppleUserProfile:
         settings = get_settings()
         client = await self._cache.get(settings.apple_keys_url)
 
@@ -106,6 +116,14 @@ class AppleOAuthAdapter:
                 f"apple identity_token invalid: {exc}",
                 code="APPLE_TOKEN_INVALID",
             ) from exc
+
+        expected_nonce_hash = hashlib.sha256(nonce.encode("utf-8")).hexdigest()
+        token_nonce = payload.get("nonce")
+        if token_nonce != expected_nonce_hash:
+            raise AppleAuthError(
+                "apple identity_token nonce mismatch",
+                code="APPLE_NONCE_MISMATCH",
+            )
 
         sub = payload.get("sub")
         if not isinstance(sub, str) or not sub:
