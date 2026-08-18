@@ -50,6 +50,27 @@ abstract class UnreadCountResponse with _$UnreadCountResponse {
       _$UnreadCountResponseFromJson(json);
 }
 
+/// Response for `GET /me/notification-preferences` and its PATCH counterpart
+/// (BC-92).
+///
+/// [preferences] merges stored overrides with defaults — a missing key means
+/// "on". [requiredTypes] lists notification types the reader cannot turn
+/// off; the server never includes them in [preferences] and the client
+/// renders them as always-on, disabled rows.
+@freezed
+abstract class NotificationPreferencesResponse
+    with _$NotificationPreferencesResponse {
+  const factory NotificationPreferencesResponse({
+    required Map<String, bool> preferences,
+    required List<String> requiredTypes,
+  }) = _NotificationPreferencesResponse;
+
+  factory NotificationPreferencesResponse.fromJson(
+    Map<String, dynamic> json,
+  ) =>
+      _$NotificationPreferencesResponseFromJson(json);
+}
+
 /// Response for `GET /reports/weekly`. 404 when no report exists for the week.
 @freezed
 abstract class WeeklyReportResponse with _$WeeklyReportResponse {

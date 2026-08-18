@@ -45,6 +45,7 @@ import '../../features/club/presentation/session_loader.dart';
 import '../../features/club/presentation/agenda_editor_screen.dart';
 import '../../features/club/domain/club.dart';
 import '../../features/club/domain/club_session.dart';
+import '../../features/notification/presentation/notification_preferences_screen.dart';
 import '../../features/notification/presentation/notification_screen.dart';
 import '../../features/notification/presentation/weekly_report_screen.dart';
 import '../../features/referral/application/referral_providers.dart';
@@ -210,6 +211,10 @@ class AppRoutes {
   static const settings = '/settings';
   static const account = '/settings/account';
   static const blockedUsers = '/settings/blocked';
+
+  // BC-92 — per-type notification opt-in/out toggles, distinct from
+  // [notifications] (the inbox).
+  static const notificationPreferences = '/settings/notifications';
 
   // Highlight discovery — community-wide highlight explore feed.
   static const highlightExplore = '/highlights/explore';
@@ -724,6 +729,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.blockedUsers,
         parentNavigatorKey: _rootKey,
         builder: (context, state) => const BlockedUsersScreen(),
+      ),
+      // BC-92 — per-type notification toggle screen, backed by
+      // `GET`/`PATCH /me/notification-preferences`.
+      GoRoute(
+        path: AppRoutes.notificationPreferences,
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) => const NotificationPreferencesScreen(),
       ),
       // M31 — deeplink entry point: bookclub.app/invite/{code}
       // Applies the referral code and then redirects to home. The apply call

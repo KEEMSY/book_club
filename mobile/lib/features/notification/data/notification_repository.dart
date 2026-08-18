@@ -67,6 +67,21 @@ class NotificationRepository {
     }
   }
 
+  /// BC-92: fetches the current per-type toggle state.
+  Future<NotificationPreferencesResponse> getNotificationPreferences() =>
+      _call(() => _api.getNotificationPreferences());
+
+  /// Partial update — only the keys in [preferences] change; other types
+  /// keep their existing state.
+  Future<NotificationPreferencesResponse> updateNotificationPreferences(
+    Map<String, bool> preferences,
+  ) =>
+      _call(
+        () => _api.updateNotificationPreferences(
+          {'preferences': preferences},
+        ),
+      );
+
   Future<T> _call<T>(Future<T> Function() fn) async {
     try {
       return await fn();

@@ -44,6 +44,22 @@ class _FakeNotificationRepository implements NotificationRepository {
 
   @override
   Future<WeeklyReportResponse?> getWeeklyReport(String weekDate) async => null;
+
+  @override
+  Future<NotificationPreferencesResponse> getNotificationPreferences() async =>
+      const NotificationPreferencesResponse(
+        preferences: {},
+        requiredTypes: [],
+      );
+
+  @override
+  Future<NotificationPreferencesResponse> updateNotificationPreferences(
+    Map<String, bool> preferences,
+  ) async =>
+      const NotificationPreferencesResponse(
+        preferences: {},
+        requiredTypes: [],
+      );
 }
 
 /// Test-only AuthNotifier that skips the rehydrate RPC and pins state to
