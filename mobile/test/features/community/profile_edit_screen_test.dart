@@ -131,7 +131,10 @@ void main() {
       expect(body['cover_image_url'], 'https://example.com/cover.jpg');
       expect(body['featured_quote'], '인생은 짧고 책은 많다');
       expect(body['theme'], 'midnight');
-      expect(body.containsKey('featured_book_id'), isFalse);
+      // Full-form submit (BC-100): an untouched-empty featured book is sent as
+      // an explicit null so the backend clears it, rather than being omitted.
+      expect(body.containsKey('featured_book_id'), isTrue);
+      expect(body['featured_book_id'], isNull);
 
       // Saved successfully → popped back to the previous page.
       expect(find.text('PROFILE_SCREEN'), findsOneWidget);
@@ -193,6 +196,46 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(fakeApi.updateProfileCalls.single['featured_book_id'], 'book-9');
+    },
+  );
+
+  testWidgets(
+    '대표 책을 제거하고 커버·인용구를 비워 저장하면 null로 PATCH해 삭제한다',
+    (tester) async {
+      final bookRepo = FakeBookRepository()
+        ..getByIdResult = buildBook(id: 'book-1', title: '피크엔드');
+      final fakeApi = await _pump(
+        tester,
+        profile: _profile(
+          bio: '기존 소개',
+          coverImageUrl: 'https://example.com/old.jpg',
+          featuredBookId: 'book-1',
+          featuredQuote: '기존 인용구',
+        ),
+        bookRepo: bookRepo,
+      );
+
+      // Clear the featured book via the new 제거 button (BC-100).
+      await tester.tap(find.text('제거'));
+      await tester.pump();
+      expect(find.text('선택된 책이 없어요'), findsOneWidget);
+
+      // Empty the cover URL and quote fields.
+      await tester.enterText(find.widgetWithText(TextField, 'https://...'), '');
+      await tester.enterText(
+        find.widgetWithText(TextField, '마음에 남은 문장을 남겨보세요'),
+        '',
+      );
+
+      await tester.tap(find.text('저장'));
+      await tester.pumpAndSettle();
+
+      final body = fakeApi.updateProfileCalls.single;
+      expect(body.containsKey('featured_book_id'), isTrue);
+      expect(body['featured_book_id'], isNull);
+      expect(body['cover_image_url'], isNull);
+      expect(body['featured_quote'], isNull);
+      expect(find.text('PROFILE_SCREEN'), findsOneWidget);
     },
   );
 

@@ -133,6 +133,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                   setState(() => _featuredBookId = picked.id);
                 }
               },
+              onClear: () => setState(() => _featuredBookId = null),
             ),
             SizedBox(height: spacing.lg),
             Text('대표 인용구', style: theme.textTheme.labelLarge),
@@ -145,7 +146,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
             ),
             SizedBox(height: spacing.sm),
             Text(
-              '커버·대표 책·인용구는 비워서 저장해도 기존 값이 지워지지 않아요.',
+              '커버·대표 책·인용구는 비우고 저장하면 프로필에서 제거돼요.',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
               ),
@@ -275,10 +276,15 @@ class _ThemeSwatch extends StatelessWidget {
 // ---------------------------------------------------------------------------
 
 class _FeaturedBookPicker extends ConsumerWidget {
-  const _FeaturedBookPicker({required this.bookId, required this.onPick});
+  const _FeaturedBookPicker({
+    required this.bookId,
+    required this.onPick,
+    required this.onClear,
+  });
 
   final String? bookId;
   final VoidCallback onPick;
+  final VoidCallback onClear;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -338,6 +344,8 @@ class _FeaturedBookPicker extends ConsumerWidget {
       child: Row(
         children: [
           Expanded(child: preview),
+          if (id != null && id.isNotEmpty)
+            TextButton(onPressed: onClear, child: const Text('제거')),
           TextButton(onPressed: onPick, child: const Text('책 선택')),
         ],
       ),

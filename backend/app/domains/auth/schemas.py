@@ -93,12 +93,14 @@ class TrialStatusResponse(BaseModel):
 
 
 class UpdateProfileRequest(BaseModel):
+    # nickname is required, so ``None`` (or omission) leaves it unchanged — it is
+    # never cleared. For every field below the router uses ``model_fields_set`` to
+    # tell an omitted field (unchanged) from an explicit ``null`` (clear) — BC-100.
     nickname: str | None = Field(default=None, min_length=1, max_length=64)
-    # An explicit None clears the bio; omitting the field leaves it unchanged.
+    # Omit to leave unchanged; send ``null`` to clear.
     bio: str | None = Field(default=None, max_length=200)
-    # Profile expressiveness (BC-81) — same None convention as bio/nickname
-    # above: the service only applies a field when it is not None, so these
-    # can be set but not yet cleared back to NULL via this endpoint.
+    # Profile expressiveness (BC-81) — omit to leave unchanged, send ``null`` to
+    # clear back to NULL (BC-100).
     cover_image_url: str | None = Field(default=None, max_length=1024)
     theme: ProfileThemeLiteral | None = Field(default=None)
     featured_book_id: UUID | None = Field(default=None)
