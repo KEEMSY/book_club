@@ -29,6 +29,7 @@ from app.domains.auth.schemas import (
     UserPublic,
 )
 from app.domains.auth.service import AuthService
+from app.shared.sentinel import UNSET, UnsetType
 
 router = APIRouter(tags=["auth"])
 
@@ -140,14 +141,21 @@ async def update_me(
     user_id: Annotated[str, Depends(get_current_user_id)],
     service: Annotated[AuthService, Depends(get_auth_service)],
 ) -> UserPublic:
+    # A field the client omitted must stay unchanged; a field sent as an
+    # explicit ``null`` clears the column (BC-100). ``model_fields_set`` is the
+    # only way to tell the two apart, so unsent fields are forwarded as UNSET.
+    fields = body.model_fields_set
+    theme: ProfileTheme | None | UnsetType = UNSET
+    if "theme" in fields:
+        theme = ProfileTheme(body.theme) if body.theme is not None else None
     user = await service.update_profile(
         user_id=UUID(user_id),
         nickname=body.nickname,
-        bio=body.bio,
-        cover_image_url=body.cover_image_url,
-        theme=ProfileTheme(body.theme) if body.theme is not None else None,
-        featured_book_id=body.featured_book_id,
-        featured_quote=body.featured_quote,
+        bio=body.bio if "bio" in fields else UNSET,
+        cover_image_url=body.cover_image_url if "cover_image_url" in fields else UNSET,
+        theme=theme,
+        featured_book_id=body.featured_book_id if "featured_book_id" in fields else UNSET,
+        featured_quote=body.featured_quote if "featured_quote" in fields else UNSET,
     )
     return UserPublic.model_validate(user)
 

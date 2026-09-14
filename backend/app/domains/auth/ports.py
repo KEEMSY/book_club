@@ -17,6 +17,7 @@ from typing import Protocol
 from uuid import UUID
 
 from app.domains.auth.models import AuthProvider, DevicePlatform, DeviceToken, ProfileTheme, User
+from app.shared.sentinel import UNSET, UnsetType
 
 
 @dataclass(frozen=True, slots=True)
@@ -62,12 +63,12 @@ class UserRepositoryPort(Protocol):
         self,
         user_id: UUID,
         nickname: str | None,
-        bio: str | None,
+        bio: str | None | UnsetType = UNSET,
         *,
-        cover_image_url: str | None = None,
-        theme: ProfileTheme | None = None,
-        featured_book_id: UUID | None = None,
-        featured_quote: str | None = None,
+        cover_image_url: str | None | UnsetType = UNSET,
+        theme: ProfileTheme | None | UnsetType = UNSET,
+        featured_book_id: UUID | None | UnsetType = UNSET,
+        featured_quote: str | None | UnsetType = UNSET,
     ) -> User: ...
 
 

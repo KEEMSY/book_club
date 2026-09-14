@@ -16,6 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import ConflictError
 from app.domains.auth.models import AuthProvider, DevicePlatform, DeviceToken, ProfileTheme, User
+from app.shared.sentinel import UNSET, UnsetType
 
 
 class UserRepository:
@@ -89,29 +90,32 @@ class UserRepository:
         self,
         user_id: UUID,
         nickname: str | None,
-        bio: str | None,
+        bio: str | None | UnsetType = UNSET,
         *,
-        cover_image_url: str | None = None,
-        theme: ProfileTheme | None = None,
-        featured_book_id: UUID | None = None,
-        featured_quote: str | None = None,
+        cover_image_url: str | None | UnsetType = UNSET,
+        theme: ProfileTheme | None | UnsetType = UNSET,
+        featured_book_id: UUID | None | UnsetType = UNSET,
+        featured_quote: str | None | UnsetType = UNSET,
     ) -> User:
         from app.core.exceptions import NotFoundError
 
         user = await self._session.get(User, user_id)
         if user is None or user.deleted_at is not None:
             raise NotFoundError("user not found", code="USER_NOT_FOUND")
+        # nickname is required, so ``None`` means "unchanged" (never cleared).
+        # For the expressiveness fields UNSET means "unchanged" while an explicit
+        # ``None`` clears the column to NULL (BC-100).
         if nickname is not None:
             user.nickname = nickname
-        if bio is not None:
+        if bio is not UNSET:
             user.bio = bio
-        if cover_image_url is not None:
+        if cover_image_url is not UNSET:
             user.cover_image_url = cover_image_url
-        if theme is not None:
+        if theme is not UNSET:
             user.theme = theme
-        if featured_book_id is not None:
+        if featured_book_id is not UNSET:
             user.featured_book_id = featured_book_id
-        if featured_quote is not None:
+        if featured_quote is not UNSET:
             user.featured_quote = featured_quote
         try:
             await self._session.flush()

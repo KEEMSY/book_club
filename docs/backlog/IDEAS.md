@@ -288,7 +288,7 @@
 ### 2026-08-08 (BC-77 프로필 개선 에픽 마감 시 발견)
 
 - [x] (community/profile) **'내 활동' 요약 집계기가 community 도메인 종속** — BC-80의 `GET /community/me/activity`가 community 도메인 하위라 `FeatureFlags.community=false`(현재)면 프로필 '내 활동' 요약 섹션이 미노출. 개별 목록(리뷰/하이라이트/발제문/읽는중)은 community 밖이라 정상. 활동 집계기를 community 밖(예: me/auth 또는 별도 activity 표면)으로 이설할지 검토 — 맥락: BC-83 내 활동 탭 / BC-77 마감 (2026-08-08) — BC-90로 이설 완료: `GET /me/activity`(community 게이팅 밖, 항상 마운트) (PR #58)
-- [ ] (profile) 프로필 표현력 4필드(cover_image_url·theme·featured_book_id·featured_quote)를 **NULL로 되돌릴 수 없음** — PATCH /me가 None을 "미변경"으로 처리(기존 bio와 동일 한계). "제거" 지원하려면 명시적 클리어 시맨틱(sentinel/전용 필드) 필요 — 맥락: BC-81/BC-84 (2026-08-08)
+- [x] (profile) 프로필 표현력 4필드(cover_image_url·theme·featured_book_id·featured_quote)를 **NULL로 되돌릴 수 없음** — PATCH /me가 None을 "미변경"으로 처리(기존 bio와 동일 한계). "제거" 지원하려면 명시적 클리어 시맨틱(sentinel/전용 필드) 필요 — 맥락: BC-81/BC-84 (2026-08-08) — 해소: `app/shared/sentinel.py` UNSET + 라우터 `model_fields_set`로 "생략=유지 / 명시적 null=삭제" 3-state, bio 포함. 프론트 편집에 대표책 "제거" 버튼 + 명시적 null 전송 (BC-100, PR 예정)
 - [ ] (profile) 표현력 편집의 "대표 책 선택"이 **서재 내 책만** 대상(전체 카탈로그 검색 아님) — 카탈로그 검색 선택 UX 검토 — 맥락: BC-84 (2026-08-08)
 
 ### 2026-08-18 (BC-93 Apple 로그인 검증·완성 중 발견)

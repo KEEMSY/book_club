@@ -17,6 +17,7 @@ from app.core.security import create_access_token, create_refresh_token
 from app.domains.auth.models import AuthProvider, DevicePlatform, DeviceToken, ProfileTheme, User
 from app.domains.auth.ports import AppleUserProfile, KakaoUserProfile
 from app.domains.auth.service import AuthService
+from app.shared.sentinel import UNSET, UnsetType
 
 
 class FakeUserRepo:
@@ -78,25 +79,25 @@ class FakeUserRepo:
         self,
         user_id: UUID,
         nickname: str | None,
-        bio: str | None,
+        bio: str | None | UnsetType = UNSET,
         *,
-        cover_image_url: str | None = None,
-        theme: ProfileTheme | None = None,
-        featured_book_id: UUID | None = None,
-        featured_quote: str | None = None,
+        cover_image_url: str | None | UnsetType = UNSET,
+        theme: ProfileTheme | None | UnsetType = UNSET,
+        featured_book_id: UUID | None | UnsetType = UNSET,
+        featured_quote: str | None | UnsetType = UNSET,
     ) -> User:
         user = self.users[user_id]
         if nickname is not None:
             user.nickname = nickname
-        if bio is not None:
+        if bio is not UNSET:
             user.bio = bio
-        if cover_image_url is not None:
+        if cover_image_url is not UNSET:
             user.cover_image_url = cover_image_url
-        if theme is not None:
+        if theme is not UNSET:
             user.theme = theme
-        if featured_book_id is not None:
+        if featured_book_id is not UNSET:
             user.featured_book_id = featured_book_id
-        if featured_quote is not None:
+        if featured_quote is not UNSET:
             user.featured_quote = featured_quote
         return user
 
@@ -424,3 +425,80 @@ async def test_update_profile_partial_update_leaves_other_fields_unchanged() -> 
     assert updated.nickname == "새닉네임"
     # cover_image_url was omitted (None) on the second call, so it survives.
     assert updated.cover_image_url == "https://cdn.example.com/first.jpg"
+
+
+# --- BC-100: explicit null clears, omitted field stays unchanged ---
+
+
+@pytest.mark.asyncio
+async def test_update_profile_explicit_none_clears_expressiveness_fields() -> None:
+    book_id = uuid4()
+    service, _users, _ = _build_service(known_book_ids={book_id})
+    login = await service.login_with_kakao(access_token="kakao-at")
+    await service.update_profile(
+        user_id=login.user.id,
+        nickname=None,
+        bio="원래 소개",
+        cover_image_url="https://cdn.example.com/cover.jpg",
+        theme=ProfileTheme.SUNSET,
+        featured_book_id=book_id,
+        featured_quote="원래 인용구",
+    )
+
+    cleared = await service.update_profile(
+        user_id=login.user.id,
+        nickname=None,
+        bio=None,
+        cover_image_url=None,
+        theme=None,
+        featured_book_id=None,
+        featured_quote=None,
+    )
+
+    assert cleared.bio is None
+    assert cleared.cover_image_url is None
+    assert cleared.theme is None
+    assert cleared.featured_book_id is None
+    assert cleared.featured_quote is None
+
+
+@pytest.mark.asyncio
+async def test_update_profile_omitted_fields_are_unchanged() -> None:
+    book_id = uuid4()
+    service, _users, _ = _build_service(known_book_ids={book_id})
+    login = await service.login_with_kakao(access_token="kakao-at")
+    await service.update_profile(
+        user_id=login.user.id,
+        nickname=None,
+        bio="유지될 소개",
+        cover_image_url="https://cdn.example.com/keep.jpg",
+        theme=ProfileTheme.SUNSET,
+        featured_book_id=book_id,
+        featured_quote="유지될 인용구",
+    )
+
+    # Every expressiveness field omitted (UNSET) → all intact; only nickname changes.
+    updated = await service.update_profile(user_id=login.user.id, nickname="닉만변경")
+
+    assert updated.nickname == "닉만변경"
+    assert updated.bio == "유지될 소개"
+    assert updated.cover_image_url == "https://cdn.example.com/keep.jpg"
+    assert updated.theme is ProfileTheme.SUNSET
+    assert updated.featured_book_id == book_id
+    assert updated.featured_quote == "유지될 인용구"
+
+
+@pytest.mark.asyncio
+async def test_update_profile_clearing_featured_book_skips_existence_check() -> None:
+    # Clearing (None) must not run the book-existence check — a user whose
+    # featured book was later removed must still be able to clear the dangling id.
+    service, _users, _ = _build_service(known_book_ids=set())
+    login = await service.login_with_kakao(access_token="kakao-at")
+
+    cleared = await service.update_profile(
+        user_id=login.user.id,
+        nickname=None,
+        featured_book_id=None,
+    )
+
+    assert cleared.featured_book_id is None

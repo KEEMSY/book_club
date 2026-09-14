@@ -39,6 +39,7 @@ from app.domains.auth.ports import (
     KakaoOAuthPort,
     UserRepositoryPort,
 )
+from app.shared.sentinel import UNSET, UnsetType
 
 _APPLE_FALLBACK_NICKNAME = "애플회원"
 
@@ -222,16 +223,21 @@ class AuthService:
         *,
         user_id: UUID,
         nickname: str | None,
-        bio: str | None,
-        cover_image_url: str | None = None,
-        theme: ProfileTheme | None = None,
-        featured_book_id: UUID | None = None,
-        featured_quote: str | None = None,
+        bio: str | None | UnsetType = UNSET,
+        cover_image_url: str | None | UnsetType = UNSET,
+        theme: ProfileTheme | None | UnsetType = UNSET,
+        featured_book_id: UUID | None | UnsetType = UNSET,
+        featured_quote: str | None | UnsetType = UNSET,
     ) -> User:
         # A book must exist to be featured — a stale/typo'd id would render
         # nothing sensible on the profile screen. Validated here (not at the
-        # 422 boundary) because it's a business rule, not a shape check.
-        if featured_book_id is not None and not await self.featured_books.exists(featured_book_id):
+        # 422 boundary) because it's a business rule, not a shape check. Skipped
+        # when the field is omitted (UNSET) or explicitly cleared (None).
+        if (
+            featured_book_id is not UNSET
+            and featured_book_id is not None
+            and not await self.featured_books.exists(featured_book_id)
+        ):
             raise NotFoundError("book not found", code="BOOK_NOT_FOUND")
         return await self.users.update_profile(
             user_id,
