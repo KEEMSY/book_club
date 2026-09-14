@@ -273,7 +273,7 @@
 
 ### 2026-06-24 (Phase 16 M73 Flutter Web 진행 중 발견)
 
-- [ ] (mobile) `dart:io` 직접 import 7개 파일 웹 호환 처리 — `flutter build web` 컴파일 차단 블로커. `dart:io`는 웹에서 미지원이라 조건부 import(`dart.library.io` / `dart.library.html`) 또는 `kIsWeb` 분기 + 플랫폼 추상화 필요. 대상: `core/network/dio_provider.dart`, `reading/application/timer_lifecycle.dart`, `reading/application/timer_notifier.dart`, `auth/data/apple_login_adapter.dart`, `auth/application/auth_notifier.dart`, `auth/presentation/login_screen.dart`, `auth/data/kakao_login_adapter.dart` — 맥락: M73 웹 빌드 파이프라인 구축 (2026-06-24)
+- [x] (mobile) `dart:io` 직접 import 7개 파일 웹 호환 처리 — `flutter build web` 컴파일 차단 블로커. `dart:io`는 웹에서 미지원이라 조건부 import(`dart.library.io` / `dart.library.html`) 또는 `kIsWeb` 분기 + 플랫폼 추상화 필요. 대상: `core/network/dio_provider.dart`, `reading/application/timer_lifecycle.dart`, `reading/application/timer_notifier.dart`, `auth/data/apple_login_adapter.dart`, `auth/application/auth_notifier.dart`, `auth/presentation/login_screen.dart`, `auth/data/kakao_login_adapter.dart` — 맥락: M73 웹 빌드 파이프라인 구축 (2026-06-24) — `dart:io` → `defaultTargetPlatform` 교체로 해소, `mobile/lib` 직접 import 0건·웹 빌드/dev 서버 정상 (commit ffb5127, 정합성 정리 BC-99)
 
 ### 2026-08-06 (BC-42 발제문 모임 에픽 마감 시 발견)
 
