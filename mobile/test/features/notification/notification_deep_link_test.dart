@@ -18,20 +18,10 @@ void main() {
     );
   }
 
-  group('BC-52 club-session notification deep links', () {
-    test('session_opened pushes to the session detail route', () {
-      final target = notificationDeepLink(
-        buildDto(
-          ntype: 'session_opened',
-          data: const {'club_id': 'club-1', 'session_id': 'session-1'},
-        ),
-      );
-
-      expect(target, isNotNull);
-      expect(target!.path, AppRoutes.sessionDetail('club-1', 'session-1'));
-      expect(target.useGo, isFalse);
-    });
-
+  group('BC-48 club-session notification deep links', () {
+    // session_opened is intentionally NOT routed: the backend NotificationType
+    // enum never emits it, so it falls through to the no-destination default
+    // (BC-101). The unknown-ntype test below covers that fallthrough.
     test('agenda_published pushes to the session detail route', () {
       final target = notificationDeepLink(
         buildDto(
@@ -64,10 +54,29 @@ void main() {
     });
 
     test('returns null when club_id or session_id is missing', () {
-      expect(notificationDeepLink(buildDto(ntype: 'session_opened')), isNull);
       expect(
         notificationDeepLink(
           buildDto(ntype: 'agenda_published', data: const {'club_id': 'c1'}),
+        ),
+        isNull,
+      );
+      expect(
+        notificationDeepLink(
+          buildDto(
+              ntype: 'discussion_commented', data: const {'club_id': 'c1'}),
+        ),
+        isNull,
+      );
+    });
+
+    test('session_opened is not a notification type — resolves to nothing', () {
+      // Feed-only event (see feed_event_card); never reaches the inbox (BC-101).
+      expect(
+        notificationDeepLink(
+          buildDto(
+            ntype: 'session_opened',
+            data: const {'club_id': 'club-1', 'session_id': 'session-1'},
+          ),
         ),
         isNull,
       );
