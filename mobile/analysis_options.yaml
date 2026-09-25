@@ -1,8 +1,13 @@
 include: package:flutter_lints/flutter.yaml
 
 analyzer:
-  plugins:
-    - custom_lint
+  # custom_lint (riverpod_lint) is intentionally NOT wired as an analyzer plugin
+  # here: as an analyzer-server plugin it makes `flutter analyze` non-deterministic
+  # — it surfaces a flaky subset of its INFO advisories and fails the CI gate at
+  # random (BC-102). The packages stay as dev_dependencies, so custom_lint can be
+  # run deliberately via `dart run custom_lint`. Re-introducing it as a dedicated,
+  # non-flaky CI step (after clearing the existing INFO backlog) is tracked as a
+  # follow-up.
   exclude:
     - "**/*.g.dart"
     - "**/*.freezed.dart"
