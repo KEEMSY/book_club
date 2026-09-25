@@ -59,15 +59,11 @@ NotificationDeepLink? notificationDeepLink(NotificationDto dto) {
       if (clubId != null) {
         return (path: AppRoutes.clubDetail(clubId), useGo: false);
       }
-    // BC-52 — club session/agenda/discussion events. These ntype strings
-    // are provisional: BC-48 (backend notification integration) hasn't
-    // landed yet, so they're chosen to match the feed event types BC-47
-    // already shipped (`session_opened`/`agenda_published`/
-    // `discussion_commented` in `feed/models.py`'s `FeedEventType`), which
-    // follow the same lowercase-snake convention as the existing
-    // `club_joined`/`club_chat` ntypes above. Confirm/adjust once BC-48
-    // lands with its actual `ntype` values.
-    case 'session_opened' || 'agenda_published' || 'discussion_commented':
+    // BC-48 club-session notifications. The backend `NotificationType` enum
+    // only emits `agenda_published`/`discussion_commented`; there is no
+    // `session_opened` notification (the feed-only `SESSION_OPENED` event is a
+    // separate surface handled by `feed_event_card`), so it is not routed here.
+    case 'agenda_published' || 'discussion_commented':
       final clubId = dto.data['club_id'];
       final sessionId = dto.data['session_id'];
       if (clubId != null && sessionId != null) {
@@ -413,8 +409,8 @@ class _NtypeIcon extends StatelessWidget {
       'challenge_reminder' => ('⏰', const Color(0xFFFFF3E0)),
       // Club activity
       'club_joined' || 'club_invite' => ('📚', const Color(0xFFE8F5E9)),
-      // BC-52 — club session/agenda/discussion events.
-      'session_opened' => ('🗓️', const Color(0xFFE8F5E9)),
+      // BC-48 — club agenda/discussion notifications (no session_opened; that
+      // event lives only in the feed, not the notification inbox).
       'agenda_published' => ('✍️', const Color(0xFFFFF3E0)),
       'discussion_commented' => ('💬', const Color(0xFFE3F2FD)),
       _ => ('🔔', theme.colorScheme.surfaceContainer),
